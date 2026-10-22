@@ -1,4 +1,4 @@
-"""Validate the frozen S1 model-scale comparison in transient FreeCAD solids.
+"""Validate finite S1 and L1 model comparisons in transient FreeCAD solids.
 
 Fresh named boundaries come from the projected analytical result. Full-size
 canonical inputs remain unchanged. This path has no document, persistence,
@@ -34,6 +34,7 @@ from tracktemplate.adapters.freecad.chair_seat_exact import (
     construct_chair_seat_shape,
 )
 from tracktemplate.application.chair_model_research import (
+    prepare_chair_l1_model_research,
     prepare_chair_model_research,
 )
 from tracktemplate.domain.chair_assembly import CHAIR_ASSEMBLY_ROLES
@@ -48,15 +49,24 @@ def _require(condition, code, message):
         raise ChairModelExactGeometryError(code, message)
 
 
-def _construct_components(model):
+def _construct_components(model, *, l1=False):
     """Build fresh model boundaries after complete input validation."""
     builders = (
         construct_chair_base_shape, construct_chair_seat_shape,
         construct_chair_key_shape, construct_chair_outer_jaw_shape,
         construct_chair_inner_jaw_shape,
     )
-    return tuple(builder(component.geometry)
-                 for builder, component in zip(builders, model.components))
+    shapes = []
+    for role, builder, component in zip(
+        CHAIR_ASSEMBLY_ROLES, builders, model.components,
+    ):
+        if l1 and role == "outer-jaw":
+            shapes.append(Part.makeCompound([
+                builder(geometry) for _name, geometry in component.geometry.parts
+            ]))
+        else:
+            shapes.append(builder(component.geometry))
+    return tuple(shapes)
 
 
 def validate_chair_model_exact_geometry(package, manifest_text, request):
@@ -69,20 +79,48 @@ def validate_chair_model_exact_geometry(package, manifest_text, request):
     contain neutral measurements only. No first construction is retained.
     """
     model = prepare_chair_model_research(package, manifest_text, request)
+    return _validate_model(
+        model, "tracktemplate.chair-model-scale-exact-research.v1",
+    )
+
+
+def validate_chair_l1_model_exact_geometry(package, manifest_text, request):
+    """Measure seven L1 model solids grouped in five named components.
+
+    Revalidate the original full-size package and explicit model request
+    before host construction. Keep all three outer-jaw parts separate.
+    Return neutral measurements without document or file mutation, fit,
+    package, source-scale fidelity or production acceptance.
+    """
+    model = prepare_chair_l1_model_research(package, manifest_text, request)
+    return _validate_model(
+        model, "tracktemplate.chair-l1-model-scale-exact-research.v1", l1=True,
+    )
+
+
+def _validate_model(model, contract_id, *, l1=False):
+    """Apply existing numerical guards after finite family preparation."""
+    package = model.package
     try:
-        shapes = _construct_components(model)
+        shapes = (_construct_components(model, l1=True) if l1
+                  else _construct_components(model))
         _require(len(shapes) == 5, "assembly-component-count", "expected five")
         components = [
-            _measure_component(shape, component, role)
+            _measure_component(
+                shape, component, role, l1_outer=l1 and role == "outer-jaw",
+            )
             for shape, component, role in zip(
                 shapes, model.components, CHAIR_ASSEMBLY_ROLES,
             )
         ]
         compound = Part.makeCompound(shapes)
+        solid_count = 7 if l1 else 5
         _require(
             not compound.isNull() and compound.ShapeType == "Compound"
-            and compound.isValid() and len(compound.Solids) == 5,
-            "invalid-assembly-compound", "expected five valid named solids",
+            and compound.isValid() and len(compound.Solids) == solid_count,
+            "invalid-assembly-compound",
+            ("expected seven solids in five named components" if l1
+             else "expected five valid named solids"),
         )
         children = compound.childShapes()
         _require(
@@ -110,7 +148,7 @@ def validate_chair_model_exact_geometry(package, manifest_text, request):
         contacts = _measure_contacts(shapes, model.components)
         scale_request = json.loads(model.request_json)
         return {
-            "contract_id": "tracktemplate.chair-model-scale-exact-research.v1",
+            "contract_id": contract_id,
             "package_signature": package.content_signature,
             "manifest_signature": model.manifest_signature,
             "request_signature": model.request_signature,
@@ -125,7 +163,8 @@ def validate_chair_model_exact_geometry(package, manifest_text, request):
             "scale_denominator": scale_request["scale_denominator"],
             "placement": "same-chair-origin-and-axes-central-key",
             "manufacturing_compensation_applied": False,
-            "shape_type": "Compound", "component_count": 5, "solid_count": 5,
+            "shape_type": "Compound", "component_count": 5,
+            "solid_count": solid_count,
             "valid": True, "fused": False, "bounds_mm": bounds,
             "component_volume_sum_mm3": volume_sum,
             "maximum_bounds_residual_mm": residual,

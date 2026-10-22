@@ -16,6 +16,7 @@ from tracktemplate.application.chair_research import (
     ChairAssemblyResearchResult,
     ChairResearchError,
     prepare_chair_assembly_research,
+    prepare_chair_l1_assembly_research,
     prepare_chair_s1j_assembly_research,
 )
 from tracktemplate.domain.chair_model_scale import (
@@ -131,6 +132,19 @@ def prepare_chair_s1j_model_research(package, manifest_text, request):
     """
     return _prepare_chair_model_research(
         package, manifest_text, request, prepare_chair_s1j_assembly_research,
+    )
+
+
+def prepare_chair_l1_model_research(package, manifest_text, request):
+    """Project the finite L1 assembly with its three outer-jaw parts.
+
+    The unchanged full-size preparation validates the original package
+    and source marks. The explicit 4 mm/ft request applies only to the
+    derived model boundary; it does not change the source-mark encoding.
+    Package, document, file and acceptance state remain unchanged.
+    """
+    return _prepare_chair_model_research(
+        package, manifest_text, request, prepare_chair_l1_assembly_research,
     )
 
 
