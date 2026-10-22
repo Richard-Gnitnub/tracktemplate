@@ -1846,11 +1846,11 @@ This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
 
-## L1 chair display through B16 — 2026-10-22
+## L1 chair display for B16 — 2026-10-22
 
 This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
 
-The [software](../../tracktemplate/compatibility/transition_workflow.py) now supplies `preview_l1_reference_chair` for B16.
+The [software](../../tracktemplate/compatibility/transition_workflow.py) supplies `preview_l1_reference_chair` for B16.
 It makes a new `App.Document` with `FileName = ""` for the previous L1 result.
 The five chair components contain seven `Solid` shapes.
 A person can select each chair component and change its `Visibility` value.
