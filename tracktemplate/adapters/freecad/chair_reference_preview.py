@@ -1,8 +1,8 @@
-"""Materialise one private S1 or S1J preview in an isolated document.
+"""Materialise private chair reference previews in isolated documents.
 
-Five validated model components remain separate, centrally keyed and
-reference-only. The seven display layers have no production/export tags,
-live source binding, stored schema or automatic regeneration behaviour.
+Validated model components remain separate, centrally keyed and
+reference-only. Display layers have no production/export tags, live source
+binding, stored schema or automatic regeneration behaviour.
 """
 
 from copy import deepcopy
@@ -27,6 +27,9 @@ from tracktemplate.adapters.freecad.chair_inner_jaw_exact import (
 from tracktemplate.adapters.freecad.chair_key_exact import (
     construct_chair_key_shape,
 )
+from tracktemplate.adapters.freecad.chair_model_exact import (
+    _construct_components,
+)
 from tracktemplate.adapters.freecad.chair_outer_jaw_exact import (
     construct_chair_outer_jaw_shape,
 )
@@ -44,6 +47,7 @@ from tracktemplate.adapters.freecad.core_export_document import (
     _selection_snapshot,
 )
 from tracktemplate.application.chair_model_research import (
+    prepare_chair_l1_model_research,
     prepare_chair_model_research,
     prepare_chair_s1j_model_research,
 )
@@ -421,6 +425,71 @@ def _materialise_preview(
         if interruption is not None:
             error.add_note(f"{family} preview cleanup was interrupted.")
         raise
+
+
+def create_l1_reference_preview(package, manifest_text, model_request):
+    """Inspect one private L1 model at its canonical origin and axes.
+
+    Validate original inputs before creating five named component layers
+    in one undoable transaction. The outer jaw retains three separate
+    solids. Reuse the shared isolated-document lifecycle and return neutral
+    measurements only. No track placement, fit or production claim follows.
+    """
+    model = prepare_chair_l1_model_research(
+        package, manifest_text, model_request,
+    )
+    layer_specs = tuple(("L1" + name[2:], role, colour)
+                        for name, role, colour in _LAYERS[2:])
+
+    def measure_components(shapes):
+        _require(len(shapes) == len(model.components) == 5,
+                 "L1 requires five semantic components")
+        _require(tuple(c.role for c in model.components)
+                 == CHAIR_ASSEMBLY_ROLES, "L1 component order changed")
+        return [
+            _measure_component(
+                shape, component, component.role,
+                l1_outer=component.role == "outer-jaw",
+            ) for shape, component in zip(shapes, model.components)
+        ]
+
+    def prepare_layers():
+        layers = _construct_components(model, l1=True)
+        components = measure_components(layers)
+        result = {
+            "contract_id": "tracktemplate.private-l1-reference-preview.v1",
+            "package_signature": model.package.content_signature,
+            "manifest_signature": model.manifest_signature,
+            "request_signature": model.request_signature,
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "key_placement": "central-reference-only",
+            "length_unit": "mm", "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "same-chair-origin-and-axes-central-key",
+            "component_count": 5, "solid_count": 7, "layer_count": 5,
+            "components": components,
+            "layers": [dict(_measure_layer(shape), name=spec[0], role=spec[1])
+                       for spec, shape in zip(layer_specs, layers)],
+            "limits": [
+                "Private reference; no production or export authority.",
+                "Central key; no directional-key or physical-fit acceptance.",
+                "Snapshot only; no live invalidation or persistence contract.",
+                "Model origin only; no track placement or source-scale claim.",
+            ],
+        }
+        return layers, result, measure_components
+
+    def verify_inputs():
+        _require(prepare_chair_l1_model_research(
+            package, manifest_text, model_request,
+        ) == model, "L1 inputs changed during preview creation")
+
+    return _materialise_preview(
+        "L1", {"coverage_summary": "one model at its origin"},
+        layer_specs, prepare_layers, verify_inputs,
+    )
 
 
 def create_s1_reference_preview(
