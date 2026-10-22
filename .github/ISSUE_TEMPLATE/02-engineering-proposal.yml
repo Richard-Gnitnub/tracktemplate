@@ -1,0 +1,59 @@
+name: Engineering proposal
+description: Suggest a capability, improvement, engineering requirement or research task.
+title: "[Proposal] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the engineering need and desired result. This issue records a proposal; implementation and acceptance remain subject to TrackTemplate's existing workflow.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What are you proposing?
+      placeholder: Give a short description of the proposal.
+    validations:
+      required: true
+  - type: textarea
+    id: problem-opportunity
+    attributes:
+      label: Problem or opportunity
+      description: Why is this needed? What limitation or opportunity does it address?
+    validations:
+      required: true
+  - type: textarea
+    id: desired-outcome
+    attributes:
+      label: Desired outcome
+      description: What should TrackTemplate be able to do or establish?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and references
+      description: Link relevant drawings, standards, examples, measurements, issues or other sources. Distinguish verified facts from open questions.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How could the result be checked or demonstrated? Use research questions for exploratory proposals.
+    validations:
+      required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and exclusions
+      description: What is included, and what is deliberately outside this proposal?
+    validations:
+      required: false
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and related work
+      description: Link relevant requirements, issues, decisions or later programme work. Leave blank if unknown.
+    validations:
+      required: false

@@ -1,0 +1,63 @@
+name: Defect report
+description: Report incorrect behaviour, a failed operation or a regression in TrackTemplate.
+title: "[Defect] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem and include evidence where available. An issue records a finding; it does not authorise a change to accepted requirements.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is wrong?
+      placeholder: Give a short description of the defect.
+    validations:
+      required: true
+  - type: textarea
+    id: observed-behaviour
+    attributes:
+      label: Observed behaviour
+      description: What happened? Include any relevant error or unexpected result.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behaviour
+      description: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the inputs and steps if you know them.
+      placeholder: |
+        1. Open or create ...
+        2. Select or run ...
+        3. Observe ...
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and environment
+      description: Add relevant logs, screenshots, files, FreeCAD or TrackTemplate versions, and source references. Do not include credentials or private information.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What observable check would confirm that the defect is resolved?
+    validations:
+      required: false
+  - type: textarea
+    id: scope-dependencies
+    attributes:
+      label: Scope, exclusions and dependencies
+      description: Add known boundaries and links to related issues or decisions. Leave blank if unknown.
+    validations:
+      required: false
