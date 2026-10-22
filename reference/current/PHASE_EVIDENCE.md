@@ -1845,3 +1845,33 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## L1 chair display through B16 — 2026-10-22
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/transition_workflow.py) now supplies `preview_l1_reference_chair` for B16.
+It makes a new `App.Document` with `FileName = ""` for the previous L1 result.
+The five chair components contain seven `Solid` shapes.
+A person can select each chair component and change its `Visibility` value.
+For the C10 test input, all 59 S1/S1J chair positions stay the same.
+This change adds no chairs at the other 109 positions.
+
+The [test with standalone Python](../../tests/validate_phase9b_l1_reference_preview.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_l1_reference_preview.py) gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
+The FreeCAD test gives PASS results for `Undo`, `Redo` and `transaction_rollback`.
+The source data and each previous `App.Document` stay the same.
+The results stay in `tmp/l1-reference-preview/standalone-01.log`, `native-04/` and `gui-02/`.
+
+The independent review gives a PASS result for the source and tests.
+The result stays in `tmp/l1-reference-preview/quality-review-03.json`.
+The reviewer examined `gui-02/overview.png` and `gui-02/chair-closeup.png`.
+
+All previous FAIL results and quality reviews with BLOCKED results stay available.
+The [previous L1 limitations](#l1-chair-at-4-mmft--2026-10-22) and the S1/S1J limitations do not change.
+The previous S1 `native-04` limitation does not change.
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

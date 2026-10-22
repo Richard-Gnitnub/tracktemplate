@@ -2574,6 +2574,7 @@ class ModularCoreLayoutWorkflowSession:
         s1_reference_preview_factory=None,
         s1j_reference_preview_factory=None,
         s1_s1j_reference_preview_factory=None,
+        l1_reference_preview_factory=None,
     ):
         staged = staged or atomic
         if staged and not callable(export_files_factory):
@@ -2593,6 +2594,7 @@ class ModularCoreLayoutWorkflowSession:
         self._s1_reference_preview_factory = s1_reference_preview_factory
         self._s1j_reference_preview_factory = s1j_reference_preview_factory
         self._s1_s1j_reference_preview_factory = s1_s1j_reference_preview_factory
+        self._l1_reference_preview_factory = l1_reference_preview_factory
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
             else CORE_LAYOUT_EXPORT_HOST_OPERATIONS
@@ -2862,6 +2864,17 @@ class ModularCoreLayoutWorkflowSession:
             self._s1_s1j_reference_preview_factory,
         )
 
+    def preview_l1_reference_chair(self, package, manifest_text, model_request):
+        """Inspect one private L1 model at its origin in a new document."""
+        self.routing_record()
+        if not callable(self._l1_reference_preview_factory):
+            raise TransitionWorkflowError(
+                "The private L1 reference preview adapter is unavailable."
+            )
+        return self._l1_reference_preview_factory(
+            package, manifest_text, model_request,
+        )
+
     def launch_workflow(self):
         """Launch after restoring and checking both selected route groups."""
         self._bind_core_layout_export()
@@ -2882,6 +2895,7 @@ def load_modular_transition_workflow_session(
     s1_reference_preview_factory=None,
     s1j_reference_preview_factory=None,
     s1_s1j_reference_preview_factory=None,
+    l1_reference_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2940,4 +2954,5 @@ def load_modular_transition_workflow_session(
         s1_reference_preview_factory=s1_reference_preview_factory,
         s1j_reference_preview_factory=s1j_reference_preview_factory,
         s1_s1j_reference_preview_factory=s1_s1j_reference_preview_factory,
+        l1_reference_preview_factory=l1_reference_preview_factory,
     )
