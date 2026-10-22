@@ -1819,15 +1819,15 @@ The `outer-jaw` component keeps three parts: `body`, `bevel-negative` and `bevel
 Each part is a `Solid`.
 
 The source input keeps its `source_mark_quantum_mm` value for `8 mm/ft`.
-This result does not prove that the shapes agree with Templot output at `4 mm/ft`.
+This result does not give sufficient evidence that the shapes agree with Templot output at `4 mm/ft`.
 For the C10 test input, the previous S1 and S1J results and all 59 chair positions do not change.
 This change adds no chairs at the other 109 positions.
 
 The [test with standalone Python](../../tests/validate_phase9b_chair_l1_model.py) gives a PASS result.
-The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_l1_model.py) gives PASS results on the qualified host profile and with the FreeCAD window open.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_l1_model.py) gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
 The tests calculate values from the previous L1 result.
 They compare these values with the new result.
-The tests also compare source data and the document condition before and after execution.
+The tests also compare source data and the condition of the `App.Document` before and after they operate.
 The results stay in `tmp/l1-model-scale/standalone-l1-model-02.json`, `native-02/` and `gui-02/`.
 
 The independent review gives a PASS result for the source and tests.
@@ -1835,8 +1835,8 @@ The result stays in `tmp/l1-model-scale/quality-review-02.json`.
 The reviewer examined `gui-02/overview.png` and `gui-02/chair-closeup.png`.
 
 The previous limitations for the `4 mm/ft` and `6 mm/ft` source inputs do not change.
-The previous FreeCAD `common_edge_count = 0` result for the `outer-jaw` parts stays a limitation.
-All previous FAIL results and the initial BLOCKED review stay available.
+The previous `common_edge_count = 0` result from FreeCAD for the `outer-jaw` parts stays a limitation.
+All previous FAIL results and the initial quality review with a BLOCKED result stay available.
 The limitations of the previous L1, S1 and S1J evidence, with the `native-04` limitation, do not change.
 
 The conditions in D-P9-018 stay the same.
