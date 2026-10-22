@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 
 from tracktemplate.domain.chair_assembly import ChairAssemblyGeometry
+from tracktemplate.domain.chair_l1 import ChairL1OuterJawGeometry
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,13 @@ class ChairModelComponentGeometry:
     bounds_mm: tuple
     volume_mm3: object
     landmarks: tuple
+
+
+@dataclass(frozen=True)
+class ChairModelMultipartComponentGeometry(ChairModelComponentGeometry):
+    """The L1 outer boundary with its three separate named model parts."""
+
+    parts: tuple
 
 
 @dataclass(frozen=True)
@@ -38,6 +46,23 @@ def _project_landmarks(landmarks, factor):
         (name, tuple(coordinate * factor for coordinate in point))
         for name, point in landmarks
     )
+
+
+def _project_boundary(geometry, factor, *, parts=None):
+    """Scale one boundary, retaining explicit L1 part grouping if given."""
+    values = {
+        "vertices": tuple(
+            (name, x * factor, y * factor, z * factor)
+            for name, x, y, z in geometry.vertices
+        ),
+        "faces": geometry.faces,
+        "bounds_mm": tuple(value * factor for value in geometry.bounds_mm),
+        "volume_mm3": geometry.volume_mm3 * factor ** 3,
+        "landmarks": _project_landmarks(geometry.landmarks, factor),
+    }
+    if parts is not None:
+        return ChairModelMultipartComponentGeometry(**values, parts=parts)
+    return ChairModelComponentGeometry(**values)
 
 
 def project_chair_assembly_to_model(full_size_geometry, scale_denominator):
@@ -58,15 +83,12 @@ def project_chair_assembly_to_model(full_size_geometry, scale_denominator):
     factor = 1 / scale_denominator
     volume_factor = factor ** 3
     components = tuple(
-        (role, ChairModelComponentGeometry(
-            vertices=tuple(
-                (name, x * factor, y * factor, z * factor)
-                for name, x, y, z in geometry.vertices
-            ),
-            faces=geometry.faces,
-            bounds_mm=tuple(value * factor for value in geometry.bounds_mm),
-            volume_mm3=geometry.volume_mm3 * volume_factor,
-            landmarks=_project_landmarks(geometry.landmarks, factor),
+        (role, _project_boundary(
+            geometry, factor,
+            parts=(tuple(
+                (name, _project_boundary(part, factor))
+                for name, part in geometry.parts
+            ) if isinstance(geometry, ChairL1OuterJawGeometry) else None),
         ))
         for role, geometry in full_size_geometry.components
     )
