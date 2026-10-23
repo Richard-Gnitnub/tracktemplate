@@ -2062,11 +2062,11 @@ The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_s1j_placement.
 It gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
 The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and the changes to source data and shapes that the software rejects.
 The source files and each previous `App.Document` stay the same.
-The results and images stay in `tmp/catalogue-s1j-placement/`, with `native-repair-01/` and `gui-01/`.
+The results and files that show the FreeCAD display stay in `tmp/catalogue-s1j-placement/`, with `native-repair-01/` and `gui-01/`.
 
 One `test-or-oracle-defect` repair changes only the new FreeCAD test.
-The test keeps four previous positions and calculates only the position that the previous plan rejects.
-The review of the source and tests gives a PASS result. The reviewer did this review independently and did not write this change.
+The test keeps four previous `S1J` positions. It calculates only the `S1J` position in `plan["analytical_only"]`.
+The reviewer examined the source and tests independently and gave a PASS result. The reviewer did not write this change.
 The result stays in `tmp/catalogue-s1j-placement/quality-review-01.json`.
 
 The new result contains data for all 168 source positions: five have these `S1J` chair components, and 163 do not.
