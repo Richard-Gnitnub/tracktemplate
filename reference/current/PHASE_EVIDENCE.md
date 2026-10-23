@@ -1976,13 +1976,13 @@ This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions 
 The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_p_chairs` for B16.
 For `TO-001`, it shows 22 chair components at each of 14 `P` positions.
 These positions have `chair_code = 2` and `assignment_status = CHAIR_ASSIGNMENT_CONFIRMED`.
-Their `prototype_timber_identifier` values are `S1` through `S7`, with `rail_role = "stock rail"`.
+Their `prototype_timber_identifier` data are `S1`, `S2`, `S3`, `S4`, `S5`, `S6` and `S7`, with `rail_role = "stock rail"`.
 
 The software uses the previous `P` shapes from `basic-04`.
 It does not calculate new chair shapes or change their dimensions.
 The software does not show the `display_rail` source component as a chair component.
-The input conditions are C10 at 1:76.2, `track_gauge` of 16.5 mm, `flangeway` of 1 mm and the complete `Templot556b-CL-EMGS-S4Soc-Code75-revA` data.
-The `key_direction_sign` stays `0`. The `key_orientation` stays unresolved.
+The input conditions are C10 at 1:76.2, `track_gauge` of 16.5 mm, `flangeway` of 1 mm and the full `Templot556b-CL-EMGS-S4Soc-Code75-revA` data.
+The `key_direction_sign` stays `0`. The `key_orientation` stays `"requires a configurable key-direction policy"`.
 
 The [test with standalone Python](../../tests/validate_phase9b_catalogue_p_placement.py) gives a PASS result.
 The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_p_placement.py) compares all 308 component results with the source file.
@@ -1996,7 +1996,7 @@ The reviewer did not write this change.
 The result stays in `tmp/catalogue-p-placement/quality-review-04.json`.
 
 The new result contains data for all 168 source positions: 14 have `P` chair components, and 154 do not.
-The previous S1/S1J operation keeps its 59 positions and 109 other positions unchanged.
+The previous S1/S1J operation keeps its 59 positions and 109 other positions the same.
 The previous [S1, S1J and L1 limitations](#s1-and-s1j-chairs-on-a-c10-crossover--2026-10-23) do not change.
 All previous FAIL results and review results of BLOCKED stay available.
 The output stays in private-development status.
