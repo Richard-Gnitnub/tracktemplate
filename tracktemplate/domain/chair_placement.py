@@ -147,6 +147,11 @@ class S1JPlacement(S1Placement):
     """A joint-chair family tag on the same proper model-mm frame."""
 
 
+@dataclass(frozen=True)
+class PPlacement(S1Placement):
+    """A retained P reference tag on the same proper model-mm frame."""
+
+
 def prepare_s1_placements(records):
     """Freeze only integer-code-1 records in stable position order."""
     return _prepare_placements(records, 1, S1Placement, "S1")

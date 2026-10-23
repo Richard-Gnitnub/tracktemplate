@@ -626,6 +626,7 @@ def validate_composition_boundary():
     combined_preview_factory = lambda *args: None
     l1_preview_factory = lambda *args: None
     catalogue_preview_factory = lambda *args: None
+    catalogue_p_preview_factory = lambda *args: None
     routing = {"route": "modular"}
     session = types.SimpleNamespace(routing_record=lambda: routing)
 
@@ -642,6 +643,7 @@ def validate_composition_boundary():
             "s1_s1j_reference_preview_factory": combined_preview_factory,
             "l1_reference_preview_factory": l1_preview_factory,
             "private_catalogue_preview_factory": catalogue_preview_factory,
+            "private_catalogue_p_preview_factory": catalogue_p_preview_factory,
         }
         return session
 
@@ -662,6 +664,11 @@ def validate_composition_boundary():
         "tracktemplate.adapters.freecad.chair_catalogue_preview": (
             types.SimpleNamespace(
                 create_private_catalogue_preview=catalogue_preview_factory,
+            )
+        ),
+        "tracktemplate.adapters.freecad.chair_catalogue_placement_preview": (
+            types.SimpleNamespace(
+                create_private_catalogue_p_preview=catalogue_p_preview_factory,
             )
         ),
     }

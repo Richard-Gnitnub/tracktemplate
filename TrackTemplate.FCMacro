@@ -56,6 +56,9 @@ def _load_modular_transition_workflow(
     chair_catalogue = importlib.import_module(
         "tracktemplate.adapters.freecad.chair_catalogue_preview"
     )
+    catalogue_placement = importlib.import_module(
+        "tracktemplate.adapters.freecad.chair_catalogue_placement_preview"
+    )
     transition_contract = bootstrap.load_contract(
         repository_root
         / "reference"
@@ -81,6 +84,9 @@ def _load_modular_transition_workflow(
         l1_reference_preview_factory=chair_preview.create_l1_reference_preview,
         private_catalogue_preview_factory=(
             chair_catalogue.create_private_catalogue_preview
+        ),
+        private_catalogue_p_preview_factory=(
+            catalogue_placement.create_private_catalogue_p_preview
         ),
     )
     return session, session.routing_record()
