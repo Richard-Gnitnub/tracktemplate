@@ -2013,7 +2013,8 @@ This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions 
 The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_p_crossover_chairs` for B16.
 For `XO-001`, it shows 22 chair components at each of 28 `P` positions.
 Each of the two turnouts has 14 of these positions.
-The software requires current `B4` results and checks the turnout identity for each position.
+For the software, `B4` results that agree with the source data are necessary.
+The software examines the turnout identity for each position.
 
 The software uses the previous `P` shapes from `basic-04`.
 It does not calculate new chair shapes or change their dimensions.
