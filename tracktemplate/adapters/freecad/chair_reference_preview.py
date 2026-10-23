@@ -335,6 +335,7 @@ def _create_reference_preview(
 
 def _materialise_preview(
     family, receipt, layer_specs, prepare_layers, verify_source,
+    *, title_suffix="central keys",
 ):
     """Apply one prepared snapshot through the shared document lifecycle."""
     gui = None
@@ -360,7 +361,7 @@ def _materialise_preview(
         document = App.newDocument(
             name, f"Private {family} - " + receipt.get(
                 "coverage_summary", "reference only",
-            ) + " - central keys", False, False,
+            ) + " - " + title_suffix, False, False,
         )
         observed = dict(App.listDocuments())
         if (document is not None and observed.get(name) is document
