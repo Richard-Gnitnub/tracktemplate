@@ -1968,3 +1968,40 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## P chair components at C10 positions — 2026-10-23
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_p_chairs` for B16.
+For `TO-001`, it shows 22 chair components at each of 14 `P` positions.
+These positions have `chair_code = 2` and `assignment_status = CHAIR_ASSIGNMENT_CONFIRMED`.
+Their `prototype_timber_identifier` data are `S1`, `S2`, `S3`, `S4`, `S5`, `S6` and `S7`, with `rail_role = "stock rail"`.
+
+The software uses the previous `P` shapes from `basic-04`.
+It does not calculate new chair shapes or change their dimensions.
+The software does not show the `display_rail` source component as a chair component.
+The input conditions are C10 at 1:76.2, `track_gauge` of 16.5 mm, `flangeway` of 1 mm and the full `Templot556b-CL-EMGS-S4Soc-Code75-revA` data.
+The `key_direction_sign` stays `0`. The `key_orientation` stays `"requires a configurable key-direction policy"`.
+
+The [test with standalone Python](../../tests/validate_phase9b_catalogue_p_placement.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_p_placement.py) compares all 308 component results with the source file.
+It gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
+The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and the changes to source data and shapes that the software rejects.
+The source files and each previous `App.Document` stay the same.
+The results stay in `tmp/catalogue-p-placement/`, with `native-04/` and `gui-03/`.
+
+The independent review of the source and tests gives a PASS result.
+The reviewer did not write this change.
+The result stays in `tmp/catalogue-p-placement/quality-review-04.json`.
+
+The new result contains data for all 168 source positions: 14 have `P` chair components, and 154 do not.
+The previous S1/S1J operation keeps its 59 positions and 109 other positions the same.
+The previous [S1, S1J and L1 limitations](#s1-and-s1j-chairs-on-a-c10-crossover--2026-10-23) do not change.
+All previous FAIL results and review results of BLOCKED stay available.
+The output stays in private-development status.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
