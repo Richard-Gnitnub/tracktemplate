@@ -2043,3 +2043,39 @@ This result gives no acceptance for physical fit, persistence, production, expor
 This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## S1J chair components at C10 positions — 2026-10-23
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_s1j_chairs` for B16.
+For `TO-001`, it shows 17 chair components at each of five previous `S1J` positions.
+The software uses the previous `S1J` shapes from `basic-04`. It does not calculate new chair shapes or change their dimensions.
+It adds no positions and does not show the `display_rail` source component as a chair component.
+
+The [C10 input conditions](#p-chair-components-at-c10-positions--2026-10-23) stay the same.
+The `key_direction_sign` stays `0`.
+The `key_orientation` stays `"towards the adjacent rail joint; exact direction sign requires stored joint chainage"`.
+
+The [test with standalone Python](../../tests/validate_phase9b_catalogue_s1j_placement.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_s1j_placement.py) compares all 85 component results with the source file.
+It gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
+The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and the changes to source data and shapes that the software rejects.
+The source files and each previous `App.Document` stay the same.
+The results and files that show the FreeCAD display stay in `tmp/catalogue-s1j-placement/`, with `native-repair-01/` and `gui-01/`.
+
+One `test-or-oracle-defect` repair changes only the new FreeCAD test.
+The test keeps four previous `S1J` positions. It calculates only the `S1J` position in `plan["analytical_only"]`.
+The reviewer examined the source and tests independently and gave a PASS result. The reviewer did not write this change.
+The result stays in `tmp/catalogue-s1j-placement/quality-review-01.json`.
+
+The new result contains data for all 168 source positions: five have these `S1J` chair components, and 163 do not.
+The previous C10 turnout operations keep their 14/154 and 59/109 results the same.
+The previous [S1, S1J and L1 limitations](#s1-and-s1j-chairs-on-a-c10-crossover--2026-10-23) do not change.
+All previous FAIL results and review results of BLOCKED stay available.
+The output stays in `private-development` status.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
