@@ -1949,7 +1949,7 @@ The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_catalogue.py) comp
 It gives a PASS result with the qualified host profile.
 For `P` and `AB`, the same test gives a PASS result when a person can see the FreeCAD display.
 
-The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and changes to source data and shapes that must be rejected.
+The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and the changes to source data and shapes that the software rejects.
 The source files and each previous `App.Document` stay the same.
 The results stay in `tmp/private-chair-catalogue/`, with `native-03/` and `gui-02/`.
 
