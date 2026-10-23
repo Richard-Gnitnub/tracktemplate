@@ -360,12 +360,12 @@ def _source_state_controls(module, document, run_dir):
             "shape_mutation_rejected": True, "original_unchanged": True}
 
 
-def _state(module, document):
+def _state(module, document, entity_kind="turnout", entity_id="TO-001"):
     """Retain exact decision, editable, native and visible source state."""
     result = {
-        "decisions": continuity._decision_state(module, document, "turnout"),
+        "decisions": continuity._decision_state(module, document, entity_kind),
         "editable": continuity.SIGNATURE._document_state(
-            module, document, "turnout", "TO-001",
+            module, document, entity_kind, entity_id,
         ),
         "filename": document.FileName,
         "undo": document.UndoCount, "redo": document.RedoCount,

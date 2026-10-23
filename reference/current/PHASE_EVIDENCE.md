@@ -1875,3 +1875,35 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## S1 and S1J chairs on a C10 crossover — 2026-10-23
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/transition_workflow.py) supplies `preview_s1_s1j_crossover_reference_chairs` for B16.
+It uses the previous software for chair components and their positions on the C10 crossover.
+The current `b4_result` with `applied = True` is necessary.
+
+For the copied `XO-001` test input, the result contains 123 S1 chairs and 12 S1J chairs.
+The other 220 positions stay without these chair components.
+The software makes a new `App.Document` with `FileName = ""` for the result.
+A person can select each `Part::Feature` and change its `Visibility` value.
+
+The [test with standalone Python](../../tests/validate_phase9b_crossover_reference_preview.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_crossover_reference_preview.py) gives a PASS result with the qualified host profile.
+The same test gives a PASS result when a person can see the FreeCAD display.
+The source data and each previous `App.Document` stay the same.
+The FreeCAD test gives PASS results for `Undo`, `Redo` and `transaction_rollback`.
+The results stay in `tmp/crossover-chair-preview/`, with `native-02/`, `gui-02/` and `turnout-native-02/`.
+
+The independent review of the source gives a PASS result.
+
+The previous turnout result keeps its 59 S1/S1J positions and 109 other positions.
+All previous FAIL results and review results of BLOCKED stay available.
+The previous S1 `native-04` limitation does not change.
+The [previous L1 limitations](#l1-chair-at-4-mmft--2026-10-22) and the S1/S1J limitations do not change.
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

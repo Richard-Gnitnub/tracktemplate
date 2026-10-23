@@ -2864,6 +2864,22 @@ class ModularCoreLayoutWorkflowSession:
             self._s1_s1j_reference_preview_factory,
         )
 
+    def preview_s1_s1j_crossover_reference_chairs(
+        self, source_document, crossover_id, s1_package, s1_manifest_text,
+        s1j_package, s1j_manifest_text, model_request,
+    ):
+        """Inspect private S1/S1J references on a managed C10 crossover."""
+        from tracktemplate.compatibility.chair_reference_preview import (
+            preview_s1_s1j_crossover_reference_chairs,
+        )
+
+        self.routing_record()
+        return preview_s1_s1j_crossover_reference_chairs(
+            self.module, source_document, crossover_id, s1_package,
+            s1_manifest_text, s1j_package, s1j_manifest_text, model_request,
+            self._s1_s1j_reference_preview_factory,
+        )
+
     def preview_l1_reference_chair(self, package, manifest_text, model_request):
         """Inspect one private L1 model at its origin in a new document."""
         self.routing_record()

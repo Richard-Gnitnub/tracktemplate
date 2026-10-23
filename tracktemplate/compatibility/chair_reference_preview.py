@@ -1,4 +1,4 @@
-"""Bind explicit private S1 and S1J previews to current C10 chair analysis.
+"""Bind private S1 and S1J previews to current C10 trackwork analysis.
 
 The inherited host supplies railway decisions and placement context. This
 adapter neither changes them nor substitutes the reference for production
@@ -26,19 +26,25 @@ def _canonical_json(record):
     )
 
 
-def _source_context(module, document, turnout_id, family="S1"):
+def _source_context(
+    module, document, entity_id, family="S1", *, entity_kind="turnout",
+):
     """Read current decisions without using the rounded solid-plan cache."""
+    if entity_kind not in ("turnout", "crossover"):
+        raise ValueError("Unsupported reference preview source kind.")
     kind, config, analysis, settings, rails, timbers = (
-        module._chair_generation_context(document, "turnout", turnout_id)
+        module._chair_generation_context(document, entity_kind, entity_id)
     )
     if (
-        kind != "turnout" or config.get("turnout_id") != turnout_id
+        kind != entity_kind or config.get(entity_kind + "_id") != entity_id
         or config.get("size") != module.TURNOUT_SIZE_C10
         or module.TURNOUT_DEFAULT_SCALE != 76.2
     ):
         raise ValueError(
             f"{family} reference preview requires one C10 at 1:76.2."
         )
+    if entity_kind == "crossover":
+        _require_crossover_context(module, document, config, timbers)
     plan = module._A8A7B15_BUILD_SOLID_PLAN(
         document, kind, config, analysis, rails, timbers, settings,
     )
@@ -49,6 +55,26 @@ def _source_context(module, document, turnout_id, family="S1"):
         "settings": settings, "rails": rails, "timbers": timbers,
         "plan": plan,
     }), analysis, settings, plan, rails, timbers
+
+
+def _require_crossover_context(module, document, config, timbers):
+    """Require both C10 constituents and current applied B4 timber data."""
+    for field in ("turnout_a_config", "turnout_b_config"):
+        constituent = config.get(field)
+        if (not isinstance(constituent, dict)
+                or constituent.get("size") != module.TURNOUT_SIZE_C10):
+            raise ValueError("Both crossover constituents must be C10.")
+    result = config.get("b4_result")
+    inherited = module.crossover_inherited_timber_records(document, config)
+    if (
+        not isinstance(result, dict) or not result.get("applied")
+        or not module._crossover_b4_result_is_current(
+            config, inherited, result,
+        )
+        or not result.get("resolved_timbers")
+        or timbers != result["resolved_timbers"]
+    ):
+        raise ValueError("Current applied B4 crossover timbers are required.")
 
 
 def _recover_positions(
@@ -222,32 +248,55 @@ def _select_family_positions(
     )
 
 
-def _open_source_context(module, source_document, turnout_id, family):
+def _open_source_context(
+    module, source_document, entity_id, family, *, entity_kind="turnout",
+):
     """Capture one current source context from an open document."""
     import FreeCAD as App
 
     if (
         source_document is None
         or App.getDocument(source_document.Name) is not source_document
-        or not isinstance(turnout_id, str) or not turnout_id.strip()
+        or not isinstance(entity_id, str) or not entity_id.strip()
     ):
-        raise ValueError("Select an open source document and one turnout ID.")
+        raise ValueError(
+            f"Select an open source document and one {entity_kind} ID."
+        )
     return _source_context(
-        module, source_document, turnout_id, family,
+        module, source_document, entity_id, family, entity_kind=entity_kind,
     )
 
 
+def _source_context_objects(module, document, entity_id, entity_kind):
+    """Select the existing rail and timber shapes for one source entity."""
+    if entity_kind == "turnout":
+        roles = module._turnout_objects_by_role(document, entity_id)
+        return tuple(roles.get(role) for role in (
+            module.TURNOUT_RAIL_ROLE, module.TURNOUT_TIMBER_ROLE,
+        ))
+    objects = module._crossover_objects(document, entity_id)
+    context = []
+    for role in (module.CROSSOVER_RAIL_ROLE, module.CROSSOVER_B4_ROLE):
+        matches = [obj for obj in objects if module.object_string_property(
+            obj, "GeneratedRole", "",
+        ) == role]
+        if len(matches) != 1:
+            raise ValueError("Crossover rail or B4 timber context is ambiguous.")
+        context.append(matches[0])
+    return tuple(context)
+
+
 def _context_shapes_and_verifier(
-    module, source_document, turnout_id, family, signature_text,
+    module, source_document, entity_id, family, signature_text,
+    *, entity_kind="turnout",
 ):
     """Copy context geometry and retain the complete final source check."""
     import FreeCAD as App
 
     document_name = source_document.Name
-    roles = module._turnout_objects_by_role(source_document, turnout_id)
-    context_objects = tuple(roles.get(role) for role in (
-        module.TURNOUT_RAIL_ROLE, module.TURNOUT_TIMBER_ROLE,
-    ))
+    context_objects = _source_context_objects(
+        module, source_document, entity_id, entity_kind,
+    )
     if any(obj is None for obj in context_objects):
         raise ValueError("Current C10 rail and timber context is required.")
     source_shapes = tuple(obj.Shape for obj in context_objects)
@@ -259,8 +308,22 @@ def _context_shapes_and_verifier(
         if App.getDocument(document_name) is not source_document:
             raise ValueError("The preview source document is no longer open.")
         current, *_context = _source_context(
-            module, source_document, turnout_id, family,
+            module, source_document, entity_id, family,
+            entity_kind=entity_kind,
         )
+        if entity_kind == "crossover":
+            current_objects = _source_context_objects(
+                module, source_document, entity_id, entity_kind,
+            )
+            if any(
+                current_object is not previous_object
+                for current_object, previous_object in zip(
+                    current_objects, context_objects,
+                )
+            ):
+                raise ValueError(
+                    "The crossover context changed during construction."
+                )
         if current != signature_text or any(
             source_document.getObject(obj.Name) is not obj
             or not obj.Shape.isSame(shape)
@@ -430,11 +493,44 @@ def preview_s1_s1j_reference_chairs(
     preparation, the single document transaction and whole-view recovery.
     This command gives no production, fit or output authority.
     """
+    return _preview_s1_s1j_reference_chairs(
+        module, source_document, turnout_id, s1_package, s1_manifest_text,
+        s1j_package, s1j_manifest_text, model_request, create_preview,
+        entity_kind="turnout",
+    )
+
+
+def preview_s1_s1j_crossover_reference_chairs(
+    module, source_document, crossover_id, s1_package, s1_manifest_text,
+    s1j_package, s1j_manifest_text, model_request, create_preview,
+):
+    """Inspect confirmed S1/S1J positions on one managed C10 crossover.
+
+    Require current applied B4 timbers and both C10 constituents at
+    1:76.2. Reuse model-mm placements without changing source assignments
+    or exclusions. Create only a separate unsaved private reference view;
+    its source receipt identifies the crossover. No fit, persistence,
+    export, production or rights acceptance follows.
+    """
+    return _preview_s1_s1j_reference_chairs(
+        module, source_document, crossover_id, s1_package, s1_manifest_text,
+        s1j_package, s1j_manifest_text, model_request, create_preview,
+        entity_kind="crossover",
+    )
+
+
+def _preview_s1_s1j_reference_chairs(
+    module, source_document, entity_id, s1_package, s1_manifest_text,
+    s1j_package, s1j_manifest_text, model_request, create_preview,
+    *, entity_kind,
+):
+    """Bind both families to one source snapshot and one transaction."""
     if not callable(create_preview):
         raise ValueError("The S1/S1J reference preview adapter is unavailable.")
     signature_text, analysis, settings, plan, rails, timbers = (
         _open_source_context(
-            module, source_document, turnout_id, "S1/S1J",
+            module, source_document, entity_id, "S1/S1J",
+            entity_kind=entity_kind,
         )
     )
     s1_placements, s1j_placements, excluded = _select_s1_s1j_positions(
@@ -447,10 +543,12 @@ def preview_s1_s1j_reference_chairs(
         module, analysis, plan, rails, timbers, s1j_placements, excluded, 7,
     )
     context_shapes, verify_source = _context_shapes_and_verifier(
-        module, source_document, turnout_id, "S1/S1J", signature_text,
+        module, source_document, entity_id, "S1/S1J", signature_text,
+        entity_kind=entity_kind,
     )
     source_receipt = {
-        "document_name": source_document.Name, "turnout_id": turnout_id,
+        "document_name": source_document.Name,
+        entity_kind + "_id": entity_id,
         "source_context_signature": "sha256:" + hashlib.sha256(
             signature_text.encode("utf-8"),
         ).hexdigest(),
@@ -466,6 +564,9 @@ def preview_s1_s1j_reference_chairs(
         "context_kind": "derived rail and timber wires",
         "source_document_mutation": False,
     }
+    if entity_kind == "crossover":
+        source_receipt["source_kind"] = "crossover"
+        source_receipt["timber_context"] = "current B4 resolved timbers"
     coverage = []
     for family, chair_code, placements in (
         ("S1", 1, s1_placements), ("S1J", 7, s1j_placements),
