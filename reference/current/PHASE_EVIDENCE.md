@@ -1907,3 +1907,27 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## P chair component `PSEAT` — 2026-10-23
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/application/chair_research.py) uses nine lengths from a `ChairDefinition` to make the `PSEAT` chair component.
+The result has one `Solid` shape with `length_basis = "full-size"`.
+The inputs are Templot data with `reference-only` status.
+The output stays in private-development status.
+
+The [test with standalone Python](../../tests/validate_phase9b_chair_p_seat.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_p_seat.py) gives a PASS result with the qualified host profile.
+The same test gives a PASS result when a person can see the FreeCAD display.
+The source data and each previous `App.Document` stay the same.
+The independent review of the source and tests gives a PASS result.
+The results stay in `tmp/p-slide-seat/`, with `native-02/`, `gui-02/` and `owner-repair-20261023/`.
+
+The result is only the `PSEAT` chair component.
+All previous FAIL results and review results of BLOCKED stay available.
+This result gives no acceptance for chair positions, physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

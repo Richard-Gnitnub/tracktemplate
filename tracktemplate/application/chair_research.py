@@ -56,6 +56,11 @@ from tracktemplate.domain.chair_outer_jaw import (
     ChairOuterJawParameters,
     construct_chair_outer_jaw,
 )
+from tracktemplate.domain.chair_p_seat import (
+    ChairPSeatGeometry,
+    ChairPSeatParameters,
+    construct_chair_p_seat,
+)
 from tracktemplate.domain.chair_seat import (
     ChairSeatGeometry,
     ChairSeatParameters,
@@ -64,6 +69,7 @@ from tracktemplate.domain.chair_seat import (
 
 
 CHAIR_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.seat-reference.v1"
+CHAIR_P_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.p-seat-reference.v1"
 CHAIR_KEY_RESEARCH_RULE_ID = "tracktemplate.chair.key-reference.v1"
 CHAIR_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.base-reference.v1"
 CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
@@ -106,6 +112,18 @@ class ChairSeatResearchResult:
     component_id: str
     procedure_id: str
     geometry: ChairSeatGeometry
+
+
+@dataclass(frozen=True)
+class ChairPSeatResearchResult:
+    """Derived P slide-seat with immutable, unadmitted research inputs."""
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    component_id: str
+    procedure_id: str
+    geometry: ChairPSeatGeometry
 
 
 @dataclass(frozen=True)
@@ -335,14 +353,19 @@ def _parameter_map(
 
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
-    inner_jaw=False, assembly=False, l1=False, s1j=False,
+    inner_jaw=False, assembly=False, l1=False, s1j=False, p_seat=False,
 ):
     _require(
-        sum((key, base, outer_jaw, inner_jaw)) <= 1,
+        sum((key, base, outer_jaw, inner_jaw, p_seat)) <= 1
+        and not (p_seat and (assembly or l1 or s1j)),
         "research-procedure-set", "$.definition.procedures",
         "only one finite component rule can be selected",
     )
-    if inner_jaw:
+    if p_seat:
+        name = "P slide-seat"
+        rule_id = CHAIR_P_SEAT_RESEARCH_RULE_ID
+        parameter_type = ChairPSeatParameters
+    elif inner_jaw:
         name = "inner jaw"
         rule_id = CHAIR_INNER_JAW_RESEARCH_RULE_ID
         parameter_type = ChairInnerJawParameters
@@ -554,6 +577,57 @@ def prepare_chair_seat_research(package, manifest_text):
             "research-geometry-invalid", "$.definition.quantities", str(error)
         ) from error
     return ChairSeatResearchResult(
+        package=package,
+        manifest_json=json.dumps(
+            manifest, allow_nan=False, ensure_ascii=True,
+            separators=(",", ":"), sort_keys=True,
+        ),
+        manifest_signature=chair_definition_manifest_signature(manifest_text),
+        component_id=component_id,
+        procedure_id=seat["procedure_id"],
+        geometry=geometry,
+    )
+
+
+def prepare_chair_p_seat_research(package, manifest_text):
+    """Prepare only a finite P slide-seat from explicit private inputs.
+
+    Verify the complete package and manifest at each request. Source-byte
+    authentication belongs to the evidence harness. This creates no host
+    object, file, placement, manufacturing correction or acceptance.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(
+            error.code, error.path, error.detail
+        ) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    quantities = {
+        item["quantity_id"]: item for item in definition["quantities"]
+    }
+    placement, seat, selected = _procedures(
+        definition, quantities, p_seat=True,
+    )
+    component_id = _component_contract(definition, placement, seat)
+    _quantity_coverage(record, quantities, selected)
+    try:
+        parameters = ChairPSeatParameters(**{
+            name: Fraction(item["canonical_value"])
+            for name, item in selected.items()
+        })
+        geometry = construct_chair_p_seat(parameters)
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-geometry-invalid", "$.definition.quantities", str(error)
+        ) from error
+    return ChairPSeatResearchResult(
         package=package,
         manifest_json=json.dumps(
             manifest, allow_nan=False, ensure_ascii=True,
