@@ -2005,3 +2005,41 @@ This result gives no acceptance for physical fit, persistence, production, expor
 This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## P chair components on a C10 crossover — 2026-10-23
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_p_crossover_chairs` for B16.
+For `XO-001`, it shows 22 chair components at each of 28 `P` positions.
+Each of the two turnouts has 14 of these positions.
+For the software, `B4` results that agree with the source data are necessary.
+The software examines the turnout identity for each position.
+
+The software uses the previous `P` shapes from `basic-04`.
+It does not calculate new chair shapes or change their dimensions.
+The [C10 input conditions and `key_orientation` limitations](#p-chair-components-at-c10-positions--2026-10-23) stay the same.
+
+The [test with standalone Python](../../tests/validate_phase9b_catalogue_p_crossover.py) gives a PASS result.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_p_crossover.py) compares all 616 component results with the source file.
+It gives PASS results with the qualified host profile and when a person can see the FreeCAD display.
+The tests give PASS results for `Undo`, `Redo`, `transaction_rollback` and the changes to source data and shapes that the software rejects.
+The source files and each previous `App.Document` stay the same.
+The results stay in `tmp/catalogue-p-crossover/`, with `native-01/` and `gui-repair-01/`.
+
+One `fixture-or-harness-defect` repair changes only the new FreeCAD test.
+The independent review of the source and tests gives a PASS result.
+The reviewer did not write this change.
+The result stays in `tmp/catalogue-p-crossover/quality-review-02.json`.
+
+The new result contains data for all 355 source positions: 28 have `P` chair components, and 327 do not.
+The previous S1/S1J crossover operation keeps its 135 positions and 220 other positions the same.
+The previous C10 turnout operations keep their 14/154 and 59/109 results the same.
+The previous [S1, S1J and L1 limitations](#s1-and-s1j-chairs-on-a-c10-crossover--2026-10-23) do not change.
+All previous FAIL results and review results of BLOCKED stay available.
+The output stays in `private-development` status.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
