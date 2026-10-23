@@ -1,4 +1,4 @@
-"""Place the retained P reference at confirmed C10 analytical positions.
+"""Place retained P and S1J references at confirmed C10 positions.
 
 This private snapshot leaves the inherited physical plan and all existing
 placement routes unchanged. Its source frame and datum are read from the
@@ -14,6 +14,8 @@ from numbers import Real
 from tracktemplate.compatibility.chair_reference_preview import (
     _context_shapes_and_verifier,
     _open_source_context,
+    _recover_positions,
+    _select_s1j_positions,
 )
 from tracktemplate.domain.chair_placement import (
     PPlacement,
@@ -49,9 +51,9 @@ _KEY_ORIENTATION = "requires a configurable key-direction policy"
 _KEY_CLASSIFICATION = "dimension requiring later confirmation"
 
 
-def _require(condition, message):
+def _require(condition, message, *, family="P"):
     if not condition:
-        raise ValueError("Private P placement: " + message)
+        raise ValueError(f"Private {family} placement: " + message)
 
 
 def _indexed(records, field):
@@ -75,8 +77,10 @@ def _finite(value):
         return False
 
 
-def _require_context(module, context, turnout_id, settings, plan):
-    """Refuse any context beyond the retained fixed P model's inputs."""
+def _require_context(
+    module, context, turnout_id, settings, plan, *, family="P",
+):
+    """Refuse contexts beyond the retained fixed model's inputs."""
     config = context["configuration"]
     _require(
         context["kind"] == "turnout"
@@ -85,31 +89,33 @@ def _require_context(module, context, turnout_id, settings, plan):
         and module.TURNOUT_DEFAULT_SCALE == 76.2
         and plan.get("entity_kind") == "turnout"
         and plan.get("entity_id") == turnout_id,
-        "one C10 turnout at 1:76.2 is required",
+        "one C10 turnout at 1:76.2 is required", family=family,
     )
     for field, expected in (("track_gauge", 16.5), ("flangeway", 1.0)):
         _require(_finite(config.get(field)) and config[field] == expected,
-                 "unsupported " + field)
-    _require_model_inputs(settings, plan)
+                 "unsupported " + field, family=family)
+    _require_model_inputs(settings, plan, family=family)
 
 
-def _require_model_inputs(settings, plan):
+def _require_model_inputs(settings, plan, *, family="P"):
     """Keep the complete fixed rail profile and source embedding binding."""
     profile = plan.get("rail_profile")
     expected_profile = dict(_CODE75_PROFILE)
     _require(isinstance(profile, dict) and profile == expected_profile
              and profile.get("vertical_rail") is True,
-             "the complete fixed Code 75 revA profile is required")
+             "the complete fixed Code 75 revA profile is required",
+             family=family)
     for field, expected in _CODE75_PROFILE:
         if type(expected) is float:
-            _require(_finite(profile[field]), "invalid profile " + field)
+            _require(_finite(profile[field]), "invalid profile " + field,
+                     family=family)
     _require(settings.get("rail_profile_id") == expected_profile["profile_id"],
-             "analysis rail profile disagrees")
+             "analysis rail profile disagrees", family=family)
     _require(isinstance(plan.get("settings"), dict)
              and plan["settings"].get("embed_depth")
              == settings.get("future_chair_embed_depth")
              and _finite(settings.get("future_chair_embed_depth")),
-             "source embedding settings disagree")
+             "source embedding settings disagree", family=family)
 
 
 def _require_p_crossover_context(
@@ -421,6 +427,183 @@ def _preview_private_catalogue_p_chairs(
     if entity_kind == "crossover":
         source_receipt["source_kind"] = "crossover"
         source_receipt["timber_context"] = "current B4 resolved timbers"
+    return create_preview(
+        catalogue_path, placements, context_shapes, source_receipt,
+        verify_source,
+    )
+
+
+def _require_s1j_assignment(module, position, rail, timber, turnout_id):
+    """Bind only an existing confirmed joint assignment to its own source."""
+    _require(
+        type(position.get("chair_code")) is int
+        and position["chair_code"] == 7
+        and position.get("chair_code_label") == "S1J"
+        and position.get("chair_family") == module.CHAIR_FAMILY_JOINT
+        and position.get("assignment_status")
+        == module.CHAIR_ASSIGNMENT_CONFIRMED
+        and position.get("assignment_complete_in_current_stage") is True
+        and position.get("deliberate_omission") is False
+        and position.get("special_assignment_deferred") is False
+        and position.get("stale_signature_state") is False
+        and position.get("validation_status") == "validated",
+        "joint assignment is incomplete, stale or unsupported", family="S1J",
+    )
+    _require(
+        all(record.get("parent_turnout_identity") == turnout_id
+            for record in (position, rail, timber))
+        and not position.get("parent_crossover_identity")
+        and not rail.get("parent_crossover_identity")
+        and not timber.get("crossover_identity")
+        and position.get("rail_name") == rail.get("name")
+        and position.get("rail_role") == rail.get("rail_role")
+        and position.get("timber_identifier") == timber.get("identifier")
+        and position.get("prototype_timber_identifier")
+        == timber.get("prototype_reference"),
+        "joint source ownership or named support disagrees", family="S1J",
+    )
+    footprint = position.get("chair_footprint_parameters")
+    _require(
+        position.get("source_or_assumed_classification")
+        == module.CHAIR_CLASS_SOURCE
+        and isinstance(footprint, dict)
+        and footprint.get("dimension_classification")
+        == module.CHAIR_CLASS_SOURCE,
+        "joint source dimensions are unresolved", family="S1J",
+    )
+    _require(
+        type(position.get("key_direction_sign")) is int
+        and position["key_direction_sign"] == 0
+        and position.get("key_orientation") == (
+            "towards the adjacent rail joint; exact direction sign "
+            "requires stored joint chainage"
+        )
+        and position.get("key_orientation_classification")
+        == module.CHAIR_CLASS_SOURCE,
+        "the retained model does not implement a key-direction policy",
+        family="S1J",
+    )
+
+
+def preview_private_catalogue_s1j_chairs(
+    module, source_document, turnout_id, catalogue_path, create_preview,
+):
+    """Inspect retained S1J components at existing C10 joint assignments.
+
+    Reuse the qualified selection and named-face recovery without changing
+    the physical plan. Require the complete fixed source profile and keep
+    all original exclusions. The adapter verifies source and catalogue
+    bytes transactionally in a separate unsaved private document.
+    """
+    _require(callable(create_preview), "the native adapter is unavailable",
+             family="S1J")
+    signature_text, analysis, settings, plan, rails, timbers = (
+        _open_source_context(module, source_document, turnout_id, "S1J")
+    )
+    _require_context(module, json.loads(signature_text), turnout_id,
+                     settings, plan, family="S1J")
+    positions = _indexed(analysis.get("positions"),
+                         "stable_chair_position_identity")
+    rail_by_id = _indexed(rails, "stable_identity")
+    timber_by_id = _indexed(timbers, "stable_identity")
+    instances = _indexed(plan.get("instances"), "chair_position_identity")
+    original_excluded = _indexed(plan.get("analytical_only"),
+                                 "chair_position_identity")
+    _require(not instances.keys() & original_excluded.keys()
+             and instances.keys() | original_excluded.keys()
+             == positions.keys(),
+             "the inherited plan does not account for every position",
+             family="S1J")
+    datums = [item.get("base_z") for item in instances.values()]
+    _require(datums and all(_finite(value) for value in datums)
+             and all(value == datums[0] for value in datums),
+             "source placement datum is missing or inconsistent",
+             family="S1J")
+    for identity, position in positions.items():
+        original = instances.get(identity, original_excluded.get(identity))
+        _require(
+            all(original.get(field) == position.get(field)
+                for field in ("rail_identity", "timber_identity")),
+            "plan and analysis source identities disagree", family="S1J",
+        )
+        if position.get("chair_code") != 7:
+            _require(position.get("chair_code_label") != "S1J",
+                     "joint label and code disagree", family="S1J")
+            continue
+        rail = rail_by_id.get(position.get("rail_identity"))
+        timber = timber_by_id.get(position.get("timber_identity"))
+        _require(rail is not None and timber is not None,
+                 "the named rail or timber source is missing", family="S1J")
+        _require_s1j_assignment(module, position, rail, timber, turnout_id)
+        _require(original.get("chair_label") == "S1J",
+                 "plan joint label disagrees", family="S1J")
+        if identity in instances:
+            _require(original.get("centre_point")
+                     == position.get("centre_point"),
+                     "plan joint centre disagrees", family="S1J")
+    placements, remaining = _select_s1j_positions(module, analysis, plan)
+    placements, remaining, recovered = _recover_positions(
+        module, analysis, plan, rails, timbers, placements, remaining, 7,
+    )
+    # The shared selector describes the older five-component preview.
+    # Keep original exclusions exact; name only this new selection correctly.
+    for item in remaining:
+        if (item["position_id"] in instances and item["reason"]
+                == "Only the five-component S1J reference is selected."):
+            item["reason"] = "Only retained S1J references are selected."
+    selected = []
+    for placement in placements:
+        position = positions[placement.position_id]
+        selected.append({
+            "position_id": placement.position_id,
+            "rail_id": placement.rail_id, "timber_id": placement.timber_id,
+            "chair_code": 7,
+            "original_instance": copy.deepcopy(
+                instances.get(placement.position_id),
+            ),
+            "original_exclusion": copy.deepcopy(
+                original_excluded.get(placement.position_id),
+            ),
+            "key_direction_sign": position["key_direction_sign"],
+            "key_orientation": position["key_orientation"],
+            "key_orientation_classification": (
+                position["key_orientation_classification"]
+            ),
+        })
+    context_shapes, verify_source = _context_shapes_and_verifier(
+        module, source_document, turnout_id, "S1J", signature_text,
+    )
+    source_receipt = {
+        "document_name": source_document.Name, "turnout_id": turnout_id,
+        "source_context_signature": "sha256:" + hashlib.sha256(
+            signature_text.encode("utf-8"),
+        ).hexdigest(),
+        "source_analysis_signature": analysis["geometry_signature"],
+        "analysis_position_count": len(positions),
+        "selected_s1j_count": len(placements), "selected_positions": selected,
+        "coverage_summary": (
+            f"{len(placements)} S1J references; "
+            f"{len(positions)} source positions accounted for"
+        ),
+        "remaining_positions": remaining,
+        "recovered_positions": recovered,
+        "original_analytical_exclusions": copy.deepcopy(
+            plan["analytical_only"],
+        ),
+        "source_base_z_mm": datums[0],
+        "embed_depth_mm": settings["future_chair_embed_depth"],
+        "embedding_basis": "unchanged existing source-plan base_z",
+        "model_support_adjustments_applied": False,
+        "context_kind": "derived rail and timber wires",
+        "source_document_mutation": False,
+        "limits": [
+            "Private fixed-reference placement; no physical fit acceptance.",
+            "The source key-direction policy remains unresolved.",
+            "All inherited physical exclusions and placement routes "
+            "remain unchanged.",
+            "No production, export, persistence or live-update authority.",
+        ],
+    }
     return create_preview(
         catalogue_path, placements, context_shapes, source_receipt,
         verify_source,

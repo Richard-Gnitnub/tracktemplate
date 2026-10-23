@@ -1,4 +1,4 @@
-"""Place the retained private P chair without rebuilding its geometry.
+"""Place retained private P and S1J chairs without rebuilding geometry.
 
 The fixed catalogue supplies chair-local model-mm B-reps. Each copied
 component receives one outer proper track-frame transform. The source
@@ -27,7 +27,7 @@ from tracktemplate.application.chair_catalogue import (
     prepare_catalogue_chair,
     verify_catalogue_sources,
 )
-from tracktemplate.domain.chair_placement import PPlacement
+from tracktemplate.domain.chair_placement import PPlacement, S1JPlacement
 
 
 _P_MODEL_SHA256 = (
@@ -42,6 +42,16 @@ _P_SOURCE_NAMES = (
     "SourceFixing013", "SourceFixing014", "SourceFixing015",
     "SourceFixing016", "SourceFixing017", "SourceFixing018",
 )
+_S1J_MODEL_SHA256 = (
+    "fd5cb5ffa9fa2004ef2930ab9280b4e906175b9233364448d07d8ef63c212c4b"
+)
+_S1J_SOURCE_NAMES = (
+    "base_plinth", "seat", "outer", "inner", "key", "display_rail",
+    "SourceFixing", "SourceFixing001", "SourceFixing002", "SourceFixing003",
+    "SourceFixing004", "SourceFixing005", "SourceFixing006",
+    "SourceFixing007", "SourceFixing008", "SourceFixing009",
+    "SourceFixing010", "SourceFixing011",
+)
 _DISCRETE_FIELDS = (
     "shape_type", "solid_count", "shell_count", "face_count", "wire_count",
     "edge_count", "vertex_count", "maximum_kernel_tolerance_mm",
@@ -49,12 +59,12 @@ _DISCRETE_FIELDS = (
 )
 
 
-def _require(condition, message):
+def _require(condition, message, *, family="P"):
     if not condition:
-        raise ValueError("Private P catalogue placement: " + message)
+        raise ValueError(f"Private {family} catalogue placement: " + message)
 
 
-def _prototype_state(shape):
+def _prototype_state(shape, *, family="P"):
     """Keep geometry metrics independent of shared display triangulation."""
     measured = _measure_shape(shape)
     # GUI tessellation changes shared face caches. Shape.BoundBox can use
@@ -63,19 +73,20 @@ def _prototype_state(shape):
     bounds = (box.XMin, box.YMin, box.ZMin,
               box.XMax, box.YMax, box.ZMax)
     _require(all(math.isfinite(value) for value in bounds),
-             "nonfinite geometry-based prototype bounds")
+             "nonfinite geometry-based prototype bounds", family=family)
     return dict(measured, bounds_mm=bounds)
 
 
-def _verify_component(actual, expected):
+def _verify_component(actual, expected, *, family="P"):
     """Retain native topology, direction, location and validity."""
     _require(_same_presented_shape(actual, expected),
-             "component geometry, orientation or placement changed")
+             "component geometry, orientation or placement changed",
+             family=family)
     observed = _measure_shape(actual)
     original = _measure_shape(expected)
     _require(all(observed[key] == original[key]
                  for key in _DISCRETE_FIELDS),
-             "component topology or validity changed")
+             "component topology or validity changed", family=family)
     return observed
 
 
@@ -98,19 +109,50 @@ def create_private_catalogue_p_preview(
     Invalid inputs fail before document creation; later failures dispose
     only of this preview. No fit, production or phase acceptance follows.
     """
+    return _create_private_catalogue_preview(
+        catalogue_path, placements, context_shapes, source_receipt,
+        verify_source, family="P", placement_type=PPlacement,
+        model_sha256=_P_MODEL_SHA256, source_names=_P_SOURCE_NAMES,
+    )
+
+
+def create_private_catalogue_s1j_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Create one unsaved private S1J view from confirmed joint placements.
+
+    Proper model-mm frames place the fixed S1J/basic-04 components once.
+    Source checks, the transaction and preview disposal use the P lifecycle.
+    No geometry is rebuilt and no fit or production acceptance follows.
+    """
+    return _create_private_catalogue_preview(
+        catalogue_path, placements, context_shapes, source_receipt,
+        verify_source, family="S1J", placement_type=S1JPlacement,
+        model_sha256=_S1J_MODEL_SHA256, source_names=_S1J_SOURCE_NAMES,
+    )
+
+
+def _create_private_catalogue_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+    *, family, placement_type, model_sha256, source_names,
+):
+    """Place one fixed family through the shared component lifecycle."""
+    def require(condition, message):
+        _require(condition, message, family=family)
+
     if not callable(verify_source):
-        raise TypeError("P placement requires source verification")
-    placements = _placements(placements, PPlacement)
+        raise TypeError(f"{family} placement requires source verification")
+    placements = _placements(placements, placement_type)
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
-    _require(isinstance(receipt, dict), "source receipt must be a mapping")
-    prepared = prepare_catalogue_chair(catalogue_path, "P", run="basic-04")
-    _require(
-        prepared.label == "P" and prepared.run == "basic-04"
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    prepared = prepare_catalogue_chair(catalogue_path, family, run="basic-04")
+    require(
+        prepared.label == family and prepared.run == "basic-04"
         and prepared.context == "fixed-basic-source-context"
-        and prepared.model_sha256 == _P_MODEL_SHA256
+        and prepared.model_sha256 == model_sha256
         and tuple(item.name for item in prepared.components)
-        == _P_SOURCE_NAMES,
-        "the fixed P catalogue component binding differs",
+        == source_names,
+        f"the fixed {family} catalogue component binding differs",
     )
     components = tuple(item for item in prepared.components
                        if item.name != "display_rail")
@@ -124,9 +166,9 @@ def create_private_catalogue_p_preview(
 
     def prepare_layers():
         all_shapes, all_measurements = _import_components(prepared)
-        _require(len(all_shapes) == len(all_measurements)
-                 == len(prepared.components),
-                 "imported source component count changed")
+        require(len(all_shapes) == len(all_measurements)
+                == len(prepared.components),
+                "imported source component count changed")
         admitted = tuple(
             (component, shape, measured)
             for component, shape, measured in zip(
@@ -134,7 +176,7 @@ def create_private_catalogue_p_preview(
             ) if component.name != "display_rail"
         )
         prototypes = tuple(shape for _item, shape, _measured in admitted)
-        original_metrics = tuple(_prototype_state(shape)
+        original_metrics = tuple(_prototype_state(shape, family=family)
                                  for shape in prototypes)
         prototype_records = tuple(
             dict(measured, **_source_identity(prepared, component))
@@ -152,13 +194,13 @@ def create_private_catalogue_p_preview(
                 # The B-rep already contains each fitting's local placement.
                 shape = Part.Shape(prototype)
                 shape.Placement = rigid.multiply(prototype.Placement)
-                _require(shape.isPartner(prototype)
-                         and shape.Orientation == prototype.Orientation,
-                         "rigid placement changed native geometry")
+                require(shape.isPartner(prototype)
+                        and shape.Orientation == prototype.Orientation,
+                        "rigid placement changed native geometry")
                 measured = _measure_shape(shape)
-                _require(all(measured[key] == original_metrics[index][key]
-                             for key in _DISCRETE_FIELDS),
-                         "rigid placement changed component invariants")
+                require(all(measured[key] == original_metrics[index][key]
+                            for key in _DISCRETE_FIELDS),
+                        "rigid placement changed component invariants")
                 measurements.append(dict(
                     measured, **_source_identity(prepared, component),
                     placement_identity=(placement.position_id,
@@ -179,17 +221,19 @@ def create_private_catalogue_p_preview(
             compound = Part.makeCompound(expected)
             _measure_shape(compound)
             children = compound.childShapes()
-            _require(len(children) == len(expected),
-                     "component compound child count changed")
+            require(len(children) == len(expected),
+                    "component compound child count changed")
             for actual, original in zip(children, expected):
-                _verify_component(actual, original)
+                _verify_component(actual, original, family=family)
             compounds.append(compound)
-        _require(original_metrics == tuple(
-            _prototype_state(shape) for shape in prototypes
+        require(original_metrics == tuple(
+            _prototype_state(shape, family=family) for shape in prototypes
         ), "placement changed a shared source component")
         layers = _context_layers(context_shapes) + tuple(compounds)
         result = {
-            "contract_id": "tracktemplate.private-catalogue-p-placement.v1",
+            "contract_id": (
+                f"tracktemplate.private-catalogue-{family.lower()}-placement.v1"
+            ),
             "label": prepared.label,
             "run": prepared.run,
             "context": prepared.context,
@@ -225,7 +269,7 @@ def create_private_catalogue_p_preview(
             "geometry_rebuilt": False,
             "track_placements_added": len(placements),
             "limits": [
-                "Private fixed-source P placement; no physical-fit "
+                f"Private fixed-source {family} placement; no physical-fit "
                 "acceptance.",
                 "No production, export, persistence or phase acceptance.",
                 "Source overlaps and hidden mating closures remain.",
@@ -236,25 +280,25 @@ def create_private_catalogue_p_preview(
         }
 
         def verify_layers(stored):
-            _require(len(stored) == len(layers), "stored layer count changed")
+            require(len(stored) == len(layers), "stored layer count changed")
             for index, (actual, expected) in enumerate(zip(stored, layers)):
-                _require(_same_presented_shape(actual, expected),
-                         "stored layer geometry or placement changed")
+                require(_same_presented_shape(actual, expected),
+                        "stored layer geometry or placement changed")
                 if index < 2:
                     _measure_layer(actual)
-                    _require(not actual.Faces and not actual.Solids
-                             and len(actual.Edges) == len(expected.Edges),
-                             "stored context is no longer the copied wires")
+                    require(not actual.Faces and not actual.Solids
+                            and len(actual.Edges) == len(expected.Edges),
+                            "stored context is no longer the copied wires")
                     continue
-                _verify_component(actual, expected)
+                _verify_component(actual, expected, family=family)
                 children = actual.childShapes()
                 originals = by_component[index - 2]
-                _require(len(children) == len(originals),
-                         "stored component child count changed")
+                require(len(children) == len(originals),
+                        "stored component child count changed")
                 for child, original in zip(children, originals):
-                    _verify_component(child, original)
-            _require(original_metrics == tuple(
-                _prototype_state(shape) for shape in prototypes
+                    _verify_component(child, original, family=family)
+            require(original_metrics == tuple(
+                _prototype_state(shape, family=family) for shape in prototypes
             ), "stored placement changed a shared source component")
 
         return layers, result, verify_layers
@@ -264,6 +308,6 @@ def create_private_catalogue_p_preview(
         verify_catalogue_sources(prepared)
 
     return _materialise_preview(
-        "P", receipt, layer_specs, prepare_layers, verify_inputs,
+        family, receipt, layer_specs, prepare_layers, verify_inputs,
         title_suffix="catalogue placements",
     )

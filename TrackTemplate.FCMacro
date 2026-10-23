@@ -88,6 +88,9 @@ def _load_modular_transition_workflow(
         private_catalogue_p_preview_factory=(
             catalogue_placement.create_private_catalogue_p_preview
         ),
+        private_catalogue_s1j_preview_factory=(
+            catalogue_placement.create_private_catalogue_s1j_preview
+        ),
     )
     return session, session.routing_record()
 

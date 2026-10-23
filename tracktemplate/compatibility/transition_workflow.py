@@ -2577,6 +2577,7 @@ class ModularCoreLayoutWorkflowSession:
         l1_reference_preview_factory=None,
         private_catalogue_preview_factory=None,
         private_catalogue_p_preview_factory=None,
+        private_catalogue_s1j_preview_factory=None,
     ):
         staged = staged or atomic
         if staged and not callable(export_files_factory):
@@ -2602,6 +2603,9 @@ class ModularCoreLayoutWorkflowSession:
         )
         self._private_catalogue_p_preview_factory = (
             private_catalogue_p_preview_factory
+        )
+        self._private_catalogue_s1j_preview_factory = (
+            private_catalogue_s1j_preview_factory
         )
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
@@ -2926,6 +2930,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_p_preview_factory,
         )
 
+    def preview_private_catalogue_s1j_chairs(
+        self, source_document, turnout_id, catalogue_path,
+    ):
+        """Preview private retained S1J components at existing turnout joints."""
+        from tracktemplate.compatibility.chair_catalogue_placement import (
+            preview_private_catalogue_s1j_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_s1j_chairs(
+            self.module, source_document, turnout_id, catalogue_path,
+            self._private_catalogue_s1j_preview_factory,
+        )
+
     def preview_private_catalogue_p_crossover_chairs(
         self, source_document, crossover_id, catalogue_path,
     ):
@@ -2963,6 +2981,7 @@ def load_modular_transition_workflow_session(
     l1_reference_preview_factory=None,
     private_catalogue_preview_factory=None,
     private_catalogue_p_preview_factory=None,
+    private_catalogue_s1j_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -3024,4 +3043,7 @@ def load_modular_transition_workflow_session(
         l1_reference_preview_factory=l1_reference_preview_factory,
         private_catalogue_preview_factory=private_catalogue_preview_factory,
         private_catalogue_p_preview_factory=private_catalogue_p_preview_factory,
+        private_catalogue_s1j_preview_factory=(
+            private_catalogue_s1j_preview_factory
+        ),
     )
