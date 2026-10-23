@@ -2926,6 +2926,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_p_preview_factory,
         )
 
+    def preview_private_catalogue_p_crossover_chairs(
+        self, source_document, crossover_id, catalogue_path,
+    ):
+        """Inspect retained P chairs on a current private C10 crossover."""
+        from tracktemplate.compatibility.chair_catalogue_placement import (
+            preview_private_catalogue_p_crossover_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_p_crossover_chairs(
+            self.module, source_document, crossover_id, catalogue_path,
+            self._private_catalogue_p_preview_factory,
+        )
+
     def launch_workflow(self):
         """Launch after restoring and checking both selected route groups."""
         self._bind_core_layout_export()

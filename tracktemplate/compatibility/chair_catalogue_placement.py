@@ -90,6 +90,11 @@ def _require_context(module, context, turnout_id, settings, plan):
     for field, expected in (("track_gauge", 16.5), ("flangeway", 1.0)):
         _require(_finite(config.get(field)) and config[field] == expected,
                  "unsupported " + field)
+    _require_model_inputs(settings, plan)
+
+
+def _require_model_inputs(settings, plan):
+    """Keep the complete fixed rail profile and source embedding binding."""
     profile = plan.get("rail_profile")
     expected_profile = dict(_CODE75_PROFILE)
     _require(isinstance(profile, dict) and profile == expected_profile
@@ -107,7 +112,53 @@ def _require_context(module, context, turnout_id, settings, plan):
              "source embedding settings disagree")
 
 
-def _require_p_assignment(module, position, rail, timber, turnout_id):
+def _require_p_crossover_context(
+    module, context, crossover_id, settings, plan,
+):
+    """Bind compatible P inputs to the two named crossover constituents."""
+    config = context["configuration"]
+    _require(
+        context["kind"] == "crossover"
+        and config.get("crossover_id") == crossover_id
+        and config.get("size") == module.TURNOUT_SIZE_C10
+        and module.TURNOUT_DEFAULT_SCALE == 76.2
+        and plan.get("entity_kind") == "crossover"
+        and plan.get("entity_id") == crossover_id,
+        "one C10 crossover at 1:76.2 is required",
+    )
+    for field, expected in (("track_gauge", 16.5), ("flangeway", 1.0)):
+        _require(_finite(config.get(field)) and config[field] == expected,
+                 "unsupported crossover " + field)
+    thickness = config.get("template_thickness")
+    _require(_finite(thickness), "invalid crossover template thickness")
+    owners = {}
+    for side in ("A", "B"):
+        prefix = "turnout_" + side.lower()
+        constituent = config.get(prefix + "_config")
+        _require(isinstance(constituent, dict)
+                 and constituent.get("size") == module.TURNOUT_SIZE_C10,
+                 "both crossover constituents must be C10")
+        identity = constituent.get("turnout_id")
+        _require(isinstance(identity, str) and identity.strip()
+                 and identity == config.get(prefix + "_id")
+                 and identity not in owners,
+                 "crossover constituent identities disagree")
+        for field, expected in (("track_gauge", 16.5), ("flangeway", 1.0)):
+            _require(_finite(constituent.get(field))
+                     and constituent[field] == expected,
+                     "unsupported constituent " + field)
+        _require(_finite(constituent.get("template_thickness"))
+                 and constituent["template_thickness"] == thickness,
+                 "crossover constituent mounting datums disagree")
+        owners[identity] = side
+    _require_model_inputs(settings, plan)
+    return owners
+
+
+def _require_p_assignment(
+    module, position, rail, timber, turnout_id,
+    *, crossover_id=None, turnout_side=None,
+):
     """Admit only the existing explicit S1-S7 stock-rail P assignment."""
     identifier = position.get("prototype_timber_identifier")
     _require(
@@ -139,14 +190,27 @@ def _require_p_assignment(module, position, rail, timber, turnout_id):
         ),
         "P needs its named C-switch stock rail and timber",
     )
-    _require(
-        all(record.get("parent_turnout_identity") == turnout_id
-            for record in (position, rail, timber))
-        and not position.get("parent_crossover_identity")
-        and not rail.get("parent_crossover_identity")
-        and not timber.get("crossover_identity"),
-        "P source ownership disagrees",
-    )
+    if crossover_id is None:
+        _require(
+            all(record.get("parent_turnout_identity") == turnout_id
+                for record in (position, rail, timber))
+            and not position.get("parent_crossover_identity")
+            and not rail.get("parent_crossover_identity")
+            and not timber.get("crossover_identity"),
+            "P source ownership disagrees",
+        )
+    else:
+        _require(
+            all(record.get("parent_turnout_identity") == turnout_id
+                for record in (position, rail, timber))
+            and position.get("parent_crossover_identity") == crossover_id
+            and rail.get("parent_crossover_identity") == crossover_id
+            and timber.get("crossover_identity") == crossover_id
+            and turnout_side in ("A", "B")
+            and rail.get("turnout_side") == turnout_side
+            and timber.get("turnout_side") == turnout_side,
+            "P crossover source ownership disagrees",
+        )
     footprint = position.get("chair_footprint_parameters")
     _require(
         position.get("source_or_assumed_classification")
@@ -166,7 +230,10 @@ def _require_p_assignment(module, position, rail, timber, turnout_id):
     )
 
 
-def _select_p_positions(module, analysis, plan, rails, timbers, turnout_id):
+def _select_p_positions(
+    module, analysis, plan, rails, timbers, turnout_id,
+    *, crossover_owners=None,
+):
     """Partition every input ID without changing the inherited exclusions."""
     positions = _indexed(analysis.get("positions"),
                          "stable_chair_position_identity")
@@ -224,7 +291,17 @@ def _select_p_positions(module, analysis, plan, rails, timbers, turnout_id):
             "P has another inherited exclusion or physical-plan status",
         )
         rail, timber = rail_by_id[rail_id], timber_by_id[timber_id]
-        _require_p_assignment(module, position, rail, timber, turnout_id)
+        if crossover_owners is None:
+            _require_p_assignment(module, position, rail, timber, turnout_id)
+        else:
+            owner = position.get("parent_turnout_identity")
+            _require(isinstance(owner, str) and owner in crossover_owners,
+                     "P is not owned by a named crossover constituent")
+            _require_p_assignment(
+                module, position, rail, timber, owner,
+                crossover_id=turnout_id,
+                turnout_side=crossover_owners[owner],
+            )
         frame = recover_reference_frame(
             position.get("centre_point"), position.get("local_rail_tangent"),
             rail.get("gauge_face_points"), rail.get("outer_face_points"),
@@ -262,20 +339,57 @@ def preview_private_catalogue_p_chairs(
     The adapter checks catalogue bytes and the unchanged source inside its
     transaction. This does not admit P to the inherited physical plan.
     """
+    return _preview_private_catalogue_p_chairs(
+        module, source_document, turnout_id, catalogue_path, create_preview,
+        entity_kind="turnout",
+    )
+
+
+def preview_private_catalogue_p_crossover_chairs(
+    module, source_document, crossover_id, catalogue_path, create_preview,
+):
+    """Inspect retained P chairs on one current C10 crossover privately.
+
+    Require two compatible C10 constituents and current applied B4 timbers.
+    Reuse unchanged P geometry at confirmed stock-rail assignments in a
+    separate unsaved document. Preserve the source and physical exclusions;
+    no fit, production, persistence, export or rights acceptance follows.
+    """
+    return _preview_private_catalogue_p_chairs(
+        module, source_document, crossover_id, catalogue_path, create_preview,
+        entity_kind="crossover",
+    )
+
+
+def _preview_private_catalogue_p_chairs(
+    module, source_document, entity_id, catalogue_path, create_preview,
+    *, entity_kind,
+):
+    """Bind unchanged P components to one complete current source snapshot."""
     _require(callable(create_preview), "the native adapter is unavailable")
     signature_text, analysis, settings, plan, rails, timbers = (
-        _open_source_context(module, source_document, turnout_id, "P")
+        _open_source_context(
+            module, source_document, entity_id, "P", entity_kind=entity_kind,
+        )
     )
     context = json.loads(signature_text)
-    _require_context(module, context, turnout_id, settings, plan)
+    owners = None
+    if entity_kind == "turnout":
+        _require_context(module, context, entity_id, settings, plan)
+    else:
+        owners = _require_p_crossover_context(
+            module, context, entity_id, settings, plan,
+        )
     placements, selected, remaining, base_z = _select_p_positions(
-        module, analysis, plan, rails, timbers, turnout_id,
+        module, analysis, plan, rails, timbers, entity_id,
+        crossover_owners=owners,
     )
     context_shapes, verify_source = _context_shapes_and_verifier(
-        module, source_document, turnout_id, "P", signature_text,
+        module, source_document, entity_id, "P", signature_text,
+        entity_kind=entity_kind,
     )
     source_receipt = {
-        "document_name": source_document.Name, "turnout_id": turnout_id,
+        "document_name": source_document.Name, entity_kind + "_id": entity_id,
         "source_context_signature": "sha256:" + hashlib.sha256(
             signature_text.encode("utf-8"),
         ).hexdigest(),
@@ -304,6 +418,9 @@ def preview_private_catalogue_p_chairs(
             "No production, export, persistence or live-update authority.",
         ],
     }
+    if entity_kind == "crossover":
+        source_receipt["source_kind"] = "crossover"
+        source_receipt["timber_context"] = "current B4 resolved timbers"
     return create_preview(
         catalogue_path, placements, context_shapes, source_receipt,
         verify_source,
