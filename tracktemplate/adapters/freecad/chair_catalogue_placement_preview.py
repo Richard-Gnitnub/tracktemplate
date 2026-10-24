@@ -27,7 +27,13 @@ from tracktemplate.application.chair_catalogue import (
     prepare_catalogue_chair,
     verify_catalogue_sources,
 )
+from tracktemplate.application.chair_pair_catalogue import (
+    CONTEXT_IDS,
+    prepare_paired_catalogue,
+    verify_paired_catalogue,
+)
 from tracktemplate.domain.chair_placement import (
+    PairedChairPlacement,
     PPlacement,
     S1JPlacement,
     S1Placement,
@@ -178,6 +184,7 @@ def _prepare_catalogue_family(
     catalogue_path, placements, context_shapes, source_receipt,
     *, family, placement_type, model_sha256, source_names,
     run="basic-04", source_context="fixed-basic-source-context",
+    prepared_selection=None,
 ):
     """Prepare one fixed assembly without creating a document.
 
@@ -190,7 +197,11 @@ def _prepare_catalogue_family(
     placements = _placements(placements, placement_type)
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
-    prepared = prepare_catalogue_chair(catalogue_path, family, run=run)
+    # The whole-crossover caller obtains supplemental selections from the
+    # repository-owned frozen reader. It verifies the complete set again
+    # at the transaction boundary, with no caller-defined trust callback.
+    prepared = (prepare_catalogue_chair(catalogue_path, family, run=run)
+                if prepared_selection is None else prepared_selection)
     require(
         prepared.label == family and prepared.run == run
         and prepared.context == source_context
@@ -356,8 +367,9 @@ def _prepare_catalogue_family(
 def create_private_catalogue_crossover_preview(
     catalogue_path, placements_by_family, context_shapes, source_receipt,
     verify_source,
+    *, paired_contexts_path=None,
 ):
-    """Create one unsaved crossover view with retained S1, S1J and P parts.
+    """Create one unsaved crossover view with qualified retained assemblies.
 
     Each family keeps its existing proper model-mm placement contract.
     The caller records every source position and evidenced exclusion.
@@ -371,9 +383,14 @@ def create_private_catalogue_crossover_preview(
 
     if not callable(verify_source):
         raise TypeError("Crossover placement requires source verification")
+    paired = (() if paired_contexts_path is None
+              else prepare_paired_catalogue(paired_contexts_path))
+    expected_groups = {"S1", "S1J", "P"}
+    if paired:
+        expected_groups.update(CONTEXT_IDS)
     require(isinstance(placements_by_family, dict)
-            and set(placements_by_family) == {"S1", "S1J", "P"},
-            "the S1, S1J and P placement groups are required")
+            and set(placements_by_family) == expected_groups,
+            "the complete qualified placement groups are required")
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     specifications = (
@@ -403,6 +420,27 @@ def create_private_catalogue_crossover_preview(
                          for name, title, colour in specs)
         layer_specs += prefixed
         selections.append((label, prepared, prefixed, prepare))
+    for prepared in paired:
+        context_id = prepared.run
+        placements = _placements(placements_by_family[context_id],
+                                 PairedChairPlacement)
+        ids = {placement.position_id for placement in placements}
+        require(len(placements) == 2 and not identities.intersection(ids),
+                "paired placements are incomplete or overlap another group")
+        identities.update(ids)
+        _prepared, specs, prepare = _prepare_catalogue_family(
+            paired_contexts_path, placements, None, receipt,
+            family=prepared.label, placement_type=PairedChairPlacement,
+            model_sha256=prepared.model_sha256,
+            source_names=tuple(item.name for item in prepared.components),
+            run=context_id, source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefix = context_id.replace("-", "_")
+        prefixed = tuple((prefix + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((context_id, prepared, prefixed, prepare))
 
     def prepare_layers():
         layers = _context_layers(context_shapes)
@@ -419,10 +457,11 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": "tracktemplate.private-catalogue-crossover.v1",
+            "contract_id": "tracktemplate.private-catalogue-crossover.v2",
             "source_receipt": receipt,
             "families": families,
-            "family_count": len(families),
+            "family_count": len({item["label"] for item in families.values()}),
+            "assembly_group_count": len(families),
             "placement_count": len(identities),
             "component_count": sum(item["component_count"]
                                    for item in families.values()),
@@ -441,7 +480,7 @@ def create_private_catalogue_crossover_preview(
             "geometry_rebuilt": False,
             "track_placements_added": len(identities),
             "limits": [
-                "Only source-supported S1, S1J and P positions are placed.",
+                "Only source-supported qualified assemblies are placed.",
                 "Every other source position keeps its evidenced exclusion.",
                 "No physical-fit, production, export or phase acceptance.",
                 "Source overlaps and hidden mating closures remain.",
@@ -468,7 +507,10 @@ def create_private_catalogue_crossover_preview(
     def verify_inputs():
         verify_source()
         for _label, prepared, _specs, _prepare in selections:
-            verify_catalogue_sources(prepared)
+            if prepared.run not in CONTEXT_IDS:
+                verify_catalogue_sources(prepared)
+        if paired:
+            verify_paired_catalogue(paired)
 
     return _materialise_preview(
         family, receipt, layer_specs, prepare_layers, verify_inputs,
