@@ -11,11 +11,16 @@ import json
 import math
 from numbers import Real
 
+from tracktemplate.application.chair_catalogue import (
+    prepare_catalogue_chair,
+    verify_catalogue_sources,
+)
 from tracktemplate.compatibility.chair_reference_preview import (
     _context_shapes_and_verifier,
     _open_source_context,
     _recover_positions,
     _select_s1j_positions,
+    _select_s1_s1j_positions,
 )
 from tracktemplate.domain.chair_placement import (
     PPlacement,
@@ -431,6 +436,303 @@ def _preview_private_catalogue_p_chairs(
         catalogue_path, placements, context_shapes, source_receipt,
         verify_source,
     )
+
+
+def _whole_crossover_records(module, analysis, rails, timbers, crossover_id):
+    """Validate every source record before interpreting an exclusion."""
+    positions = _indexed(analysis.get("positions"),
+                         "stable_chair_position_identity")
+    rail_by_id = _indexed(rails, "stable_identity")
+    timber_by_id = _indexed(timbers, "stable_identity")
+    for position in positions.values():
+        code = position.get("chair_code")
+        _require(type(code) is int and code in (
+            0, 1, 2, 5, 7, 11, 12, 15, 21, 22, 23, 24, 25, 26, 27, 28,
+        ), "unsupported whole-crossover chair code")
+        label = "" if code == 0 else module.CHAIR_CODE_CATALOG[code]["label"]
+        _require(position.get("chair_code_label") == label,
+                 "whole-crossover label and code disagree")
+        rail = rail_by_id.get(position.get("rail_identity"))
+        timber = timber_by_id.get(position.get("timber_identity"))
+        _require(rail is not None and timber is not None,
+                 "the named rail or timber source is missing")
+        _require(
+            position.get("parent_crossover_identity") == crossover_id
+            and rail.get("parent_crossover_identity") == crossover_id
+            and timber.get("crossover_identity") == crossover_id
+            and position.get("rail_name") == rail.get("name")
+            and position.get("rail_role") == rail.get("rail_role")
+            and position.get("parent_turnout_identity")
+            == rail.get("parent_turnout_identity")
+            and position.get("timber_identifier") == timber.get("identifier")
+            and position.get("stale_signature_state") is False,
+            "whole-crossover source ownership is stale or inconsistent",
+        )
+        for field in ("centre_point", "local_rail_tangent"):
+            values = position.get(field)
+            _require(isinstance(values, (list, tuple)) and len(values) == 2
+                     and all(_finite(value) for value in values),
+                     "invalid whole-crossover " + field)
+        _require(type(position.get("key_direction_sign")) is int
+                 and position["key_direction_sign"] == 0,
+                 "the retained models have no resolved key-direction policy")
+        if code == 0:
+            _require(position.get("deliberate_omission") is True
+                     and position.get("special_assignment_deferred") is False
+                     and position.get("assignment_status")
+                     == module.CHAIR_ASSIGNMENT_OMITTED,
+                     "shared support assignment is not confirmed")
+        elif code in (1, 2, 7, 11, 12):
+            _require(position.get("deliberate_omission") is False
+                     and position.get("special_assignment_deferred") is False
+                     and position.get("assignment_complete_in_current_stage")
+                     is True
+                     and position.get("assignment_status")
+                     == module.CHAIR_ASSIGNMENT_CONFIRMED,
+                     "single-rail or block assignment is not confirmed")
+            if code in (1, 7):
+                family = module.CHAIR_CODE_CATALOG[code]["family"]
+                _require(position.get("chair_family") == family
+                         and position.get("chair_footprint_parameters", {}).get(
+                             "dimension_classification")
+                         == module.CHAIR_CLASS_SOURCE,
+                         "single-rail family or source dimensions disagree")
+                orientation = (_KEY_ORIENTATION if code == 1 else
+                               "towards the adjacent rail joint; exact direction "
+                               "sign requires stored joint chainage")
+                classification = (_KEY_CLASSIFICATION if code == 1
+                                  else module.CHAIR_CLASS_SOURCE)
+                _require(position.get("key_orientation") == orientation
+                         and position.get("key_orientation_classification")
+                         == classification,
+                         "single-rail key evidence disagrees")
+        else:
+            _require(position.get("deliberate_omission") is False
+                     and position.get("special_assignment_deferred") is True
+                     and position.get("assignment_status")
+                     == module.CHAIR_ASSIGNMENT_DEFERRED_SPECIAL,
+                     "special assignment has no supported exclusion")
+            if code == 5:
+                _require(position.get("chair_family") == module.CHAIR_FAMILY_BRIDGE,
+                         "deferred bridge family disagrees")
+            else:
+                family, subtype, expected_code = (
+                    module._chair_crossing_deferred_assignment(
+                        position.get("prototype_timber_identifier"), timber, rail,
+                    )
+                )
+                _require((position.get("chair_family"),
+                          position.get("chair_subtype"), code)
+                         == (family, subtype, expected_code),
+                         "deferred crossing source assignment disagrees")
+    return positions
+
+
+def _shared_stock_support(position, positions):
+    """Link the source's deliberate switch omission to its named stock rail."""
+    names = {
+        "curved switch and closure rail": "main-side stock rail",
+        "straight switch and closure rail": "turnout-side stock rail",
+    }
+    name = names.get(position.get("rail_name"))
+    _require(name is not None, "shared switch rail name is unsupported")
+    matches = [item for item in positions.values()
+               if item.get("rail_name") == name
+               and item.get("timber_identity") == position["timber_identity"]
+               and item.get("parent_turnout_identity")
+               == position["parent_turnout_identity"]
+               and item.get("chair_code") in (2, 11, 12)]
+    _require(len(matches) == 1, "shared support owner is ambiguous or absent")
+    return matches[0]
+
+
+def _block_context_exclusion(position, mate, prepared):
+    """Compare a rigid invariant; never infer fit from catalogue availability."""
+    recipe = prepared.metadata["native_record"]["source_recipe"]
+    _require(recipe.get("sample_kind") == "fixture_timber"
+             and recipe.get("timber_id")
+             == position.get("prototype_timber_identifier")
+             and recipe.get("chair_code") == position["chair_code"],
+             "the retained block context does not identify this support")
+    source_angle = recipe["context"]["aq_k_rad"]
+    first, second = (position["local_rail_tangent"],
+                     mate["local_rail_tangent"])
+    _require(_finite(source_angle) and all(
+        abs(math.hypot(*axis) - 1.0) <= 32 * math.ulp(1.0)
+        for axis in (first, second)
+    ), "block context has an invalid rail direction")
+    # An unoriented line angle is unchanged by a rigid transform. The
+    # roundoff guard is not a physical-fit or railway acceptance tolerance.
+    target_angle = math.atan2(
+        first[0] * second[1] - first[1] * second[0],
+        first[0] * second[0] + first[1] * second[1],
+    )
+    target_angle = (target_angle + math.pi / 2) % math.pi - math.pi / 2
+    difference = abs(abs(target_angle) - abs(source_angle))
+    _require(difference > 32 * math.ulp(1.0),
+             "block context mismatch is no longer evidenced; reassess mapping")
+    return {
+        "retained_family": prepared.label,
+        "source_model_sha256": prepared.model_sha256,
+        "source_context_sha256": prepared.context["context_sha256"],
+        "retained_relative_angle_rad": source_angle,
+        "target_relative_angle_rad": target_angle,
+        "angle_magnitude_difference_rad": difference,
+        "mate_position_id": mate["stable_chair_position_identity"],
+    }
+
+
+def preview_private_catalogue_crossover_chairs(
+    module, source_document, crossover_id, catalogue_path, create_preview,
+):
+    """Preview supported retained chairs with complete crossover accounting.
+
+    Reuse existing S1, S1J and P placements. Keep deferred assignments,
+    incompatible paired references and deliberate shared omissions visible
+    in the receipt. No source assignment, shape or key policy is changed.
+    Invalid or newly unsupported evidence fails before native creation.
+    """
+    _require(callable(create_preview), "the native adapter is unavailable")
+    signature, analysis, settings, plan, rails, timbers = _open_source_context(
+        module, source_document, crossover_id, "whole crossover",
+        entity_kind="crossover",
+    )
+    owners = _require_p_crossover_context(
+        module, json.loads(signature), crossover_id, settings, plan,
+    )
+    positions = _whole_crossover_records(
+        module, analysis, rails, timbers, crossover_id,
+    )
+    first, second, remaining = _select_s1_s1j_positions(module, analysis, plan)
+    recovered = []
+    families = {}
+    for family, code, placements in (("S1", 1, first), ("S1J", 7, second)):
+        placements, remaining, records = _recover_positions(
+            module, analysis, plan, rails, timbers, placements, remaining, code,
+        )
+        _require({item.position_id for item in placements} == {
+            identity for identity, position in positions.items()
+            if position["chair_code"] == code
+        }, "a confirmed single-rail position has no supported frame")
+        families[family] = placements
+        recovered.extend(records)
+    families["P"], _selected_p, _remaining_p, base_z = _select_p_positions(
+        module, analysis, plan, rails, timbers, crossover_id,
+        crossover_owners=owners,
+    )
+    instances = _indexed(plan["instances"], "chair_position_identity")
+    originals = _indexed(plan["analytical_only"], "chair_position_identity")
+    selected_ids = {item.position_id for values in families.values()
+                    for item in values}
+    shared = {
+        identity: _shared_stock_support(position, positions)
+        for identity, position in positions.items()
+        if position["deliberate_omission"]
+    }
+    selected, excluded, preparations = [], [], {}
+    for identity, position in sorted(positions.items()):
+        code = position["chair_code"]
+        record = {
+            "position_id": identity, "rail_id": position["rail_identity"],
+            "timber_id": position["timber_identity"], "chair_code": code,
+            "chair_label": position["chair_code_label"],
+            "original_exclusion": copy.deepcopy(originals.get(identity)),
+            **{key: position[key] for key in (
+                "key_direction_sign", "key_orientation",
+                "key_orientation_classification",
+            )},
+        }
+        if identity in selected_ids:
+            if identity in instances:
+                _require(instances[identity].get("centre_point")
+                         == position.get("centre_point"),
+                         "selected plan centre differs from its source")
+            record.update(family=position["chair_code_label"],
+                          original_instance=copy.deepcopy(
+                              instances.get(identity)))
+            selected.append(record)
+            continue
+        _require(identity in originals, "excluded position has no source reason")
+        if code == 0:
+            owner_id = shared[identity]["stable_chair_position_identity"]
+            record.update(
+                exclusion_kind="confirmed-no-separate-chair",
+                reason=position["chair_subtype"],
+                supporting_position_id=owner_id,
+                supporting_assembly_placed=owner_id in selected_ids,
+            )
+        elif code in (11, 12):
+            identifier = position.get("prototype_timber_identifier")
+            _require(identifier in ("S8", "S9", "S10", "S11", "S12"),
+                     "block support has no retained C-switch recipe")
+            label = str(int(identifier[1:]) - 7) + "P"
+            if label not in preparations:
+                preparations[label] = prepare_catalogue_chair(
+                    catalogue_path, label, run="context-native-02",
+                )
+            mates = [positions[key] for key, owner in shared.items()
+                     if owner["stable_chair_position_identity"] == identity]
+            _require(len(mates) == 1, "block support has no unique shared rail")
+            record.update(
+                exclusion_kind="retained-paired-context-incompatible",
+                reason=("Retained paired-rail angle differs from this source; "
+                        "a rigid placement cannot align both rail directions. "
+                        "No physical-fit tolerance or new geometry is authorised."),
+                source_context_comparison=_block_context_exclusion(
+                    position, mates[0], preparations[label],
+                ),
+            )
+        else:
+            record.update(
+                exclusion_kind="source-assignment-deferred",
+                reason=position["chair_subtype"],
+                assignment_status=position["assignment_status"],
+                source_or_assumed_classification=(
+                    position["source_or_assumed_classification"]
+                ),
+            )
+        excluded.append(record)
+    shapes, verify_source = _context_shapes_and_verifier(
+        module, source_document, crossover_id, "whole crossover", signature,
+        entity_kind="crossover",
+    )
+
+    def verify_all_sources():
+        verify_source()
+        for prepared in preparations.values():
+            verify_catalogue_sources(prepared)
+
+    receipt = {
+        "document_name": source_document.Name, "crossover_id": crossover_id,
+        "source_kind": "crossover", "timber_context": "current B4 resolved timbers",
+        "source_context_signature": "sha256:" + hashlib.sha256(
+            signature.encode("utf-8"),
+        ).hexdigest(),
+        "source_analysis_signature": analysis["geometry_signature"],
+        "analysis_position_count": len(positions),
+        "placement_count": len(selected), "excluded_position_count": len(excluded),
+        "selected_counts": {family: len(values)
+                            for family, values in families.items()},
+        "selected_positions": selected, "excluded_positions": excluded,
+        "recovered_positions": recovered,
+        "original_analytical_exclusions": copy.deepcopy(plan["analytical_only"]),
+        "coverage_summary": (f"{len(selected)} placed; {len(excluded)} excluded; "
+                             f"{len(positions)} source positions accounted for"),
+        "source_base_z_mm": base_z,
+        "embed_depth_mm": settings["future_chair_embed_depth"],
+        "embedding_basis": "unchanged existing source-plan base_z",
+        "model_support_adjustments_applied": False,
+        "context_kind": "derived rail and timber wires",
+        "source_document_mutation": False,
+        "limits": [
+            "Complete position accounting does not mean a fully chaired crossover.",
+            "Retained key geometry does not resolve the source key-direction policy.",
+            "Deferred source assignments and incompatible paired contexts stay excluded.",
+            "No physical fit, production, export, persistence or rights acceptance.",
+        ],
+    }
+    return create_preview(catalogue_path, families, shapes, receipt,
+                          verify_all_sources)
 
 
 def _require_s1j_assignment(module, position, rail, timber, turnout_id):
