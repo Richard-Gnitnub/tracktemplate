@@ -2179,3 +2179,58 @@ This result gives no acceptance for physical fit, persistence, production, expor
 The output stays in `private-development` status. This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Central CC chair components on XO-001 — 2026-10-24
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) adds `include_central_cc=True` to `preview_private_catalogue_crossover_chairs`.
+It shows 12 `CC` chair assemblies at `X2-Y`, `X3-X` and `X4-A` on the two turnouts of `XO-001`.
+Each new assembly supplies chair components for one `stock-rail` position and one `check-rail` position.
+The software uses all 33 previous components from `CC/context-native-02`. It does not calculate new chair shapes.
+
+The output has 195 assemblies and 3951 component results.
+The previous 183 assemblies stay the same.
+The 48 positions with `exclusion_kind` of `confirmed-no-separate-chair` stay the same.
+The new assemblies supply chair components for 24 positions that have `special_assignment_deferred` set to `true`.
+The other 100 positions have no chair components in this output.
+
+All 355 source position identities and `original_analytical_exclusions` stay the same.
+All 124 values of `special_assignment_deferred` stay `true`.
+
+The [independent source check](../../tests/central_check_source_oracle.py) includes all 12 new assemblies.
+The Templot 556b source supplies data for these positions.
+The check compares each of the 396 new component positions with the previous source shapes.
+
+In each assembly, 17 chair components use one set of `x_axis` and `y_axis` values.
+The 16 `SourceFixing` components use different values.
+The software uses `source-central-check-component-frames.v1`. It calculates `host_station_mm` and `travel_heading_rad` as before.
+
+`fixing_angle_frame` is `uncurved-RH-source-before-common-host-rotation`.
+The software turns the `SourceFixing` components by `travel_heading_rad`. Templot keeps `BOLTBOSS` at `0` after it turns the other components.
+`templot_global_fixing_angle_parity` and `random_export_parity` stay `false`.
+These checks give no acceptance for physical fit. No numerical tolerance for physical fit is set.
+
+The [standalone Python test](../../tests/validate_phase9b_catalogue_central_check.py) gives a PASS result.
+The previous crossover and TrackTemplate Core tests also give PASS results.
+
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_central_check.py) gives a PASS result without the FreeCAD display.
+It compares all 3555 previous component results and all 396 new component results.
+It checks the new components again after `Undo/Redo`.
+The source `App.Document`, the other test `App.Document` and the source files stay the same.
+
+The same test gives a PASS result with the FreeCAD display.
+It includes `Undo/Redo`, selection, changes to `ViewObject.Visibility` and `transaction_rollback` checks for `CC`.
+An independent reviewer did an inspection of all 12 new positions, the full crossover and the previous chair groups.
+
+The independent review of the source and tests gives a PASS result.
+
+Local evidence is in `tmp/central-check-preview/`, with `native-02/` and `gui-01/`.
+The previous C10 limitations and `key_direction_sign` of `0` stay the same. `Q-PAIR-002` stays `BACKLOG`.
+
+`project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
+This result gives no acceptance for persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

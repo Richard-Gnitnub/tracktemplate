@@ -575,7 +575,7 @@ def _block_context_exclusion(position, mate, prepared):
 
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
-    *, paired_contexts_path=None,
+    *, paired_contexts_path=None, include_central_cc=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -583,8 +583,13 @@ def preview_private_catalogue_crossover_chairs(
     unqualified paired references and deliberate shared omissions visible
     in the receipt. An explicit frozen supplement admits all twenty paired
     source contexts. No source assignment, shape or key policy is changed.
-    Invalid or newly unsupported evidence fails before native creation.
+    The central CC option adds twelve stock/check assemblies, with source
+    component frames. Invalid evidence fails before native creation.
     """
+    _require(type(include_central_cc) is bool,
+             "include_central_cc requires an actual Boolean")
+    _require(not include_central_cc or paired_contexts_path is not None,
+             "central CC requires the paired supplement")
     _require(callable(create_preview), "the native adapter is unavailable")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
         module, source_document, crossover_id, "whole crossover",
@@ -631,6 +636,19 @@ def preview_private_catalogue_crossover_chairs(
             paired_contexts_path,
         )
         families.update(pairs)
+    check_witnesses, check_companions = {}, {}
+    verify_checks = None
+    if include_central_cc:
+        from tracktemplate.compatibility.chair_check_placement import (
+            prepare_central_checks,
+        )
+        checks, check_witnesses, check_companions, verify_checks = (
+            prepare_central_checks(
+                module, source_document, signature, positions, timbers, base_z,
+                catalogue_path,
+            )
+        )
+        families["CC"] = checks
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
     selected, excluded, preparations = [], [], {}
@@ -661,10 +679,21 @@ def preview_private_catalogue_crossover_chairs(
                          "paired support has no unique shared rail")
                 record.update(pair_witnesses[identity],
                               mate_position_id=mates[0])
+            if identity in check_witnesses:
+                record.update(check_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
-        if code == 0:
+        if identity in check_companions:
+            record.update(
+                exclusion_kind="source-paired-reference-support",
+                supporting_position_id=check_companions[identity],
+                supporting_assembly_placed=True,
+                assignment_status=position["assignment_status"],
+                reason="The source CC assembly includes this check support; "
+                       "the canonical deferred assignment is unchanged.",
+            )
+        elif code == 0:
             owner_id = shared[identity]["stable_chair_position_identity"]
             record.update(
                 exclusion_kind="confirmed-no-separate-chair",
@@ -713,6 +742,8 @@ def preview_private_catalogue_crossover_chairs(
         verify_source()
         if verify_hosts is not None:
             verify_hosts()
+        if verify_checks is not None:
+            verify_checks()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -745,6 +776,36 @@ def preview_private_catalogue_crossover_chairs(
             "No physical fit, production, export, persistence or rights acceptance.",
         ],
     }
+    if include_central_cc:
+        represented = len(selected) + len(shared) + len(check_companions)
+        receipt.update(
+            represented_source_position_count=represented,
+            unrepresented_source_position_count=len(positions) - represented,
+            existing_shared_support_count=len(shared),
+            source_paired_check_support_count=len(check_companions),
+            canonical_deferred_assignment_count=sum(
+                position["special_assignment_deferred"] is True
+                for position in positions.values()
+            ),
+            coverage_summary=(f"{len(selected)} assemblies; {len(shared)} "
+                              f"existing shared supports; {len(check_companions)} "
+                              "source-paired check supports; "
+                              f"{len(positions) - represented} unrepresented; "
+                              f"{len(positions)} source positions accounted for"),
+        )
+        receipt["limits"] = [
+            "All canonical deferred assignments and exclusions remain unchanged.",
+            "Central CC fixings use separate source component frames.",
+            "Fixing head rotation is zero; random export parity is not claimed.",
+            "Fixing angles use the local source frame then the common host "
+            "rotation; final Templot global fixing angles are not reproduced.",
+            "Retained keys do not resolve the source key-direction policy.",
+            "No physical fit, production, export, persistence or rights acceptance.",
+        ]
+        return create_preview(
+            catalogue_path, families, shapes, receipt, verify_all_sources,
+            paired_contexts_path=paired_contexts_path, include_central_cc=True,
+        )
     if paired_contexts_path is None:
         return create_preview(catalogue_path, families, shapes, receipt,
                               verify_all_sources)
