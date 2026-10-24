@@ -38,6 +38,10 @@ from tracktemplate.domain.chair_placement import (
     S1JPlacement,
     S1Placement,
 )
+from tracktemplate.domain.central_check_placement import (
+    CentralCheckPlacement,
+    prepare_central_check_placements,
+)
 
 
 _P_MODEL_SHA256 = (
@@ -64,6 +68,12 @@ _S1J_SOURCE_NAMES = (
 )
 _S1_MODEL_SHA256 = (
     "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb"
+)
+_CC_MODEL_SHA256 = (
+    "b28b574a517e677c86fc35e26cab9a966e41504cb2242968db45e7c07ac81637"
+)
+_CC_FIXING_NAMES = ("SourceFixing",) + tuple(
+    f"SourceFixing{index:03d}" for index in range(1, 16)
 )
 _S1_SOURCE_NAMES = (
     "Part_00", "Part_01", "Part_02", "Part_03", "Part_04",
@@ -194,7 +204,9 @@ def _prepare_catalogue_family(
     def require(condition, message):
         _require(condition, message, family=family)
 
-    placements = _placements(placements, placement_type)
+    placements = (prepare_central_check_placements(placements)
+                  if placement_type is CentralCheckPlacement else
+                  _placements(placements, placement_type))
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     # The whole-crossover caller obtains supplemental selections from the
@@ -246,10 +258,17 @@ def _prepare_catalogue_family(
             for index, (component, prototype, _measured) in enumerate(
                 admitted,
             ):
+                component_frame = placement
+                if (isinstance(placement, CentralCheckPlacement)
+                        and component.name in _CC_FIXING_NAMES):
+                    fixing_index = _CC_FIXING_NAMES.index(component.name) // 4
+                    component_frame = placement.fixing_frames[fixing_index]
+                component_rigid = (rigid if component_frame is placement
+                                   else _host_placement(component_frame))
                 # The shallow wrapper shares native geometry, not its location.
                 # The B-rep already contains each fitting's local placement.
                 shape = Part.Shape(prototype)
-                shape.Placement = rigid.multiply(prototype.Placement)
+                shape.Placement = component_rigid.multiply(prototype.Placement)
                 require(shape.isPartner(prototype)
                         and shape.Orientation == prototype.Orientation,
                         "rigid placement changed native geometry")
@@ -262,6 +281,12 @@ def _prepare_catalogue_family(
                     placement_identity=(placement.position_id,
                                         prepared.model_sha256, component.name),
                 ))
+                if isinstance(placement, CentralCheckPlacement):
+                    measurements[-1].update(
+                        origin_mm=component_frame.origin_mm,
+                        x_axis=component_frame.x_axis,
+                        y_axis=component_frame.y_axis,
+                    )
                 by_component[index].append(shape)
             placed_records.append({
                 "position_id": placement.position_id,
@@ -336,6 +361,14 @@ def _prepare_catalogue_family(
                 "Unresolved key direction and original exclusions remain.",
             ],
         }
+        if placement_type is CentralCheckPlacement:
+            result.update(
+                contract_id="tracktemplate.private-catalogue-cc-placement.v1",
+                placement="source-central-check-component-frames.v1",
+                fixing_head_rotation_rad=0.0, random_export_parity=False,
+                fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
+                templot_global_fixing_angle_parity=False,
+            )
 
         def verify_layers(stored):
             require(len(stored) == len(layers), "stored layer count changed")
@@ -367,7 +400,7 @@ def _prepare_catalogue_family(
 def create_private_catalogue_crossover_preview(
     catalogue_path, placements_by_family, context_shapes, source_receipt,
     verify_source,
-    *, paired_contexts_path=None,
+    *, paired_contexts_path=None, include_central_cc=False,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -381,6 +414,10 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(type(include_central_cc) is bool,
+            "include_central_cc requires an actual Boolean")
+    require(not include_central_cc or paired_contexts_path is not None,
+            "central CC requires the paired supplement")
     if not callable(verify_source):
         raise TypeError("Crossover placement requires source verification")
     paired = (() if paired_contexts_path is None
@@ -388,6 +425,8 @@ def create_private_catalogue_crossover_preview(
     expected_groups = {"S1", "S1J", "P"}
     if paired:
         expected_groups.update(CONTEXT_IDS)
+    if include_central_cc:
+        expected_groups.add("CC")
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -441,6 +480,30 @@ def create_private_catalogue_crossover_preview(
                          for name, title, colour in specs)
         layer_specs += prefixed
         selections.append((context_id, prepared, prefixed, prepare))
+    if include_central_cc:
+        prepared = prepare_catalogue_chair(
+            catalogue_path, "CC", run="context-native-02",
+        )
+        placements = prepare_central_check_placements(placements_by_family["CC"])
+        ids = {placement.position_id for placement in placements}
+        require(len(placements) == 12 and not identities.intersection(ids),
+                "central CC placements are incomplete or overlap another group")
+        require(len(prepared.components) == 33
+                and tuple(item.name for item in prepared.components[-16:])
+                == _CC_FIXING_NAMES,
+                "central CC component identities differ")
+        identities.update(ids)
+        _prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, placements, None, receipt,
+            family="CC", placement_type=CentralCheckPlacement,
+            model_sha256=_CC_MODEL_SHA256,
+            source_names=tuple(item.name for item in prepared.components),
+            run="context-native-02", source_context=prepared.context,
+        )
+        prefixed = tuple(("CC_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append(("CC", prepared, prefixed, prepare))
 
     def prepare_layers():
         layers = _context_layers(context_shapes)
@@ -457,7 +520,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": "tracktemplate.private-catalogue-crossover.v2",
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v3"
+                            if include_central_cc else
+                            "tracktemplate.private-catalogue-crossover.v2"),
             "source_receipt": receipt,
             "families": families,
             "family_count": len({item["label"] for item in families.values()}),
@@ -489,6 +554,8 @@ def create_private_catalogue_crossover_preview(
                 "Unresolved key direction remains.",
             ],
         }
+        if include_central_cc:
+            result["placement"] = "proper-source-component-frames-on-retained-brep"
 
         def verify_layers(stored):
             require(len(stored) == len(layers), "stored layer count changed")
