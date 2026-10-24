@@ -37,14 +37,14 @@ def whole_source():
     plan["analytical_only"][:] = [
         p for p in plan["analytical_only"] if p["chair_label"] == "P"
     ]
-    module.CHAIR_FAMILY_ORDINARY = "running chair"
-    module.CHAIR_FAMILY_JOINT = "joint chair"
     module.CHAIR_FAMILY_BRIDGE = "bridge chair"
     module.CHAIR_ASSIGNMENT_OMITTED = "confirmed shared switch support"
     module.CHAIR_ASSIGNMENT_DEFERRED_SPECIAL = "deferred special"
     module.CHAIR_CODE_CATALOG = {
-        1: {"label": "S1"}, 2: {"label": "P"}, 5: {"label": "L1"},
-        7: {"label": "S1J"}, 11: {"label": "1P/2P"},
+        1: {"label": "S1", "family": "running chair"},
+        2: {"label": "P"}, 5: {"label": "L1"},
+        7: {"label": "S1J", "family": "joint chair"},
+        11: {"label": "1P/2P"},
     }
     module._chair_supported_physical_position = lambda _p: (True, "supported")
     template = copy.deepcopy(positions[0])
@@ -70,8 +70,7 @@ def whole_source():
                           identifier=identifier, prototype_reference=identifier)
             timbers.append(timber)
         if code in (1, 7):
-            position["chair_family"] = (module.CHAIR_FAMILY_ORDINARY if code == 1
-                                        else module.CHAIR_FAMILY_JOINT)
+            position["chair_family"] = module.CHAIR_CODE_CATALOG[code]["family"]
         if code == 5:
             position["chair_family"] = module.CHAIR_FAMILY_BRIDGE
         if code == 7:

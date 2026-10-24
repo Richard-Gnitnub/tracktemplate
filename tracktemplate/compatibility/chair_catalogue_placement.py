@@ -491,8 +491,7 @@ def _whole_crossover_records(module, analysis, rails, timbers, crossover_id):
                      == module.CHAIR_ASSIGNMENT_CONFIRMED,
                      "single-rail or block assignment is not confirmed")
             if code in (1, 7):
-                family = (module.CHAIR_FAMILY_ORDINARY if code == 1
-                          else module.CHAIR_FAMILY_JOINT)
+                family = module.CHAIR_CODE_CATALOG[code]["family"]
                 _require(position.get("chair_family") == family
                          and position.get("chair_footprint_parameters", {}).get(
                              "dimension_classification")
