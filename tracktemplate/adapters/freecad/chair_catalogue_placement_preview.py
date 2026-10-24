@@ -1,4 +1,4 @@
-"""Place retained private P and S1J chairs without rebuilding geometry.
+"""Place retained private chair assemblies without rebuilding geometry.
 
 The fixed catalogue supplies chair-local model-mm B-reps. Each copied
 component receives one outer proper track-frame transform. The source
@@ -27,7 +27,11 @@ from tracktemplate.application.chair_catalogue import (
     prepare_catalogue_chair,
     verify_catalogue_sources,
 )
-from tracktemplate.domain.chair_placement import PPlacement, S1JPlacement
+from tracktemplate.domain.chair_placement import (
+    PPlacement,
+    S1JPlacement,
+    S1Placement,
+)
 
 
 _P_MODEL_SHA256 = (
@@ -51,6 +55,20 @@ _S1J_SOURCE_NAMES = (
     "SourceFixing004", "SourceFixing005", "SourceFixing006",
     "SourceFixing007", "SourceFixing008", "SourceFixing009",
     "SourceFixing010", "SourceFixing011",
+)
+_S1_MODEL_SHA256 = (
+    "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb"
+)
+_S1_SOURCE_NAMES = (
+    "Part_00", "Part_01", "Part_02", "Part_03", "Part_04",
+    "SourceFixing", "SourceFixing001", "SourceFixing002", "SourceFixing003",
+    "SourceFixing004", "SourceFixing005", "SourceFixing006",
+    "SourceFixing007", "SourceFixing008", "SourceFixing009",
+    "SourceFixing010", "SourceFixing011",
+)
+_CONTEXT_SPECS = (
+    ("ReferenceRails", "rail context", (0.55, 0.58, 0.62)),
+    ("ReferenceTimbers", "timber context", (0.55, 0.40, 0.25)),
 )
 _DISCRETE_FIELDS = (
     "shape_type", "solid_count", "shell_count", "face_count", "wire_count",
@@ -137,18 +155,45 @@ def _create_private_catalogue_preview(
     *, family, placement_type, model_sha256, source_names,
 ):
     """Place one fixed family through the shared component lifecycle."""
+    if not callable(verify_source):
+        raise TypeError(f"{family} placement requires source verification")
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    prepared, layer_specs, prepare_layers = _prepare_catalogue_family(
+        catalogue_path, placements, context_shapes, receipt,
+        family=family, placement_type=placement_type,
+        model_sha256=model_sha256, source_names=source_names,
+    )
+
+    def verify_inputs():
+        verify_source()
+        verify_catalogue_sources(prepared)
+
+    return _materialise_preview(
+        family, receipt, layer_specs, prepare_layers, verify_inputs,
+        title_suffix="catalogue placements",
+    )
+
+
+def _prepare_catalogue_family(
+    catalogue_path, placements, context_shapes, source_receipt,
+    *, family, placement_type, model_sha256, source_names,
+    run="basic-04", source_context="fixed-basic-source-context",
+):
+    """Prepare one fixed assembly without creating a document.
+
+    A whole-crossover caller supplies its shared context separately.
+    Existing single-family callers keep their original context layers.
+    """
     def require(condition, message):
         _require(condition, message, family=family)
 
-    if not callable(verify_source):
-        raise TypeError(f"{family} placement requires source verification")
     placements = _placements(placements, placement_type)
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
-    prepared = prepare_catalogue_chair(catalogue_path, family, run="basic-04")
+    prepared = prepare_catalogue_chair(catalogue_path, family, run=run)
     require(
-        prepared.label == family and prepared.run == "basic-04"
-        and prepared.context == "fixed-basic-source-context"
+        prepared.label == family and prepared.run == run
+        and prepared.context == source_context
         and prepared.model_sha256 == model_sha256
         and tuple(item.name for item in prepared.components)
         == source_names,
@@ -156,13 +201,13 @@ def _create_private_catalogue_preview(
     )
     components = tuple(item for item in prepared.components
                        if item.name != "display_rail")
-    excluded, = (item for item in prepared.components
-                 if item.name == "display_rail")
-    layer_specs = (
-        ("ReferenceRails", "rail context", (0.55, 0.58, 0.62)),
-        ("ReferenceTimbers", "timber context", (0.55, 0.40, 0.25)),
-    ) + tuple((item.name, item.label, _component_colour(item.label))
-              for item in components)
+    excluded = tuple(item for item in prepared.components
+                     if item.name == "display_rail")
+    context_specs = _CONTEXT_SPECS if context_shapes is not None else ()
+    layer_specs = context_specs + tuple(
+        (item.name, item.label, _component_colour(item.label))
+        for item in components
+    )
 
     def prepare_layers():
         all_shapes, all_measurements = _import_components(prepared)
@@ -229,7 +274,9 @@ def _create_private_catalogue_preview(
         require(original_metrics == tuple(
             _prototype_state(shape, family=family) for shape in prototypes
         ), "placement changed a shared source component")
-        layers = _context_layers(context_shapes) + tuple(compounds)
+        context = (_context_layers(context_shapes)
+                   if context_shapes is not None else ())
+        layers = context + tuple(compounds)
         result = {
             "contract_id": (
                 f"tracktemplate.private-catalogue-{family.lower()}-placement.v1"
@@ -250,9 +297,9 @@ def _create_private_catalogue_preview(
             "components": prototype_records,
             "placements": placed_records,
             "excluded_source_components": [{
-                **_source_identity(prepared, excluded),
+                **_source_identity(prepared, item),
                 "reason": "Source display rail is context, not a chair part.",
-            }],
+            } for item in excluded],
             "project_status": "reference-only",
             "intended_uses": ["private-development"],
             "production_geometry_authorized": False,
@@ -284,7 +331,7 @@ def _create_private_catalogue_preview(
             for index, (actual, expected) in enumerate(zip(stored, layers)):
                 require(_same_presented_shape(actual, expected),
                         "stored layer geometry or placement changed")
-                if index < 2:
+                if index < len(context):
                     _measure_layer(actual)
                     require(not actual.Faces and not actual.Solids
                             and len(actual.Edges) == len(expected.Edges),
@@ -292,7 +339,7 @@ def _create_private_catalogue_preview(
                     continue
                 _verify_component(actual, expected, family=family)
                 children = actual.childShapes()
-                originals = by_component[index - 2]
+                originals = by_component[index - len(context)]
                 require(len(children) == len(originals),
                         "stored component child count changed")
                 for child, original in zip(children, originals):
@@ -303,11 +350,127 @@ def _create_private_catalogue_preview(
 
         return layers, result, verify_layers
 
+    return prepared, layer_specs, prepare_layers
+
+
+def create_private_catalogue_crossover_preview(
+    catalogue_path, placements_by_family, context_shapes, source_receipt,
+    verify_source,
+):
+    """Create one unsaved crossover view with retained S1, S1J and P parts.
+
+    Each family keeps its existing proper model-mm placement contract.
+    The caller records every source position and evidenced exclusion.
+    All families share one transaction and copied rail/timber context.
+    No geometry, scale, source frame or key-direction policy is changed.
+    """
+    family = "Crossover"
+
+    def require(condition, message):
+        _require(condition, message, family=family)
+
+    if not callable(verify_source):
+        raise TypeError("Crossover placement requires source verification")
+    require(isinstance(placements_by_family, dict)
+            and set(placements_by_family) == {"S1", "S1J", "P"},
+            "the S1, S1J and P placement groups are required")
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    specifications = (
+        ("S1", S1Placement, _S1_MODEL_SHA256, _S1_SOURCE_NAMES,
+         "existing-02", "retained-S1-L1-reference-package"),
+        ("S1J", S1JPlacement, _S1J_MODEL_SHA256, _S1J_SOURCE_NAMES,
+         "basic-04", "fixed-basic-source-context"),
+        ("P", PPlacement, _P_MODEL_SHA256, _P_SOURCE_NAMES,
+         "basic-04", "fixed-basic-source-context"),
+    )
+    selections = []
+    identities = set()
+    layer_specs = _CONTEXT_SPECS
+    for label, placement_type, digest, names, run, context in specifications:
+        placements = _placements(placements_by_family[label], placement_type)
+        ids = {placement.position_id for placement in placements}
+        require(not identities.intersection(ids),
+                "placement identities overlap between families")
+        identities.update(ids)
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, placements, None, receipt,
+            family=label, placement_type=placement_type,
+            model_sha256=digest, source_names=names,
+            run=run, source_context=context,
+        )
+        prefixed = tuple((label + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((label, prepared, prefixed, prepare))
+
+    def prepare_layers():
+        layers = _context_layers(context_shapes)
+        families = {}
+        verifiers = []
+        for label, _prepared, specs, prepare in selections:
+            components, result, verify = prepare()
+            start = len(layers)
+            layers += components
+            verifiers.append((start, len(layers), verify))
+            result.pop("source_receipt")
+            result["family"] = label
+            result["layers"] = [dict(_measure_layer(shape), name=spec[0])
+                                for spec, shape in zip(specs, components)]
+            families[label] = result
+        result = {
+            "contract_id": "tracktemplate.private-catalogue-crossover.v1",
+            "source_receipt": receipt,
+            "families": families,
+            "family_count": len(families),
+            "placement_count": len(identities),
+            "component_count": sum(item["component_count"]
+                                   for item in families.values()),
+            "layer_count": len(layers),
+            "solid_count": sum(item["solid_count"]
+                               for item in families.values()),
+            "layers": [dict(_measure_layer(shape), name=spec[0])
+                       for spec, shape in zip(layer_specs, layers)],
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "length_unit": "mm",
+            "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "outer-proper-planar-frame-on-retained-brep",
+            "geometry_rebuilt": False,
+            "track_placements_added": len(identities),
+            "limits": [
+                "Only source-supported S1, S1J and P positions are placed.",
+                "Every other source position keeps its evidenced exclusion.",
+                "No physical-fit, production, export or phase acceptance.",
+                "Source overlaps and hidden mating closures remain.",
+                "No source XML placement, scale or frame conversion "
+                "reapplied.",
+                "Unresolved key direction remains.",
+            ],
+        }
+
+        def verify_layers(stored):
+            require(len(stored) == len(layers), "stored layer count changed")
+            for actual, expected in zip(stored[:2], layers[:2]):
+                require(_same_presented_shape(actual, expected),
+                        "stored context geometry or placement changed")
+                _measure_layer(actual)
+                require(not actual.Faces and not actual.Solids
+                        and len(actual.Edges) == len(expected.Edges),
+                        "stored context is no longer the copied wires")
+            for start, end, verify in verifiers:
+                verify(stored[start:end])
+
+        return layers, result, verify_layers
+
     def verify_inputs():
         verify_source()
-        verify_catalogue_sources(prepared)
+        for _label, prepared, _specs, _prepare in selections:
+            verify_catalogue_sources(prepared)
 
     return _materialise_preview(
         family, receipt, layer_specs, prepare_layers, verify_inputs,
-        title_suffix="catalogue placements",
+        title_suffix="retained catalogue assemblies",
     )

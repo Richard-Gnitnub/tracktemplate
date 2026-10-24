@@ -2578,6 +2578,7 @@ class ModularCoreLayoutWorkflowSession:
         private_catalogue_preview_factory=None,
         private_catalogue_p_preview_factory=None,
         private_catalogue_s1j_preview_factory=None,
+        private_catalogue_crossover_preview_factory=None,
     ):
         staged = staged or atomic
         if staged and not callable(export_files_factory):
@@ -2606,6 +2607,9 @@ class ModularCoreLayoutWorkflowSession:
         )
         self._private_catalogue_s1j_preview_factory = (
             private_catalogue_s1j_preview_factory
+        )
+        self._private_catalogue_crossover_preview_factory = (
+            private_catalogue_crossover_preview_factory
         )
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
@@ -2958,6 +2962,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_p_preview_factory,
         )
 
+    def preview_private_catalogue_crossover_chairs(
+        self, source_document, crossover_id, catalogue_path,
+    ):
+        """Inspect retained chairs and every exclusion on a private crossover."""
+        from tracktemplate.compatibility.chair_catalogue_placement import (
+            preview_private_catalogue_crossover_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_crossover_chairs(
+            self.module, source_document, crossover_id, catalogue_path,
+            self._private_catalogue_crossover_preview_factory,
+        )
+
     def launch_workflow(self):
         """Launch after restoring and checking both selected route groups."""
         self._bind_core_layout_export()
@@ -2982,6 +3000,7 @@ def load_modular_transition_workflow_session(
     private_catalogue_preview_factory=None,
     private_catalogue_p_preview_factory=None,
     private_catalogue_s1j_preview_factory=None,
+    private_catalogue_crossover_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -3045,5 +3064,8 @@ def load_modular_transition_workflow_session(
         private_catalogue_p_preview_factory=private_catalogue_p_preview_factory,
         private_catalogue_s1j_preview_factory=(
             private_catalogue_s1j_preview_factory
+        ),
+        private_catalogue_crossover_preview_factory=(
+            private_catalogue_crossover_preview_factory
         ),
     )

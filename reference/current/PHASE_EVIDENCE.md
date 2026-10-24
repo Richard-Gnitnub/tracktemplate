@@ -2079,3 +2079,50 @@ This result gives no acceptance for physical fit, persistence, production, expor
 This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Chair components across the XO-001 crossover — 2026-10-24
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) supplies `preview_private_catalogue_crossover_chairs` for B16.
+It shows chair components at 163 positions in one new `App.Document` for `XO-001`.
+The software does not write the document to a file.
+
+It shows 17 components at each of 123 `S1` positions and each of 12 `S1J` positions.
+It shows 22 components at each of 28 `P` positions.
+The total is 2911 component results.
+The software uses the previous shapes and the previous software to put them at the same positions.
+
+The `source_receipt` contains data for all 355 source positions.
+It gives the identity and source cause for each of the 192 positions where the software does not put chair components:
+
+- 124 positions have `special_assignment_deferred` set to `true`.
+- At 20 positions, the angle between the two rail directions is different from that in the previous model. The software cannot move and turn the previous model to make the two directions agree.
+- At 48 positions, the source shows a chair at another position. The output shows chair components for 28 of these 48 positions. It does not show chair components for the other 20 positions.
+
+The `key_direction_sign` stays `0`.
+The previous [C10 input conditions and key limitations](#p-chair-components-at-c10-positions--2026-10-23) stay the same.
+
+The [standalone test](../../tests/validate_phase9b_catalogue_whole_crossover.py) gives a PASS result.
+The previous `P`, `S1J` and Core tests also give PASS results.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_whole_crossover.py) gives a PASS result without the GUI.
+It compares all 2911 component results with the previous shapes.
+
+The same test gives a PASS result with the GUI.
+It includes selection, visibility, `Undo/Redo` and failure checks.
+The source and unrelated documents stay unchanged.
+Visual inspection includes the full crossover and chair components from each family on the two turnouts.
+The independent review of the source and tests gives a PASS result.
+
+Local evidence is in `tmp/whole-crossover-preview/`, with `native-01/` and `gui-02/`.
+
+The first GUI test gave a FAIL result after the FreeCAD `Document::Save` operation.
+This operation changed internal `ElementMap` data. It did not change the geometry data.
+A control with no chair output caused the same changes.
+The second run sets `AutoSaveEnabled` to `false` before FreeCAD starts.
+The software and tests stay the same.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+The output stays in `private-development` status. This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
