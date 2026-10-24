@@ -2127,3 +2127,55 @@ This result gives no acceptance for physical fit, persistence, production, expor
 The output stays in `private-development` status. This result gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Chair components at S8–S12 — 2026-10-24
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The software adds chair components at 20 positions on `S8`–`S12` for `XO-001` output in `private-development` status.
+It uses ten sets of source inputs: `RH-MS-1P` to `RH-MS-5P` and `RH-TS-1P` to `RH-TS-5P`.
+The software uses the previous `context_native.py` to prepare these source inputs.
+The `preview_private_catalogue_crossover_chairs` operation uses `chair_pair_catalogue.py` to read the chair components.
+It applies `source-paired-common-timber-frame.v1` to put them on the crossover.
+
+The earlier [crossover check](#chair-components-across-the-xo-001-crossover--2026-10-24) used `aq_k_rad` and a value calculated from `local_rail_tangent`.
+The first value is `retained_uncurved_gauge_face_angle_rad`. The second uses `target_sampled_world_midline_tangents`.
+Their difference did not prove that the source chair components were incorrect.
+
+The source check from an independent reviewer includes all 20 positions.
+It includes `x_mm`, `y_mm`, `rotation_rad`, `crop_mm` and `shear_rad`.
+It includes the `S12` inputs with `aq_branch` set to `closure`.
+The [source check](../../tests/paired_switch_source_oracle.py) identifies the source files and their applicable parts.
+
+The output has 183 chair assemblies and 3555 component results.
+The previous 163 assemblies and all 355 source position identities stay the same.
+The `source_receipt` includes the other 172 positions:
+
+- 124 positions keep `special_assignment_deferred` set to `true`.
+- 48 positions use a chair assembly at a different source position. The output now shows all 48 of these assemblies.
+
+`key_direction_sign` stays `0`. The previous C10 limitations stay the same.
+
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_paired_crossover.py) gives PASS results with and without the FreeCAD display.
+It does a check of all 3555 component results, `Undo/Redo`, `transaction_rollback`, selection and `ViewObject.Visibility`.
+The source files and the other test `App.Document` stay the same.
+An independent reviewer did a visual inspection of all 20 new positions and six previous groups of chair components.
+
+These full FreeCAD tests gave PASS results before the last source repair.
+That repair changes only how `CONTEXT_IDS` supplies its values. The type, values and sequence stay the same.
+An independent reviewer found `remaining_ast_identical: true` for the other Python source.
+The last FreeCAD check reads all ten sets of source inputs and does a check of all 20 positions.
+The Python checks after the repair and the previous `validate_core_export_staging.py` test give PASS results.
+
+The independent reviewer gives `PASS_WITH_FINDINGS` for the source and tests after the repair.
+`Q-PAIR-001` is resolved. `Q-PAIR-002` stays `BACKLOG` in `tmp/paired-switch-preview/quality-review-02.json`.
+This finding is about different units in `_near`. Different source checks include `rotation_rad`, `aq_k_rad` and `shear_rad`.
+
+An independent reviewer measured distances at 80 source points. The distances from the data samples for each `rail_id` are 0.000127 to 0.006716 mm.
+These results give no acceptance for physical fit. No numerical tolerance for physical fit is set.
+Local evidence is in `tmp/paired-switch-preview/` and `tmp/paired-switch-context/`.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+The output stays in `private-development` status. This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

@@ -172,8 +172,13 @@ class WholeCrossoverTests(unittest.TestCase):
         self.assertTrue(excluded["p-mate"]["supporting_assembly_placed"])
         self.assertFalse(excluded["block-mate"]["supporting_assembly_placed"])
         self.assertEqual(excluded["block-mate"]["supporting_position_id"], "block")
-        self.assertAlmostEqual(excluded["block"]["source_context_comparison"][
-            "angle_magnitude_difference_rad"], 0.12)
+        comparison = excluded["block"]["source_context_comparison"]
+        self.assertEqual(comparison["retained_uncurved_gauge_face_angle_rad"],
+                         0.03)
+        self.assertEqual(comparison["physical_fit"], "NOT_PROVED")
+        self.assertEqual(excluded["block"]["exclusion_kind"],
+                         "paired-source-context-not-qualified")
+        self.assertNotIn("angle_magnitude_difference_rad", comparison)
         self.assertEqual(receipt["original_analytical_exclusions"],
                          source[4]["analytical_only"])
         verified.assert_called_once()
@@ -227,12 +232,18 @@ class WholeCrossoverTests(unittest.TestCase):
                 item[field] = value
                 self.reject(source)
 
-    def test_refuses_old_mismatch_when_pair_now_matches(self):
+    def test_equal_sampled_angle_does_not_qualify_source_context(self):
         source = whole_source()
         mate = next(p for p in source[3][2]["positions"]
                     if p["stable_chair_position_identity"] == "block-mate")
         mate["local_rail_tangent"] = [math.cos(0.03), math.sin(0.03)]
-        self.reject(source)
+        receipt = preview(source, lambda _p, _f, _s, result, _v: result)
+        block = next(item for item in receipt["excluded_positions"]
+                     if item["position_id"] == "block")
+        self.assertEqual(block["exclusion_kind"],
+                         "paired-source-context-not-qualified")
+        self.assertNotIn("angle_magnitude_difference_rad",
+                         block["source_context_comparison"])
 
     def test_late_source_and_catalogue_changes_refused(self):
         for change in ("source", "catalogue"):

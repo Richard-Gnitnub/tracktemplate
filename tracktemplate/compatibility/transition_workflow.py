@@ -2964,6 +2964,7 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_crossover_chairs(
         self, source_document, crossover_id, catalogue_path,
+        *, paired_contexts_path=None,
     ):
         """Inspect retained chairs and every exclusion on a private crossover."""
         from tracktemplate.compatibility.chair_catalogue_placement import (
@@ -2971,9 +2972,13 @@ class ModularCoreLayoutWorkflowSession:
         )
 
         self.routing_record()
+        arguments = {} if paired_contexts_path is None else {
+            "paired_contexts_path": paired_contexts_path,
+        }
         return preview_private_catalogue_crossover_chairs(
             self.module, source_document, crossover_id, catalogue_path,
             self._private_catalogue_crossover_preview_factory,
+            **arguments,
         )
 
     def launch_workflow(self):

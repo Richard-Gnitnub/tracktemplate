@@ -547,7 +547,7 @@ def _shared_stock_support(position, positions):
 
 
 def _block_context_exclusion(position, mate, prepared):
-    """Compare a rigid invariant; never infer fit from catalogue availability."""
+    """Describe the missing qualification without comparing unlike frames."""
     recipe = prepared.metadata["native_record"]["source_recipe"]
     _require(recipe.get("sample_kind") == "fixture_timber"
              and recipe.get("timber_id")
@@ -561,35 +561,28 @@ def _block_context_exclusion(position, mate, prepared):
         abs(math.hypot(*axis) - 1.0) <= 32 * math.ulp(1.0)
         for axis in (first, second)
     ), "block context has an invalid rail direction")
-    # An unoriented line angle is unchanged by a rigid transform. The
-    # roundoff guard is not a physical-fit or railway acceptance tolerance.
-    target_angle = math.atan2(
-        first[0] * second[1] - first[1] * second[0],
-        first[0] * second[0] + first[1] * second[1],
-    )
-    target_angle = (target_angle + math.pi / 2) % math.pi - math.pi / 2
-    difference = abs(abs(target_angle) - abs(source_angle))
-    _require(difference > 32 * math.ulp(1.0),
-             "block context mismatch is no longer evidenced; reassess mapping")
     return {
         "retained_family": prepared.label,
         "source_model_sha256": prepared.model_sha256,
         "source_context_sha256": prepared.context["context_sha256"],
-        "retained_relative_angle_rad": source_angle,
-        "target_relative_angle_rad": target_angle,
-        "angle_magnitude_difference_rad": difference,
+        "retained_uncurved_gauge_face_angle_rad": source_angle,
+        "target_sampled_world_midline_tangents": [first, second],
+        "comparison": "different reference frames; no incompatibility inference",
+        "physical_fit": "NOT_PROVED",
         "mate_position_id": mate["stable_chair_position_identity"],
     }
 
 
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
+    *, paired_contexts_path=None,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
     Reuse existing S1, S1J and P placements. Keep deferred assignments,
-    incompatible paired references and deliberate shared omissions visible
-    in the receipt. No source assignment, shape or key policy is changed.
+    unqualified paired references and deliberate shared omissions visible
+    in the receipt. An explicit frozen supplement admits all twenty paired
+    source contexts. No source assignment, shape or key policy is changed.
     Invalid or newly unsupported evidence fails before native creation.
     """
     _require(callable(create_preview), "the native adapter is unavailable")
@@ -622,13 +615,24 @@ def preview_private_catalogue_crossover_chairs(
     )
     instances = _indexed(plan["instances"], "chair_position_identity")
     originals = _indexed(plan["analytical_only"], "chair_position_identity")
-    selected_ids = {item.position_id for values in families.values()
-                    for item in values}
     shared = {
         identity: _shared_stock_support(position, positions)
         for identity, position in positions.items()
         if position["deliberate_omission"]
     }
+    pair_witnesses = {}
+    verify_hosts = None
+    if paired_contexts_path is not None:
+        from tracktemplate.compatibility.chair_pair_placement import (
+            prepare_crossover_pairs,
+        )
+        pairs, pair_witnesses, verify_hosts = prepare_crossover_pairs(
+            module, source_document, signature, positions, timbers, base_z,
+            paired_contexts_path,
+        )
+        families.update(pairs)
+    selected_ids = {item.position_id for values in families.values()
+                    for item in values}
     selected, excluded, preparations = [], [], {}
     for identity, position in sorted(positions.items()):
         code = position["chair_code"]
@@ -650,6 +654,13 @@ def preview_private_catalogue_crossover_chairs(
             record.update(family=position["chair_code_label"],
                           original_instance=copy.deepcopy(
                               instances.get(identity)))
+            if identity in pair_witnesses:
+                mates = [key for key, owner in shared.items()
+                         if owner["stable_chair_position_identity"] == identity]
+                _require(len(mates) == 1,
+                         "paired support has no unique shared rail")
+                record.update(pair_witnesses[identity],
+                              mate_position_id=mates[0])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
@@ -674,10 +685,11 @@ def preview_private_catalogue_crossover_chairs(
                      if owner["stable_chair_position_identity"] == identity]
             _require(len(mates) == 1, "block support has no unique shared rail")
             record.update(
-                exclusion_kind="retained-paired-context-incompatible",
-                reason=("Retained paired-rail angle differs from this source; "
-                        "a rigid placement cannot align both rail directions. "
-                        "No physical-fit tolerance or new geometry is authorised."),
+                exclusion_kind="paired-source-context-not-qualified",
+                reason=("The retained LH main-side reference does not qualify "
+                        "the required RH main-side and turnout-side contexts. "
+                        "Source chair angles and sampled world rail tangents "
+                        "have different reference frames."),
                 source_context_comparison=_block_context_exclusion(
                     position, mates[0], preparations[label],
                 ),
@@ -699,6 +711,8 @@ def preview_private_catalogue_crossover_chairs(
 
     def verify_all_sources():
         verify_source()
+        if verify_hosts is not None:
+            verify_hosts()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -727,12 +741,17 @@ def preview_private_catalogue_crossover_chairs(
         "limits": [
             "Complete position accounting does not mean a fully chaired crossover.",
             "Retained key geometry does not resolve the source key-direction policy.",
-            "Deferred source assignments and incompatible paired contexts stay excluded.",
+            "Deferred assignments and unqualified paired contexts stay excluded.",
             "No physical fit, production, export, persistence or rights acceptance.",
         ],
     }
-    return create_preview(catalogue_path, families, shapes, receipt,
-                          verify_all_sources)
+    if paired_contexts_path is None:
+        return create_preview(catalogue_path, families, shapes, receipt,
+                              verify_all_sources)
+    return create_preview(
+        catalogue_path, families, shapes, receipt, verify_all_sources,
+        paired_contexts_path=paired_contexts_path,
+    )
 
 
 def _require_s1j_assignment(module, position, rail, timber, turnout_id):

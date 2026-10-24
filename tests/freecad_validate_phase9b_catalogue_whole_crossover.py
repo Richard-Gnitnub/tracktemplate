@@ -114,7 +114,7 @@ def _coverage(source, context, frames):
     assert selected.keys() | excluded.keys() == positions.keys()
     assert Counter(item["exclusion_kind"] for item in excluded.values()) == {
         "source-assignment-deferred": 124,
-        "retained-paired-context-incompatible": 20,
+        "paired-source-context-not-qualified": 20,
         "confirmed-no-separate-chair": 48,
     }
     assert source["original_analytical_exclusions"] == plan["analytical_only"]
@@ -156,7 +156,7 @@ def _coverage(source, context, frames):
         kind = item["exclusion_kind"]
         if kind == "source-assignment-deferred":
             assert position["special_assignment_deferred"]
-        elif kind == "retained-paired-context-incompatible":
+        elif kind == "paired-source-context-not-qualified":
             assert not position["special_assignment_deferred"]
             assert position["chair_code_label"] in ("1P/2P", "3P-11P")
             comparison = item["source_context_comparison"]
@@ -165,18 +165,14 @@ def _coverage(source, context, frames):
             assert mate["deliberate_omission"]
             tangent = position["local_rail_tangent"]
             other = mate["local_rail_tangent"]
-            relative = math.atan2(
-                tangent[0] * other[1] - tangent[1] * other[0],
-                tangent[0] * other[0] + tangent[1] * other[1],
+            assert comparison["target_sampled_world_midline_tangents"] == [
+                tangent, other,
+            ]
+            assert math.isfinite(
+                comparison["retained_uncurved_gauge_face_angle_rad"],
             )
-            relative = (relative + math.pi / 2) % math.pi - math.pi / 2
-            assert relative == comparison["target_relative_angle_rad"]
-            difference = abs(
-                abs(comparison["retained_relative_angle_rad"])
-                - abs(relative)
-            )
-            assert difference == comparison["angle_magnitude_difference_rad"]
-            assert difference > 0
+            assert comparison["physical_fit"] == "NOT_PROVED"
+            assert "angle_magnitude_difference_rad" not in comparison
         else:
             assert position["deliberate_omission"]
             owner_id = item["supporting_position_id"]
@@ -195,7 +191,7 @@ def _assert_preview(result, document, references, frames, context):
     for text in ("163 placed", "192 excluded", "355 source positions"):
         assert text in document.Label
     assert tuple(obj.Name for obj in document.Objects) == LAYER_NAMES
-    assert result["contract_id"] == "tracktemplate.private-catalogue-crossover.v1"
+    assert result["contract_id"] == "tracktemplate.private-catalogue-crossover.v2"
     assert result["family_count"] == 3
     assert result["placement_count"] == result["track_placements_added"] == 163
     assert result["component_count"] == 56 and result["layer_count"] == 58

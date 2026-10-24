@@ -152,6 +152,49 @@ class PPlacement(S1Placement):
     """A retained P reference tag on the same proper model-mm frame."""
 
 
+@dataclass(frozen=True)
+class PairedChairPlacement(S1Placement):
+    """A qualified paired assembly in one common proper timber frame.
+
+    Its retained geometry already contains the source hand, side, jaw
+    insertions, crops and shears. This outer transform cannot deform it.
+    """
+
+
+def place_paired_chair(
+    position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
+    base_z_mm, main_gauge_offset_mm, retained_y_offset_mm,
+):
+    """Map a qualified RH source assembly through one rigid host frame.
+
+    The source frame has X relative to the nominal timber station and Y
+    relative to the main gauge face after the source hand reflection.
+    The retained frame is ``(-X, -Y-retained_y_offset_mm, Z)`` with its
+    mounting plane already at Z=0. The host point is the centreline at
+    that station, not a nearest rail projection. +Y in the world frame
+    is left of travel; the main gauge face is at +main_gauge_offset_mm.
+
+    This is the rigid common-frame convention of Templot5 556b
+    math_unit.pas add_jaw/add_seat and chair base transformation, for
+    square, unshoved switch timbers. It does not compare a source jaw
+    angle with the tangent of an independently curved rail. Inputs and
+    result use model mm and radians; no fit tolerance is applied.
+    """
+    point = _coordinates(host_point_mm, 2, "host_point_mm")
+    heading = _finite_number(travel_heading_rad, "travel_heading_rad")
+    base_z = _finite_number(base_z_mm, "base_z_mm")
+    offset = (_finite_number(main_gauge_offset_mm, "main_gauge_offset_mm")
+              - _finite_number(retained_y_offset_mm, "retained_y_offset_mm"))
+    tangent = (math.cos(heading), math.sin(heading))
+    normal = (-tangent[1], tangent[0])
+    return PairedChairPlacement(
+        position_id, rail_id, timber_id,
+        (point[0] + offset * normal[0],
+         point[1] + offset * normal[1], base_z),
+        (-tangent[0], -tangent[1]), (-normal[0], -normal[1]),
+    )
+
+
 def prepare_s1_placements(records):
     """Freeze only integer-code-1 records in stable position order."""
     return _prepare_placements(records, 1, S1Placement, "S1")
