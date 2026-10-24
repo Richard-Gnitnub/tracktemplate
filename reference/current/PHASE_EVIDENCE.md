@@ -2180,7 +2180,7 @@ The output stays in `private-development` status. This result gives no positive 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
 
-## Central CC chair components on XO-001 — 2026-10-24
+## CC chair components on XO-001 — 2026-10-24
 
 This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
 
@@ -2216,7 +2216,7 @@ The previous crossover and TrackTemplate Core tests also give PASS results.
 
 The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_central_check.py) gives a PASS result without the FreeCAD display.
 It compares all 3555 previous component results and all 396 new component results.
-It checks the new components again after `Undo/Redo`.
+It does a check of the new components again after `Undo/Redo`.
 The source `App.Document`, the other test `App.Document` and the source files stay the same.
 
 The same test gives a PASS result with the FreeCAD display.
