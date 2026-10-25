@@ -2326,3 +2326,72 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Catalogue P placement after a radius change — 2026-10-25
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+It also supplies evidence for the PR-16 checks after input changes.
+
+The new [FreeCAD test](../../tests/freecad_validate_phase9b_p_curvature_recalculation.py) changes `CurveRadius` from 600 to 900 mm and back through the FreeCAD GUI.
+It uses `Generate` with `Replace`, creates `XO-001` again, applies B4 and analyses chair positions.
+The 14 settings in `SOURCE_OPTIONS`, including the reference toe and the requested minimum radius of 600 mm, stay the same.
+
+The existing solver calculates the other toe and checks the resulting minimum radius.
+This sequence has explicit operations. It gives no acceptance for automatic changes to dependent objects during edits.
+
+The [independent source check](../../tests/p_curvature_source_oracle.py) calculates expected chair positions from rail `points` and timber `centre` values.
+It gets only source identities from chair analysis. It does not get expected positions or angles from that analysis.
+
+The check examines all rail segments and uses `gauge_face_points` and `outer_face_points` to calculate the axes.
+This check examines the accepted rail data. It does not test the software that calculates the rail data or show physical fit.
+The [standalone test](../../tests/validate_phase9b_p_curvature_recalculation.py) checks known calculations and invalid inputs. It rejects results that incorrectly keep previous positions or axes.
+
+The standalone test gives PASS results for nine tests. Its three negative controls correctly reject unchanged results, previous positions and previous axes.
+The previous standalone P placement and crossover tests also give PASS results.
+
+The FreeCAD test gives PASS results without the display in `native-02` and with the display in `gui-02`.
+Both tests use the qualified `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10` profile. Both have the exact success message and exit code 0.
+
+Each state has 28 P assemblies with 22 components per assembly. The tests compare all 616 component results in each state.
+The two states with `CurveRadius` of 600 mm have 355 source positions. The state with `CurveRadius` of 900 mm has 354.
+
+All 28 P identities stay the same. All 28 positions and axes change at 900 mm.
+The test compares each state with its current source data. It also compares the returned component results with the permanent reference.
+
+The previous numerical comparison limits stay the same. No numerical tolerance for physical fit is added.
+The largest difference between returned component positions and the reference is less than 1.84e-12 mm. The previous dimensional limit is 1e-7 mm.
+
+The `32 * sys.float_info.epsilon` limit applies only to axes calculated from the same source data.
+The test records the difference between returned and reference source axes separately. It does not apply that limit across different source data.
+
+The tests check `Undo/Redo`, source data, other documents, object identities, selection and all 24 component layers.
+The changed state also passes the test that changes the source during construction and requires `transaction_rollback`.
+The previous preview objects stay the same after `Generate`. The source check rejects their deleted `XO-001` source.
+
+The tests close all documents that they create. The GUI test removes its temporary profile and restores the display state.
+An independent reviewer examined the source, tests, complete native and GUI results, and all 408 source hashes with their input records.
+The reviewer also examined the reference and returned views, all eight changed close-ups, and the GUI radius input. The review gives a PASS result.
+
+The test without the display uses copies of files from the GUI sequence. SHA-256 values identify those files.
+The test runs chair analysis again after it opens each changed copy. It checks that rail data, timber data, settings and B4 results stay the same.
+
+The `native-01` failure shows that small coordinate changes after reopening cause the existing source check to reject the previous chair analysis.
+The `gui-01` failure shows that the previous state checker requires 355 positions.
+One repair changes only the new test. It runs analysis again after file transport and supplies the explicit count of 355 or 354 to the previous state checker.
+The test runs all nine previous negative checks.
+
+The original tests, failed proofs and diagnostic failures stay the same. The test repair changes no product source or independent source check.
+
+The original `XO-001` file stays the same and remains a permanent regression test.
+The software for the previous 203 assemblies, 48 shared supports, source identities and exclusions stays the same.
+The full preview still requires its previous fixed source. These results do not admit other inputs to that full preview.
+
+Local evidence is in `tmp/p-curvature-recalculation/`. It includes `source-freeze-03.json`, `native-02/`, `gui-02/`, `runtime-summary-01.json` and `independent-staff-review-final-02.json`.
+The original failures, diagnostic failures and their independent classifications remain in that directory.
+The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+`physical_fit` stays `NOT_PROVED`. `project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
+This result gives no acceptance for persistence, production, export behaviour, product performance, rights or phase exits.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
