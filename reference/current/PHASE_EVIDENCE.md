@@ -2326,3 +2326,72 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## P chair positions after a radius change — 2026-10-25
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+It also supplies evidence for the PR-16 checks after input changes.
+
+The new [FreeCAD test](../../tests/freecad_validate_phase9b_p_curvature_recalculation.py) changes `CurveRadius` from 600 to 900 mm and back through the FreeCAD display.
+It uses `Generate` with `Replace`, makes `XO-001` again, applies B4 and uses `analyse_entity_chair_positions`.
+The 14 inputs in `SOURCE_OPTIONS` stay the same. These inputs include `toe_chainage_a` and `minimum_requested_radius` of 600 mm.
+
+The accepted software calculates `toe_chainage_b` and examines `minimum_resulting_radius`.
+This sequence uses the specified operations. It gives no acceptance for automatic changes to related objects after input changes.
+
+The [source check](../../tests/p_curvature_source_oracle.py) independently calculates chair positions from `points` in `rail_records` and `centre` in `timber_records`.
+It gets only source identities from the results of `analyse_entity_chair_positions`. It does not get positions or directions from those results.
+
+The check examines each pair of adjacent points in `rail_records`. It uses `gauge_face_points` and `outer_face_points` to calculate the directions.
+This check examines the accepted `rail_records` data. It does not examine the software that calculates those data or show physical fit.
+The [test in standalone Python](../../tests/validate_phase9b_p_curvature_recalculation.py) examines calculated data with known results and inputs with an invalid state. It rejects incorrect results that keep previous positions or directions.
+
+The test in standalone Python gives PASS results for nine tests. Three checks correctly reject results that stay the same, previous positions and previous directions.
+The previous tests for P chair positions and crossovers in standalone Python also give PASS results.
+
+The FreeCAD test gives PASS results without the display in `native-02` and with the display in `gui-02`.
+The two tests use the qualified host profile `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`. Each test gives the specified sentinel and process exit status 0.
+
+For each input, the test makes 28 P assemblies with 22 components for each assembly. The tests compare all 616 component results for each input.
+The two inputs with `CurveRadius` of 600 mm have 355 source positions. The input with `CurveRadius` of 900 mm has 354.
+
+All 28 P identities stay the same. All 28 positions and directions change at 900 mm.
+The test compares each result with its current source data. It also compares the `returned-600` component results with the permanent `reference-600` input.
+
+The previous numerical tolerances stay the same. This change adds no numerical tolerance for physical fit.
+The largest difference between `returned-600` and `reference-600` component positions is less than 1.84e-12 mm. The previous limit for dimensions is 1e-7 mm.
+
+The `32 * sys.float_info.epsilon` limit applies only to directions calculated from the same source data.
+The test independently records the difference between `returned-600` and `reference-600` source directions. It does not apply that limit across different source data.
+
+The tests examine `Undo/Redo`, source data, other documents, object identities, selection and all 24 objects that `LAYER_NAMES` identifies.
+The changed input also gives a PASS result for the test that changes the source during `create_private_catalogue_p_preview` and makes `transaction_rollback` necessary.
+The previous objects from `preview_private_catalogue_p_crossover_chairs` stay the same after `Generate`. The source check rejects their removed `XO-001` source.
+
+The tests use `App.closeDocument` for all documents that they make. The test with the display removes its temporary `user.cfg` file and puts the display back to its previous condition.
+An independent reviewer examined the source, tests, complete `native-02` and `gui-02` results, and all 408 source hashes with their input data.
+The reviewer also examined the `reference-600` and `returned-600` displays, all eight changed `chair-closeup.png` files, and the radius input display. The independent review gives a PASS result.
+
+The test without the display uses copies of files from the display sequence. SHA-256 values identify those files.
+The test uses `analyse_entity_chair_positions` again after `App.openDocument` opens each changed copy. It makes sure that `rail_records`, `timber_records`, inputs and B4 results stay the same.
+
+The `native-01` FAIL result shows small changes in positions after `App.openDocument`. Those changes cause the accepted source check to reject previous results from `analyse_entity_chair_positions`.
+The `gui-01` FAIL result shows that the previous validator makes 355 positions necessary.
+One repair changes only the new test. It uses `analyse_entity_chair_positions` again after `shutil.copy2` and `App.openDocument`, and supplies 355 or 354 to the previous validator.
+The test does all nine previous checks with an invalid state.
+
+The initial tests, FAIL results and diagnostics stay the same. The test repair changes no product source or source check.
+
+The initial `XO-001` file stays the same and stays a permanent regression test.
+The software for the previous 203 assemblies and source identities stays the same. The 48 `confirmed-no-separate-chair` items and other `excluded_positions` stay the same.
+The full `preview_private_catalogue_crossover_chairs` command continues to make its previous source necessary. These results do not admit other inputs to that command.
+
+Local evidence is in `tmp/p-curvature-recalculation/`. It includes `source-freeze-03.json`, `native-02/`, `gui-02/`, `runtime-summary-01.json` and `independent-staff-review-final-02.json`.
+The initial FAIL results, diagnostic FAIL results and their failure classifications from independent review stay in that directory.
+The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+`physical_fit` stays `NOT_PROVED`. `project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
+This result gives no acceptance for persistence, production, export behaviour, product performance or phase exits. It gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
