@@ -2242,78 +2242,83 @@ This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions 
 The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) adds `include_check_ends=True` to `preview_private_catalogue_crossover_chairs`.
 It shows eight `CCL` and `CCR` chair assemblies at `X1-Z` and `X5-B` on the two turnouts of `XO-001`.
 Each new assembly supplies chair components for one `stock-rail` position and one `check-rail` position.
-The software uses the previous 33 components from each `context-native-02` family. It does not calculate new chair shapes.
+The software uses the previous 33 components for each of `CCL` and `CCR` from `context-native-02`. It does not calculate new chair shapes.
 
 The output has 203 assemblies and 4215 component results.
 The previous 195 assemblies and their 3951 component results stay the same.
 The 48 positions with `exclusion_kind` of `confirmed-no-separate-chair` stay the same.
 The new assemblies supply chair components for 16 more positions. The other 84 positions have no chair components in this output.
 
-All 355 source position identities and `original_analytical_exclusions` stay the same.
+All 355 identities for source positions and `original_analytical_exclusions` stay the same.
 All 124 values of `special_assignment_deferred` stay `true`.
 
-The [source check](../../tests/check_end_source_oracle.py) calculates the rail, branch, chair family, angle, crop, shear and component positions for all 16 identities.
-On the main side, rail `1` uses `main_straight`.
-On the turnout side, rail `4` uses `aq3offset` with `radcurve` at `X1-Z` and `turnoutst_main` at `X5-B`.
-The previous stopped candidate incorrectly used the straight branch at both turnout-side positions.
+The [source check](../../tests/check_end_source_oracle.py) calculates component positions and the `source_rail_code`, `source_branch`, `family`, `source_angle_rad`, `source_crop_mm`, `source_inner_shear_rad` and `source_outer_shear_rad` values for all 16 identities.
+For `side="MS"`, `source_rail_code` is `1` and `source_branch` is `main_straight`.
+For `side="TS"`, `source_rail_code` is `4`. Templot uses `aq3offset` with `radcurve` at `X1-Z` and `turnoutst_main` at `X5-B`.
+The previous stopped exact candidate used the angle from `turnoutst_main` for the two positions with `side="TS"`. This was incorrect at `X1-Z`.
 
-The independent RED tests reject that branch assumption before the successor implementation.
-The same tests give PASS results after the implementation.
+The RED tests compare values independently and gave FAIL results before the software changed.
+The same tests give PASS results after the change.
 
-The source check calculates the circle and tangent directly. It does not call the product function that calculates the rail position.
-It reuses the accepted source parameter reader and elementary comparison functions. This reuse limits its independence.
+The source check calculates its `stock_radius_mm`, `centre_x_mm`, `centre_y_mm`, `y_mm` and `k_rad` values directly. It does not use the product function `_rea_c10_turnout_outer_gauge_point_at_x`.
+It uses the accepted `source_parameters` function and functions from `central_check_source_oracle.py` again.
+These functions are the same for this source check and previous source checks. This is a limitation of its evidence.
 
-The [placement calculation](../../tracktemplate/domain/check_end_placement.py) uses separate values for the body, check seat, key and four fixings.
-The [source check in the software](../../tracktemplate/compatibility/chair_check_end_placement.py) requires the previous complete source and host hashes.
-The whole preview does not admit other host inputs.
+The [software](../../tracktemplate/domain/check_end_placement.py) has `origin_mm`, `x_axis` and `y_axis` values for the assembly. Its `check_frame` values apply to the seat and key. Four `fixing_frames` give the values for the fastenings.
+The [source check in the software](../../tracktemplate/compatibility/chair_check_end_placement.py) rejects hashes that are different from the previous full hashes for source files and alignment inputs.
+The full output rejects other alignment inputs.
 
 The [standalone Python test](../../tests/validate_phase9b_catalogue_check_ends.py) gives a PASS result.
-Its comparisons include both travel directions, straight hosts and curves with positive and negative signs at radii of 600, 1200 and 2400 mm.
-It also checks varying curves, source branch boundaries, host endpoints, interpolation, invalid inputs and changes that must give a FAIL result.
+The test compares the two travel directions and straight alignments. It also compares curves with `curvature` above and below 0 at radii of 600, 1200 and 2400 mm.
+Other checks include curves where `curvature` changes, the ends of alignments, and `interpolate_alignment_station`.
+The tests also examine source positions where `source_branch` changes, inputs with an invalid state, and changes that must give a FAIL result.
 
-The minimum resulting radius tests include each limiting road and the adjacent representable values on each side of the configured limit.
-Numerical comparisons use the existing calculation contracts. They do not set a tolerance for physical fit.
+The `complete_radius_decision` tests include each of its three radius inputs as the smallest input.
+They include the specified limit and `math.nextafter` values immediately below and above it.
+The tests use the previous comparison rules for the values. They do not set a numerical tolerance for physical fit.
 The previous crossover and TrackTemplate Core tests also give PASS results.
 
 The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_check_ends.py) gives a PASS result without the FreeCAD display in `native-02`.
 It compares all 3951 previous component results and all 264 new component results.
 It compares the 264 new component results again after `Undo/Redo`.
-Another 24 assemblies supply 792 component comparisons across both travel directions, straight hosts and positive and negative curves with a radius of 1200 mm.
-All 32 fixing boss caps have complete source facet comparisons and pass the unchanged containment checks.
+The test also compares 792 components in 24 more assemblies.
 
-The later test repair changes only the path that uses the FreeCAD display.
-An independent comparison confirms that the native execution path and its other dependencies stay the same.
-Thus, `native-02` remains applicable to that native path. It is not a new test run against the later file bytes.
+These tests use the two travel directions and straight alignments. They also use curves with `curvature` above and below 0 and a radius of 1200 mm.
+All 32 items in `boss_cap_containment` have `complete_source_facet_bijection` of `true` and give PASS results in the previous checks.
 
-The complete test gives a PASS result with the FreeCAD display in `gui-02`.
-It includes selection, changes to `ViewObject.Visibility`, `Undo/Redo`, source checks and `transaction_rollback` checks for both new families.
-The source `App.Document`, the other test `App.Document`, source files and document identities stay the same.
-The test closes all documents that it creates.
+The third test repair changes only the software that uses the FreeCAD display.
+An independent reviewer compared the software that operates without the display and the other files that it uses. They stay the same.
+Thus, `native-02` stays applicable to that software. It is not a new test against the file bytes after the third repair.
 
-The new family refusal and rollback checks run again. The earlier central `CC` and paired-family failure results are reused.
-An independent reviewer inspected all 36 pairs of images, including all eight new assemblies and the full crossover.
-The independent source, test, runtime and visual reviews give PASS results for this bounded outcome.
+The full test gives a PASS result with the FreeCAD display in `gui-02`.
+It includes selection, changes to `ViewObject.Visibility`, `Undo/Redo`, source checks and `transaction_rollback` checks for `CCL` and `CCR`.
+The source `App.Document`, the other test `App.Document`, source files and identities of the `App.Document` items stay the same.
+The test closes all `App.Document` items that it makes.
 
-The original stopped candidate, its failed evidence and its exhausted `2/2` repair history stay unchanged.
-The successor keeps its RED results, failed `native-01`, failed `gui-01` and later diagnostic results.
-Three successor repairs correct source-boundary coverage, the test for a cap with multiple faces and the test-owned GUI cleanup.
-The owner removed the successor repair limit before the third repair. This decision does not reopen the original stopped candidate.
+The tests repeat the checks for rejected `CCL` and `CCR` inputs and `transaction_rollback`. The test uses the previous results for rejected inputs from `freecad_validate_phase9b_catalogue_central_check.py` and `freecad_validate_phase9b_catalogue_paired_crossover.py` again.
+An independent reviewer examined all 36 pairs of `.png` files. These files show all eight new assemblies and the full crossover.
+Independent review gives PASS results for the source, tests, FreeCAD operation and `.png` files in this bounded scope.
 
-`CCLCCR-SUCCESSOR-Q04` stays `BACKLOG` for the shared preview lifecycle owner.
-In a separate synthetic box test, `view.fitAll()` can change the active document to the witness document.
-That failure does not occur in the copied `XO-001` test with nonempty selection and preselection.
-The shared product code stays unchanged. Deliberate changes to selection and preselection in the actual `XO-001` test reach the required failure checks.
+The initial stopped exact candidate and its evidence for FAIL results stay the same. Its repair history stays at the `2/2` limit.
+This change keeps its RED results, the `native-01` and `gui-01` FAIL results, and the diagnostic results after them.
+Three repairs correct the checks where `source_branch` changes, the check for multiple `Faces` in a `boss_cap_containment` item, and test cleanup.
+The project owner removed the repair limit for this change before the third repair. This decision does not reopen the initial stopped exact candidate.
 
-The unchanged `XO-001` input remains a permanent regression test.
-These results supply component calculation evidence for later work with user-defined curves.
-Admission of other hosts and preview changes during interactive edits need separate owner authority and tests before implementation.
+`CCLCCR-SUCCESSOR-Q04` stays `BACKLOG` for the canonical owner of `tracktemplate/adapters/freecad/chair_reference_preview.py`.
+In the `Part.makeBox` test, `view.fitAll()` can make the other `App.Document` active.
+That change does not occur in the test with a copy of `XO-001` and items in `selection` and `preselection`.
+The shared product software stays the same. The actual `XO-001` tests change `selection` and `preselection`. Those changes give the necessary FAIL results.
 
-`physical_fit` stays `NOT_PROVED`. No numerical tolerance for physical fit is set.
-The previous C10 limitations, `key_direction_sign` of `0` and fixing-angle limitations stay the same. `Q-PAIR-002` stays `BACKLOG`.
+The `XO-001` input stays the same and stays a permanent regression test.
+These results show how the software calculates component positions for work with curves that a person supplies after this change.
+Different alignment inputs and output changes during edits must have a new project owner decision and tests before the software changes.
+
+`physical_fit` stays `NOT_PROVED`. This change sets no numerical tolerance for physical fit.
+The previous C10 limitations, `key_direction_sign` of `0` and limitations recorded with `fixing_angle_frame` stay the same. `Q-PAIR-002` stays `BACKLOG`.
 
 Local evidence is in `tmp/check-end-successor/`, with `native-02/`, `gui-02/`, `source-freeze-03.json` and the `quality-review-04` records.
 The source references include Templot 556b `math_unit.pas:17766–17790,26696–26820,30140–30369,31602–31824` and `heave_chairs.pas:1363–1400`.
-The source check records the remaining source references and hashes. The [provenance](../PROVENANCE.md) and [rights restrictions](../LICENSING_BOUNDARIES.md) continue to apply.
+The source check records the remaining source references and hashes. The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
 
 `project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
 This result gives no acceptance for persistence, production, export behaviour, product performance or phase exits.
