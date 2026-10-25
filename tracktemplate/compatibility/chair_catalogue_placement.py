@@ -576,6 +576,7 @@ def _block_context_exclusion(position, mate, prepared):
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
+    include_check_ends=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -585,7 +586,13 @@ def preview_private_catalogue_crossover_chairs(
     source contexts. No source assignment, shape or key policy is changed.
     The central CC option adds twelve stock/check assemblies, with source
     component frames. Invalid evidence fails before native creation.
+    Check ends add eight CCL/CCR assemblies to that complete baseline.
     """
+    _require(type(include_check_ends) is bool,
+             "include_check_ends requires an actual Boolean")
+    _require(not include_check_ends or (include_central_cc is True
+                                      and paired_contexts_path is not None),
+             "check-end preview requires central CC and the paired supplement")
     _require(type(include_central_cc) is bool,
              "include_central_cc requires an actual Boolean")
     _require(not include_central_cc or paired_contexts_path is not None,
@@ -649,6 +656,17 @@ def preview_private_catalogue_crossover_chairs(
             )
         )
         families["CC"] = checks
+    end_witnesses, end_companions = {}, {}
+    verify_ends = None
+    if include_check_ends:
+        from tracktemplate.compatibility.chair_check_end_placement import (
+            prepare_check_ends,
+        )
+        ends, end_witnesses, end_companions, verify_ends = prepare_check_ends(
+            module, source_document, signature, positions, timbers, base_z,
+            catalogue_path,
+        )
+        families.update(ends)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
     selected, excluded, preparations = [], [], {}
@@ -681,6 +699,8 @@ def preview_private_catalogue_crossover_chairs(
                               mate_position_id=mates[0])
             if identity in check_witnesses:
                 record.update(check_witnesses[identity])
+            if identity in end_witnesses:
+                record.update(end_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
@@ -692,6 +712,15 @@ def preview_private_catalogue_crossover_chairs(
                 assignment_status=position["assignment_status"],
                 reason="The source CC assembly includes this check support; "
                        "the canonical deferred assignment is unchanged.",
+            )
+        elif identity in end_companions:
+            record.update(
+                exclusion_kind="source-paired-check-end-support",
+                supporting_position_id=end_companions[identity],
+                supporting_assembly_placed=True,
+                assignment_status=position["assignment_status"],
+                reason="The source check-end assembly includes this check "
+                       "support; the canonical deferred assignment is unchanged.",
             )
         elif code == 0:
             owner_id = shared[identity]["stable_chair_position_identity"]
@@ -744,6 +773,8 @@ def preview_private_catalogue_crossover_chairs(
             verify_hosts()
         if verify_checks is not None:
             verify_checks()
+        if verify_ends is not None:
+            verify_ends()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -777,7 +808,8 @@ def preview_private_catalogue_crossover_chairs(
         ],
     }
     if include_central_cc:
-        represented = len(selected) + len(shared) + len(check_companions)
+        represented = (len(selected) + len(shared) + len(check_companions)
+                       + len(end_companions))
         receipt.update(
             represented_source_position_count=represented,
             unrepresented_source_position_count=len(positions) - represented,
@@ -802,6 +834,23 @@ def preview_private_catalogue_crossover_chairs(
             "Retained keys do not resolve the source key-direction policy.",
             "No physical fit, production, export, persistence or rights acceptance.",
         ]
+        if include_check_ends:
+            receipt["source_paired_check_end_support_count"] = len(end_companions)
+            receipt["coverage_summary"] = (
+                f"{len(selected)} assemblies; {len(shared)} existing shared "
+                f"supports; {len(check_companions)} central check supports; "
+                f"{len(end_companions)} check-end supports; "
+                f"{len(positions) - represented} unrepresented; "
+                f"{len(positions)} source positions accounted for"
+            )
+            receipt["limits"].append(
+                "Check ends use separate source frames for seats, keys and fixings."
+            )
+            return create_preview(
+                catalogue_path, families, shapes, receipt, verify_all_sources,
+                paired_contexts_path=paired_contexts_path,
+                include_central_cc=True, include_check_ends=True,
+            )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,
             paired_contexts_path=paired_contexts_path, include_central_cc=True,

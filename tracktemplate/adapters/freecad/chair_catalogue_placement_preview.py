@@ -42,6 +42,10 @@ from tracktemplate.domain.central_check_placement import (
     CentralCheckPlacement,
     prepare_central_check_placements,
 )
+from tracktemplate.domain.check_end_placement import (
+    CheckEndPlacement,
+    prepare_check_end_placements,
+)
 
 
 _P_MODEL_SHA256 = (
@@ -74,6 +78,30 @@ _CC_MODEL_SHA256 = (
 )
 _CC_FIXING_NAMES = ("SourceFixing",) + tuple(
     f"SourceFixing{index:03d}" for index in range(1, 16)
+)
+_CHECK_END_MODELS = (
+    ("CCL", "692a8cfbe6845fd9fce4e8b471f1ec37d5388366c6451f9bff2d65601dbccb3d"),
+    ("CCR", "d594dfb2f387c2b2a0360863ea8dcc30cd2057ed06095f8eb1e49a9421282fa7"),
+)
+_CHECK_END_CONTEXT_SHA256 = (
+    "4c6d059f99889cb292fc028783d2ee425b7493540e6b22b80f55961df543d2ef"
+)
+_CHECK_END_SEAT_KEY_NAMES = ("c06_CCSEATCK_CCSEATCK", "c07_CCKEY_CCKEY")
+_CHECK_END_COMMON_NAMES = (
+    "base_plinth", "c00_SCOUTJAW_SCOUTJAW", "c01_CCFIJAW_body",
+    "c01_CCFIJAW_bevel_negative", "c01_CCFIJAW_bevel_positive",
+    "c01_CCFIJAW_grip", "c01_CCFIJAW_stiffener",
+    "c02_SCCCSEAT_SCCCSEAT", "c03_KEY_KEY",
+)
+_CHECK_END_NAMES = (
+    ("CCL", _CHECK_END_COMMON_NAMES + (
+        "c04_MA_body", "c04_MA_bevel_negative", "c04_MA_bevel_positive",
+        "c04_MA_grip", "c04_MA_stiffener", "c05_MB_MB",
+    ) + _CHECK_END_SEAT_KEY_NAMES + _CC_FIXING_NAMES),
+    ("CCR", _CHECK_END_COMMON_NAMES + (
+        "c04_MC_body", "c04_MC_bevel_negative", "c04_MC_bevel_positive",
+        "c04_MC_grip", "c04_MC_stiffener", "c05_MD_MD",
+    ) + _CHECK_END_SEAT_KEY_NAMES + _CC_FIXING_NAMES),
 )
 _S1_SOURCE_NAMES = (
     "Part_00", "Part_01", "Part_02", "Part_03", "Part_04",
@@ -204,9 +232,14 @@ def _prepare_catalogue_family(
     def require(condition, message):
         _require(condition, message, family=family)
 
-    placements = (prepare_central_check_placements(placements)
-                  if placement_type is CentralCheckPlacement else
-                  _placements(placements, placement_type))
+    if placement_type is CheckEndPlacement:
+        placements = prepare_check_end_placements(placements)
+        require(all(value.family == family for value in placements),
+                "check-end family differs from its component frames")
+    else:
+        placements = (prepare_central_check_placements(placements)
+                      if placement_type is CentralCheckPlacement else
+                      _placements(placements, placement_type))
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     # The whole-crossover caller obtains supplemental selections from the
@@ -259,10 +292,13 @@ def _prepare_catalogue_family(
                 admitted,
             ):
                 component_frame = placement
-                if (isinstance(placement, CentralCheckPlacement)
+                if (isinstance(placement, (CentralCheckPlacement, CheckEndPlacement))
                         and component.name in _CC_FIXING_NAMES):
                     fixing_index = _CC_FIXING_NAMES.index(component.name) // 4
                     component_frame = placement.fixing_frames[fixing_index]
+                elif (isinstance(placement, CheckEndPlacement)
+                      and component.name in _CHECK_END_SEAT_KEY_NAMES):
+                    component_frame = placement.check_frame
                 component_rigid = (rigid if component_frame is placement
                                    else _host_placement(component_frame))
                 # The shallow wrapper shares native geometry, not its location.
@@ -281,7 +317,7 @@ def _prepare_catalogue_family(
                     placement_identity=(placement.position_id,
                                         prepared.model_sha256, component.name),
                 ))
-                if isinstance(placement, CentralCheckPlacement):
+                if isinstance(placement, (CentralCheckPlacement, CheckEndPlacement)):
                     measurements[-1].update(
                         origin_mm=component_frame.origin_mm,
                         x_axis=component_frame.x_axis,
@@ -369,6 +405,13 @@ def _prepare_catalogue_family(
                 fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
                 templot_global_fixing_angle_parity=False,
             )
+        if placement_type is CheckEndPlacement:
+            result.update(
+                placement="source-check-end-component-frames.v1",
+                fixing_head_rotation_rad=0.0, random_export_parity=False,
+                fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
+                templot_global_fixing_angle_parity=False,
+            )
 
         def verify_layers(stored):
             require(len(stored) == len(layers), "stored layer count changed")
@@ -401,6 +444,7 @@ def create_private_catalogue_crossover_preview(
     catalogue_path, placements_by_family, context_shapes, source_receipt,
     verify_source,
     *, paired_contexts_path=None, include_central_cc=False,
+    include_check_ends=False,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -414,6 +458,11 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(type(include_check_ends) is bool,
+            "include_check_ends requires an actual Boolean")
+    require(not include_check_ends or (include_central_cc is True
+                                     and paired_contexts_path is not None),
+            "check-end preview requires central CC and the paired supplement")
     require(type(include_central_cc) is bool,
             "include_central_cc requires an actual Boolean")
     require(not include_central_cc or paired_contexts_path is not None,
@@ -427,6 +476,8 @@ def create_private_catalogue_crossover_preview(
         expected_groups.update(CONTEXT_IDS)
     if include_central_cc:
         expected_groups.add("CC")
+    if include_check_ends:
+        expected_groups.update(family for family, _digest in _CHECK_END_MODELS)
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -505,6 +556,29 @@ def create_private_catalogue_crossover_preview(
         layer_specs += prefixed
         selections.append(("CC", prepared, prefixed, prepare))
 
+    if include_check_ends:
+        for family, digest in _CHECK_END_MODELS:
+            prepared = prepare_catalogue_chair(
+                catalogue_path, family, run="context-native-02",
+            )
+            placements = prepare_check_end_placements(placements_by_family[family])
+            ids = {placement.position_id for placement in placements}
+            require(len(placements) == 4 and not identities.intersection(ids),
+                    "check-end placements are incomplete or overlap another group")
+            require(prepared.context["context_sha256"] == _CHECK_END_CONTEXT_SHA256,
+                    "check-end source context differs")
+            identities.update(ids)
+            _prepared, specs, prepare = _prepare_catalogue_family(
+                catalogue_path, placements, None, receipt,
+                family=family, placement_type=CheckEndPlacement,
+                model_sha256=digest, source_names=dict(_CHECK_END_NAMES)[family],
+                run="context-native-02", source_context=prepared.context,
+            )
+            prefixed = tuple((family + "_" + name, title, colour)
+                             for name, title, colour in specs)
+            layer_specs += prefixed
+            selections.append((family, prepared, prefixed, prepare))
+
     def prepare_layers():
         layers = _context_layers(context_shapes)
         families = {}
@@ -520,7 +594,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": ("tracktemplate.private-catalogue-crossover.v3"
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v4"
+                            if include_check_ends else
+                            "tracktemplate.private-catalogue-crossover.v3"
                             if include_central_cc else
                             "tracktemplate.private-catalogue-crossover.v2"),
             "source_receipt": receipt,
