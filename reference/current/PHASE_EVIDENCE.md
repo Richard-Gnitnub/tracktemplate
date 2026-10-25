@@ -2234,3 +2234,95 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## CCL and CCR chair components on XO-001 — 2026-10-25
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/compatibility/chair_catalogue_placement.py) adds `include_check_ends=True` to `preview_private_catalogue_crossover_chairs`.
+It shows eight `CCL` and `CCR` chair assemblies at `X1-Z` and `X5-B` on the two turnouts of `XO-001`.
+Each new assembly supplies chair components for one `stock-rail` position and one `check-rail` position.
+The software uses the previous 33 components for each of `CCL` and `CCR` from `context-native-02`. It does not calculate new chair shapes.
+
+The output has 203 assemblies and 4215 component results.
+The previous 195 assemblies and their 3951 component results stay the same.
+The 48 positions with `exclusion_kind` of `confirmed-no-separate-chair` stay the same.
+The new assemblies supply chair components for 16 more positions. The other 84 positions have no chair components in this output.
+
+All 355 identities for source positions and `original_analytical_exclusions` stay the same.
+All 124 values of `special_assignment_deferred` stay `true`.
+
+The [source check](../../tests/check_end_source_oracle.py) calculates component positions and the `source_rail_code`, `source_branch`, `family`, `source_angle_rad`, `source_crop_mm`, `source_inner_shear_rad` and `source_outer_shear_rad` values for all 16 identities.
+For `side="MS"`, `source_rail_code` is `1` and `source_branch` is `main_straight`.
+For `side="TS"`, `source_rail_code` is `4`. Templot uses `aq3offset` with `radcurve` at `X1-Z` and `turnoutst_main` at `X5-B`.
+The previous stopped exact candidate used the angle from `turnoutst_main` for the two positions with `side="TS"`. This was incorrect at `X1-Z`.
+
+The RED tests compare values independently and gave FAIL results before the software changed.
+The same tests give PASS results after the change.
+
+The source check calculates its `stock_radius_mm`, `centre_x_mm`, `centre_y_mm`, `y_mm` and `k_rad` values directly. It does not use the product function `_rea_c10_turnout_outer_gauge_point_at_x`.
+It uses the accepted `source_parameters` function and functions from `central_check_source_oracle.py` again.
+These functions are the same for this source check and previous source checks. This is a limitation of its evidence.
+
+The [software](../../tracktemplate/domain/check_end_placement.py) has `origin_mm`, `x_axis` and `y_axis` values for the assembly. Its `check_frame` values apply to the seat and key. Four `fixing_frames` give the values for the fastenings.
+The [source check in the software](../../tracktemplate/compatibility/chair_check_end_placement.py) rejects hashes that are different from the previous full hashes for source files and alignment inputs.
+The full output rejects other alignment inputs.
+
+The [standalone Python test](../../tests/validate_phase9b_catalogue_check_ends.py) gives a PASS result.
+The test compares the two travel directions and straight alignments. It also compares curves with `curvature` above and below 0 at radii of 600, 1200 and 2400 mm.
+Other checks include curves where `curvature` changes, the ends of alignments, and `interpolate_alignment_station`.
+The tests also examine source positions where `source_branch` changes, inputs with an invalid state, and changes that must give a FAIL result.
+
+The `complete_radius_decision` tests include each of its three radius inputs as the smallest input.
+They include the specified limit and `math.nextafter` values immediately below and above it.
+The tests use the previous comparison rules for the values. They do not set a numerical tolerance for physical fit.
+The previous crossover and TrackTemplate Core tests also give PASS results.
+
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_check_ends.py) gives a PASS result without the FreeCAD display in `native-02`.
+It compares all 3951 previous component results and all 264 new component results.
+It compares the 264 new component results again after `Undo/Redo`.
+The test also compares 792 components in 24 more assemblies.
+
+These tests use the two travel directions and straight alignments. They also use curves with `curvature` above and below 0 and a radius of 1200 mm.
+All 32 items in `boss_cap_containment` have `complete_source_facet_bijection` of `true` and give PASS results in the previous checks.
+
+The third test repair changes only the software that uses the FreeCAD display.
+An independent reviewer compared the software that operates without the display and the other files that it uses. They stay the same.
+Thus, `native-02` stays applicable to that software. It is not a new test against the file bytes after the third repair.
+
+The full test gives a PASS result with the FreeCAD display in `gui-02`.
+It includes selection, changes to `ViewObject.Visibility`, `Undo/Redo`, source checks and `transaction_rollback` checks for `CCL` and `CCR`.
+The source `App.Document`, the other test `App.Document`, source files and identities of the `App.Document` items stay the same.
+The test closes all `App.Document` items that it makes.
+
+The tests repeat the checks for rejected `CCL` and `CCR` inputs and `transaction_rollback`. The test uses the previous results for rejected inputs from `freecad_validate_phase9b_catalogue_central_check.py` and `freecad_validate_phase9b_catalogue_paired_crossover.py` again.
+An independent reviewer examined all 36 pairs of `.png` files. These files show all eight new assemblies and the full crossover.
+Independent review gives PASS results for the source, tests, FreeCAD operation and `.png` files in this bounded scope.
+
+The initial stopped exact candidate and its evidence for FAIL results stay the same. Its repair history stays at the `2/2` limit.
+This change keeps its RED results, the `native-01` and `gui-01` FAIL results, and the diagnostic results after them.
+Three repairs correct the checks where `source_branch` changes, the check for multiple `Faces` in a `boss_cap_containment` item, and test cleanup.
+The project owner removed the repair limit for this change before the third repair. This decision does not reopen the initial stopped exact candidate.
+
+`CCLCCR-SUCCESSOR-Q04` stays `BACKLOG` for the canonical owner of `tracktemplate/adapters/freecad/chair_reference_preview.py`.
+In the `Part.makeBox` test, `view.fitAll()` can make the other `App.Document` active.
+That change does not occur in the test with a copy of `XO-001` and items in `selection` and `preselection`.
+The shared product software stays the same. The actual `XO-001` tests change `selection` and `preselection`. Those changes give the necessary FAIL results.
+
+The `XO-001` input stays the same and stays a permanent regression test.
+These results show how the software calculates component positions for work with curves that a person supplies after this change.
+Different alignment inputs and output changes during edits must have a new project owner decision and tests before the software changes.
+
+`physical_fit` stays `NOT_PROVED`. This change sets no numerical tolerance for physical fit.
+The previous C10 limitations, `key_direction_sign` of `0` and limitations recorded with `fixing_angle_frame` stay the same. `Q-PAIR-002` stays `BACKLOG`.
+
+Local evidence is in `tmp/check-end-successor/`, with `native-02/`, `gui-02/`, `source-freeze-03.json` and the `quality-review-04` records.
+The source references include Templot 556b `math_unit.pas:17766–17790,26696–26820,30140–30369,31602–31824` and `heave_chairs.pas:1363–1400`.
+The source check records the remaining source references and hashes. The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+`project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
+This result gives no acceptance for persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
