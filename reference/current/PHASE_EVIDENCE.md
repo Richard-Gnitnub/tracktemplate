@@ -2487,64 +2487,64 @@ It gives no positive rights claim.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
 
-## Additional S1, S1J and L1 chairs for XO-001 — 2026-10-26
+## More S1, S1J and L1 chairs for XO-001 — 2026-10-26
 
-This Level 2 result supplies evidence for part of Exit 9B-3 under [D-P9-018](#lms-chair-record-and-templot-development-panel).
+This Level 2 result supplies evidence for part of Exit 9B-3 with authority from [D-P9-018](#lms-chair-record-and-templot-development-panel).
 
 The optional `include_single_rail=True` argument adds 34 assemblies to the private `XO-001` crossover view.
-These assemblies comprise 16 L1 chairs, 14 S1 chairs and four S1J chairs.
-The complete view has 237 assemblies and 4,889 components. It represents 305 of the 355 source positions.
+These assemblies are 16 L1 chairs, 14 S1 chairs and four S1J chairs.
+The full view has 237 assemblies and 4,889 components. It shows 305 of the 355 source positions.
 The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the previous catalogue geometry and preview lifecycle.
 
-The default command behaviour stays the same. Exact geometry remains on demand.
+The default command behaviour stays the same. The command makes exact geometry only when the caller starts the preview.
 
-The new calculations use the frozen Templot 556b source conditions, nominal timber stations and component positions.
+The source adapter calculates the new component positions from the frozen Templot 556b source conditions and nominal timber stations.
 The four outer stock-rail positions at X9-F use the source joint override for S1J.
-The [component calculations](../../tracktemplate/domain/single_rail_placement.py) calculate separate positions and directions for the fixings that the source identifies.
-They do not reconstruct, scale or deform the geometry that the catalogue keeps.
-Final Templot global fixing angles and random export behaviour remain outside the comparison.
+The [component module](../../tracktemplate/domain/single_rail_placement.py) calculates the position and direction of each fixing that the source identifies.
+The module does not make new catalogue geometry or change its dimensions or shape.
+The tests do not compare the global angles of Templot fixings or Templot's random export behaviour.
 
 The previous 203 assemblies, 48 shared supports and all canonical identities stay the same.
 The canonical analytical exclusions and 124 deferred assignment flags also stay the same.
-Fifty positions remain unrepresented: 40 crossing-rail positions and ten exit or envelope positions.
-Their source contexts or segment mappings need more evidence. Catalogue family labels alone do not supply that evidence.
+The view does not show 50 positions: 40 crossing-rail positions and ten exit or envelope positions.
+More evidence is necessary for their source contexts or segment mappings. Catalogue family labels do not supply sufficient evidence.
 
-Ten previous S1 assignments at S13, T1 and T2 differ from the L1 selections in the source conditions at the switch heel.
-This result preserves those ten assignments within the previous 203 assemblies, as the owner requires.
-The ten differences remain necessary work for Exit 9B-3. They do not prove a physical-fit failure or a geometry defect.
-This result does not establish agreement with all Templot family assignments.
+At the switch heel, the source conditions select L1 for ten previous S1 assignments at S13, T1 and T2.
+This result preserves those ten assignments in the previous 203 assemblies. The owner's decision makes this preservation necessary.
+The ten differences stay necessary work for Exit 9B-3. These differences are not sufficient evidence of a physical-fit failure or a geometry defect.
+This result is not sufficient evidence of full agreement with Templot family assignments.
 
-The [standalone tests](../../tests/validate_phase9b_catalogue_single_rail.py) first give RED evidence for the missing feature.
+The [standalone tests](../../tests/validate_phase9b_catalogue_single_rail.py) first give RED evidence for the missing behaviour.
 The 12 tests and the related regression tests then give PASS results.
-The component comparisons include both travel directions, signed host curvature, source boundaries and invalid inputs.
-The independent source check reads the frozen Pascal calculations and retained native components. It does not call product placement functions.
+The tests compare components for the two travel directions, signed host curvature, source boundaries and invalid inputs.
+The independent source check reads the frozen Pascal code and the native components that the catalogue keeps. It does not use product placement functions.
 
-The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_single_rail.py) uses the qualified profile `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
-The complete test gives PASS results without the display in `native-01` and with the display in `gui-02`.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_catalogue_single_rail.py) uses the qualified host profile `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+The full test gives PASS results without the display in `native-01` and with the display in `gui-02`.
 Each process completes execution with exit status 0 and gives the specified success sentinel.
-All 416 source paths and 94 input bindings stay the same. Each test closes all documents that it makes.
+All 416 source paths and 94 input bindings stay the same. Each test removes all documents that it makes from the FreeCAD session.
 The GUI test also removes its temporary profile and sets the display power to its previous condition.
 
-Both tests compare all 4,215 previous components and all 674 new components.
+The two tests compare all 4,215 previous components and all 674 new components.
 The largest new component difference is less than 5.09e-13 mm.
-The previous numerical limits stay the same. They do not prove physical fit.
-Both tests give PASS results for full `Undo/Redo` and recovery after deliberate errors for each of the three added families.
+The previous numerical limits stay the same. These limits are not sufficient evidence of physical fit.
+The two tests give PASS results for full `Undo/Redo`. They also validate recovery after errors that the tests cause for each of the three added families.
 
 The GUI test also gives PASS results for selection and visibility checks on all 536 layers.
-An independent reviewer examines all 34 original closeups and the full overview. The visual inspection gives a PASS result.
-The 68 original image hashes agree with `gui-02/image-manifest.json`.
-The images do not prove physical fit.
+An independent reviewer examines all 34 closeups and the full overview from the GUI test. The visual inspection gives a PASS result.
+The hashes of the 68 images from the GUI test agree with `gui-02/image-manifest.json`.
+The images are not sufficient evidence of physical fit.
 
 The independent review of source, tests and evidence gives `PASS_WITH_FINDING`, with no open blocker for this bounded change.
-The ten previous family differences remain necessary work before Exit 9B-3.
+The ten previous family differences stay necessary work before Exit 9B-3.
 
 Local evidence is in `tmp/single-rail-coverage/`.
 It includes `source-freeze-01.json`, `remaining-50-01.json`, `accepted-heel-family-limitation-01.json` and `independent-staff-review-01-final.json`.
-The initial RED results, classified test-fixture correction and interrupted first GUI run remain in that directory.
+The initial RED results, classified test-fixture correction and interruption of the first GUI run stay in that directory.
 
 `physical_fit` stays `NOT_PROVED`. `project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
 The [provenance](../PROVENANCE.md) and [licensing boundaries](../LICENSING_BOUNDARIES.md) stay the same.
 
 This result gives no acceptance for other host inputs, physical fit, persistence, production, export behaviour, performance or phase exits.
-The fixed `XO-001` regression and the stopped CCL/CCR candidate with its exhausted repair history stay the same.
+The frozen `XO-001` regression stays the same. The stopped CCL/CCR candidate and its repair history stay the same at the `2/2` limit.
 Phase 9B stays Open at 3/6. More work on LMS chairs is not permitted until after Phase 11.
