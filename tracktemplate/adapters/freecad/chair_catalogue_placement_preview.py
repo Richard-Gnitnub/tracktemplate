@@ -46,6 +46,10 @@ from tracktemplate.domain.check_end_placement import (
     CheckEndPlacement,
     prepare_check_end_placements,
 )
+from tracktemplate.domain.single_rail_placement import (
+    SingleRailPlacement,
+    prepare_single_rail_placements,
+)
 
 
 _P_MODEL_SHA256 = (
@@ -72,6 +76,9 @@ _S1J_SOURCE_NAMES = (
 )
 _S1_MODEL_SHA256 = (
     "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb"
+)
+_L1_MODEL_SHA256 = (
+    "a0289c046b6ae8cb1e2df88a8f6a1f3f0dc79f7a0ae1870d0b3b13154e0eb042"
 )
 _CC_MODEL_SHA256 = (
     "b28b574a517e677c86fc35e26cab9a966e41504cb2242968db45e7c07ac81637"
@@ -110,6 +117,7 @@ _S1_SOURCE_NAMES = (
     "SourceFixing007", "SourceFixing008", "SourceFixing009",
     "SourceFixing010", "SourceFixing011",
 )
+_L1_SOURCE_NAMES = tuple(f"Part_{index:02d}" for index in range(7)) + _CC_FIXING_NAMES
 _CONTEXT_SPECS = (
     ("ReferenceRails", "rail context", (0.55, 0.58, 0.62)),
     ("ReferenceTimbers", "timber context", (0.55, 0.40, 0.25)),
@@ -232,7 +240,11 @@ def _prepare_catalogue_family(
     def require(condition, message):
         _require(condition, message, family=family)
 
-    if placement_type is CheckEndPlacement:
+    if placement_type is SingleRailPlacement:
+        placements = prepare_single_rail_placements(placements)
+        require(all(value.family == family for value in placements),
+                "single-rail family differs from its component frames")
+    elif placement_type is CheckEndPlacement:
         placements = prepare_check_end_placements(placements)
         require(all(value.family == family for value in placements),
                 "check-end family differs from its component frames")
@@ -292,7 +304,8 @@ def _prepare_catalogue_family(
                 admitted,
             ):
                 component_frame = placement
-                if (isinstance(placement, (CentralCheckPlacement, CheckEndPlacement))
+                if (isinstance(placement, (CentralCheckPlacement, CheckEndPlacement,
+                                           SingleRailPlacement))
                         and component.name in _CC_FIXING_NAMES):
                     fixing_index = _CC_FIXING_NAMES.index(component.name) // 4
                     component_frame = placement.fixing_frames[fixing_index]
@@ -317,7 +330,8 @@ def _prepare_catalogue_family(
                     placement_identity=(placement.position_id,
                                         prepared.model_sha256, component.name),
                 ))
-                if isinstance(placement, (CentralCheckPlacement, CheckEndPlacement)):
+                if isinstance(placement, (CentralCheckPlacement, CheckEndPlacement,
+                                          SingleRailPlacement)):
                     measurements[-1].update(
                         origin_mm=component_frame.origin_mm,
                         x_axis=component_frame.x_axis,
@@ -412,6 +426,14 @@ def _prepare_catalogue_family(
                 fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
                 templot_global_fixing_angle_parity=False,
             )
+        if placement_type is SingleRailPlacement:
+            result.update(
+                contract_id=f"tracktemplate.private-catalogue-{family.lower()}-source-placement.v1",
+                placement="source-single-rail-component-frames.v1",
+                fixing_head_rotation_rad=0.0, random_export_parity=False,
+                fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
+                templot_global_fixing_angle_parity=False,
+            )
 
         def verify_layers(stored):
             require(len(stored) == len(layers), "stored layer count changed")
@@ -444,7 +466,7 @@ def create_private_catalogue_crossover_preview(
     catalogue_path, placements_by_family, context_shapes, source_receipt,
     verify_source,
     *, paired_contexts_path=None, include_central_cc=False,
-    include_check_ends=False,
+    include_check_ends=False, include_single_rail=False,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -458,6 +480,12 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(type(include_single_rail) is bool,
+            "include_single_rail requires an actual Boolean")
+    require(not include_single_rail or (
+        include_check_ends is True and include_central_cc is True
+        and paired_contexts_path is not None
+    ), "single-rail coverage requires check ends, central CC and pairs")
     require(type(include_check_ends) is bool,
             "include_check_ends requires an actual Boolean")
     require(not include_check_ends or (include_central_cc is True
@@ -478,6 +506,8 @@ def create_private_catalogue_crossover_preview(
         expected_groups.add("CC")
     if include_check_ends:
         expected_groups.update(family for family, _digest in _CHECK_END_MODELS)
+    if include_single_rail:
+        expected_groups.update(("SupplementS1", "SupplementS1J", "L1"))
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -579,6 +609,32 @@ def create_private_catalogue_crossover_preview(
             layer_specs += prefixed
             selections.append((family, prepared, prefixed, prepare))
 
+    if include_single_rail:
+        single_specs = (
+            ("SupplementS1", "S1", 14, _S1_MODEL_SHA256, _S1_SOURCE_NAMES,
+             "existing-02", "retained-S1-L1-reference-package"),
+            ("SupplementS1J", "S1J", 4, _S1J_MODEL_SHA256, _S1J_SOURCE_NAMES,
+             "basic-04", "fixed-basic-source-context"),
+            ("L1", "L1", 16, _L1_MODEL_SHA256, _L1_SOURCE_NAMES,
+             "existing-02", "retained-S1-L1-reference-package"),
+        )
+        for group, family, count, digest, names, run, context in single_specs:
+            placements = prepare_single_rail_placements(placements_by_family[group])
+            ids = {placement.position_id for placement in placements}
+            require(len(placements) == count and not identities.intersection(ids),
+                    "single-rail placements are incomplete or overlap another group")
+            identities.update(ids)
+            prepared, specs, prepare = _prepare_catalogue_family(
+                catalogue_path, placements, None, receipt,
+                family=family, placement_type=SingleRailPlacement,
+                model_sha256=digest, source_names=names,
+                run=run, source_context=context,
+            )
+            prefixed = tuple((group + "_" + name, title, colour)
+                             for name, title, colour in specs)
+            layer_specs += prefixed
+            selections.append((group, prepared, prefixed, prepare))
+
     def prepare_layers():
         layers = _context_layers(context_shapes)
         families = {}
@@ -594,7 +650,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": ("tracktemplate.private-catalogue-crossover.v4"
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v5"
+                            if include_single_rail else
+                            "tracktemplate.private-catalogue-crossover.v4"
                             if include_check_ends else
                             "tracktemplate.private-catalogue-crossover.v3"
                             if include_central_cc else

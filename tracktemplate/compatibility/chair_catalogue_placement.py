@@ -576,7 +576,7 @@ def _block_context_exclusion(position, mate, prepared):
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
-    include_check_ends=False,
+    include_check_ends=False, include_single_rail=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -587,7 +587,14 @@ def preview_private_catalogue_crossover_chairs(
     The central CC option adds twelve stock/check assemblies, with source
     component frames. Invalid evidence fails before native creation.
     Check ends add eight CCL/CCR assemblies to that complete baseline.
+    The single-rail option adds 34 source-qualified S1, S1J and L1 assemblies.
     """
+    _require(type(include_single_rail) is bool,
+             "include_single_rail requires an actual Boolean")
+    _require(not include_single_rail or (
+        include_check_ends is True and include_central_cc is True
+        and paired_contexts_path is not None
+    ), "single-rail coverage requires check ends, central CC and pairs")
     _require(type(include_check_ends) is bool,
              "include_check_ends requires an actual Boolean")
     _require(not include_check_ends or (include_central_cc is True
@@ -667,6 +674,17 @@ def preview_private_catalogue_crossover_chairs(
             catalogue_path,
         )
         families.update(ends)
+    single_witnesses = {}
+    verify_singles = None
+    if include_single_rail:
+        from tracktemplate.compatibility.chair_single_rail_placement import (
+            prepare_single_rails,
+        )
+        singles, single_witnesses, verify_singles = prepare_single_rails(
+            module, source_document, signature, positions, timbers, base_z,
+            catalogue_path,
+        )
+        families.update(singles)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
     selected, excluded, preparations = [], [], {}
@@ -701,6 +719,8 @@ def preview_private_catalogue_crossover_chairs(
                 record.update(check_witnesses[identity])
             if identity in end_witnesses:
                 record.update(end_witnesses[identity])
+            if identity in single_witnesses:
+                record.update(single_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
@@ -775,6 +795,8 @@ def preview_private_catalogue_crossover_chairs(
             verify_checks()
         if verify_ends is not None:
             verify_ends()
+        if verify_singles is not None:
+            verify_singles()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -846,10 +868,17 @@ def preview_private_catalogue_crossover_chairs(
             receipt["limits"].append(
                 "Check ends use separate source frames for seats, keys and fixings."
             )
+            if include_single_rail:
+                receipt["limits"].extend((
+                    "The single-rail supplement uses source body and fixing frames.",
+                    "Previous accepted assignments are preserved; complete Templot "
+                    "assignment equivalence is not claimed.",
+                ))
             return create_preview(
                 catalogue_path, families, shapes, receipt, verify_all_sources,
                 paired_contexts_path=paired_contexts_path,
                 include_central_cc=True, include_check_ends=True,
+                **({"include_single_rail": True} if include_single_rail else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,

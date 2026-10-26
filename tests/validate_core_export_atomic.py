@@ -107,7 +107,11 @@ def run_case(root, *, manifest=True, fault=None, adapter=None,
 
 def validate_application():
     cases = 0
-    with tempfile.TemporaryDirectory(prefix="tt-atomic-application-") as area:
+    temporary_root = ROOT / "tmp"
+    temporary_root.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        prefix="tt-atomic-application-", dir=temporary_root,
+    ) as area:
         base = Path(area)
         for manifest in (True, False):
             root = base / ("csv" if manifest else "no-csv")
@@ -204,7 +208,11 @@ def validate_application():
 
 def validate_dependency_members():
     cases = 0
-    with tempfile.TemporaryDirectory(prefix="tt-core-dependencies-") as area:
+    temporary_root = ROOT / "tmp"
+    temporary_root.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        prefix="tt-core-dependencies-", dir=temporary_root,
+    ) as area:
         base = Path(area)
         for csv_on in (True, False):
             root = base / str(csv_on)
