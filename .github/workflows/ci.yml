@@ -1,46 +1,112 @@
-name: Standalone CI
+name: PR214 atomic export diagnostic
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: standalone-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  validation:
-    runs-on: ubuntu-latest
+  atomic-diagnostic:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
     steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out diagnostic probe
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          fetch-depth: 0
+          path: diagnostic
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: Check out unchanged PR214 exact head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          python-version: "3.12"
+          ref: a196f0a9167d919578c0abbda8f784bd7b539cf9
+          path: candidate
+          persist-credentials: false
 
-      - name: Parse tracked Python and macro sources
-        run: python tools/validate_python_syntax.py
-
-      - name: Run standalone tests and repository contracts
-        id: standalone
-        run: python tools/run_standalone_validators.py --profile ci
-
-      - name: Preserve standalone validation output
-        if: ${{ always() && steps.standalone.outcome != 'skipped' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Check out unchanged last green baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          name: standalone-validation-${{ github.event.pull_request.head.sha || github.sha }}
-          path: benchmark-output/standalone-validation/
+          ref: aafb0e709cc908181a4cfdf25b96ac659964e2bd
+          path: baseline
+          persist-credentials: false
+
+      - name: Match the recorded Python version
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12.15"
+
+      - name: Capture results without replacing original assertions
+        env:
+          REQUESTED_RUNNER: ${{ matrix.runner }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          workspace = Path(os.environ["GITHUB_WORKSPACE"])
+          output = workspace / "diagnostic-output"
+          output.mkdir(exist_ok=False)
+          probe = workspace / "diagnostic/diagnostics/trace_atomic_export_v2.py"
+          facts = {
+              "kind": "fresh diagnostic reproduction, not original-runner recovery",
+              "environment": {name: os.environ.get(name) for name in (
+                  "ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH",
+                  "REQUESTED_RUNNER", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
+                  "GITHUB_SHA", "GITHUB_REF",
+              )},
+              "python": sys.version,
+              "probe_sha256": hashlib.sha256(probe.read_bytes()).hexdigest(),
+          }
+          (output / "runner.json").write_text(json.dumps(facts, indent=2) + "\n")
+          results = []
+          failed = False
+          expected_heads = {
+              "candidate": "a196f0a9167d919578c0abbda8f784bd7b539cf9",
+              "baseline": "aafb0e709cc908181a4cfdf25b96ac659964e2bd",
+          }
+          for label, expected_head in expected_heads.items():
+              repository = workspace / label
+              actual_head = subprocess.check_output(
+                  ["git", "-C", str(repository), "rev-parse", "HEAD"], text=True,
+              ).strip()
+              if actual_head != expected_head:
+                  raise RuntimeError("Checkout identity mismatch: " + label)
+              for temporary_root in ("default", "checkout"):
+                  command = [
+                      sys.executable, str(probe), "--repository", str(repository),
+                      "--output", str(output / (label + "-" + temporary_root)),
+                  ]
+                  if temporary_root == "checkout":
+                      owned_root = repository / "tmp/pr214-atomic-diagnostic"
+                      owned_root.mkdir(parents=True, exist_ok=False)
+                      command.extend(["--temp-root", str(owned_root)])
+                  completed = subprocess.run(command, check=False)
+                  results.append({
+                      "checkout": label, "head": actual_head,
+                      "temporary_root": temporary_root,
+                      "command": command, "exit_code": completed.returncode,
+                  })
+                  failed = failed or completed.returncode != 0
+                  (output / "runs.json").write_text(
+                      json.dumps(results, indent=2) + "\n",
+                  )
+          raise SystemExit(1 if failed else 0)
+          PY
+
+      - name: Preserve all diagnostic results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr214-atomic-diagnostic-${{ matrix.runner }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: diagnostic-output/
           if-no-files-found: error
