@@ -130,12 +130,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:4ff38151aa1bffc22b60325188ff14e745e6a671",
-      "accepted_sha256": "sha256:105e482525eefd4a1dc1651b5c35e80d13d846381224321d421341c38fa2baa1",
+      "accepted_blob": "sha1:04cb89c457fa6e77867214bbfccace9087d771ed",
+      "accepted_sha256": "sha256:e14b2366a568b76ff7bb8b98c47c30553990de1f7419028b540e41eb40bde8a3",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/VALIDATION.md",
-      "review_receipt": "sha256:474ddace496e5db8e58fa70bfc46a9346929d3fe0d9ceea2c87023f272fca78e",
+      "review_receipt": "sha256:836e2d5a95339c6cd2e881327330cd8a5b1e982ca02daae699324cbeb3368895",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -586,6 +586,15 @@
       "lifecycle_status": "locked",
       "path": "reference/phase-evidence/S1_PILOT_PLAN.md",
       "review_receipt": "sha256:29a20c9277b6a7e86f6654a100775c88675c621260f2d474f4abe194e294a347",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:536b4e20cab9ac86ecebe73ee94d288700d84940",
+      "accepted_sha256": "sha256:1fb3ca5373a123c7e78c94ab8c5647d5a69bf2ecc00637ff896282ffdb5888e2",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "tools/freecad_bridge/README.md",
+      "review_receipt": "sha256:836e2d5a95339c6cd2e881327330cd8a5b1e982ca02daae699324cbeb3368895",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     }
   ],

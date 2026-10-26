@@ -276,6 +276,10 @@ manager migration is a different authorised task.
 
 ### Programmatic regression pipeline
 
+Before you start a FreeCAD validation command, select a memory limit in MiB
+and a time limit in seconds. Set `validation_memory_mib` to the selected memory
+limit. Set `validation_seconds` to the selected time limit.
+
 Use the local pipeline as the usual concise entry point for regression tests:
 
 ```bash
@@ -286,21 +290,9 @@ Use the local pipeline as the usual concise entry point for regression tests:
   --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
 ```
 
-Before a FreeCAD profile, set `validation_memory_mib` and `validation_seconds`
-to explicit limits for the selected workload. These limits are safety controls.
-They do not establish product performance requirements. The runtime preflight
-uses its own limits of 4,096 MiB and 90 seconds.
-
-The [validation launcher](../tools/freecad_validation_guard.py) permits one
-TrackTemplate FreeCAD validation process group per user, across worktrees.
-It sets and verifies limits on the actual Flatpak process group before FreeCAD
-starts. A separate timer limits the run if the calling process stops.
-The launcher checks that the process group is empty after the run. If cleanup
-is not proved, the next run is blocked and the timer stays active.
-
-Logs, resource samples and cleanup results stay with the validation evidence.
-A resource failure cannot become a PASS result because a test printed its
-success sentinel. Display-server and GPU allocations are outside these limits.
+The [validation launcher](../tools/freecad_validation_guard.py) keeps command
+output and validation evidence after FreeCAD stops. These limits give no
+acceptance for product performance.
 
 The default `standalone` profile first uses the development-toolchain preflight
 for `validation` and Ruff. It then checks each tracked Python and macro source
