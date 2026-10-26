@@ -18,19 +18,6 @@ from tracktemplate.compatibility.chair_pair_placement import _host_context
 from tracktemplate.domain.single_rail_placement import place_single_rail
 
 
-_RAILS = {
-    "S13": {"curved switch and closure rail": 2, "turnout-side stock rail": 4},
-    "T1": {"curved switch and closure rail": 2, "turnout-side stock rail": 4},
-    "T2": {"curved switch and closure rail": 2, "turnout-side stock rail": 4},
-    "T14": {"curved switch and closure rail": 2},
-    **{timber: {"main-side stock rail": 1, "turnout-side stock rail": 4}
-       for timber in ("X6-C", "X7-D", "X8-E")},
-    "X9-F": {"main-side stock rail": 1, "turnout-side stock rail": 4,
-             "vee splice rail": 2, "vee point rail": 3},
-}
-_GROUPS = {"S1": "SupplementS1", "S1J": "SupplementS1J", "L1": "L1"}
-
-
 def _require(condition, message):
     if not condition:
         raise ValueError("Private single-rail placement: " + message)
@@ -90,23 +77,38 @@ def prepare_single_rails(
     named source contexts on each turnout. B4 extensions must retain the
     original source identity and station; envelope stations are not used.
     """
+    rails_by_timber = {
+        "S13": {"curved switch and closure rail": 2,
+                "turnout-side stock rail": 4},
+        "T1": {"curved switch and closure rail": 2,
+               "turnout-side stock rail": 4},
+        "T2": {"curved switch and closure rail": 2,
+               "turnout-side stock rail": 4},
+        "T14": {"curved switch and closure rail": 2},
+        **{timber: {"main-side stock rail": 1, "turnout-side stock rail": 4}
+           for timber in ("X6-C", "X7-D", "X8-E")},
+        "X9-F": {"main-side stock rail": 1, "turnout-side stock rail": 4,
+                 "vee splice rail": 2, "vee point rail": 3},
+    }
+    family_groups = {"S1": "SupplementS1", "S1J": "SupplementS1J", "L1": "L1"}
     configuration = json.loads(signature)["configuration"]
     _require(configuration["crossover_id"] == "XO-001",
              "only the qualified XO-001 context is supported")
     hosts, data, objects = _host_context(module, document, configuration)
     selections = {family: prepare_catalogue_chair(
         catalogue_path, family, run="basic-04" if family == "S1J" else "existing-02",
-    ) for family in _GROUPS}
+    ) for family in family_groups}
     timber_map = {item["stable_identity"]: item for item in timbers}
     _require(len(timber_map) == len(timbers), "source timber identities repeat")
     owners = {configuration["turnout_" + side.lower() + "_id"]: side
               for side in ("A", "B")}
     expected = {(side, timber, rail) for side in ("A", "B")
-                for timber, rails in _RAILS.items() for rail in rails.values()}
+                for timber, rails in rails_by_timber.items()
+                for rail in rails.values()}
     candidates = {}
     for identity, position in positions.items():
         timber = position["prototype_timber_identifier"]
-        rail = _RAILS.get(timber, {}).get(position["rail_name"])
+        rail = rails_by_timber.get(timber, {}).get(position["rail_name"])
         if rail is None:
             continue
         side = owners.get(position["parent_turnout_identity"])
@@ -121,7 +123,7 @@ def prepare_single_rails(
         candidates[key] = position
     _require(set(candidates) == expected, "all 34 single-rail positions are required")
     dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
-    groups = {name: [] for name in _GROUPS.values()}
+    groups = {name: [] for name in family_groups.values()}
     witnesses = {}
     for side in ("A", "B"):
         config = configuration["turnout_" + side.lower() + "_config"]
@@ -134,7 +136,7 @@ def prepare_single_rails(
                   module.rea_c10_timber_layout(dimensions, config["template_width"])}
         direction = module._turnout_orientation_sign(config["orientation"])
         _require(direction in (-1.0, 1.0), "unsupported travel direction")
-        for timber, rails in _RAILS.items():
+        for timber, rails in rails_by_timber.items():
             for rail in rails.values():
                 position = candidates[side, timber, rail]
                 identity = position["stable_chair_position_identity"]
@@ -159,7 +161,7 @@ def prepare_single_rails(
                          "single-rail station lies outside its canonical host")
                 point, heading = module.interpolate_alignment_station(data[side], station)
                 travel = heading if direction > 0 else heading + math.pi
-                groups[_GROUPS[family]].append(place_single_rail(
+                groups[family_groups[family]].append(place_single_rail(
                     identity, position["rail_identity"], position["timber_identity"],
                     (point.x, point.y), travel, base_z, family=family,
                     source_rail_code=rail, source_angle_rad=angle,
