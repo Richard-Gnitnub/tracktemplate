@@ -277,6 +277,16 @@ def _validate_exact_host(contract):
         "freecad-unqualified",
     )
     assert len(calls) == 1
+    guarded = calls[0]
+    assert pathlib.Path(guarded[1]).name == "freecad_validation_guard.py"
+    assert guarded[guarded.index("--memory-max-mib") + 1] == "4096"
+    assert guarded[guarded.index("--timeout-seconds") + 1] == "90"
+    assert "--isolate-profile" in guarded
+    assert guarded[guarded.index("--") + 1:] == [
+        "/usr/bin/flatpak", "run", "--command=FreeCADCmd",
+        "org.freecad.FreeCAD", "tools/runtime_compatibility_probe.py",
+        "--pass", "--require-qualified",
+    ]
 
     no_run_calls = []
     context = preflight.Context(
@@ -294,6 +304,38 @@ def _validate_exact_host(contract):
         "freecad-profile-undeclared",
     )
     assert no_run_calls == []
+
+
+def _validate_guard_failure_preserves_qualification_checks(contract):
+    compatibility = json.loads(
+        (ROOT / contract["compatibility_contract"]).read_text("utf-8")
+    )
+    profile = next(
+        item["profile_id"]
+        for item in compatibility["runtime_baseline"]["qualified_profiles"]
+        if item["status"].startswith("qualified")
+    )
+    output = compatibility["evidence"]["probe_sentinel"] + json.dumps({
+        "compatibility_evaluation": {
+            "status": "qualified", "matched_profile_id": profile,
+        },
+    }) + "\n"
+    for code, stdout in ((1, output), (0, "")):
+        def run(arguments, **kwargs):
+            assert kwargs["timeout"] == 90
+            assert "--isolate-profile" in arguments
+            return subprocess.CompletedProcess(
+                arguments, code, stdout=stdout, stderr="guard diagnostic",
+            )
+
+        context = preflight.Context(root=ROOT, run=run)
+        context.resolved["flatpak"] = "/usr/bin/flatpak"
+        _expect_error(
+            lambda: preflight.check_qualified_freecad(
+                contract, contract["tools"]["qualified_freecad"], context,
+            ),
+            "success-sentinel-missing",
+        )
 
 
 def _validate_system_tool_resolution(contract):
@@ -674,6 +716,8 @@ def _validate_consumers(contract):
                 "transition",
                 root=ROOT,
                 python_executable="python-under-test",
+                memory_max_mib=4096,
+                timeout_seconds=120,
             )
         which.assert_called_once_with("flatpak", path=os.defpath)
         expected_flatpak = str(flatpak.resolve())
@@ -760,6 +804,7 @@ def validate():
     _validate_ruff_contract(contract)
     _validate_stage_isolation_and_failure(contract)
     _validate_exact_host(contract)
+    _validate_guard_failure_preserves_qualification_checks(contract)
     _validate_system_tool_resolution(contract)
     _validate_isolated_system_python(contract)
     _validate_bridge_tree_integrity(contract)

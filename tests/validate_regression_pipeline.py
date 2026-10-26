@@ -8,6 +8,8 @@ import io
 import pathlib
 import sys
 import tempfile
+from types import SimpleNamespace
+from unittest.mock import patch
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -27,6 +29,8 @@ def _step_names(profile):
             profile,
             root=ROOT,
             python_executable="python-under-test",
+            memory_max_mib=4096,
+            timeout_seconds=120,
         )
     )
 
@@ -59,6 +63,8 @@ def _validate_profiles():
         "transition-gui",
         root=ROOT,
         python_executable="python-under-test",
+        memory_max_mib=4096,
+        timeout_seconds=120,
     )
     assert gui_steps[0].command == (
         "python-under-test",
@@ -82,6 +88,19 @@ def _validate_profiles():
             / "run-phase5-transition-viewprovider"
         ),
     )
+    assert all(step.freecad_limits == (4096, 120)
+               for step in gui_steps[4:7])
+    assert dict(gui_steps[-1].environment) == {
+        "TRACKTEMPLATE_VALIDATION_MEMORY_MAX_MIB": "4096",
+        "TRACKTEMPLATE_VALIDATION_TIMEOUT_SECONDS": "120",
+    }
+    for profile in ("transition", "transition-gui"):
+        try:
+            pipeline.build_steps(profile)
+        except ValueError as error:
+            assert "explicit" in str(error)
+        else:
+            raise AssertionError("Full proof accepted implicit limits")
 
 
 def _validate_execution_and_logs():
@@ -196,10 +215,58 @@ def _validate_canonical_routing():
     assert "--profile transition-gui" not in workflow
 
 
+def _validate_resource_failure_cannot_pass():
+    with tempfile.TemporaryDirectory(prefix="tt-pipeline-resource-") as name:
+        root = pathlib.Path(name)
+        stdout = root / "payload.stdout"
+        stderr = root / "payload.stderr"
+        stdout.write_text("PROOF_PASS\n", encoding="utf-8")
+        stderr.write_text("original diagnostic\n", encoding="utf-8")
+        receipt = root / "receipt.json"
+        receipt.write_text("{}", encoding="utf-8")
+        step = pipeline.PipelineStep(
+            "native", ("flatpak", "run", "org.freecad.FreeCAD"),
+            "PROOF_PASS", freecad_limits=(4096, 120),
+        )
+        for index, (status, cleanup) in enumerate((
+            ("failed", True), ("completed", False),
+        )):
+            calls = []
+
+            def guarded_run(argv, **kwargs):
+                calls.append((argv, kwargs))
+                return {
+                    "status": status, "process_exit": 0,
+                    "cleanup_proved": cleanup,
+                    "stdout_path": str(stdout), "stderr_path": str(stderr),
+                    "receipt_path": str(receipt),
+                }
+
+            fake = SimpleNamespace(
+                ValidationLimits=lambda **values: values,
+                run_guarded_flatpak=guarded_run,
+            )
+            with (
+                patch.object(pipeline, "_guard_module", return_value=fake),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                summary = pipeline.run_pipeline(
+                    profile="transition", steps=(step,), root=root,
+                    run_directory=root / str(index),
+                )
+            assert summary["failed"] == ["native"]
+            assert summary["results"][0]["sentinel_found"] is True
+            assert summary["results"][0]["return_code"] != 0
+            assert len(calls) == 1
+            assert calls[0][0] == step.command
+            assert calls[0][1]["isolate_profile"] is True
+
+
 def validate():
     _validate_profiles()
     _validate_execution_and_logs()
     _validate_canonical_routing()
+    _validate_resource_failure_cannot_pass()
     print("Programmatic regression pipeline contract passed")
 
 

@@ -5,6 +5,12 @@ export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
+guard="${project_root}/tools/freecad_validation_guard.py"
+entry="${bridge_dir}/launch-freecad"
+if [[ "${TRACKTEMPLATE_VALIDATION_RESERVED_ENTRY:-}" != "${entry}" ]]; then
+    exec "${project_root}/.venv/bin/python" "${guard}" reserve-gui "${entry}" "$@"
+fi
+"${project_root}/.venv/bin/python" "${guard}" verify-gui-lease
 tool_root="${project_root}/.devtools/freecad-cli"
 state_dir="${project_root}/benchmark-output/freecad-bridge"
 profile_dir="${state_dir}/profile"
@@ -33,8 +39,16 @@ fi
 chmod 600 "${token_file}"
 : >"${instance_file}"
 exec 3>"${instance_file}"
+guard_evidence="${TRACKTEMPLATE_VALIDATION_EVIDENCE_DIR:-}"
+if [[ -z "${guard_evidence}" ]]; then
+    guard_parent="$(mktemp -d "${state_dir}/validation.XXXXXX")"
+    guard_evidence="${guard_parent}/guard"
+fi
 
-exec flatpak run \
+exec "${project_root}/.venv/bin/python" "${guard}" \
+    --memory-max-mib "${TRACKTEMPLATE_VALIDATION_MEMORY_MAX_MIB}" \
+    --timeout-seconds "${TRACKTEMPLATE_VALIDATION_TIMEOUT_SECONDS}" \
+    --evidence-dir "${guard_evidence}" -- flatpak run \
     --die-with-parent \
     --instance-id-fd=3 \
     --env="FREECAD_CLI_PORT=${bridge_port}" \

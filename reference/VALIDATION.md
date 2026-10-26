@@ -276,13 +276,23 @@ manager migration is a different authorised task.
 
 ### Programmatic regression pipeline
 
+Before you start a FreeCAD validation command, select a memory limit in MiB
+and a time limit in seconds. Set `validation_memory_mib` to the selected memory
+limit. Set `validation_seconds` to the selected time limit.
+
 Use the local pipeline as the usual concise entry point for regression tests:
 
 ```bash
 .venv/bin/python tools/run_regression_pipeline.py
-.venv/bin/python tools/run_regression_pipeline.py --profile transition
-.venv/bin/python tools/run_regression_pipeline.py --profile transition-gui
+.venv/bin/python tools/run_regression_pipeline.py --profile transition \
+  --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
+.venv/bin/python tools/run_regression_pipeline.py --profile transition-gui \
+  --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
 ```
+
+The [validation launcher](../tools/freecad_validation_guard.py) keeps command
+output and validation evidence after FreeCAD stops. These limits give no
+acceptance for product performance.
 
 The default `standalone` profile first uses the development-toolchain preflight
 for `validation` and Ruff. It then checks each tracked Python and macro source
