@@ -12,16 +12,19 @@ TrackTemplateMacro runtime dependency.
 - Its FreeCAD user home/data paths and XDG data, configuration and cache
   directories are isolated there as well, so installed addons and cache locks
   from everyday FreeCAD are not shared. Each automated isolated run receives a
-  fresh temporary/recovery directory which is removed after its exact FreeCAD
-  instance stops, preventing a failed run's recovery record from contaminating
-  the next run.
+  fresh temporary/recovery directory. The directory and validation evidence
+  remain available after the run. The next run receives a different directory.
 - The addon is supplied only through this session's `--module-path`; it is not
   installed into the normal FreeCAD `Mod` directory.
 - The server binds to `127.0.0.1`, uses the dedicated port `19875`, and requires
   a generated local token.
 - Long operations use asynchronous jobs and can be polled for up to six hours.
-- The launcher records its exact Flatpak instance ID and requests parent-death
-  cleanup; the isolated lifecycle wrapper uses that ID as a shutdown fallback.
+- Native and GUI validation share one per-user lock across worktrees. The
+  launcher verifies the limits on the actual Flatpak process group before it
+  starts FreeCAD. A separate timer limits the run if the calling process stops.
+- The isolated wrapper requests shutdown for its verified process group and
+  checks the cleanup result. A resource failure or unproved cleanup makes the
+  command fail, even if the client command gives exit status 0.
 
 Do not open an irreplaceable document in this session. Use a copy or a
 deterministic construction recipe for benchmark work.
@@ -47,6 +50,19 @@ The command checks out the exact upstream commit, applies only
 runs the 22 focused bridge tests without adding pytest to the product project.
 
 ## Commands
+
+Set explicit memory and time limits before a GUI command or isolated wrapper:
+
+```bash
+export TRACKTEMPLATE_VALIDATION_MEMORY_MAX_MIB="$validation_memory_mib"
+export TRACKTEMPLATE_VALIDATION_TIMEOUT_SECONDS="$validation_seconds"
+```
+
+Select these values for the workload before the run. The launcher refuses a
+memory limit that equals or exceeds currently available host memory. Other
+host workloads can change that available memory. Display-server and GPU
+allocations are outside the process-group limit. These controls do not qualify
+full-crossover workloads or establish product performance requirements.
 
 Start the dedicated GUI session:
 

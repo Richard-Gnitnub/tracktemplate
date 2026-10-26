@@ -30,6 +30,8 @@ class PipelineStep:
     name: str
     command: tuple[str, ...]
     sentinel: str
+    freecad_limits: tuple[int, int] | None = None
+    environment: tuple[tuple[str, str], ...] = ()
 
 
 def build_steps(
@@ -37,10 +39,22 @@ def build_steps(
     *,
     root=ROOT,
     python_executable=sys.executable,
+    memory_max_mib=None,
+    timeout_seconds=None,
 ):
     """Return the ordered durable regression steps for ``profile``."""
     if profile not in PROFILES:
         raise ValueError("unknown regression profile: {!r}".format(profile))
+    if profile != "standalone":
+        if memory_max_mib is None or timeout_seconds is None:
+            raise ValueError(
+                "FreeCAD profiles require explicit memory and time limits"
+            )
+        _guard_module().ValidationLimits(
+            memory_max_mib=memory_max_mib,
+            timeout_seconds=timeout_seconds,
+        )
+    freecad_limits = (memory_max_mib, timeout_seconds)
 
     root = pathlib.Path(root).resolve()
     steps = [
@@ -124,6 +138,7 @@ def build_steps(
                         "Phase 4 transition FreeCAD persistence "
                         "validation passed"
                     ),
+                    freecad_limits=freecad_limits,
                 ),
                 PipelineStep(
                     "transition-coin-scene",
@@ -136,6 +151,7 @@ def build_steps(
                         ),
                     ),
                     "Phase 5 transition Coin host validation passed",
+                    freecad_limits=freecad_limits,
                 ),
                 PipelineStep(
                     "transition-edit-lifecycle",
@@ -148,6 +164,7 @@ def build_steps(
                         ),
                     ),
                     "Phase 5 transition edit FreeCAD validation passed",
+                    freecad_limits=freecad_limits,
                 ),
             )
         )
@@ -180,11 +197,58 @@ def build_steps(
                         ),
                     ),
                     "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=",
+                    environment=(
+                        ("TRACKTEMPLATE_VALIDATION_MEMORY_MAX_MIB",
+                         str(memory_max_mib)),
+                        ("TRACKTEMPLATE_VALIDATION_TIMEOUT_SECONDS",
+                         str(timeout_seconds)),
+                    ),
                 ),
             )
         )
 
     return tuple(steps)
+
+
+def _guard_module():
+    """Load the Linux validation tool only for a FreeCAD profile."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from tools import freecad_validation_guard
+    return freecad_validation_guard
+
+
+def _run_step(step, root, log, evidence_dir):
+    """Preserve proof output; resource or cleanup failure cannot pass."""
+    environment = dict(os.environ, **dict(step.environment))
+    if step.freecad_limits is None:
+        return subprocess.run(
+            step.command, cwd=root, env=environment, stdout=log,
+            stderr=subprocess.STDOUT, check=False,
+        ).returncode
+    guard = _guard_module()
+    memory_mib, seconds = step.freecad_limits
+    result = guard.run_guarded_flatpak(
+        step.command,
+        limits=guard.ValidationLimits(
+            memory_max_mib=memory_mib, timeout_seconds=seconds,
+        ),
+        evidence_dir=evidence_dir, cwd=root, env=environment,
+        isolate_profile=True,
+    )
+    for key in ("stdout_path", "stderr_path"):
+        path = result.get(key)
+        if path:
+            with pathlib.Path(path).open(
+                encoding="utf-8", errors="replace",
+            ) as stream:
+                shutil.copyfileobj(stream, log)
+    log.write("\nTRACKTEMPLATE_PIPELINE_RESOURCE_RECEIPT="
+              + str(result["receipt_path"]) + "\n")
+    if (result["status"] != "completed" or result["process_exit"] != 0
+            or not result["cleanup_proved"]):
+        return result["process_exit"] or 1
+    return result["process_exit"]
 
 
 def default_run_directory(root=ROOT):
@@ -286,15 +350,11 @@ def run_pipeline(
             )
             log.flush()
             try:
-                completed = subprocess.run(
-                    step.command,
-                    cwd=root,
-                    stdout=log,
-                    stderr=subprocess.STDOUT,
-                    check=False,
+                return_code = _run_step(
+                    step, root, log,
+                    run_directory / (step.name + "-resources"),
                 )
                 command_started = True
-                return_code = completed.returncode
             except OSError as error:
                 log.write(
                     "TRACKTEMPLATE_PIPELINE_START_ERROR="
@@ -384,10 +444,20 @@ def main(argv=None):
             "FreeCAD; transition-gui also runs the isolated real-GUI proof"
         ),
     )
+    parser.add_argument("--memory-max-mib", type=int)
+    parser.add_argument("--timeout-seconds", type=int)
     arguments = parser.parse_args(argv)
+    try:
+        steps = build_steps(
+            arguments.profile,
+            memory_max_mib=arguments.memory_max_mib,
+            timeout_seconds=arguments.timeout_seconds,
+        )
+    except ValueError as error:
+        parser.error(str(error))
     summary = run_pipeline(
         profile=arguments.profile,
-        steps=build_steps(arguments.profile),
+        steps=steps,
         root=ROOT,
         run_directory=default_run_directory(),
     )

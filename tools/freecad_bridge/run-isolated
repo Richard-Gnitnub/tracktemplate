@@ -5,6 +5,12 @@ export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
+guard="${project_root}/tools/freecad_validation_guard.py"
+entry="${bridge_dir}/run-isolated"
+if [[ "${TRACKTEMPLATE_VALIDATION_RESERVED_ENTRY:-}" != "${entry}" ]]; then
+    exec "${project_root}/.venv/bin/python" "${guard}" reserve-gui "${entry}" "$@"
+fi
+"${project_root}/.venv/bin/python" "${guard}" verify-gui-lease
 state_dir="${project_root}/benchmark-output/freecad-bridge"
 launcher_log="${TRACKTEMPLATE_BRIDGE_LAUNCHER_LOG:-${state_dir}/isolated-launcher.log}"
 instance_file="${TRACKTEMPLATE_BRIDGE_INSTANCE_FILE:-${state_dir}/isolated-instance-id}"
@@ -26,38 +32,33 @@ export PYTHONDONTWRITEBYTECODE PYTHONPYCACHEPREFIX
 : >"${instance_file}"
 TRACKTEMPLATE_BRIDGE_INSTANCE_FILE="${instance_file}" \
 TRACKTEMPLATE_BRIDGE_TEMP_DIR="${isolated_temp_dir}" \
+TRACKTEMPLATE_VALIDATION_EVIDENCE_DIR="${isolated_temp_dir}/guard" \
     "${bridge_dir}/launch-freecad" >"${launcher_log}" 2>&1 &
 freecad_process=$!
 
 cleanup() {
     cleanup_status=0
-    instance_id="$(tr -d '[:space:]' <"${instance_file}" 2>/dev/null || true)"
-    if [[ "${instance_id}" =~ ^[0-9]+$ ]]; then
-        flatpak kill "${instance_id}" >/dev/null 2>&1 || true
+    if kill -0 "${freecad_process}" >/dev/null 2>&1; then
+        "${project_root}/.venv/bin/python" "${guard}" request-gui-stop \
+            "${isolated_temp_dir}/guard" "${freecad_process}" \
+            "${command_status}" || cleanup_status=1
         for _shutdown_attempt in $(seq 1 80); do
-            if ! flatpak ps --columns=instance 2>/dev/null | grep -Fxq "${instance_id}"; then
+            if ! kill -0 "${freecad_process}" >/dev/null 2>&1; then
                 break
             fi
             sleep 0.25
         done
-        if flatpak ps --columns=instance 2>/dev/null | grep -Fxq "${instance_id}"; then
-            echo "The isolated FreeCAD instance ${instance_id} did not stop." >&2
-            cleanup_status=1
-        fi
     fi
     if kill -0 "${freecad_process}" >/dev/null 2>&1; then
-        kill "${freecad_process}" >/dev/null 2>&1 || true
+        echo "Validation supervisor remains active; deadline and evidence retained." >&2
+        cleanup_status=1
+    else
         wait "${freecad_process}" >/dev/null 2>&1 || true
+        "${project_root}/.venv/bin/python" "${guard}" check-gui-cleanup \
+            "${isolated_temp_dir}/guard/result.json" \
+            "${command_status}" || cleanup_status=1
     fi
-    case "${isolated_temp_dir}" in
-        "${state_dir}"/isolated-temp.*)
-            rm -rf -- "${isolated_temp_dir}"
-            ;;
-        *)
-            echo "Refusing to remove unexpected isolated temp path: ${isolated_temp_dir}" >&2
-            cleanup_status=1
-            ;;
-    esac
+    echo "Validation evidence retained: ${isolated_temp_dir}" >&2
     return "${cleanup_status}"
 }
 
@@ -77,6 +78,9 @@ trap 'exit 130' INT TERM
 
 ready=0
 for _attempt in $(seq 1 90); do
+    if ! kill -0 "${freecad_process}" >/dev/null 2>&1; then
+        break
+    fi
     if "${bridge_dir}/freecad-cli" ping >/dev/null 2>&1; then
         ready=1
         break

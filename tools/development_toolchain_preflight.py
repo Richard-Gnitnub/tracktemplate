@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 from urllib.parse import urlparse
+import uuid
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -913,7 +914,18 @@ def check_qualified_freecad(contract, specification, context):
             "The FreeCAD probe command is outside the supported route.",
         )
     command[0] = context.resolved.get("flatpak", command[0])
-    result = _run(context, command, timeout=90)
+    evidence_dir = (
+        context.root / "benchmark-output" / "freecad-validation"
+        / ("preflight-" + uuid.uuid4().hex)
+    )
+    guarded_command = [
+        str(context.python_executable),
+        str(context.root / "tools" / "freecad_validation_guard.py"),
+        "--memory-max-mib", "4096", "--timeout-seconds", "90",
+        "--evidence-dir", str(evidence_dir), "--isolate-profile",
+        "--", *command,
+    ]
+    result = _run(context, guarded_command, timeout=90)
     sentinel = evidence.get("probe_sentinel")
     if not isinstance(sentinel, str):
         raise PreflightError(

@@ -310,7 +310,12 @@ def validate():
     assert "run-isolated" in warm_wrapper_text
     assert 'isolated_temp_dir="$(mktemp -d' in isolated_wrapper_text
     assert 'TRACKTEMPLATE_BRIDGE_TEMP_DIR="${isolated_temp_dir}"' in isolated_wrapper_text
-    assert '"${state_dir}"/isolated-temp.*)' in isolated_wrapper_text
+    assert "rm -rf" not in isolated_wrapper_text
+    assert (
+        'TRACKTEMPLATE_VALIDATION_EVIDENCE_DIR="${isolated_temp_dir}/guard"'
+        in isolated_wrapper_text
+    )
+    assert '"${guard}" check-gui-cleanup' in isolated_wrapper_text
     assert 'temp_dir="${TRACKTEMPLATE_BRIDGE_TEMP_DIR:-${profile_dir}/temp}"' in launcher_text
     assert 'parser.add_argument("--base", type=pathlib.Path, required=True)' in warm_host_text
     assert "if args.iterations != 3:" in warm_host_text

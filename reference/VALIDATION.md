@@ -280,9 +280,27 @@ Use the local pipeline as the usual concise entry point for regression tests:
 
 ```bash
 .venv/bin/python tools/run_regression_pipeline.py
-.venv/bin/python tools/run_regression_pipeline.py --profile transition
-.venv/bin/python tools/run_regression_pipeline.py --profile transition-gui
+.venv/bin/python tools/run_regression_pipeline.py --profile transition \
+  --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
+.venv/bin/python tools/run_regression_pipeline.py --profile transition-gui \
+  --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
 ```
+
+Before a FreeCAD profile, set `validation_memory_mib` and `validation_seconds`
+to explicit limits for the selected workload. These limits are safety controls.
+They do not establish product performance requirements. The runtime preflight
+uses its own limits of 4,096 MiB and 90 seconds.
+
+The [validation launcher](../tools/freecad_validation_guard.py) permits one
+TrackTemplate FreeCAD validation process group per user, across worktrees.
+It sets and verifies limits on the actual Flatpak process group before FreeCAD
+starts. A separate timer limits the run if the calling process stops.
+The launcher checks that the process group is empty after the run. If cleanup
+is not proved, the next run is blocked and the timer stays active.
+
+Logs, resource samples and cleanup results stay with the validation evidence.
+A resource failure cannot become a PASS result because a test printed its
+success sentinel. Display-server and GPU allocations are outside these limits.
 
 The default `standalone` profile first uses the development-toolchain preflight
 for `validation` and Ruff. It then checks each tracked Python and macro source
