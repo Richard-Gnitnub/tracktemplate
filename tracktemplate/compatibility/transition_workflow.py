@@ -20,6 +20,10 @@ from tracktemplate.compatibility.selected_export_workflow import (
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
+from tracktemplate.compatibility.crossover_dependent_recalculation import (
+    CrossoverDependentRecalculationAdapter,
+    HOOK_NAMES as CROSSOVER_DEPENDENT_HOOK_NAMES,
+)
 from tracktemplate.compatibility.crossover_host_integration_recovery import (
     CrossoverHostIntegrationRecoveryAdapter,
 )
@@ -1453,6 +1457,19 @@ class ModularTransitionWorkflowSession:
                 "create_turnout_host_integration": turnout_adapter.create,
                 "remove_turnout_host_integration": turnout_adapter.remove,
             })
+        self._crossover_dependent_recalculation = None
+        if "remove_all_generated_outputs" in namespace:
+            if (not crossover_complete or not b4_complete
+                    or not all(callable(namespace.get(name))
+                               for name in CROSSOVER_DEPENDENT_HOOK_NAMES)):
+                raise TransitionWorkflowError(
+                    "The inherited dependent Generate route is incomplete."
+                )
+            dependent = CrossoverDependentRecalculationAdapter(
+                self.module, namespace["run_macro"],
+            )
+            self._crossover_dependent_recalculation = dependent
+            self._host_functions.update(dependent.bindings)
         self._bind_modular()
 
     def _bind_modular(self):
@@ -1501,6 +1518,22 @@ class ModularTransitionWorkflowSession:
     def _validate_binding(self):
         """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
+        dependent = self._crossover_dependent_recalculation
+        if ("remove_all_generated_outputs" in namespace) != (
+            dependent is not None
+        ):
+            raise TransitionWorkflowError(
+                "The dependent Generate route has a mixed binding."
+            )
+        if dependent is not None:
+            if (type(dependent) is not CrossoverDependentRecalculationAdapter
+                    or dependent.module is not self.module
+                    or any(self._host_functions.get(name) is not function
+                           for name, function in dependent.bindings.items())):
+                raise TransitionWorkflowError(
+                    "The dependent Generate route has a mixed binding."
+                )
+            dependent.validate_binding()
         adapter = self._chair_signature_adapter
         present = any(name in namespace for name in _CHAIR_SIGNATURE_SURFACE)
         if present != (adapter is not None):

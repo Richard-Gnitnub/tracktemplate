@@ -1,9 +1,9 @@
-"""Prove explicit P recalculation after canonical GUI radius changes.
+"""Prove P placement after canonical GUI radius changes.
 
 Native execution consumes hash-bound GUI-generated fixture copies. GUI
-execution uses the actual radius dialog, Generate/Replace, explicit XO-001
-creation, B4 and analysis. Neither route adds automatic regeneration,
-whole-preview host admission, physical-fit or production qualification.
+execution uses the actual radius dialog and Generate/Replace, then checks
+product-owned XO-001, B4 and analysis recalculation without test repair.
+Neither route qualifies whole-preview host admission, fit or production.
 """
 
 from collections import Counter
@@ -194,7 +194,7 @@ def _generate(module, document, radius_mm, directory):
                for key in ("inputs", "replace", "success"))
     assert module.quantity_value(module.latest_generated_settings(document),
                                  "CurveRadius", -1) == radius_mm
-    assert module.crossover_config_by_id(document, "XO-001") is None
+    assert module.crossover_config_by_id(document, "XO-001") is not None
     return record
 
 
@@ -238,6 +238,20 @@ def _recreate(module, command, source, config, path):
             "toe_b_mm": fresh["toe_chainage_b"],
             "minimum_resulting_radius_mm": fresh["minimum_resulting_radius"],
             "missing_source_refusals": refusals, "fresh_b4_and_analysis": True}
+
+
+def _current_dependencies(module, source, original):
+    """Inspect automatic results without rebuilding or refreshing them."""
+    current = module.crossover_config_by_id(source, "XO-001")
+    assert current is not None
+    assert all(current[key] == original[key] for key in SOURCE_OPTIONS)
+    assert current["b4_result"]
+    context = previous._context(module, source)
+    assert context[1]["positions"]
+    return {"same_crossover_identity": "XO-001",
+            "same_options": True, "current_b4_and_analysis": True,
+            "source_context_sha256": _digest(context),
+            "manual_recreation_or_analysis": False}
 
 
 def _source_state(module, source, count, *, negative_controls=False):
@@ -518,7 +532,8 @@ def validate():
     run_dir = Path(os.environ["TRACKTEMPLATE_P_CURVATURE_RUN_DIR"])
     run_dir.mkdir(parents=True, exist_ok=False)
     receipt = {"status": "RUNNING", "gui": bool(gui), "cases": [],
-               "physical_fit": "NOT_PROVED", "automatic_regeneration": False}
+               "physical_fit": "NOT_PROVED",
+               "automatic_regeneration": bool(gui)}
     initial = catalogue.helpers._document_state()
     try:
         prepared = p.prepare_catalogue_chair(path, "P", run="basic-04")
@@ -573,8 +588,8 @@ def validate():
                 item["old_source_refusal"] = catalogue._reject(
                     verifiers[-1], ValueError,
                 )
-                item["recreation"] = _recreate(
-                    module, command, source, config, path,
+                item["dependent_recalculation"] = _current_dependencies(
+                    module, source, config,
                 )
                 assert [combined._foreign_state(doc)
                         for doc in old_previews] == frozen
