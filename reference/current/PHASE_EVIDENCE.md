@@ -2395,3 +2395,94 @@ This result gives no acceptance for persistence, production, export behaviour, p
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Automatic changes to P chair positions after a radius change — 2026-10-26
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the authority in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+It also supplies evidence for the PR-16 checks after input changes.
+
+The [new adapter](../../tracktemplate/compatibility/crossover_dependent_recalculation.py) keeps the input values and identifiers for `XO-001` when `Generate` with `Replace` changes `CurveRadius` in the canonical state.
+The operator does not have to make the crossover again or manually apply B4, `create_crossover_host_integration` and `analyse_entity_chair_positions`.
+The adapter uses the same functions. It keeps the initial `run_macro` function.
+
+This change is permitted only for the radius of one `XO-001` in `SET-001` that meets the specified conditions.
+The adapter examines the source before replacement. It rejects source data that do not meet its conditions before removal.
+It keeps the same optional route properties and crossover edit metadata, with the same values.
+
+For `MODE_MATCH_SPACINGS`, the input values stay the same. The calculated `entry_transition_length` and `exit_transition_length` values can change.
+The `track_configs` values read from the document must be equal to the values that `_store` keeps.
+
+The adapter calculates B4 and chair positions during the same `Generate` operation.
+It also uses `create_crossover_host_integration` again when the integration is active.
+It makes `ProductionSchedule` and `MaterialLengthReport` from the source data after integration, before `commitTransaction` completes that operation.
+One full `Undo` gives the previous exact state. `Redo` gives the new exact state.
+The private preview command is still necessary to make catalogue chairs with FreeCAD `Part` geometry.
+
+The [standalone test](../../tests/validate_phase9b_p_dependent_recalculation.py) and eleven related regression tests give PASS results.
+The new tests first show removal of `XO-001` and subsequent defects. The failure classes for these defects are in the local evidence.
+The same commands and test checks then give PASS results with the repaired source.
+
+The [FreeCAD test](../../tests/freecad_validate_phase9b_p_dependent_recalculation.py) operates the same `Generate` command at 600, 900 and 600 mm.
+The test uses the qualified host profile `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+
+The full test gives PASS results without the display in `native-06` and with the display in `gui-05`.
+The two processes complete execution with exit status 0 and give the specified success sentinel. All 412 source paths and SHA-256 values stay the same.
+The test closes all documents that it makes. The test with the display removes its temporary `user.cfg` file and sets the display power to its previous condition.
+
+The `native-05` test completes its checks and gives its success sentinel. Its outer process stops with exit status 143.
+The FreeCAD process exit status is unknown. This process evidence does not give a full PASS result.
+The validator does the full test again without source changes to get the necessary process evidence.
+
+Each input has 28 P assemblies with 22 components for each assembly.
+The two tests compare all 616 components for each input with the same source check and the frozen manual results from PR #211.
+All 28 identities stay the same. All 28 positions and directions change at 900 mm.
+The counts of source positions stay 355, 354 and 355.
+
+The largest component difference between the second 600 mm result and the initial result is less than 1.74e-12 mm.
+The previous dimension limit stays 1e-7 mm. The test records differences between directions from different source data independently.
+The source check and its numerical tolerances stay the same.
+
+The two tests give PASS results for full `Undo/Redo`, cancellation and regeneration with the same inputs. The nine checks with invalid source data also give PASS results.
+
+The two tests also give PASS results for full recovery after errors from B4, `create_crossover_host_integration`, `analyse_entity_chair_positions` and the table functions. These functions write data before the errors.
+
+The tables use the source data after integration. The previous private previews stay the same. The preview command rejects their changed source.
+
+An independent reviewer examined all changed source and tests, the complete results and their source hashes.
+The reviewer also examined the initial and second 600 mm displays, all eight views at 900 mm and the two radius input displays.
+The independent review gives a PASS result. It has no open findings for the source or tests in this bounded scope.
+
+The initial tests with FAIL results and their failure classes stay in `tmp/p-dependent-recalculation/`.
+The `native-03` and `gui-03` checks give FAIL results because the `Free` flag changes when the test reads the calculated group shapes in a different sequence.
+The source inspection by the independent reviewer identifies this flag as a calculated software condition, not geometry.
+All other bytes from `exportBrepToString` stay the same for each of these groups.
+
+The repaired test reads each calculated group shape in a specified sequence. Then it compares full document snapshots with the same checks.
+It does not remove fields or add numerical tolerances. Other checks must reject changed marker geometry and group membership.
+
+The `native-04` and `gui-04` checks give FAIL results at the test of the minimum radius.
+The minimum input changes the selected connector. The sum of two previous results, divided by two, does not prove that an input is invalid.
+The repair uses `lower-preview-pass-complete-fail` from the [accepted source contract](../contracts/phase1-crossover-feasibility.json).
+
+That input has a toe position of 500 mm and a minimum radius of 600 mm.
+The other test input gives PASS results for B4, integration and the source check for all 28 P positions at 900 mm.
+The `Generate` operation at 600 mm rejects that input. It gives the previous exact state for the full document.
+
+For each of the four rejected radius results, the difference from the accepted contract is less than its previous limit of 1e-6 mm.
+That limit does not prove physical fit. The test also rejects replacement when `UndoMode` is `0`.
+
+The same `XO-001` input stays a permanent regression test.
+The software for the accepted 203 assemblies, 48 shared supports and source identities stays the same.
+The full `preview_private_catalogue_crossover_chairs` command keeps its previous source conditions.
+The previous CCL/CCR candidate stays stopped, with no repairs available from its previous limit of two repairs. Its evidence with FAIL results and frozen history stay the same.
+The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+Local evidence is in `tmp/p-dependent-recalculation/`.
+It includes `source-freeze-05.json`, `native-06/`, `gui-05/`, their process records and `independent-staff-review-05-final.json`.
+
+`physical_fit` stays `NOT_PROVED`. `project_status` stays `reference-only`. `intended_uses` stays `["private-development"]`.
+This result gives no acceptance for other inputs, persistence, production, export behaviour, product performance or phase exits.
+It gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
