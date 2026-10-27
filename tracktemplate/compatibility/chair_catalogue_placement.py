@@ -577,6 +577,7 @@ def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False,
+    crossing_contexts_path=None,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -588,7 +589,13 @@ def preview_private_catalogue_crossover_chairs(
     component frames. Invalid evidence fails before native creation.
     Check ends add eight CCL/CCR assemblies to that complete baseline.
     The single-rail option adds 34 source-qualified S1, S1J and L1 assemblies.
+    The crossing supplement adds sixteen crossing and eight exit assemblies.
+    Two endpoint-only envelope records retain proved source-anchor exclusions.
     """
+    _require(crossing_contexts_path is None or (
+        include_single_rail is True and include_check_ends is True
+        and include_central_cc is True and paired_contexts_path is not None
+    ), "crossing and exit coverage requires all existing supplements")
     _require(type(include_single_rail) is bool,
              "include_single_rail requires an actual Boolean")
     _require(not include_single_rail or (
@@ -685,6 +692,23 @@ def preview_private_catalogue_crossover_chairs(
             catalogue_path,
         )
         families.update(singles)
+    crossing_witnesses, crossing_companions, envelope_exclusions = {}, {}, {}
+    heel_discrepancies = []
+    verify_crossings = None
+    if crossing_contexts_path is not None:
+        from tracktemplate.compatibility.chair_crossing_exit_placement import (
+            prepare_crossing_exit,
+        )
+        (crossings, crossing_witnesses, crossing_companions,
+         envelope_exclusions, heel_discrepancies, verify_crossings) = (
+            prepare_crossing_exit(
+                module, source_document, signature, positions, rails, timbers,
+                base_z, catalogue_path, crossing_contexts_path,
+            )
+        )
+        _require(not set(families).intersection(crossings),
+                 "crossing groups overlap accepted families")
+        families.update(crossings)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
     selected, excluded, preparations = [], [], {}
@@ -721,10 +745,23 @@ def preview_private_catalogue_crossover_chairs(
                 record.update(end_witnesses[identity])
             if identity in single_witnesses:
                 record.update(single_witnesses[identity])
+            if identity in crossing_witnesses:
+                record.update(crossing_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
-        if identity in check_companions:
+        if identity in crossing_companions:
+            record.update(
+                exclusion_kind="source-paired-crossing-support",
+                supporting_position_id=crossing_companions[identity],
+                supporting_assembly_placed=True,
+                assignment_status=position["assignment_status"],
+                reason="One source crossing assembly includes this rail "
+                       "support; the canonical deferred assignment is unchanged.",
+            )
+        elif identity in envelope_exclusions:
+            record.update(envelope_exclusions[identity])
+        elif identity in check_companions:
             record.update(
                 exclusion_kind="source-paired-reference-support",
                 supporting_position_id=check_companions[identity],
@@ -797,6 +834,8 @@ def preview_private_catalogue_crossover_chairs(
             verify_ends()
         if verify_singles is not None:
             verify_singles()
+        if verify_crossings is not None:
+            verify_crossings()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -831,7 +870,7 @@ def preview_private_catalogue_crossover_chairs(
     }
     if include_central_cc:
         represented = (len(selected) + len(shared) + len(check_companions)
-                       + len(end_companions))
+                       + len(end_companions) + len(crossing_companions))
         receipt.update(
             represented_source_position_count=represented,
             unrepresented_source_position_count=len(positions) - represented,
@@ -874,11 +913,37 @@ def preview_private_catalogue_crossover_chairs(
                     "Previous accepted assignments are preserved; complete Templot "
                     "assignment equivalence is not claimed.",
                 ))
+            if crossing_contexts_path is not None:
+                _require(len(selected) == 261 and represented == 353
+                         and len(envelope_exclusions) == 2
+                         and len(positions) == 355,
+                         "complete crossing and exit accounting differs")
+                receipt.update(
+                    source_paired_crossing_support_count=len(crossing_companions),
+                    evidenced_source_exclusion_count=len(envelope_exclusions),
+                    unresolved_remaining_position_count=0,
+                    accepted_heel_family_discrepancies=heel_discrepancies,
+                    coverage_summary=(
+                        "261 assemblies; 48 existing shared supports; "
+                        "20 check supports; 24 crossing supports; "
+                        "353 represented positions; 2 evidenced source-anchor "
+                        "exclusions; all 355 canonical positions accounted for"
+                    ),
+                )
+                receipt["limits"].extend((
+                    "Ten accepted S1 placements retain source L1 discrepancies.",
+                    "Two envelope endpoints have no finite source chair anchor; "
+                    "canonical geometry and analytical padding are unchanged.",
+                    "Complete accounting does not establish complete family "
+                    "equivalence or physical fit.",
+                ))
             return create_preview(
                 catalogue_path, families, shapes, receipt, verify_all_sources,
                 paired_contexts_path=paired_contexts_path,
                 include_central_cc=True, include_check_ends=True,
                 **({"include_single_rail": True} if include_single_rail else {}),
+                **({"crossing_contexts_path": crossing_contexts_path}
+                   if crossing_contexts_path is not None else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,

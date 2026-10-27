@@ -32,6 +32,11 @@ from tracktemplate.application.chair_pair_catalogue import (
     prepare_paired_catalogue,
     verify_paired_catalogue,
 )
+from tracktemplate.application.chair_crossing_catalogue import (
+    CROSSING_CONTEXT_IDS,
+    prepare_crossing_catalogue,
+    verify_crossing_catalogue,
+)
 from tracktemplate.domain.chair_placement import (
     PairedChairPlacement,
     PPlacement,
@@ -467,6 +472,7 @@ def create_private_catalogue_crossover_preview(
     verify_source,
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False,
+    crossing_contexts_path=None,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -480,6 +486,10 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(crossing_contexts_path is None or (
+        include_single_rail is True and include_check_ends is True
+        and include_central_cc is True and paired_contexts_path is not None
+    ), "crossing and exit coverage requires all existing supplements")
     require(type(include_single_rail) is bool,
             "include_single_rail requires an actual Boolean")
     require(not include_single_rail or (
@@ -499,6 +509,8 @@ def create_private_catalogue_crossover_preview(
         raise TypeError("Crossover placement requires source verification")
     paired = (() if paired_contexts_path is None
               else prepare_paired_catalogue(paired_contexts_path))
+    crossings = (() if crossing_contexts_path is None
+                 else prepare_crossing_catalogue(crossing_contexts_path))
     expected_groups = {"S1", "S1J", "P"}
     if paired:
         expected_groups.update(CONTEXT_IDS)
@@ -508,6 +520,9 @@ def create_private_catalogue_crossover_preview(
         expected_groups.update(family for family, _digest in _CHECK_END_MODELS)
     if include_single_rail:
         expected_groups.update(("SupplementS1", "SupplementS1J", "L1"))
+    if crossings:
+        expected_groups.update((*CROSSING_CONTEXT_IDS,
+                                "ExitS1", "ExitS1J", "ExitL1"))
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -635,6 +650,53 @@ def create_private_catalogue_crossover_preview(
             layer_specs += prefixed
             selections.append((group, prepared, prefixed, prepare))
 
+    for prepared in crossings:
+        context_id = prepared.run
+        placements = _placements(placements_by_family[context_id],
+                                 PairedChairPlacement)
+        ids = {placement.position_id for placement in placements}
+        require(len(placements) == 2 and not identities.intersection(ids),
+                "crossing placements are incomplete or overlap another group")
+        identities.update(ids)
+        prepared, specs, prepare = _prepare_catalogue_family(
+            crossing_contexts_path, placements, None, receipt,
+            family=prepared.label, placement_type=PairedChairPlacement,
+            model_sha256=prepared.model_sha256,
+            source_names=tuple(item.name for item in prepared.components),
+            run=context_id, source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefixed = tuple((context_id.replace("-", "_") + "_" + name,
+                          title, colour) for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((context_id, prepared, prefixed, prepare))
+    if crossings:
+        exit_specs = (
+            ("S1", 4, _S1_MODEL_SHA256, _S1_SOURCE_NAMES,
+             "existing-02", "retained-S1-L1-reference-package"),
+            ("S1J", 2, _S1J_MODEL_SHA256, _S1J_SOURCE_NAMES,
+             "basic-04", "fixed-basic-source-context"),
+            ("L1", 2, _L1_MODEL_SHA256, _L1_SOURCE_NAMES,
+             "existing-02", "retained-S1-L1-reference-package"),
+        )
+        for family, count, digest, names, run, context in exit_specs:
+            group = "Exit" + family
+            placements = prepare_single_rail_placements(placements_by_family[group])
+            ids = {placement.position_id for placement in placements}
+            require(len(placements) == count and not identities.intersection(ids),
+                    "exit placements are incomplete or overlap another group")
+            identities.update(ids)
+            prepared, specs, prepare = _prepare_catalogue_family(
+                catalogue_path, placements, None, receipt,
+                family=family, placement_type=SingleRailPlacement,
+                model_sha256=digest, source_names=names,
+                run=run, source_context=context,
+            )
+            prefixed = tuple((group + "_" + name, title, colour)
+                             for name, title, colour in specs)
+            layer_specs += prefixed
+            selections.append((group, prepared, prefixed, prepare))
+
     def prepare_layers():
         layers = _context_layers(context_shapes)
         families = {}
@@ -650,7 +712,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": ("tracktemplate.private-catalogue-crossover.v5"
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v6"
+                            if crossings else
+                            "tracktemplate.private-catalogue-crossover.v5"
                             if include_single_rail else
                             "tracktemplate.private-catalogue-crossover.v4"
                             if include_check_ends else
@@ -708,10 +772,12 @@ def create_private_catalogue_crossover_preview(
     def verify_inputs():
         verify_source()
         for _label, prepared, _specs, _prepare in selections:
-            if prepared.run not in CONTEXT_IDS:
+            if prepared.run not in (*CONTEXT_IDS, *CROSSING_CONTEXT_IDS):
                 verify_catalogue_sources(prepared)
         if paired:
             verify_paired_catalogue(paired)
+        if crossings:
+            verify_crossing_catalogue(crossings)
 
     return _materialise_preview(
         family, receipt, layer_specs, prepare_layers, verify_inputs,
