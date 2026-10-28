@@ -274,6 +274,49 @@ existing compatibility contract. Other versions do not have this qualification.
 Do not use `uv init` in this repository. Do not add a root `uv.lock`. A package
 manager migration is a different authorised task.
 
+<a id="validation-harness-readiness"></a>
+
+### Validation before large FreeCAD tests
+
+Validate new test software, or test software with a material change, before a FreeCAD test uses much memory or time.
+Use small fixtures. Do this for tests with or without the FreeCAD display.
+
+The [change-validation skill](../.agents/skills/tracktemplate-change-validation/SKILL.md)
+supplies the procedure for this work. This document owns the validation instructions.
+[TESTING_POLICY.md](TESTING_POLICY.md) owns failure classification and test changes.
+
+Before the full test starts, get the applicable evidence below:
+
+1. Validate the executable, command invocation, `import` statements and qualified
+   host profile in the FreeCAD process. Do a check of the `__name__` value that
+   FreeCAD supplies. If a caller with project authority uses `__main__`, do a different check of that value.
+2. Do checks of necessary file paths, hashes, fixture schemas, input names and input values.
+   Obey the launcher instructions for files in an isolated worktree.
+3. Use small fixtures to do the checks that compare results.
+   Make sure that you get the result file and necessary success sentinel.
+   Fixtures with an invalid state must stop the test before it starts its full work.
+4. Use the launcher and process controls from the validation instructions.
+   Show that a different validation process cannot start at the same time.
+   Before the test starts, select memory and time limits from evidence.
+   Monitor host memory during the test.
+   Show that a stop preserves evidence.
+   Show that no process that the test started is active.
+5. Before the test starts, obey all applicable [recovery instructions](RECOVERY_AND_BACKUP.md#development-checkpoint-procedure).
+   Apply them to repository data and operator data.
+6. Preserve tests of inputs with an invalid state for the failure classes for this change.
+   Where applicable, include `__name__`, missing input names or values, and file paths not in the permitted directory.
+   Where applicable, include tests that start at the same time.
+
+Keep the specified commands, file identities, host profile and results.
+Keep evidence that no process that the test started is active.
+If a necessary result is FAIL or the evidence is not complete, stop before the full test.
+An independent reviewer must examine the applicable source, tests and result files with their initial bytes.
+
+A PASS result applies only to the software and inputs in its checks.
+It does not validate the product, its display behaviour or product performance.
+It gives no project authority for one more test, phase exit or acceptance decision.
+The repair limits and evidence for FAIL results stay the same.
+
 ### Programmatic regression pipeline
 
 Before you start a FreeCAD validation command, select a memory limit in MiB

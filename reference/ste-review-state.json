@@ -1,6 +1,24 @@
 {
   "documents": [
     {
+      "accepted_blob": "sha1:29f678f1ae62475704deaab1074225f334905f1e",
+      "accepted_sha256": "sha256:897419b18652610d165d1aa86d3f31d35d999d08c00705b5c13c215355eeabda",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": ".agents/skills/tracktemplate-change-validation/SKILL.md",
+      "review_receipt": "sha256:11bf992f90e99110d0ee99494b7d34bddeeb66b6bd7d63fa4563bdff72b48465",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:9b4c587ed3924cf4bf3e278c5c22db1e57815da5",
+      "accepted_sha256": "sha256:cc05a7e5cd49d30f2a43b7e5e7f1af949062588eaffe1730690a44895a1fc6e2",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": ".agents/skills/tracktemplate-change-validation/references/validation-checklist.md",
+      "review_receipt": "sha256:11bf992f90e99110d0ee99494b7d34bddeeb66b6bd7d63fa4563bdff72b48465",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:ae34c4fd76cffb4a4566fbdc7c201f213cb6599a",
       "accepted_sha256": "sha256:00591f620e7e8c77dd1dd7ab94fed7b0066b0da11b13c594c63218e110ae6054",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -76,6 +94,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:7d26e5c1159ec144220c6adafe422dd829f224f7",
+      "accepted_sha256": "sha256:ae72898d965598428b650b851cf0e0f46e99085f695d620338ad735ab9c2e390",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/LEARNING_FROM_EXPERIENCE.md",
+      "review_receipt": "sha256:11bf992f90e99110d0ee99494b7d34bddeeb66b6bd7d63fa4563bdff72b48465",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:6ef2185433ea9f32d5bcdad602f78da11762817d",
       "accepted_sha256": "sha256:f2a1c8e030ff7a8a021cc79434ff44bd908a799aa7df8c8ad65b11d312766656",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -130,12 +157,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:04cb89c457fa6e77867214bbfccace9087d771ed",
-      "accepted_sha256": "sha256:e14b2366a568b76ff7bb8b98c47c30553990de1f7419028b540e41eb40bde8a3",
+      "accepted_blob": "sha1:04e60978086360c56f0f1c5aa62392af5c19175b",
+      "accepted_sha256": "sha256:648021da8781a26e66823e2f547fd16bc45176722bb3955d6685fe77eee0d809",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/VALIDATION.md",
-      "review_receipt": "sha256:836e2d5a95339c6cd2e881327330cd8a5b1e982ca02daae699324cbeb3368895",
+      "review_receipt": "sha256:11bf992f90e99110d0ee99494b7d34bddeeb66b6bd7d63fa4563bdff72b48465",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -490,12 +517,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:8caeaecece8bcbbaa5735e989adb22049437a375",
-      "accepted_sha256": "sha256:f86a9c3fcac6f8ba4bf78d73066351ab119a01cfca22d7e2591b16eac0e4bc5d",
+      "accepted_blob": "sha1:ca1f0eee81d6cfdb28eed25da9fb0d80cab932ec",
+      "accepted_sha256": "sha256:865f7d1c50abd0d8209e2dfb795276a6602bbcace9ab32d688e8daef695c9b1a",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:ded6bf45bd975d8ab2e28fbbef322b6b2de52a9e71174414fee35bb83aa8ffaf",
+      "review_receipt": "sha256:11bf992f90e99110d0ee99494b7d34bddeeb66b6bd7d63fa4563bdff72b48465",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
