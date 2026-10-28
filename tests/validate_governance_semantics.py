@@ -6818,6 +6818,22 @@ def validate_documentation_profile_mutations() -> None:
         "TrackTemplate STE terminology lacks: Host compatibility",
     )
 
+    lfe_023 = table_row_containing(learning, "| LFE-023 /")
+    for name, replacement in (
+        ("missing", ""),
+        ("duplicate", lfe_023 + "\n" + lfe_023),
+    ):
+        mutated = replace_once(learning, lfe_023, replacement)
+        expect_rejected(
+            "tt-doc/lfe-023-" + name,
+            lambda value=mutated: (
+                quality_assurance.validate_documentation_profile(
+                    engineering, plan, value, terminology,
+                )
+            ),
+            "LFE ledger is not unique and append-only through LFE-023",
+        )
+
     lfe_link_deleted = replace_once(
         learning,
         "The [Technical Documentation Profile](ENGINEERING_POLICY.md#"

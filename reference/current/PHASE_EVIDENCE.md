@@ -2548,3 +2548,33 @@ The [provenance](../PROVENANCE.md) and [licensing boundaries](../LICENSING_BOUND
 This result gives no acceptance for other host inputs, physical fit, persistence, production, export behaviour, performance or phase exits.
 The frozen `XO-001` regression stays the same. The stopped CCL/CCR candidate and its repair history stay the same at the `2/2` limit.
 Phase 9B stays Open at 3/6. More work on LMS chairs is not permitted until after Phase 11.
+
+## Validation before large FreeCAD tests — 2026-10-27
+
+This Level 2 workflow change addresses [Issue #218](https://github.com/Richard-Gnitnub/tracktemplate/issues/218).
+It supplies necessary preparation for Issue #213 and later work on Exit 9B-3.
+The [validation contract](../VALIDATION.md#validation-harness-readiness) owns the requirements.
+The existing change-validation skill coordinates the checks. No new policy owner or skill is added.
+
+The [standalone tests](../../tests/validate_harness_readiness.py) give PASS results for 12 checks.
+They cover `__main__`, the filename without `.py`, missing frame fields and invalid frame values.
+They also cover files outside the permitted directory.
+The existing pipeline rejects invalid prerequisites before its later test starts.
+The 39 existing launcher tests and the existing pipeline tests also give PASS results.
+
+The [small FreeCAD fixture](../../tests/freecad_validate_harness_readiness.py) gives a PASS result through the existing launcher.
+The fixture uses small test inputs and does not read the Templot source archive.
+It uses the qualified profile `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+FreeCAD supplies the filename without `.py` as `__name__`.
+The previous `_near_frame` function accepts one valid frame and rejects seven invalid inputs.
+The fixture also checks one valid file and three invalid file conditions.
+The process returns exit status 0 and the necessary success sentinel. All processes that the test started have stopped.
+
+Local evidence is in `tmp/issue218/`, including `native-qualification-01/`, `source-independent-review-01.json` and `result-independent-review-01.json`.
+Independent reviews of the source and the bounded FreeCAD result give PASS results.
+The original failed evidence and recovery material stay preserved.
+
+This result does not qualify the 702 new XO-001 frame checks or the complete 261-assembly candidate.
+No XO-001 native test or GUI test is resumed. The consumed `2/2` repair allowance stays unchanged.
+This result gives no physical-fit, rights, production, performance or phase-exit acceptance.
+Phase 9B stays Open at 3/6. More work on LMS chairs is not permitted until after Phase 11.

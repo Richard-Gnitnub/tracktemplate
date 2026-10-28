@@ -79,6 +79,34 @@ Before evidence selection for exporter interruption, read these owners:
 
 ## Validation rules
 
+### Preparation for large FreeCAD tests
+
+This skill coordinates the
+[checks before large FreeCAD tests](../../../reference/VALIDATION.md#validation-harness-readiness).
+Use that contract for new or materially changed software that controls a large
+FreeCAD test.
+
+1. Identify the changed test software and its exact command invocation.
+   Record which canonical requirements apply and which existing evidence remains valid.
+2. Select the shortest sufficient sequence of existing qualified launchers and checks.
+   Use small fixtures before the full test.
+   Record why each necessary check observes the changed behaviour.
+3. Verify the necessary recovery checkpoint and preservation evidence before the test starts.
+   Stop if the recovery requirements are not satisfied.
+4. Execute the selected checks in order.
+   Stop before the full test if a necessary result fails or is missing.
+5. Preserve the results and obtain the applicable independent review.
+   Report this evidence separately from product validation.
+6. Confirm authority for the full test before it starts.
+   Do not infer permission for another attempt or a change to resource limits.
+
+Use `$tracktemplate-task-automation` only for an evidenced, repeated need for
+deterministic checks. Use `$tracktemplate-debugging` for an unresolved failure.
+Use `$tracktemplate-quality-review` for independent review of source, tests and
+raw results. These skills keep their existing responsibilities.
+
+### Selection and execution
+
 Before repository validation, use this command:
 
 `.venv/bin/python tools/development_toolchain_preflight.py --stage validation`

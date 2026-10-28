@@ -45,6 +45,10 @@ Require the corresponding evidence when a change affects:
 
 ## Evidence integrity
 
+- New or materially changed test software satisfies the applicable
+  [checks before large FreeCAD tests](../../../../reference/VALIDATION.md#validation-harness-readiness).
+- The result for the test software is separate from the result for the full product test.
+
 - The proof uses the highest reliable boundary that can observe the changed
   behaviour; substitutes, fixtures or mocks begin only beyond that boundary.
 - Tests assert railway outcomes, document state, persisted state, exported
