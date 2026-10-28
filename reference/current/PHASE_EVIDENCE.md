@@ -2584,3 +2584,41 @@ The `2/2` repair limit stays the same. No more repair is permitted.
 This result gives no acceptance for physical fit, production, product performance or phase exits.
 It changes no rights state.
 Phase 9B stays Open at 3/6. More work on LMS chairs is not permitted until after Phase 11.
+
+## L1 selection at S13, T1 and T2 — 2026-10-28
+
+This Level 2 result supplies evidence for chair selection and part of Exit 9B-3.
+The owner permits a change to ten previous S1 assignments: four at S13, four at T1 and two at T2.
+This instruction supersedes the [previous preservation instruction](#more-s1-s1j-and-l1-chairs-for-xo-001--2026-10-26) for these ten assignments only.
+
+The optional `correct_heel_l1=True` argument selects L1 in the private `XO-001` preview.
+The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the previous L1 catalogue geometry and placement calculations.
+The default command behaviour and canonical source records stay the same.
+Each changed preview assignment keeps its canonical identity and records S1 in `original_family`.
+The selection keeps 237 assemblies, including the other 227 assemblies, and 48 shared supports.
+This count is a software result, not a new FreeCAD geometry proof.
+
+The [Python tests](../../tests/validate_phase9b_catalogue_heel_l1.py) first give RED results for the missing behaviour.
+They then give PASS results without FreeCAD.
+The tests verify the Templot 556b source identity and its selection conditions for all ten assignments.
+They compare 350 calculated frames for the ten positions on seven host inputs, including both travel directions.
+The inputs are a straight host and signed radii of 600 mm, 900 mm and 1,800 mm.
+Independent calculations supply the expected component positions.
+
+Existing placement regression tests and four adapter tests also give PASS results without FreeCAD.
+The adapter tests check assembly identities, catalogue identity and rejection of invalid input values.
+The independent review gives `PASS_WITH_FINDING` for the source, tests and preservation evidence.
+FreeCAD geometry, lifecycle and GUI evidence remain necessary before exit acceptance.
+
+Local evidence is in `tmp/heel-l1-successor/`.
+The initial RED results, new test-fixture correction and its failure classification stay preserved there.
+The correction changes no accepted test, oracle or numerical tolerance.
+
+No FreeCAD or GUI test ran for this result.
+These tests do not prove geometry in FreeCAD, physical fit or the complete preview.
+The frozen 261-assembly candidate `bf41a7dd` and previous regression evidence stay the same.
+
+The [provenance](../PROVENANCE.md) and [licensing boundaries](../LICENSING_BOUNDARIES.md) stay the same.
+This result gives no production, rights or phase-exit acceptance.
+
+The `2/2` repair allowance stays consumed. Phase 9B stays Open at 3/6. More work on LMS chairs stays paused.
