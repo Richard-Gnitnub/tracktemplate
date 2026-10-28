@@ -278,45 +278,44 @@ manager migration is a different authorised task.
 
 ### Validation before large FreeCAD tests
 
-Validate new or materially changed test software before a FreeCAD test uses much
-memory or time. Use small fixtures. This requirement applies to tests with or
-without the FreeCAD display.
+Validate new test software, or test software with a material change, before a FreeCAD test uses much memory or time.
+Use small fixtures. Do this for tests with or without the FreeCAD display.
 
 The [change-validation skill](../.agents/skills/tracktemplate-change-validation/SKILL.md)
-coordinates this work. This document owns its validation requirements.
+supplies the procedure for this work. This document owns the validation instructions.
 [TESTING_POLICY.md](TESTING_POLICY.md) owns failure classification and test changes.
 
-Before the full test starts, obtain the applicable evidence below:
+Before the full test starts, get the applicable evidence below:
 
 1. Validate the executable, command invocation, `import` statements and qualified
-   host profile in the FreeCAD process. Test the `__name__` value that
-   FreeCAD supplies. Test `__main__` separately if a supported caller uses it.
-2. Check necessary file paths, hashes, fixture schemas and input fields.
-   Apply the existing launcher requirements for files in an isolated worktree.
-3. Use small fixtures to execute the checks that compare results.
-   Require the result record and necessary success sentinel.
-   Invalid fixtures must stop the test before it starts its full work.
-4. Use the existing qualified launcher and its process controls.
-   Show that another validation process cannot start at the same time.
-   Select memory and time limits from evidence before the test starts.
-   Observe host memory during the test.
+   host profile in the FreeCAD process. Do a check of the `__name__` value that
+   FreeCAD supplies. If a caller with project authority uses `__main__`, do a different check of that value.
+2. Do checks of necessary file paths, hashes, fixture schemas, input names and input values.
+   Obey the launcher instructions for files in an isolated worktree.
+3. Use small fixtures to do the checks that compare results.
+   Make sure that you get the result file and necessary success sentinel.
+   Fixtures with an invalid state must stop the test before it starts its full work.
+4. Use the launcher and process controls from the validation instructions.
+   Show that a different validation process cannot start at the same time.
+   Before the test starts, select memory and time limits from evidence.
+   Monitor host memory during the test.
    Show that a stop preserves evidence.
-   Show that all processes that the test started have stopped.
-5. Apply the [recovery requirements](RECOVERY_AND_BACKUP.md#development-checkpoint-procedure)
-   for checkpoints, backups and operator data before the test starts.
-6. Preserve invalid-input tests for the failure classes that affect this change.
-   Include `__name__`, missing input fields and file paths outside the permitted directory where applicable.
-   Include tests that start at the same time where applicable.
+   Show that no process that the test started is active.
+5. Before the test starts, obey all applicable [recovery instructions](RECOVERY_AND_BACKUP.md#development-checkpoint-procedure).
+   Apply them to repository data and operator data.
+6. Preserve tests of inputs with an invalid state for the failure classes for this change.
+   Where applicable, include `__name__`, missing input names or values, and file paths not in the permitted directory.
+   Where applicable, include tests that start at the same time.
 
-Keep the exact commands, file identities, host profile and results.
-Keep evidence that all started processes have stopped.
-If a necessary check fails or evidence is incomplete, stop before the full test.
-An independent reviewer must examine the applicable source, tests and raw results.
+Keep the specified commands, file identities, host profile and results.
+Keep evidence that no process that the test started is active.
+If a necessary result is FAIL or the evidence is not complete, stop before the full test.
+An independent reviewer must examine the applicable source, tests and result files with their initial bytes.
 
-A PASS result applies only to the tested software and inputs.
+A PASS result applies only to the software and inputs in its checks.
 It does not validate the product, its display behaviour or product performance.
-It gives no authority for a further test, phase exit or acceptance decision.
-Existing repair limits and failure evidence stay unchanged.
+It gives no project authority for one more test, phase exit or acceptance decision.
+The repair limits and evidence for FAIL results stay the same.
 
 ### Programmatic regression pipeline
 

@@ -79,33 +79,33 @@ Before evidence selection for exporter interruption, read these owners:
 
 ## Validation rules
 
-### Preparation for large FreeCAD tests
+### Prepare for large FreeCAD tests
 
-This skill coordinates the
+This skill supplies the procedure for the
 [checks before large FreeCAD tests](../../../reference/VALIDATION.md#validation-harness-readiness).
-Use that contract for new or materially changed software that controls a large
-FreeCAD test.
+Use these checks for new test software or test software with a material change.
 
-1. Identify the changed test software and its exact command invocation.
-   Record which canonical requirements apply and which existing evidence remains valid.
-2. Select the shortest sufficient sequence of existing qualified launchers and checks.
+1. Identify the changed test software and its specified command invocation.
+   Record the necessary canonical instructions and the previous evidence that applies.
+2. Select the shortest sufficient sequence of launchers and checks from the validation instructions.
    Use small fixtures before the full test.
-   Record why each necessary check observes the changed behaviour.
-3. Verify the necessary recovery checkpoint and preservation evidence before the test starts.
-   Stop if the recovery requirements are not satisfied.
-4. Execute the selected checks in order.
-   Stop before the full test if a necessary result fails or is missing.
-5. Preserve the results and obtain the applicable independent review.
-   Report this evidence separately from product validation.
-6. Confirm authority for the full test before it starts.
-   Do not infer permission for another attempt or a change to resource limits.
+   Record why each necessary check can examine the changed behaviour.
+3. Before the test starts, validate the necessary recovery checkpoint and preservation evidence.
+   If the recovery checks do not give PASS results, stop.
+4. Do the selected checks in sequence.
+   If a necessary result is FAIL or missing, stop before the full test.
+5. Preserve the results.
+   Get the applicable independent review.
+   Report this evidence independently from product validation.
+6. Before the full test starts, make sure that it has project authority.
+   These checks give no project authority for one more test or a change to resource limits.
 
-Use `$tracktemplate-task-automation` only for an evidenced, repeated need for
-deterministic checks. Use `$tracktemplate-debugging` for an unresolved failure.
+For work that occurs again and again with sufficient evidence, use `$tracktemplate-task-automation`
+only for deterministic checks. For an unresolved FAIL result, use `$tracktemplate-debugging`.
 Use `$tracktemplate-quality-review` for independent review of source, tests and
-raw results. These skills keep their existing responsibilities.
+result files with their initial bytes. These skills keep their workflow responsibilities.
 
-### Selection and execution
+### Select and do the tests
 
 Before repository validation, use this command:
 

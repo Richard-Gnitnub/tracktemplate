@@ -45,9 +45,9 @@ Require the corresponding evidence when a change affects:
 
 ## Evidence integrity
 
-- New or materially changed test software satisfies the applicable
+- New test software, or software with a material change, gives PASS results for the applicable
   [checks before large FreeCAD tests](../../../../reference/VALIDATION.md#validation-harness-readiness).
-- The result for the test software is separate from the result for the full product test.
+- Record the result for the test software independently from the result for the full product test.
 
 - The proof uses the highest reliable boundary that can observe the changed
   behaviour; substitutes, fixtures or mocks begin only beyond that boundary.
