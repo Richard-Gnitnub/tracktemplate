@@ -56,6 +56,11 @@ from tracktemplate.domain.chair_outer_jaw import (
     ChairOuterJawParameters,
     construct_chair_outer_jaw,
 )
+from tracktemplate.domain.chair_p_outer_jaw import (
+    ChairPOuterJawGeometry,
+    ChairPOuterJawParameters,
+    construct_chair_p_outer_jaw,
+)
 from tracktemplate.domain.chair_p_seat import (
     ChairPSeatGeometry,
     ChairPSeatParameters,
@@ -70,6 +75,9 @@ from tracktemplate.domain.chair_seat import (
 
 CHAIR_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.seat-reference.v1"
 CHAIR_P_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.p-seat-reference.v1"
+CHAIR_P_OUTER_JAW_RESEARCH_RULE_ID = (
+    "tracktemplate.chair.p-outer-jaw-reference.v1"
+)
 CHAIR_KEY_RESEARCH_RULE_ID = "tracktemplate.chair.key-reference.v1"
 CHAIR_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.base-reference.v1"
 CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
@@ -124,6 +132,18 @@ class ChairPSeatResearchResult:
     component_id: str
     procedure_id: str
     geometry: ChairPSeatGeometry
+
+
+@dataclass(frozen=True)
+class ChairPOuterJawResearchResult:
+    """Derived fixed P jaw and spacer with unadmitted research inputs."""
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    component_id: str
+    procedure_id: str
+    geometry: ChairPOuterJawGeometry
 
 
 @dataclass(frozen=True)
@@ -296,7 +316,7 @@ def _research_lineage(record, manifest):
 def _parameter_map(
     procedure, quantities, expected, path, *, allow_key_fish_ratio=False,
     allow_inner_jaw_slopes=False, allow_l1_fillet_factor=False,
-    length_name="seat",
+    allow_p_outer_jaw_fish_ratio=False, length_name="seat",
 ):
     selected = [quantities[key] for key in procedure["parameter_quantity_ids"]]
     purposes = [item["purpose"] for item in selected]
@@ -305,9 +325,11 @@ def _parameter_map(
         "research-parameter-set", path + ".parameter_quantity_ids",
         "the finite rule requires exactly its named parameter purposes",
     )
-    if allow_key_fish_ratio:
+    if allow_key_fish_ratio or allow_p_outer_jaw_fish_ratio:
         unit_message = (
-            "key parameters need lengths in mm and rail_fish_ratio in 1"
+            "{} parameters need lengths in mm and rail_fish_ratio in 1"
+        ).format(
+            "P outer jaw" if allow_p_outer_jaw_fish_ratio else "key"
         )
     elif allow_l1_fillet_factor:
         unit_message = (
@@ -331,7 +353,7 @@ def _parameter_map(
                 item["quantity_kind"] == "dimensionless"
                 and item["canonical_unit"] == "1"
             ) if (
-                (allow_key_fish_ratio
+                ((allow_key_fish_ratio or allow_p_outer_jaw_fish_ratio)
                  and item["purpose"] == "rail_fish_ratio")
                 or (allow_inner_jaw_slopes and item["purpose"] in (
                     "top_to_mid_side_slope", "mid_to_seat_side_slope",
@@ -354,14 +376,19 @@ def _parameter_map(
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
     inner_jaw=False, assembly=False, l1=False, s1j=False, p_seat=False,
+    p_outer_jaw=False,
 ):
     _require(
-        sum((key, base, outer_jaw, inner_jaw, p_seat)) <= 1
-        and not (p_seat and (assembly or l1 or s1j)),
+        sum((key, base, outer_jaw, inner_jaw, p_seat, p_outer_jaw)) <= 1
+        and not ((p_seat or p_outer_jaw) and (assembly or l1 or s1j)),
         "research-procedure-set", "$.definition.procedures",
         "only one finite component rule can be selected",
     )
-    if p_seat:
+    if p_outer_jaw:
+        name = "P outer jaw"
+        rule_id = CHAIR_P_OUTER_JAW_RESEARCH_RULE_ID
+        parameter_type = ChairPOuterJawParameters
+    elif p_seat:
         name = "P slide-seat"
         rule_id = CHAIR_P_SEAT_RESEARCH_RULE_ID
         parameter_type = ChairPSeatParameters
@@ -427,7 +454,8 @@ def _procedures(
         tuple(item.name for item in fields(parameter_type)),
         "$.definition.procedures[1]", allow_key_fish_ratio=key,
         allow_inner_jaw_slopes=inner_jaw,
-        allow_l1_fillet_factor=l1 and inner_jaw, length_name=name,
+        allow_l1_fillet_factor=l1 and inner_jaw,
+        allow_p_outer_jaw_fish_ratio=p_outer_jaw, length_name=name,
     )
     frame = _parameter_map(
         placement, quantities, _FRAME_PURPOSES, "$.definition.procedures[0]",
@@ -636,6 +664,60 @@ def prepare_chair_p_seat_research(package, manifest_text):
         manifest_signature=chair_definition_manifest_signature(manifest_text),
         component_id=component_id,
         procedure_id=seat["procedure_id"],
+        geometry=geometry,
+    )
+
+
+def prepare_chair_p_outer_jaw_research(package, manifest_text):
+    """Prepare the fixed P outer jaw and spacer from private inputs.
+
+    The finite rule represents only PJAW with an empty source suffix and
+    no loose pin. Revalidate all package and manifest fields each time.
+    Source-byte authentication belongs to the evidence harness. No host,
+    file, manufacturing correction or acceptance is created here.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(
+            error.code, error.path, error.detail,
+        ) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    quantities = {
+        item["quantity_id"]: item for item in definition["quantities"]
+    }
+    placement, jaw, selected = _procedures(
+        definition, quantities, p_outer_jaw=True,
+    )
+    component_id = _component_contract(
+        definition, placement, jaw, outer_jaw=True,
+    )
+    _quantity_coverage(record, quantities, selected)
+    try:
+        parameters = ChairPOuterJawParameters(**{
+            name: Fraction(item["canonical_value"])
+            for name, item in selected.items()
+        })
+        geometry = construct_chair_p_outer_jaw(parameters)
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-geometry-invalid", "$.definition.quantities", str(error),
+        ) from error
+    return ChairPOuterJawResearchResult(
+        package=package,
+        manifest_json=json.dumps(
+            manifest, allow_nan=False, ensure_ascii=True,
+            separators=(",", ":"), sort_keys=True,
+        ),
+        manifest_signature=chair_definition_manifest_signature(manifest_text),
+        component_id=component_id,
+        procedure_id=jaw["procedure_id"],
         geometry=geometry,
     )
 
