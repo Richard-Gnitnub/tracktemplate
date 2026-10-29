@@ -517,12 +517,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:db257713e9af1992d60897afb46b84bf87456e9b",
-      "accepted_sha256": "sha256:75b4e81df6a8c9b14dd854035fe5bb2af0bd185556711bd208db7cb74b4963c2",
+      "accepted_blob": "sha1:2d8eb27196dd0bd94181bb9d0f9d0c281bd908b0",
+      "accepted_sha256": "sha256:6e58b8fdb165b67071f25d34563e323507176538aecb7af82c7de0dea99c459c",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:c3ba4d377e8dbc293869065fb1592c0c809cbda681b638956d716a5ca942f0dd",
+      "review_receipt": "sha256:ab17972db17af3db8c6b92afbc699b94a3f5a944d6b034fd0dddeae2ad2a5ced",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {

@@ -6,6 +6,7 @@ current analysis; retained geometry supplies no new railway decisions.
 """
 
 import copy
+from fractions import Fraction
 import hashlib
 import json
 import math
@@ -573,11 +574,144 @@ def _block_context_exclusion(position, mate, prepared):
     }
 
 
+def _e001_separation(polygon, points):
+    """Prove finite segments outside one actual timber edge half-plane.
+
+    Exact rational predicates use the stored coordinates. Strict separation
+    of every vertex also separates every affine segment between vertices.
+    No analytical padding, extrapolation or physical-fit tolerance applies.
+    """
+    def exact_points(values, minimum):
+        _require(isinstance(values, (list, tuple)) and len(values) >= minimum,
+                 "E001 geometry has too few points")
+        _require(all(isinstance(point, (list, tuple)) and len(point) == 2
+                     and all(_finite(value) for value in point)
+                     for point in values), "E001 geometry is not finite XY")
+        return [tuple(Fraction(value) for value in point) for point in values]
+
+    corners = exact_points(polygon, 4)
+    _require(len(corners) == 4, "E001 needs its actual four-corner outline")
+    vertices = exact_points(points, 2)
+    edges = []
+    winding = None
+    for index, start in enumerate(corners):
+        end = corners[(index + 1) % 4]
+        dx, dy = end[0] - start[0], end[1] - start[1]
+
+        def cross(point):
+            return dx * (point[1] - start[1]) - dy * (point[0] - start[0])
+
+        interior = [cross(corners[j]) for j in range(4)
+                    if j not in (index, (index + 1) % 4)]
+        sign = 1 if interior[0] > 0 else -1
+        _require(all(value * sign > 0 for value in interior)
+                 and (winding is None or winding == sign),
+                 "E001 outline is degenerate or not convex")
+        winding = sign
+        edges.append((dx, dy, [cross(point) * sign for point in vertices]))
+    for index, (dx, dy, distances) in enumerate(edges):
+        if max(distances) < 0:
+            length = math.hypot(float(dx), float(dy))
+            minimum = float(-max(distances)) / length
+            endpoint = float(-distances[-1]) / length
+            _require(all(_finite(value) and value > 0
+                         for value in (length, minimum, endpoint)),
+                     "E001 separation cannot be reported in model millimetres")
+            return index, minimum, endpoint
+    raise ValueError("Private P placement: E001 has no strict separating edge")
+
+
+def _e001_exclusions(positions, rails, timbers):
+    """Qualify only the two generated E001 endpoint candidates.
+
+    E001 is the shared B15 envelope, not Templot's literal E exit timber.
+    Its connector station is never used as a Templot chair station.
+    """
+    _require(all(isinstance(records, dict)
+                 for records in (positions, rails, timbers)),
+             "E001 source records must be indexed")
+    timber_id = "XO-001:ENVELOPE:001"
+    timber = timbers.get(timber_id)
+    _require(isinstance(timber, dict)
+             and timber.get("stable_identity") == timber_id
+             and timber.get("identifier") == "E001"
+             and timber.get("crossover_identity") == "XO-001"
+             and timber.get("parent_turnout_identity") == "XO-001:ENVELOPE"
+             and timber.get("envelope_timber") is True,
+             "E001 generated timber identity differs")
+    source = timber.get("source_configuration")
+    routes = ["CONNECTOR", "HOST-A", "HOST-B"]
+    _require(isinstance(source, dict)
+             and source.get("route_kinds") == routes
+             and source.get("route_identities") == [
+                 f"XO-001:VIRTUAL:{route}:001" for route in routes]
+             and _finite(source.get("path_station"))
+             and source["path_station"] == timber.get("envelope_path_station")
+             and "local_x" not in source
+             and "extended_source_timber_identity" not in source,
+             "E001 is not the qualified generated envelope context")
+    result = {}
+    for name, code, label in (("vee point rail", 26, "BB/BC"),
+                              ("vee splice rail", 25, "AB")):
+        suffix = name.replace(" ", "-")
+        identity = "XO-001:chair:xo-001-envelope-001:" + suffix
+        rail_id = "XO-001-A001:rail:" + suffix
+        position, rail = positions.get(identity), rails.get(rail_id)
+        _require(isinstance(position, dict) and isinstance(rail, dict)
+                 and position.get("stable_chair_position_identity") == identity
+                 and rail.get("stable_identity") == rail_id
+                 and position.get("rail_identity") == rail_id
+                 and position.get("rail_name") == rail.get("name") == name
+                 and position.get("parent_turnout_identity")
+                 == rail.get("parent_turnout_identity") == "XO-001-A001"
+                 and position.get("parent_crossover_identity")
+                 == rail.get("parent_crossover_identity") == "XO-001"
+                 and position.get("timber_identity") == timber_id
+                 and position.get("prototype_timber_identifier") == "E001"
+                 and position.get("timber_identifier") == "E001"
+                 and type(position.get("chair_code")) is int
+                 and position["chair_code"] == code
+                 and position.get("chair_code_label") == label
+                 and position.get("special_assignment_deferred") is True
+                 and position.get("deliberate_omission") is False,
+                 "E001 endpoint ownership or assignment differs")
+        configuration = position.get("source_configuration")
+        _require(isinstance(configuration, dict)
+                 and configuration.get("timber") == source
+                 and isinstance(rail.get("source_configuration"), dict)
+                 and configuration.get("rail") == rail["source_configuration"],
+                 "E001 source configuration differs")
+        points = rail.get("points")
+        edge, minimum, endpoint = _e001_separation(
+            timber.get("outline_polygon"), points,
+        )
+        _require(position.get("centre_point") == points[-1],
+                 "E001 candidate is not the finite rail endpoint")
+        result[identity] = {
+            "exclusion_kind": "source-anchor-outside-finite-rail-domain",
+            "reason": "The finite rail ends outside the actual E001 timber. "
+                      "The analytical endpoint supplies no source chair anchor.",
+            "source_evidence": {
+                "method": "finite-polyline-outside-timber-edge-half-plane",
+                "finite_rail_segment_count": len(points) - 1,
+                "separating_timber_edge_index": edge,
+                "minimum_separation_mm": minimum,
+                "endpoint_separation_mm": endpoint,
+                "canonical_position_is_rail_endpoint": True,
+                "source_geometry_sha256": hashlib.sha256(json.dumps(
+                    [position, rail, timber], sort_keys=True, allow_nan=False,
+                ).encode("utf-8")).hexdigest(),
+                "physical_fit": "NOT_ASSESSED",
+            },
+        }
+    return result
+
+
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
-    include_r2_exit=False, include_r1_exit=False,
+    include_r2_exit=False, include_r1_exit=False, classify_e001_exclusions=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -593,7 +727,10 @@ def preview_private_catalogue_crossover_chairs(
     retaining the canonical records and the default regression behaviour.
     The R2 option adds four S1 exit assemblies using the same source frames.
     The R1 option adds two L1 and two S1J exit assemblies.
+    E001 classification adds evidence for two exclusions, never assemblies.
     """
+    _require(type(classify_e001_exclusions) is bool,
+             "classify_e001_exclusions requires an actual Boolean")
     _require(type(include_r1_exit) is bool,
              "include_r1_exit requires an actual Boolean")
     _require(not include_r1_exit or include_single_rail is True,
@@ -632,6 +769,9 @@ def preview_private_catalogue_crossover_chairs(
     positions = _whole_crossover_records(
         module, analysis, rails, timbers, crossover_id,
     )
+    e001 = (_e001_exclusions(positions, _indexed(rails, "stable_identity"),
+                            _indexed(timbers, "stable_identity"))
+            if classify_e001_exclusions else {})
     first, second, remaining = _select_s1_s1j_positions(module, analysis, plan)
     recovered = []
     families = {}
@@ -715,6 +855,8 @@ def preview_private_catalogue_crossover_chairs(
         families.update(singles)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
+    _require(not selected_ids.intersection(e001),
+             "E001 exclusions must not replace a selected assembly")
     selected, excluded, preparations = [], [], {}
     for identity, position in sorted(positions.items()):
         code = position["chair_code"]
@@ -809,6 +951,8 @@ def preview_private_catalogue_crossover_chairs(
                     position["source_or_assumed_classification"]
                 ),
             )
+        if identity in e001:
+            record.update(e001[identity])
         excluded.append(record)
     shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, crossover_id, "whole crossover", signature,
@@ -817,6 +961,12 @@ def preview_private_catalogue_crossover_chairs(
 
     def verify_all_sources():
         verify_source()
+        if classify_e001_exclusions:
+            _require(e001 == _e001_exclusions(
+                _indexed(analysis["positions"], "stable_chair_position_identity"),
+                _indexed(rails, "stable_identity"),
+                _indexed(timbers, "stable_identity"),
+            ), "E001 source changed after qualification")
         if verify_hosts is not None:
             verify_hosts()
         if verify_checks is not None:
@@ -857,6 +1007,15 @@ def preview_private_catalogue_crossover_chairs(
             "No physical fit, production, export, persistence or rights acceptance.",
         ],
     }
+    if classify_e001_exclusions:
+        represented = (len(selected) + len(check_companions)
+                       + len(end_companions) + sum(
+                           owner["stable_chair_position_identity"] in selected_ids
+                           for owner in shared.values()))
+        unresolved = len(positions) - represented - len(e001)
+        _require(unresolved >= 0, "E001 exclusion accounting overlaps")
+        receipt.update(finite_source_exclusion_count=len(e001),
+                       unresolved_source_position_count=unresolved)
     if include_central_cc:
         represented = (len(selected) + len(shared) + len(check_companions)
                        + len(end_companions))
