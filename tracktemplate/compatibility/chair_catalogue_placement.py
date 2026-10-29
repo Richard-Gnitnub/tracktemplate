@@ -577,6 +577,7 @@ def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
+    include_r2_exit=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -590,7 +591,12 @@ def preview_private_catalogue_crossover_chairs(
     The single-rail option adds 34 source-qualified S1, S1J and L1 assemblies.
     The explicit heel successor replaces ten derived S1 previews with L1,
     retaining the canonical records and the default regression behaviour.
+    The R2 option adds four S1 exit assemblies using the same source frames.
     """
+    _require(type(include_r2_exit) is bool,
+             "include_r2_exit requires an actual Boolean")
+    _require(not include_r2_exit or include_single_rail is True,
+             "R2 exit coverage requires the single-rail supplement")
     _require(type(correct_heel_l1) is bool,
              "correct_heel_l1 requires an actual Boolean")
     _require(not correct_heel_l1 or include_single_rail is True,
@@ -690,6 +696,7 @@ def preview_private_catalogue_crossover_chairs(
             module, source_document, signature, positions, timbers, base_z,
             catalogue_path,
             **({"correct_heel_l1": True} if correct_heel_l1 else {}),
+            **({"include_r2_exit": True} if include_r2_exit else {}),
         )
         if correct_heel_l1:
             corrected = {identity for identity, witness in single_witnesses.items()
@@ -898,6 +905,7 @@ def preview_private_catalogue_crossover_chairs(
                 include_central_cc=True, include_check_ends=True,
                 **({"include_single_rail": True} if include_single_rail else {}),
                 **({"correct_heel_l1": True} if correct_heel_l1 else {}),
+                **({"include_r2_exit": True} if include_r2_exit else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,
