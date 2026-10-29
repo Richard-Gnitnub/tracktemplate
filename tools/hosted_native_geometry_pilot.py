@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import resource
 import subprocess
 import sys
 import time
@@ -85,10 +86,22 @@ def _failure(classification, detail):
             "detail": detail, "expected_native_tests": 1}
 
 
+def _qualified_runtime(stdout):
+    lines = [line[len(RUNTIME_SENTINEL):] for line in stdout.splitlines()
+             if line.startswith(RUNTIME_SENTINEL)]
+    if len(lines) != 1:
+        raise ValueError("Expected one runtime report")
+    runtime = json.loads(lines[0])["compatibility_evaluation"]
+    if (runtime.get("status") != "qualified"
+            or runtime.get("matched_profile_id") != EXPECTED_PROFILE
+            or runtime.get("mismatches")):
+        raise ValueError("Qualified runtime mismatch")
+
+
 def assess_result(result, stdout, stderr, samples, clearance):
     """Require native assertions, contained execution and complete evidence."""
-    reason = result.get("execution_failure_reason") or result.get(
-        "failure_reason"
+    reason = result.get("failure_reason") or result.get(
+        "execution_failure_reason"
     )
     if result.get("status") == "refused":
         return _failure("SETUP_FAILURE", reason)
@@ -103,6 +116,10 @@ def assess_result(result, stdout, stderr, samples, clearance):
     if reason == "memory-limit":
         return _failure("MEMORY_LIMIT", reason)
     if result.get("process_exit") != 0 or reason == "payload-nonzero":
+        try:
+            _qualified_runtime(stdout)
+        except (KeyError, TypeError, ValueError) as error:
+            return _failure("SETUP_FAILURE", str(error))
         return _failure("GEOMETRY_FAILURE", reason or "Nonzero native exit")
     if result.get("status") != "completed" or reason:
         return _failure("SETUP_FAILURE", reason or "Guard did not complete")
@@ -119,7 +136,10 @@ def assess_result(result, stdout, stderr, samples, clearance):
     try:
         live = []
         removed = False
-        for sample in samples:
+        final_accounting = False
+        final_samples = [result[key] for key in ("before_cleanup", "after_cleanup")
+                         if isinstance(result.get(key), dict)]
+        for sample in [*samples, *final_samples]:
             # An empty scope can disappear after payload exit. Partial
             # telemetry is not evidence of removal and must fail closed.
             if all(sample.get(key) is None for key in SAMPLE_FIELDS):
@@ -147,18 +167,17 @@ def assess_result(result, stdout, stderr, samples, clearance):
             cpu = dict(line.split() for line in sample["cpu.stat"].splitlines())
             numbers["cpu_usage_usec"] = int(cpu["usage_usec"])
             live.append(numbers)
+            if (any(sample is item for item in final_samples)
+                    and numbers["pids.current"] == 0
+                    and not sample["cgroup.procs"].strip()
+                    and dict(line.split() for line in
+                             sample["cgroup.events"].splitlines()).get(
+                                 "populated"
+                             ) == "0"):
+                final_accounting = True
         if not live:
             raise ValueError("No complete owned cgroup sample")
-        runtime_lines = [line[len(RUNTIME_SENTINEL):]
-                         for line in stdout.splitlines()
-                         if line.startswith(RUNTIME_SENTINEL)]
-        if len(runtime_lines) != 1:
-            raise ValueError("Expected one runtime report")
-        runtime = json.loads(runtime_lines[0])["compatibility_evaluation"]
-        if (runtime.get("status") != "qualified"
-                or runtime.get("matched_profile_id") != EXPECTED_PROFILE
-                or runtime.get("mismatches")):
-            return _failure("SETUP_FAILURE", "Qualified runtime mismatch")
+        _qualified_runtime(stdout)
         combined = stdout + "\n" + stderr
         counts = re.findall(r"^Ran (\d+) tests? in ([0-9.]+)s$",
                             combined, re.MULTILINE)
@@ -175,6 +194,9 @@ def assess_result(result, stdout, stderr, samples, clearance):
             "peak_tasks_observed": max(x["pids.current"] for x in live),
             "cpu_usage_usec": max(x["cpu_usage_usec"] for x in live),
             "complete_resource_samples": len(live),
+            "resource_accounting": (
+                "final" if final_accounting else "sampled-lower-bound"
+            ),
             "scope": "One unchanged transition validator; no chair or GUI proof",
         }
     except (KeyError, TypeError, ValueError) as error:
@@ -291,6 +313,7 @@ def main():
         if "error" in host_observations[-1]:
             raise ValueError(host_observations[-1]["error"])
         guard_started = time.monotonic()
+        children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         result = guard.run_guarded_flatpak(
             ["flatpak", "run", "--command=FreeCADCmd",
              "--env=OMP_NUM_THREADS=1", "--env=OPENBLAS_NUM_THREADS=1",
@@ -300,6 +323,7 @@ def main():
             context=guard.GuardContext(sleep=observed_sleep),
             cwd=ROOT, isolate_profile=True,
         )
+        children_after = resource.getrusage(resource.RUSAGE_CHILDREN)
         guard_seconds = time.monotonic() - guard_started
         observe_host()
         samples_path = OUTPUT / "guard/measurements.jsonl"
@@ -324,6 +348,23 @@ def main():
             )
         summary["source_commit"] = identity["source_commit"]
         summary["guard_elapsed_seconds"] = guard_seconds
+        summary["waited_children"] = {
+            "user_cpu_seconds_delta": (
+                children_after.ru_utime - children_before.ru_utime
+            ),
+            "system_cpu_seconds_delta": (
+                children_after.ru_stime - children_before.ru_stime
+            ),
+            "cumulative_maximum_single_child_rss_bytes": (
+                children_after.ru_maxrss * 1024
+            ),
+            "boundary": (
+                "CPU deltas cover this coordinator's waited children, "
+                "including guard control commands. Maximum RSS includes "
+                "earlier metadata children; it is not aggregate RSS or "
+                "proof of complete FreeCAD descendant consumption."
+            ),
+        }
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         summary["detail"] = repr(error)
     finally:

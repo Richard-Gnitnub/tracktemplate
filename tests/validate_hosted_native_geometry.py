@@ -220,6 +220,23 @@ class HostedResultTests(unittest.TestCase):
                      failure_reason="payload-nonzero")
         self.assert_failed(self.assess(guard=guard), "GEOMETRY_FAILURE")
 
+    def test_nonzero_exit_without_runtime_qualification_is_setup_failure(self):
+        guard = good_guard()
+        guard.update(status="failed", process_exit=1,
+                     failure_reason="payload-nonzero")
+        self.assert_failed(
+            self.assess(guard=guard, stdout=""), "SETUP_FAILURE",
+        )
+
+    def test_final_memory_stop_overrides_earlier_payload_failure(self):
+        guard = good_guard()
+        guard.update(
+            status="failed", process_exit=1,
+            failure_reason="memory-limit",
+            execution_failure_reason="payload-nonzero",
+        )
+        self.assert_failed(self.assess(guard=guard), "MEMORY_LIMIT")
+
     def test_cleanup_and_deadline_cancellation_are_required(self):
         for key, value in (
             ("cleanup_proved", False),
@@ -299,6 +316,61 @@ class HostedResultTests(unittest.TestCase):
         terminal["monotonic_seconds"] = 2.0
         terminal["memory.current"] = None
         self.assert_failed(self.assess(samples=[live_sample(), terminal]))
+
+    def test_final_samples_contribute_peak_memory_and_cpu(self):
+        before = live_sample()
+        before["memory.peak"] = "33554432"
+        before["cpu.stat"] = before["cpu.stat"].replace(
+            "usage_usec 300000", "usage_usec 900000",
+        )
+        after = live_sample()
+        after["memory.peak"] = "67108864"
+        after["cpu.stat"] = after["cpu.stat"].replace(
+            "usage_usec 300000", "usage_usec 1200000",
+        )
+        after["pids.current"] = "0"
+        after["cgroup.events"] = "populated 0\nfrozen 0\n"
+        after["cgroup.procs"] = ""
+        for final_samples, expected_peak, expected_cpu in (
+            ({"before_cleanup": before}, 33554432, 900000),
+            ({"after_cleanup": after}, 67108864, 1200000),
+            ({"before_cleanup": before, "after_cleanup": after},
+             67108864, 1200000),
+        ):
+            with self.subTest(final_samples=list(final_samples)):
+                guard = good_guard()
+                guard.update(final_samples)
+                result = self.assess(guard=guard)
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(
+                    result["peak_cgroup_memory_bytes"], expected_peak,
+                )
+                self.assertEqual(result["cpu_usage_usec"], expected_cpu)
+
+    def test_absent_final_accounting_is_labelled_as_sampled_lower_bound(self):
+        removed = {key: None for key in live_sample()}
+        for final_samples in (
+            {}, {"before_cleanup": removed, "after_cleanup": removed},
+        ):
+            with self.subTest(final_samples=list(final_samples)):
+                guard = good_guard()
+                guard.update(final_samples)
+                result = self.assess(guard=guard)
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(
+                    result.get("resource_accounting"), "sampled-lower-bound",
+                )
+
+    def test_memory_limit_events_in_final_samples_cannot_pass(self):
+        for name in ("before_cleanup", "after_cleanup"):
+            with self.subTest(name=name):
+                final = live_sample()
+                final["memory.events"] = final["memory.events"].replace(
+                    "oom_kill 0", "oom_kill 1",
+                )
+                guard = good_guard()
+                guard[name] = final
+                self.assert_failed(self.assess(guard=guard), "MEMORY_LIMIT")
 
 
 class NativeWrapperTests(unittest.TestCase):
