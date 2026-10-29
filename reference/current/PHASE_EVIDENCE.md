@@ -2684,3 +2684,33 @@ The [technical provenance](../PROVENANCE.md) and [licensing conditions](../LICEN
 This result gives no production or phase exit acceptance. It gives no positive rights claim.
 
 No repair is available from the previous `2/2` limit. Phase 9B stays Open at 3/6. More work on LMS chairs stays stopped.
+
+## R2 exit chairs for XO-001 — 2026-10-29
+
+This Level 2 change supplies more construction and placement evidence for Exit 9B-3.
+The optional `include_r2_exit=True` argument adds four S1 assemblies to the private `XO-001` preview.
+The positions are the `vee point rail` and `vee splice rail` at R2 on each turnout.
+The option requires the previous single-rail supplement. Its default is `False`.
+Both values of `correct_heel_l1` remain supported.
+
+The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the existing S1 geometry and component placements.
+Frozen Templot 556b source calculations identify R2 as a continued crossing position, not the source's literal `R` return-track context.
+The source station is inside the existing rail ends. Its clearance selects S1, outside the interval that selects a joint chair.
+The four canonical identities, original source records and deferred assignment flags stay the same.
+
+The [standalone tests](../../tests/validate_phase9b_catalogue_r2_exit.py) give RED results before implementation and PASS results after implementation.
+They compare the new body and fixing positions for both travel directions and seven straight or signed-curvature cases.
+They also check source boundaries, invalid inputs, verification after source changes, the optional argument and previous behaviour.
+Standalone accounting gives 241 assemblies, with 68 additional components. The 48 shared supports stay the same.
+This accounting is not a complete native preview result. It does not admit more host geometry.
+
+Previous native and GUI evidence supplies representative coverage of unchanged S1 geometry, component transformations and preview recovery.
+It does not supply four new R2 native executions. No FreeCAD, GUI or full-XO test ran for this change.
+Local source, RED, regression and review evidence is in `tmp/r2-exit-coverage/`.
+
+Four R1 positions and two E001 positions remain excluded from this exit group. The 40 crossing positions remain outside this change.
+The frozen 261-assembly candidate and all previous failure evidence stay the same.
+Existing validation tools, geometry builders, numerical tolerances and accepted tests stay the same.
+Physical fit, rights, production, performance and phase exit acceptance remain unproved by this result.
+The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
+Phase 9B stays Open at 3/6. The previous `2/2` allowance remains consumed. LMS development stays stopped.

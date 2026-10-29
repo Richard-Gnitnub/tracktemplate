@@ -467,6 +467,7 @@ def create_private_catalogue_crossover_preview(
     verify_source,
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
+    include_r2_exit=False,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -480,6 +481,10 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(type(include_r2_exit) is bool,
+            "include_r2_exit requires an actual Boolean")
+    require(not include_r2_exit or include_single_rail is True,
+            "R2 exit coverage requires the single-rail supplement")
     require(type(correct_heel_l1) is bool,
             "correct_heel_l1 requires an actual Boolean")
     require(not correct_heel_l1 or include_single_rail is True,
@@ -615,7 +620,8 @@ def create_private_catalogue_crossover_preview(
 
     if include_single_rail:
         single_specs = (
-            ("SupplementS1", "S1", 14, _S1_MODEL_SHA256, _S1_SOURCE_NAMES,
+            ("SupplementS1", "S1", 18 if include_r2_exit else 14,
+             _S1_MODEL_SHA256, _S1_SOURCE_NAMES,
              "existing-02", "retained-S1-L1-reference-package"),
             ("SupplementS1J", "S1J", 4, _S1J_MODEL_SHA256, _S1J_SOURCE_NAMES,
              "basic-04", "fixed-basic-source-context"),

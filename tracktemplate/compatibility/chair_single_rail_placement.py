@@ -1,7 +1,7 @@
 """Bind single-rail chairs to the fixed private XO-001 source.
 
 Source-informed selection from Templot 556b math_unit.pas:29551-29665,
-29750-29831 and 37587-37603, GPL-3.0-or-later. See NOTICE.md and
+22760-22820, 29750-29831 and 37587-37603, GPL-3.0-or-later. See NOTICE.md and
 reference/PROVENANCE.md. Canonical assignments remain unchanged. An explicit
 successor corrects ten heel preview families; this is not general source
 or physical-fit admission.
@@ -65,23 +65,37 @@ def _family(module, dimensions, timber, station, rail):
     # All scoped outer stock positions follow the qualified check ends.
     # The exit-joint override applies after the ordinary S1 source choice.
     joint = dimensions["a_timber_x"] + (12.5 + 5 * 30) / 3
+    if timber == "R2":
+        # R2 is a continued X timber, not Templot's literal R return track.
+        _angle, y, branch = _source_pose(
+            module, dimensions, station - 4 / 3, 2,
+        )
+        _require(rail in (2, 3) and branch == "turnoutst_main"
+                 and y - 16.5 >= 19 / 3,
+                 "R2 source no longer selects two S1 chairs")
+        _require(not joint - 13.5 / 3 < station < joint + 13.5 / 3,
+                 "R2 source lies inside the joint-chair interval")
+        return "S1"
     return "S1J" if joint - 13.5 / 3 < station < joint + 13.5 / 3 else "S1"
 
 
 def prepare_single_rails(
     module, document, signature, positions, timbers, base_z, catalogue_path,
-    *, correct_heel_l1=False,
+    *, correct_heel_l1=False, include_r2_exit=False,
 ):
     """Return complete groups, source witnesses and a late host verifier.
 
     The caller first qualifies the unchanged whole XO-001 signature and
     hosts through the paired catalogue. The default admits 17 named source
     contexts per turnout. The explicit successor adds five heel corrections
-    per turnout. B4 extensions must retain the
+    per turnout. The R2 option adds two exit S1 chairs per turnout.
+    B4 extensions must retain the
     original source identity and station; envelope stations are not used.
     """
     _require(type(correct_heel_l1) is bool,
              "correct_heel_l1 requires an actual Boolean")
+    _require(type(include_r2_exit) is bool,
+             "include_r2_exit requires an actual Boolean")
     rails_by_timber = {
         "S13": {"curved switch and closure rail": 2,
                 "turnout-side stock rail": 4},
@@ -100,6 +114,8 @@ def prepare_single_rails(
             rails_by_timber[timber]["straight switch and closure rail"] = 3
             if timber != "T2":
                 rails_by_timber[timber]["main-side stock rail"] = 1
+    if include_r2_exit:
+        rails_by_timber["R2"] = {"vee splice rail": 2, "vee point rail": 3}
     family_groups = {"S1": "SupplementS1", "S1J": "SupplementS1J", "L1": "L1"}
     configuration = json.loads(signature)["configuration"]
     _require(configuration["crossover_id"] == "XO-001",
@@ -137,6 +153,13 @@ def prepare_single_rails(
                      and position["chair_code"] == 1
                      and position.get("chair_code_label") == "S1",
                      "heel correction requires the original S1 assignment")
+        if timber == "R2":
+            number = {"A": "004", "B": "010"}[side]
+            _require(timber_id == f"XO-001:INHERITED-LONG:{side}:{number}"
+                     and position["rail_identity"]
+                     == f"XO-001-{side}001:rail:"
+                     + position["rail_name"].replace(" ", "-"),
+                     "R2 source rail or inherited timber identity differs")
         candidates[key] = position
     _require(set(candidates) == expected,
              "all qualified single-rail positions are required")
@@ -161,10 +184,12 @@ def prepare_single_rails(
                 source = timber_map[position["timber_identity"]]["source_configuration"]
                 _require(source == position["source_configuration"]["timber"],
                          "position and source timber disagree")
+                _require(timber != "R2" or "local_x" not in source,
+                         "R2 requires its inherited source timber")
                 if "local_x" in source:
                     local_x = source["local_x"]
                 else:
-                    _require(timber in ("X6-C", "X7-D", "X8-E", "X9-F")
+                    _require(timber in ("X6-C", "X7-D", "X8-E", "X9-F", "R2")
                              and source.get("extended_source_timber_identity")
                              == f"XO-001:{side}:{timber}",
                              "extended source timber identity differs")
@@ -204,7 +229,8 @@ def prepare_single_rails(
                 if heel_correction:
                     witnesses[identity]["original_family"] = "S1"
     _require(Counter(item["family"] for item in witnesses.values())
-             == {"L1": 26 if correct_heel_l1 else 16, "S1": 14, "S1J": 4},
+             == {"L1": 26 if correct_heel_l1 else 16,
+                 "S1": 18 if include_r2_exit else 14, "S1J": 4},
              "qualified family counts changed")
 
     def verify():
