@@ -2690,27 +2690,30 @@ No repair is available from the previous `2/2` limit. Phase 9B stays Open at 3/6
 This Level 2 change supplies more construction and placement evidence for Exit 9B-3.
 The optional `include_r2_exit=True` argument adds four S1 assemblies to the private `XO-001` preview.
 The positions are the `vee point rail` and `vee splice rail` at R2 on each turnout.
-The option requires the previous single-rail supplement. Its default is `False`.
-Both values of `correct_heel_l1` remain supported.
+The optional operation needs the previous single-rail supplement. The initial value of `include_r2_exit` is `False`.
+The operation accepts `correct_heel_l1=True` and `correct_heel_l1=False`.
 
-The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the existing S1 geometry and component placements.
-Frozen Templot 556b source calculations identify R2 as a continued crossing position, not the source's literal `R` return-track context.
-The source station is inside the existing rail ends. Its clearance selects S1, outside the interval that selects a joint chair.
-The four canonical identities, original source records and deferred assignment flags stay the same.
+The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the current S1 geometry and component placements.
+Frozen Templot 556b source identifies R2 as a continued crossing position, not the source's named `R` return-track context.
+The source station is between the rail ends. Its clearance selects S1. The station is not in the interval that selects a joint chair.
+The four canonical identities, initial source records and deferred assignment flags stay the same.
 
-The [standalone tests](../../tests/validate_phase9b_catalogue_r2_exit.py) give RED results before implementation and PASS results after implementation.
-They compare the new body and fixing positions for both travel directions and seven straight or signed-curvature cases.
-They also check source boundaries, invalid inputs, verification after source changes, the optional argument and previous behaviour.
-Standalone accounting gives 241 assemblies, with 68 additional components. The 48 shared supports stay the same.
-This accounting is not a complete native preview result. It does not admit more host geometry.
+The [standalone tests](../../tests/validate_phase9b_catalogue_r2_exit.py) give RED results before the product change and PASS results after the product change.
+They compare the new body and fixing positions for the two travel directions and seven straight or signed-curvature conditions.
+They also check source limits, invalid inputs, checks after source changes, the optional argument and previous behaviour.
 
-Previous native and GUI evidence supplies representative coverage of unchanged S1 geometry, component transformations and preview recovery.
+The standalone tests count 241 assemblies, with 68 more components. The 48 shared supports stay the same.
+This count is not a complete native preview result. It does not admit more host geometry.
+
+Previous native and GUI evidence applies to the same S1 geometry, component transformations and preview recovery.
 It does not supply four new R2 native executions. No FreeCAD, GUI or full-XO test ran for this change.
 Local source, RED, regression and review evidence is in `tmp/r2-exit-coverage/`.
 
-Four R1 positions and two E001 positions remain excluded from this exit group. The 40 crossing positions remain outside this change.
-The frozen 261-assembly candidate and all previous failure evidence stay the same.
-Existing validation tools, geometry builders, numerical tolerances and accepted tests stay the same.
-Physical fit, rights, production, performance and phase exit acceptance remain unproved by this result.
+This exit group does not include four R1 positions and two E001 positions. This change does not include the 40 crossing positions.
+The frozen 261-assembly candidate and all previous evidence with FAIL results stay the same.
+
+The current validation tools, geometry builders, numerical tolerances and accepted tests stay the same.
+This result gives no acceptance for physical fit, rights, production, performance or phase exit.
 The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
-Phase 9B stays Open at 3/6. The previous `2/2` allowance remains consumed. LMS development stays stopped.
+
+Phase 9B stays Open at 3/6. The previous `2/2` allowance stays consumed. LMS development stays stopped.
