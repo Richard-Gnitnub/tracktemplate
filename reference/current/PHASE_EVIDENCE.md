@@ -2784,3 +2784,36 @@ Local source and test evidence, preservation audits and review evidence are in `
 The frozen 261-assembly candidate and all previous evidence with FAIL results stay the same.
 The [provenance](../PROVENANCE.md), [licensing conditions](../LICENSING_BOUNDARIES.md) and all acceptance conditions stay the same.
 Phase 9B stays Open at 3/6. No repair is available from the previous `2/2` allowance. LMS development stays stopped.
+
+## ZY chairs at X1-Z and X2-Y on XO-001 — 2026-10-29
+
+This Level 2 result supplies construction and placement evidence for part of Exit 9B-3.
+The optional `crossing_zy_contexts_path` input adds four ZY assemblies at X1-Z and X2-Y on the two turnouts.
+Each assembly supports two rails. The operation needs `include_single_rail=True` and the two qualified source contexts.
+The initial value is `None`. Previous operations and their results stay the same with that value.
+
+The [source adapter](../../tracktemplate/compatibility/chair_crossing_zy_placement.py) uses the two existing chair models, each with 33 components.
+Templot 556b selects ZY for both timbers. Rail 2 follows the curved branch at X1-Z and the straight branch at X2-Y.
+The canonical X1-Z code `21/ZY` and X2-Y code `22/XN` stay the same.
+The source selects one assembly on rail 3, with rail 2 as its second support.
+
+The [standalone tests](../../tests/validate_phase9b_catalogue_crossing_zy.py) give RED results before implementation and PASS results after implementation.
+The [adapter tests](../../tests/validate_phase9b_catalogue_crossing_zy_adapter.py) check the optional input, assembly groups, previous behaviour and checks after source changes.
+The 16 new tests and relevant regression tests give PASS results.
+Independent checks against the preserved source compare all four placement frames and eight canonical identities.
+
+With all previous chair placement inputs selected, the tests count 249 assemblies and 321 represented source positions.
+The 48 existing shared supports stay the same. The four new assemblies add 132 components and four second-rail supports.
+Two E001 positions keep their existing source exclusions. The other 32 crossing positions stay unresolved.
+These positions are at X3-X, X4-A, X5-B, X6-C, X7-D and X8-E. This change supplies no unsupported shape or placement for them.
+
+Previous FreeCAD evidence applies to the two retained ZY models.
+Previous FreeCAD and GUI evidence applies to the unchanged component transformations and document operations.
+It supplies no new FreeCAD execution or visual result for the four placements.
+No FreeCAD, GUI or full-XO test ran for this change.
+Local source checks, RED results, classified failures, regression results and reviews are in `tmp/zy-crossing/`.
+
+The frozen 261-assembly candidate, accepted geometry and previous evidence with FAIL results stay the same.
+This result gives no acceptance for physical fit, rights, production, performance or phase exit.
+The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
+Phase 9B stays Open at 3/6. No repair is available from the previous `2/2` allowance. LMS development stays stopped.
