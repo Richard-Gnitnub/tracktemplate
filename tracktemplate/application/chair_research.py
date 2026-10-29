@@ -56,6 +56,12 @@ from tracktemplate.domain.chair_outer_jaw import (
     ChairOuterJawParameters,
     construct_chair_outer_jaw,
 )
+from tracktemplate.domain.chair_p_assembly import (
+    CHAIR_P_ASSEMBLY_ROLES,
+    ChairPAssemblyGeometry,
+    assemble_p_chair_components,
+    validate_p_chair_parameters,
+)
 from tracktemplate.domain.chair_p_outer_jaw import (
     ChairPOuterJawGeometry,
     ChairPOuterJawParameters,
@@ -78,6 +84,7 @@ CHAIR_P_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.p-seat-reference.v1"
 CHAIR_P_OUTER_JAW_RESEARCH_RULE_ID = (
     "tracktemplate.chair.p-outer-jaw-reference.v1"
 )
+CHAIR_P_ASSEMBLY_RESEARCH_RULE_ID = "tracktemplate.chair.p-assembly-reference.v1"
 CHAIR_KEY_RESEARCH_RULE_ID = "tracktemplate.chair.key-reference.v1"
 CHAIR_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.base-reference.v1"
 CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
@@ -380,7 +387,7 @@ def _procedures(
 ):
     _require(
         sum((key, base, outer_jaw, inner_jaw, p_seat, p_outer_jaw)) <= 1
-        and not ((p_seat or p_outer_jaw) and (assembly or l1 or s1j)),
+        and not ((p_seat or p_outer_jaw) and (l1 or s1j)),
         "research-procedure-set", "$.definition.procedures",
         "only one finite component rule can be selected",
     )
@@ -938,6 +945,159 @@ class ChairAssemblyResearchResult:
     manifest_signature: str
     components: tuple
     geometry: ChairAssemblyGeometry
+
+
+@dataclass(frozen=True)
+class ChairPAssemblyResearchResult:
+    """Original signed package and three structural P components."""
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    components: tuple
+    geometry: ChairPAssemblyGeometry
+
+
+def prepare_chair_p_assembly_research(package, manifest_text):
+    """Compose the finite P structure from one neutral research package.
+
+    Three existing construction rules retain four separate bodies. One
+    explicit assembly constraint supplies the source table/end distance.
+    Validate all shared inputs before construction. No package, source
+    identity, host document, manufacturing profile or acceptance changes.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(error.code, error.path, error.detail) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    specifications = (
+        (CHAIR_BASE_RESEARCH_RULE_ID, ChairBaseParameters,
+         construct_chair_base, ChairBaseResearchResult, {"base": True},
+         {"base": True}),
+        (CHAIR_P_SEAT_RESEARCH_RULE_ID, ChairPSeatParameters,
+         construct_chair_p_seat, ChairPSeatResearchResult, {"p_seat": True},
+         {}),
+        (CHAIR_P_OUTER_JAW_RESEARCH_RULE_ID, ChairPOuterJawParameters,
+         construct_chair_p_outer_jaw, ChairPOuterJawResearchResult,
+         {"p_outer_jaw": True}, {"outer_jaw": True}),
+    )
+    procedures = {p["rule_id"]: p for p in definition["procedures"]}
+    _require(
+        len(definition["procedures"]) == 5
+        and set(procedures) == {
+            CHAIR_SEAT_FRAME_RULE_ID, CHAIR_P_ASSEMBLY_RESEARCH_RULE_ID,
+            *(s[0] for s in specifications),
+        },
+        "research-p-assembly-procedures", "$.definition.procedures",
+        "P assembly needs one frame, three components and one constraint",
+    )
+    components = {c["role"]: c for c in definition["components"]}
+    _require(
+        len(definition["components"]) == 3
+        and set(components) == set(CHAIR_P_ASSEMBLY_ROLES),
+        "research-p-assembly-components", "$.definition.components",
+        "P assembly requires exactly base, rail-seat and outer-jaw roles",
+    )
+    interfaces = definition["rail_interfaces"]
+    _require(
+        len(interfaces) == 1
+        and set(interfaces[0]["procedure_ids"]) == {
+            procedures[s[0]]["procedure_id"] for s in specifications
+        },
+        "research-p-assembly-interface", "$.definition.rail_interfaces",
+        "one rail interface must own all three construction procedures",
+    )
+    quantities = {q["quantity_id"]: q for q in definition["quantities"]}
+    placement = procedures[CHAIR_SEAT_FRAME_RULE_ID]
+    selections, all_selected = [], {}
+    for role, specification in zip(CHAIR_P_ASSEMBLY_ROLES, specifications):
+        rule, kind, constructor, result_type, flags, component_flags = (
+            specification
+        )
+        construction = procedures[rule]
+        # A validation view only; all original identities and lineage stay.
+        view = dict(definition, procedures=[placement, construction],
+                    components=[components[role]], rail_interfaces=[dict(
+                        interfaces[0],
+                        procedure_ids=[construction["procedure_id"]],
+                    )])
+        _, _, selected = _procedures(
+            view, quantities, assembly=True, **flags,
+        )
+        identity = _component_contract(
+            view, placement, construction, **component_flags,
+        )
+        all_selected.update({q["quantity_id"]: q for q in selected.values()})
+        selections.append((identity, construction, selected, kind,
+                           constructor, result_type))
+    constraint = procedures[CHAIR_P_ASSEMBLY_RESEARCH_RULE_ID]
+    _require(
+        constraint["kind"] == "assembly-constraint"
+        and set(constraint["input_ids"]) == {
+            procedures[s[0]]["output_ids"][0] for s in specifications
+        }
+        and len(constraint["output_ids"]) == 1,
+        "research-p-assembly-constraint", "$.definition.procedures",
+        "P constraint must consume exactly the three construction outputs",
+    )
+    end_distance = _parameter_map(
+        constraint, quantities, ("table_centre_from_inner_end_mm",),
+        "$.definition.procedures", length_name="P assembly constraint",
+    )
+    all_selected.update({q["quantity_id"]: q for q in end_distance.values()})
+    all_selected.update({identity: quantities[identity]
+                         for identity in placement["parameter_quantity_ids"]})
+    _quantity_coverage(record, quantities, all_selected)
+    try:
+        parameters = tuple(kind(**{
+            name: Fraction(q["canonical_value"])
+            for name, q in selected.items()
+        }) for _, _, selected, kind, _, _ in selections)
+        offset = Fraction(end_distance["table_centre_from_inner_end_mm"][
+            "canonical_value"
+        ])
+        validate_p_chair_parameters(
+            *parameters, table_centre_from_inner_end_mm=offset,
+        )
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-p-assembly-geometry-invalid", "$.definition", str(error),
+        ) from error
+    manifest_json = json.dumps(
+        manifest, allow_nan=False, ensure_ascii=True,
+        separators=(",", ":"), sort_keys=True,
+    )
+    signature = chair_definition_manifest_signature(manifest_text)
+    results = []
+    try:
+        for selection, inputs in zip(selections, parameters):
+            identity, construction, _, _, constructor, result_type = selection
+            results.append(result_type(
+                package=package, manifest_json=manifest_json,
+                manifest_signature=signature, component_id=identity,
+                procedure_id=construction["procedure_id"],
+                geometry=constructor(inputs),
+            ))
+        geometry = assemble_p_chair_components(tuple(
+            (role, result.geometry)
+            for role, result in zip(CHAIR_P_ASSEMBLY_ROLES, results)
+        ), table_centre_from_inner_end_mm=offset)
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-p-assembly-geometry-invalid", "$.definition", str(error),
+        ) from error
+    return ChairPAssemblyResearchResult(
+        package=package, manifest_json=manifest_json,
+        manifest_signature=signature, components=tuple(results),
+        geometry=geometry,
+    )
 
 
 def prepare_chair_assembly_research(package, manifest_text):
