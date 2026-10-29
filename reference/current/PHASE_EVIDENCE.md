@@ -2882,7 +2882,9 @@ The initial input is `None`. With `None`, previous operations and their results 
 The [source adapter](../../tracktemplate/compatibility/chair_crossing_pair_placement.py) uses the previous `RH-X3-X` and `RH-X5-B` files.
 The XA file has 33 components. The BB file has 43 components.
 The four assemblies add 152 components. Templot 556b is the source.
-The previous 257 assemblies, 48 shared supports, identities and codes stay the same.
+
+The previous 257 assemblies, identities and codes stay the same.
+The `existing_shared_support_count` value stays 48.
 
 With all previous inputs, the [adapter tests](../../tests/validate_phase9b_catalogue_crossing_splits_adapter.py) give these results:
 
@@ -2896,13 +2898,14 @@ With all previous inputs, the [adapter tests](../../tests/validate_phase9b_catal
 | `unresolved_source_position_count` | 4 |
 
 Four XN source positions at X3-X have no assembly. The source has no evidence for their use with XA.
-The two E001 results stay the same. No missing chair component is invented.
+The two E001 results stay the same. This change adds no chair component without source evidence.
 
-The [tests with standalone Python](../../tests/validate_phase9b_catalogue_crossing_splits.py) include a `RED` result before implementation.
-All 14 new tests and 161 related regression tests give PASS results, with no skipped tests.
-`actual-source-comparison.py` independently compares 28 numbers from the four assemblies and 108 numbers from component positions.
-It gives a PASS result. Its maximum residual is `1.14e-13 mm`. This result does not prove physical fit.
-All 126 previous file bindings stay the same.
+The [tests with standalone Python](../../tests/validate_phase9b_catalogue_crossing_splits.py) give a `RED` result before the product change.
+All 14 new tests and 161 related regression tests give PASS results. The `skips` value is `0`.
+
+An independent reviewer uses `actual-source-comparison.py` to compare 28 numbers from the four assemblies and 108 numbers from component positions.
+It gives a PASS result. Its maximum difference is `1.14e-13 mm`. This result supplies no evidence for physical fit.
+The 126 previous files and their hashes stay the same.
 
 Previous FreeCAD tests supply evidence for the two files. No new test uses FreeCAD or its display.
 Local evidence and independent reviews are in `tmp/xa-bb-crossing/`.
