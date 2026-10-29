@@ -2750,3 +2750,30 @@ This result gives no acceptance for physical fit, rights, production, performanc
 The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
 
 Phase 9B stays Open at 3/6. No repair is available from the previous `2/2` allowance. LMS development stays stopped.
+
+## E001 source exclusions on XO-001 — 2026-10-29
+
+This Level 2 result supplies source evidence for two more positions towards Exit 9B-3.
+The optional `classify_e001_exclusions=True` input identifies two rail ends outside the E001 timber in the private preview.
+The initial value is `False`. Previous operations and their results stay the same when this option is not selected.
+
+E001 is a generated shared timber. It is not the `E` exit timber in Templot 556b.
+Independent source checks show that the point and splice rails stop before the actual timber outline.
+The existing `0.2 mm` analysis padding includes these endpoints as chair candidates. The padding stays the same.
+The [source adapter](../../tracktemplate/compatibility/chair_catalogue_placement.py) checks every rail segment against the actual outline before it reports an exclusion.
+Contact, intersection, invalid source records or later changes to the evidence stop the operation.
+The adapter does not extend a rail or select a chair family for these positions.
+
+The [standalone tests](../../tests/validate_phase9b_catalogue_e001_exclusions.py) give RED results before implementation and PASS results after implementation.
+All 11 tests and the affected placement regressions give PASS results.
+The checks of the preserved source data also give PASS results for both E001 positions.
+The 245 assemblies, 48 shared supports and 42 positions without assemblies stay the same in the complete option set.
+Two of those 42 positions now have source exclusions with evidence. The other 40 crossing positions stay unresolved and outside this result.
+Canonical identities, source assignments, original exclusions and the preview title stay the same.
+
+Existing native and GUI evidence applies to the unchanged construction, placement and document operations.
+No new FreeCAD, GUI or full-XO test ran. No physical-fit result follows from these source exclusions.
+Local source, test, preservation and review evidence is in `tmp/e001-exclusions/`.
+The frozen 261-assembly candidate and previous failed evidence stay the same.
+The [provenance](../PROVENANCE.md), [licensing conditions](../LICENSING_BOUNDARIES.md) and all acceptance boundaries stay the same.
+Phase 9B stays Open at 3/6. The previous `2/2` allowance stays consumed. LMS development stays stopped.
