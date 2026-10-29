@@ -2999,7 +2999,7 @@ class ModularCoreLayoutWorkflowSession:
         self, source_document, crossover_id, catalogue_path,
         *, paired_contexts_path=None, include_central_cc=False,
         include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
-        include_r2_exit=False,
+        include_r2_exit=False, include_r1_exit=False,
     ):
         """Inspect retained chairs and every exclusion on a private crossover."""
         from tracktemplate.compatibility.chair_catalogue_placement import (
@@ -3020,6 +3020,8 @@ class ModularCoreLayoutWorkflowSession:
             arguments["correct_heel_l1"] = correct_heel_l1
         if include_r2_exit is not False:
             arguments["include_r2_exit"] = include_r2_exit
+        if include_r1_exit is not False:
+            arguments["include_r1_exit"] = include_r1_exit
         return preview_private_catalogue_crossover_chairs(
             self.module, source_document, crossover_id, catalogue_path,
             self._private_catalogue_crossover_preview_factory,
