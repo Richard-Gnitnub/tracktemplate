@@ -2721,29 +2721,32 @@ Phase 9B stays Open at 3/6. The previous `2/2` allowance stays consumed. LMS dev
 ## R1 chairs on XO-001 — 2026-10-29
 
 This Level 2 result supplies evidence for four more chairs and part of Exit 9B-3.
-The owner authorises these four R1 positions for private development.
+The owner authorises these four R1 positions for output in `private-development` status.
 The optional `include_r1_exit=True` input adds two L1 chairs on the splice rails and two S1J chairs on the point rails.
-The operation needs `include_single_rail=True`. The initial value of `include_r1_exit` is `False`.
-The `include_r2_exit` and `correct_heel_l1` options keep their previous behaviour.
+The operation is possible only with `include_single_rail=True`. The initial value of `include_r1_exit` is `False`.
+The `include_r2_exit` and `correct_heel_l1` inputs keep their previous behaviour.
 
-The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the current catalogue geometry and component calculations.
+The [source adapter](../../tracktemplate/compatibility/chair_single_rail_placement.py) uses the current chair shapes and calculates component positions.
 Frozen Templot 556b source identifies R1 as a continued crossing position.
-The joint rule first selects S1J. The later clearance rule changes only the splice rail to L1.
+The joint rule first selects S1J. The subsequent clearance rule changes only the splice rail to L1.
 All four positions are between the rail ends. The four canonical identities and their source records stay the same.
 
 The [standalone tests](../../tests/validate_phase9b_catalogue_r1_exit.py) give RED results before the product change and PASS results after the product change.
 The 12 tests check source identity, family selection, source limits, invalid inputs and previous behaviour.
-They compare each body and fixing frame for the two travel directions and seven straight or signed-curvature conditions.
+They compare the `origin_mm`, `x_axis` and `y_axis` data for each body and every `fixing_frames` entry.
+The tests use the two travel directions and seven conditions: a straight alignment and curves with radii of `±600 mm`, `±900 mm` and `±1800 mm`.
 With `include_r2_exit=True`, the standalone tests count 245 assemblies. The 48 shared supports stay the same.
 
-Previous native and GUI evidence applies to the same geometry, component transformations and preview recovery.
-It does not supply four new R1 native executions. No FreeCAD, GUI or full-XO test ran for this change.
-Local source, RED, regression and review evidence is in `tmp/r1-exit-coverage/`.
-The initial test error and its classified fixture correction stay in that evidence.
+Previous FreeCAD and GUI evidence applies to the same chair shapes and component positions and directions.
+It also gives evidence for the same `Undo`, `Redo` and `rollback` operations.
+It supplies no new FreeCAD test result for the four R1 positions.
+No person or tool did a FreeCAD, GUI or full-XO test for this change.
+Local source evidence, RED results, regression test results and review evidence are in `tmp/r1-exit-coverage/`.
+The evidence keeps the initial test error, its failure classification and the fixture correction.
 
-Two E001 positions and 40 crossing positions remain outside this change.
+This change does not include two E001 positions and 40 crossing positions.
 The frozen 261-assembly candidate and all previous evidence with FAIL results stay the same.
 This result gives no acceptance for physical fit, rights, production, performance or phase exit.
 The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
 
-Phase 9B stays Open at 3/6. The previous `2/2` allowance stays consumed. LMS development stays stopped.
+Phase 9B stays Open at 3/6. No repair is available from the previous `2/2` allowance. LMS development stays stopped.
