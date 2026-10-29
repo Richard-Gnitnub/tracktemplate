@@ -2956,3 +2956,22 @@ The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md
 
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. This result gives no new acceptance.
 No repair is available from the previous limit of `2/2`. LMS work stays stopped.
+
+## Manual FreeCAD workflow for Issue #230 — 2026-10-29
+
+This Level 2 work supplies test software for Issue #230 and part of Exit 9B-3.
+The [manual workflow](../../.github/workflows/native-geometry-pilot.yml) uses the original [Phase 6 test](../../tests/freecad_validate_phase6_transition_exact_geometry.py).
+It adds no railway calculation or chair component. The original assertions stay the same.
+The [validation instructions](../VALIDATION.md#manual-freecad-test-on-github) own the limits and conditions for its use.
+
+The [new tests](../../tests/validate_hosted_native_geometry.py) examine the launcher and workflow without FreeCAD.
+Test outputs and independent reviews are in `tmp/issue230/`.
+No test in this cycle starts FreeCAD or the workflow on GitHub.
+Installation, process controls and the FreeCAD result on GitHub have no new evidence.
+
+A merge needs the project owner's decision. A test then needs separate authority.
+This change gives no acceptance for FreeCAD tests, display behaviour, physical fit, rights, production or a phase exit.
+The previous candidate and all evidence with FAIL results stay the same.
+
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6.
+No repair is available from the previous limit of `2/2`. LMS work stays stopped.

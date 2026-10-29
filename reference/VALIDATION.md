@@ -317,6 +317,39 @@ It does not validate the product, its display behaviour or product performance.
 It gives no project authority for one more test, phase exit or acceptance decision.
 The repair limits and evidence for FAIL results stay the same.
 
+### Manual FreeCAD test on GitHub
+
+The [manual workflow](../.github/workflows/native-geometry-pilot.yml) defines one test on `ubuntu-24.04` for this repository on GitHub.
+Its only start condition is `workflow_dispatch`. A test needs separate authority from the project owner.
+It uses no private input and starts no FreeCAD display.
+
+The [test suite](../tests/hosted_transition_geometry_suite.py) uses FreeCAD's `unittest` operation to execute the original [Phase 6 test](../tests/freecad_validate_phase6_transition_exact_geometry.py).
+The original assertions and success sentinel stay the same.
+The installed `org.freecad.FreeCAD` and its required software must have the exact identities in the [compatibility contract](contracts/phase1-compatibility.json).
+
+The [pilot launcher](../tools/hosted_native_geometry_pilot.py) uses the existing [validation guard](../tools/freecad_validation_guard.py) with these limits:
+
+| Control | Limit |
+| --- | ---: |
+| `MemoryMax` | 4096 MiB |
+| `MemorySwapMax` | 0 |
+| `CPUQuota` | 100% |
+| `TasksMax` | 128 |
+| FreeCAD time | 900 seconds |
+| Installation time | 10 minutes |
+| FreeCAD workflow step | 17 minutes |
+| Complete workflow | 30 minutes |
+
+Before FreeCAD starts, `MemAvailable` must be at least 12 GiB.
+The 4096 MiB limit leaves 8 GiB at that check. This check does not stop the test if `MemAvailable` subsequently falls below 8 GiB.
+The launcher records `MemAvailable`, swap data and pressure data during execution. Missing data gives a FAIL result.
+This profile replaces no workstation control.
+
+The 4096 MiB value is an experimental limit. The previous test gave a PASS result within its 900-second limit, with no maximum `RSS` measurement.
+A PASS result needs the exact test count, original success sentinel, resource measurements and evidence that no test process stays active.
+Installation, process controls and the FreeCAD result on GitHub need evidence from a test with separate project authority.
+Results and diagnostic files go to `benchmark-output/hosted-native-geometry`.
+
 ### Programmatic regression pipeline
 
 Before you start a FreeCAD validation command, select a memory limit in MiB

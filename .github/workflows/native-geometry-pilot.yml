@@ -1,0 +1,95 @@
+name: Native geometry pilot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue230-native-geometry
+  cancel-in-progress: false
+
+jobs:
+  native-geometry:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the dispatched commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Install the pinned FreeCAD build without launching it
+        id: setup
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p benchmark-output/hosted-native-geometry
+          exec > >(tee benchmark-output/hosted-native-geometry/setup.log) 2>&1
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y flatpak dbus-user-session
+          sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
+          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
+          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
+          pilot_uid="$(id -u)"
+          test "$pilot_uid" -ne 0
+          sudo loginctl enable-linger "$(id -un)"
+          sudo systemctl start "user@${pilot_uid}.service"
+          sudo systemctl set-property "user@${pilot_uid}.service" Delegate=yes
+          echo "XDG_RUNTIME_DIR=/run/user/${pilot_uid}" >> "$GITHUB_ENV"
+          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${pilot_uid}/bus" >> "$GITHUB_ENV"
+
+      - name: Run one contained native geometry test
+        id: native
+        timeout-minutes: 17
+        run: python3 tools/hosted_native_geometry_pilot.py
+
+      - name: Record workflow stage outcomes
+        if: always()
+        env:
+          PILOT_SETUP: ${{ steps.setup.outcome }}
+          PILOT_NATIVE: ${{ steps.native.outcome }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          output = Path('benchmark-output/hosted-native-geometry')
+          output.mkdir(parents=True, exist_ok=True)
+          record = {
+              'source_commit': os.environ['GITHUB_SHA'],
+              'setup': os.environ['PILOT_SETUP'],
+              'native': os.environ['PILOT_NATIVE'],
+          }
+          (output / 'workflow.json').write_text(json.dumps(record, indent=2))
+          PY
+
+      - name: Preserve only this public-input pilot's evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-geometry-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            benchmark-output/hosted-native-geometry/setup.log
+            benchmark-output/hosted-native-geometry/workflow.json
+            benchmark-output/hosted-native-geometry/identity.json
+            benchmark-output/hosted-native-geometry/summary.json
+            benchmark-output/hosted-native-geometry/host.jsonl
+            benchmark-output/hosted-native-geometry/clearance.json
+            benchmark-output/hosted-native-geometry/guard/result.json
+            benchmark-output/hosted-native-geometry/guard/control.json
+            benchmark-output/hosted-native-geometry/guard/ownership.json
+            benchmark-output/hosted-native-geometry/guard/measurements.jsonl
+            benchmark-output/hosted-native-geometry/guard/watchdog.json
+            benchmark-output/hosted-native-geometry/guard/stdout
+            benchmark-output/hosted-native-geometry/guard/stderr
