@@ -712,6 +712,7 @@ def preview_private_catalogue_crossover_chairs(
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
     include_r2_exit=False, include_r1_exit=False, classify_e001_exclusions=False,
+    crossing_zy_contexts_path=None,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -728,7 +729,10 @@ def preview_private_catalogue_crossover_chairs(
     The R2 option adds four S1 exit assemblies using the same source frames.
     The R1 option adds two L1 and two S1J exit assemblies.
     E001 classification adds evidence for two exclusions, never assemblies.
+    The ZY supplement adds four paired assemblies at X1-Z and X2-Y.
     """
+    _require(crossing_zy_contexts_path is None or include_single_rail is True,
+             "ZY crossing coverage requires the single-rail supplement")
     _require(type(classify_e001_exclusions) is bool,
              "classify_e001_exclusions requires an actual Boolean")
     _require(type(include_r1_exit) is bool,
@@ -853,8 +857,22 @@ def preview_private_catalogue_crossover_chairs(
             families["S1"] = tuple(placement for placement in families["S1"]
                                    if placement.position_id not in corrected)
         families.update(singles)
+    zy_witnesses, zy_companions = {}, {}
+    verify_zy = None
+    if crossing_zy_contexts_path is not None:
+        from tracktemplate.compatibility.chair_crossing_zy_placement import (
+            prepare_crossing_zy,
+        )
+        zy, zy_witnesses, zy_companions, verify_zy = prepare_crossing_zy(
+            module, source_document, signature, positions, timbers, base_z,
+            crossing_zy_contexts_path,
+        )
+        families.update(zy)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
+    _require(not selected_ids.intersection(zy_companions)
+             and set(zy_companions.values()) <= selected_ids,
+             "ZY companion support must have one separate placed owner")
     _require(not selected_ids.intersection(e001),
              "E001 exclusions must not replace a selected assembly")
     selected, excluded, preparations = [], [], {}
@@ -891,10 +909,21 @@ def preview_private_catalogue_crossover_chairs(
                 record.update(end_witnesses[identity])
             if identity in single_witnesses:
                 record.update(single_witnesses[identity])
+            if identity in zy_witnesses:
+                record.update(zy_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
-        if identity in check_companions:
+        if identity in zy_companions:
+            record.update(
+                exclusion_kind="source-paired-crossing-support",
+                supporting_position_id=zy_companions[identity],
+                supporting_assembly_placed=True,
+                assignment_status=position["assignment_status"],
+                reason="The source ZY assembly includes this second rail; "
+                       "the canonical deferred assignment is unchanged.",
+            )
+        elif identity in check_companions:
             record.update(
                 exclusion_kind="source-paired-reference-support",
                 supporting_position_id=check_companions[identity],
@@ -975,6 +1004,8 @@ def preview_private_catalogue_crossover_chairs(
             verify_ends()
         if verify_singles is not None:
             verify_singles()
+        if verify_zy is not None:
+            verify_zy()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -1009,7 +1040,7 @@ def preview_private_catalogue_crossover_chairs(
     }
     if classify_e001_exclusions:
         represented = (len(selected) + len(check_companions)
-                       + len(end_companions) + sum(
+                       + len(end_companions) + len(zy_companions) + sum(
                            owner["stable_chair_position_identity"] in selected_ids
                            for owner in shared.values()))
         unresolved = len(positions) - represented - len(e001)
@@ -1018,7 +1049,7 @@ def preview_private_catalogue_crossover_chairs(
                        unresolved_source_position_count=unresolved)
     if include_central_cc:
         represented = (len(selected) + len(shared) + len(check_companions)
-                       + len(end_companions))
+                       + len(end_companions) + len(zy_companions))
         receipt.update(
             represented_source_position_count=represented,
             unrepresented_source_position_count=len(positions) - represented,
@@ -1064,6 +1095,22 @@ def preview_private_catalogue_crossover_chairs(
                     "Previous accepted assignments are preserved; complete Templot "
                     "assignment equivalence is not claimed.",
                 ))
+            if crossing_zy_contexts_path is not None:
+                receipt["source_paired_crossing_support_count"] = len(
+                    zy_companions,
+                )
+                receipt["coverage_summary"] = (
+                    f"{len(selected)} assemblies; {len(shared)} existing shared "
+                    f"supports; {len(check_companions)} central check supports; "
+                    f"{len(end_companions)} check-end supports; "
+                    f"{len(zy_companions)} ZY crossing supports; "
+                    f"{len(positions) - represented} unrepresented; "
+                    f"{len(positions)} source positions accounted for"
+                )
+                receipt["limits"].append(
+                    "Only X1-Z and X2-Y crossing assemblies are admitted; "
+                    "other crossing positions retain their source exclusions."
+                )
             return create_preview(
                 catalogue_path, families, shapes, receipt, verify_all_sources,
                 paired_contexts_path=paired_contexts_path,
@@ -1072,6 +1119,8 @@ def preview_private_catalogue_crossover_chairs(
                 **({"correct_heel_l1": True} if correct_heel_l1 else {}),
                 **({"include_r2_exit": True} if include_r2_exit else {}),
                 **({"include_r1_exit": True} if include_r1_exit else {}),
+                **({"crossing_zy_contexts_path": crossing_zy_contexts_path}
+                   if crossing_zy_contexts_path is not None else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,

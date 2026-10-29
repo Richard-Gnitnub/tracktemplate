@@ -32,6 +32,11 @@ from tracktemplate.application.chair_pair_catalogue import (
     prepare_paired_catalogue,
     verify_paired_catalogue,
 )
+from tracktemplate.application.chair_crossing_zy_catalogue import (
+    ZY_CONTEXT_IDS,
+    prepare_zy_catalogue,
+    verify_zy_catalogue,
+)
 from tracktemplate.domain.chair_placement import (
     PairedChairPlacement,
     PPlacement,
@@ -468,6 +473,7 @@ def create_private_catalogue_crossover_preview(
     *, paired_contexts_path=None, include_central_cc=False,
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
     include_r2_exit=False, include_r1_exit=False,
+    crossing_zy_contexts_path=None,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -481,6 +487,8 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(crossing_zy_contexts_path is None or include_single_rail is True,
+            "ZY crossing coverage requires the single-rail supplement")
     require(type(include_r1_exit) is bool,
             "include_r1_exit requires an actual Boolean")
     require(not include_r1_exit or include_single_rail is True,
@@ -512,6 +520,8 @@ def create_private_catalogue_crossover_preview(
         raise TypeError("Crossover placement requires source verification")
     paired = (() if paired_contexts_path is None
               else prepare_paired_catalogue(paired_contexts_path))
+    zy = (() if crossing_zy_contexts_path is None
+          else prepare_zy_catalogue(crossing_zy_contexts_path))
     expected_groups = {"S1", "S1J", "P"}
     if paired:
         expected_groups.update(CONTEXT_IDS)
@@ -521,6 +531,8 @@ def create_private_catalogue_crossover_preview(
         expected_groups.update(family for family, _digest in _CHECK_END_MODELS)
     if include_single_rail:
         expected_groups.update(("SupplementS1", "SupplementS1J", "L1"))
+    if zy:
+        expected_groups.update(ZY_CONTEXT_IDS)
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -564,6 +576,27 @@ def create_private_catalogue_crossover_preview(
         _prepared, specs, prepare = _prepare_catalogue_family(
             paired_contexts_path, placements, None, receipt,
             family=prepared.label, placement_type=PairedChairPlacement,
+            model_sha256=prepared.model_sha256,
+            source_names=tuple(item.name for item in prepared.components),
+            run=context_id, source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefix = context_id.replace("-", "_")
+        prefixed = tuple((prefix + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((context_id, prepared, prefixed, prepare))
+    for prepared in zy:
+        context_id = prepared.run
+        placements = _placements(placements_by_family[context_id],
+                                 PairedChairPlacement)
+        ids = {placement.position_id for placement in placements}
+        require(len(placements) == 2 and not identities.intersection(ids),
+                "ZY placements are incomplete or overlap another group")
+        identities.update(ids)
+        _prepared, specs, prepare = _prepare_catalogue_family(
+            crossing_zy_contexts_path, placements, None, receipt,
+            family="ZY", placement_type=PairedChairPlacement,
             model_sha256=prepared.model_sha256,
             source_names=tuple(item.name for item in prepared.components),
             run=context_id, source_context=prepared.context,
@@ -667,7 +700,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": ("tracktemplate.private-catalogue-crossover.v5"
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v6"
+                            if zy else
+                            "tracktemplate.private-catalogue-crossover.v5"
                             if include_single_rail else
                             "tracktemplate.private-catalogue-crossover.v4"
                             if include_check_ends else
@@ -725,10 +760,13 @@ def create_private_catalogue_crossover_preview(
     def verify_inputs():
         verify_source()
         for _label, prepared, _specs, _prepare in selections:
-            if prepared.run not in CONTEXT_IDS:
+            if (prepared.run not in CONTEXT_IDS
+                    and not (zy and prepared.run in ZY_CONTEXT_IDS)):
                 verify_catalogue_sources(prepared)
         if paired:
             verify_paired_catalogue(paired)
+        if zy:
+            verify_zy_catalogue(zy)
 
     return _materialise_preview(
         family, receipt, layer_specs, prepare_layers, verify_inputs,
