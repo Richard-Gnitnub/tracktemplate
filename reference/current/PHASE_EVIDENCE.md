@@ -2871,3 +2871,46 @@ The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md
 
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6.
 No repair is available from the previous limit of `2/2`. LMS work stays stopped.
+
+## XA/BB chairs on XO-001 — 2026-10-29
+
+This Level 2 result supplies evidence for part of Exit 9B-3.
+The optional `crossing_split_contexts_path` input adds four XA/BB assemblies for 12 source positions.
+The initial input is `None`. With `None`, previous operations and their results stay the same.
+`include_single_rail=True` is necessary. The ZY and AA/CD/DD/EF inputs are optional.
+
+The [source adapter](../../tracktemplate/compatibility/chair_crossing_pair_placement.py) uses the previous `RH-X3-X` and `RH-X5-B` files.
+The XA file has 33 components. The BB file has 43 components.
+The four assemblies add 152 components. Templot 556b is the source.
+
+The previous 257 assemblies, identities and codes stay the same.
+The `existing_shared_support_count` value stays 48.
+
+With all previous inputs, the [adapter tests](../../tests/validate_phase9b_catalogue_crossing_splits_adapter.py) give these results:
+
+| Data | Result |
+| --- | ---: |
+| `placement_count` | 261 |
+| `represented_source_position_count` | 349 |
+| `existing_shared_support_count` | 48 |
+| `source_paired_crossing_support_count` | 20 |
+| `finite_source_exclusion_count` | 2 |
+| `unresolved_source_position_count` | 4 |
+
+Four XN source positions at X3-X have no assembly. The source has no evidence for their use with XA.
+The two E001 results stay the same. This change adds no chair component without source evidence.
+
+The [tests with standalone Python](../../tests/validate_phase9b_catalogue_crossing_splits.py) give a `RED` result before the product change.
+All 14 new tests and 161 related regression tests give PASS results. The `skips` value is `0`.
+
+An independent reviewer uses `actual-source-comparison.py` to compare 28 numbers from the four assemblies and 108 numbers from component positions.
+It gives a PASS result. Its maximum difference is `1.14e-13 mm`. This result supplies no evidence for physical fit.
+The 126 previous files and their hashes stay the same.
+
+Previous FreeCAD tests supply evidence for the two files. No new test uses FreeCAD or its display.
+Local evidence and independent reviews are in `tmp/xa-bb-crossing/`.
+The previous exact candidate with 261 assemblies and its evidence with FAIL results stay the same.
+The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. This result gives no new acceptance.
+No repair is available from the previous limit of `2/2`. LMS work stays stopped.

@@ -34,8 +34,11 @@ from tracktemplate.application.chair_pair_catalogue import (
 )
 from tracktemplate.application.chair_crossing_pair_catalogue import (
     CROSSING_PAIR_CONTEXT_IDS,
+    CROSSING_SPLIT_CONTEXT_IDS,
     prepare_crossing_pair_catalogue,
+    prepare_crossing_split_catalogue,
     verify_crossing_pair_catalogue,
+    verify_crossing_split_catalogue,
 )
 from tracktemplate.application.chair_crossing_zy_catalogue import (
     ZY_CONTEXT_IDS,
@@ -479,6 +482,7 @@ def create_private_catalogue_crossover_preview(
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
     include_r2_exit=False, include_r1_exit=False,
     crossing_zy_contexts_path=None, crossing_pair_contexts_path=None,
+    crossing_split_contexts_path=None,
 ):
     """Create one unsaved crossover view with qualified retained assemblies.
 
@@ -492,6 +496,9 @@ def create_private_catalogue_crossover_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(crossing_split_contexts_path is None
+            or include_single_rail is True,
+            "crossing split coverage requires the single-rail supplement")
     require(crossing_pair_contexts_path is None
             or include_single_rail is True,
             "crossing pair coverage requires the single-rail supplement")
@@ -534,6 +541,10 @@ def create_private_catalogue_crossover_preview(
                       else prepare_crossing_pair_catalogue(
                           crossing_pair_contexts_path,
                       ))
+    crossing_splits = (() if crossing_split_contexts_path is None
+                       else prepare_crossing_split_catalogue(
+                           crossing_split_contexts_path,
+                       ))
     expected_groups = {"S1", "S1J", "P"}
     if paired:
         expected_groups.update(CONTEXT_IDS)
@@ -547,6 +558,8 @@ def create_private_catalogue_crossover_preview(
         expected_groups.update(ZY_CONTEXT_IDS)
     if crossing_pairs:
         expected_groups.update(CROSSING_PAIR_CONTEXT_IDS)
+    if crossing_splits:
+        expected_groups.update(CROSSING_SPLIT_CONTEXT_IDS)
     require(isinstance(placements_by_family, dict)
             and set(placements_by_family) == expected_groups,
             "the complete qualified placement groups are required")
@@ -600,7 +613,7 @@ def create_private_catalogue_crossover_preview(
                          for name, title, colour in specs)
         layer_specs += prefixed
         selections.append((context_id, prepared, prefixed, prepare))
-    for prepared in (*zy, *crossing_pairs):
+    for prepared in (*zy, *crossing_pairs, *crossing_splits):
         context_id = prepared.run
         placements = _placements(placements_by_family[context_id],
                                  PairedChairPlacement)
@@ -610,7 +623,9 @@ def create_private_catalogue_crossover_preview(
         identities.update(ids)
         _prepared, specs, prepare = _prepare_catalogue_family(
             (crossing_zy_contexts_path if context_id in ZY_CONTEXT_IDS
-             else crossing_pair_contexts_path), placements, None, receipt,
+             else crossing_pair_contexts_path
+             if context_id in CROSSING_PAIR_CONTEXT_IDS
+             else crossing_split_contexts_path), placements, None, receipt,
             family=prepared.label, placement_type=PairedChairPlacement,
             model_sha256=prepared.model_sha256,
             source_names=tuple(item.name for item in prepared.components),
@@ -715,7 +730,9 @@ def create_private_catalogue_crossover_preview(
                                 for spec, shape in zip(specs, components)]
             families[label] = result
         result = {
-            "contract_id": ("tracktemplate.private-catalogue-crossover.v7"
+            "contract_id": ("tracktemplate.private-catalogue-crossover.v8"
+                            if crossing_splits else
+                            "tracktemplate.private-catalogue-crossover.v7"
                             if crossing_pairs else
                             "tracktemplate.private-catalogue-crossover.v6"
                             if zy else
@@ -780,7 +797,9 @@ def create_private_catalogue_crossover_preview(
             if (prepared.run not in CONTEXT_IDS
                     and not (zy and prepared.run in ZY_CONTEXT_IDS)
                     and not (crossing_pairs and prepared.run
-                             in CROSSING_PAIR_CONTEXT_IDS)):
+                             in CROSSING_PAIR_CONTEXT_IDS)
+                    and not (crossing_splits and prepared.run
+                             in CROSSING_SPLIT_CONTEXT_IDS)):
                 verify_catalogue_sources(prepared)
         if paired:
             verify_paired_catalogue(paired)
@@ -788,6 +807,8 @@ def create_private_catalogue_crossover_preview(
             verify_zy_catalogue(zy)
         if crossing_pairs:
             verify_crossing_pair_catalogue(crossing_pairs)
+        if crossing_splits:
+            verify_crossing_split_catalogue(crossing_splits)
 
     return _materialise_preview(
         family, receipt, layer_specs, prepare_layers, verify_inputs,

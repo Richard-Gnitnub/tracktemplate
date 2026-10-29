@@ -713,6 +713,7 @@ def preview_private_catalogue_crossover_chairs(
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
     include_r2_exit=False, include_r1_exit=False, classify_e001_exclusions=False,
     crossing_zy_contexts_path=None, crossing_pair_contexts_path=None,
+    crossing_split_contexts_path=None,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -732,6 +733,9 @@ def preview_private_catalogue_crossover_chairs(
     The ZY supplement adds four paired assemblies at X1-Z and X2-Y.
     The crossing pair supplement adds eight AA/CD/DD/EF assemblies.
     """
+    _require(crossing_split_contexts_path is None
+             or include_single_rail is True,
+             "crossing split coverage requires the single-rail supplement")
     _require(crossing_pair_contexts_path is None
              or include_single_rail is True,
              "crossing pair coverage requires the single-rail supplement")
@@ -885,9 +889,26 @@ def preview_private_catalogue_crossover_chairs(
             )
         )
         families.update(crossing)
-    _require(not set(zy_companions).intersection(crossing_companions),
+    split_witnesses, split_companions = {}, {}
+    verify_splits = None
+    if crossing_split_contexts_path is not None:
+        from tracktemplate.compatibility.chair_crossing_pair_placement import (
+            prepare_crossing_splits,
+        )
+        splits, split_witnesses, split_companions, verify_splits = (
+            prepare_crossing_splits(
+                module, source_document, signature, positions, timbers, base_z,
+                crossing_split_contexts_path,
+            )
+        )
+        families.update(splits)
+    _require(not set(zy_companions).intersection(crossing_companions)
+             and not set(split_companions).intersection(
+                 set(zy_companions) | set(crossing_companions)),
              "crossing companions must have distinct source identities")
-    crossing_supports = {**zy_companions, **crossing_companions}
+    crossing_supports = {
+        **zy_companions, **crossing_companions, **split_companions,
+    }
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
     _require(not selected_ids.intersection(crossing_supports)
@@ -933,10 +954,21 @@ def preview_private_catalogue_crossover_chairs(
                 record.update(zy_witnesses[identity])
             if identity in crossing_witnesses:
                 record.update(crossing_witnesses[identity])
+            if identity in split_witnesses:
+                record.update(split_witnesses[identity])
             selected.append(record)
             continue
         _require(identity in originals, "excluded position has no source reason")
-        if identity in crossing_companions:
+        if identity in split_companions:
+            record.update(
+                exclusion_kind="source-paired-crossing-support",
+                supporting_position_id=split_companions[identity],
+                supporting_assembly_placed=True,
+                assignment_status=position["assignment_status"],
+                reason="The source XA/BB assembly includes this rail support; "
+                       "the canonical deferred assignment is unchanged.",
+            )
+        elif identity in crossing_companions:
             record.update(
                 exclusion_kind="source-paired-crossing-support",
                 supporting_position_id=crossing_companions[identity],
@@ -1039,6 +1071,8 @@ def preview_private_catalogue_crossover_chairs(
             verify_zy()
         if verify_crossing is not None:
             verify_crossing()
+        if verify_splits is not None:
+            verify_splits()
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -1140,12 +1174,14 @@ def preview_private_catalogue_crossover_chairs(
                     f"{len(positions) - represented} unrepresented; "
                     f"{len(positions)} source positions accounted for"
                 )
-                if crossing_pair_contexts_path is None:
+                if (crossing_pair_contexts_path is None
+                        and crossing_split_contexts_path is None):
                     receipt["limits"].append(
                         "Only X1-Z and X2-Y crossing assemblies are admitted; "
                         "other crossing positions retain their source exclusions."
                     )
-            if crossing_pair_contexts_path is not None:
+            if (crossing_pair_contexts_path is not None
+                    or crossing_split_contexts_path is not None):
                 receipt["source_paired_crossing_support_count"] = len(
                     crossing_supports,
                 )
@@ -1157,8 +1193,11 @@ def preview_private_catalogue_crossover_chairs(
                     f"{len(positions) - represented} unrepresented; "
                     f"{len(positions)} source positions accounted for"
                 )
-                admitted = ("AA/CD/DD/EF" if crossing_zy_contexts_path is None
-                            else "ZY and AA/CD/DD/EF")
+                admitted = " and ".join(name for path, name in (
+                    (crossing_zy_contexts_path, "ZY"),
+                    (crossing_pair_contexts_path, "AA/CD/DD/EF"),
+                    (crossing_split_contexts_path, "XA/BB wing and vee"),
+                ) if path is not None)
                 receipt["limits"].append(
                     f"Only {admitted} source contexts are admitted; "
                     "other crossing positions retain their source exclusions."
@@ -1175,6 +1214,8 @@ def preview_private_catalogue_crossover_chairs(
                    if crossing_zy_contexts_path is not None else {}),
                 **({"crossing_pair_contexts_path": crossing_pair_contexts_path}
                    if crossing_pair_contexts_path is not None else {}),
+                **({"crossing_split_contexts_path": crossing_split_contexts_path}
+                   if crossing_split_contexts_path is not None else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,
