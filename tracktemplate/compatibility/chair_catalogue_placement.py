@@ -713,7 +713,7 @@ def preview_private_catalogue_crossover_chairs(
     include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
     include_r2_exit=False, include_r1_exit=False, classify_e001_exclusions=False,
     crossing_zy_contexts_path=None, crossing_pair_contexts_path=None,
-    crossing_split_contexts_path=None,
+    crossing_split_contexts_path=None, classify_knuckle_exclusions=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -732,7 +732,13 @@ def preview_private_catalogue_crossover_chairs(
     E001 classification adds evidence for two exclusions, never assemblies.
     The ZY supplement adds four paired assemblies at X1-Z and X2-Y.
     The crossing pair supplement adds eight AA/CD/DD/EF assemblies.
+    Knuckle classification records four source endpoint exclusions only.
     """
+    _require(type(classify_knuckle_exclusions) is bool,
+             "classify_knuckle_exclusions requires an actual Boolean")
+    _require(not classify_knuckle_exclusions
+             or crossing_split_contexts_path is not None,
+             "knuckle classification requires qualified crossing splits")
     _require(crossing_split_contexts_path is None
              or include_single_rail is True,
              "crossing split coverage requires the single-rail supplement")
@@ -902,6 +908,16 @@ def preview_private_catalogue_crossover_chairs(
             )
         )
         families.update(splits)
+    knuckles = {}
+    if classify_knuckle_exclusions:
+        from tracktemplate.compatibility.chair_crossing_endpoint_exclusions import (
+            qualify_knuckle_exclusions,
+        )
+        knuckles = qualify_knuckle_exclusions(
+            positions, _indexed(rails, "stable_identity"),
+            _indexed(timbers, "stable_identity"),
+            split_witnesses, split_companions,
+        )
     _require(not set(zy_companions).intersection(crossing_companions)
              and not set(split_companions).intersection(
                  set(zy_companions) | set(crossing_companions)),
@@ -916,6 +932,9 @@ def preview_private_catalogue_crossover_chairs(
              "crossing companion support must have one separate placed owner")
     _require(not selected_ids.intersection(e001),
              "E001 exclusions must not replace a selected assembly")
+    _require(not set(knuckles).intersection(
+        selected_ids | set(crossing_supports) | set(e001),
+    ), "endpoint exclusions must remain separate from represented supports")
     selected, excluded, preparations = [], [], {}
     for identity, position in sorted(positions.items()):
         code = position["chair_code"]
@@ -1045,6 +1064,8 @@ def preview_private_catalogue_crossover_chairs(
             )
         if identity in e001:
             record.update(e001[identity])
+        if identity in knuckles:
+            record.update(knuckles[identity])
         excluded.append(record)
     shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, crossover_id, "whole crossover", signature,
@@ -1073,6 +1094,13 @@ def preview_private_catalogue_crossover_chairs(
             verify_crossing()
         if verify_splits is not None:
             verify_splits()
+        if classify_knuckle_exclusions:
+            _require(knuckles == qualify_knuckle_exclusions(
+                _indexed(analysis["positions"], "stable_chair_position_identity"),
+                _indexed(rails, "stable_identity"),
+                _indexed(timbers, "stable_identity"),
+                split_witnesses, split_companions,
+            ), "knuckle source changed after qualification")
         for prepared in preparations.values():
             verify_catalogue_sources(prepared)
 
@@ -1105,15 +1133,18 @@ def preview_private_catalogue_crossover_chairs(
             "No physical fit, production, export, persistence or rights acceptance.",
         ],
     }
-    if classify_e001_exclusions:
+    if classify_e001_exclusions or classify_knuckle_exclusions:
         represented = (len(selected) + len(check_companions)
                        + len(end_companions) + len(crossing_supports) + sum(
                            owner["stable_chair_position_identity"] in selected_ids
                            for owner in shared.values()))
-        unresolved = len(positions) - represented - len(e001)
-        _require(unresolved >= 0, "E001 exclusion accounting overlaps")
-        receipt.update(finite_source_exclusion_count=len(e001),
-                       unresolved_source_position_count=unresolved)
+        unresolved = len(positions) - represented - len(e001) - len(knuckles)
+        _require(unresolved >= 0, "source exclusion accounting overlaps")
+        if classify_e001_exclusions:
+            receipt["finite_source_exclusion_count"] = len(e001)
+        receipt["unresolved_source_position_count"] = unresolved
+        if classify_knuckle_exclusions:
+            receipt["source_endpoint_exclusion_count"] = len(knuckles)
     if include_central_cc:
         represented = (len(selected) + len(shared) + len(check_companions)
                        + len(end_companions) + len(crossing_supports))
@@ -1141,6 +1172,11 @@ def preview_private_catalogue_crossover_chairs(
             "Retained keys do not resolve the source key-direction policy.",
             "No physical fit, production, export, persistence or rights acceptance.",
         ]
+        if classify_knuckle_exclusions:
+            receipt["limits"].append(
+                "Source endpoint exclusions add no assemblies or represented "
+                "supports. No physical support at those endpoints is proved."
+            )
         if include_check_ends:
             receipt["source_paired_check_end_support_count"] = len(end_companions)
             receipt["coverage_summary"] = (
