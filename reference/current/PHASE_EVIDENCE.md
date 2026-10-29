@@ -2914,3 +2914,45 @@ The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md
 
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. This result gives no new acceptance.
 No repair is available from the previous limit of `2/2`. LMS work stays stopped.
+
+## Source evidence for four XO-001 positions — 2026-10-29
+
+This Level 2 result supplies evidence for part of Exit 9B-3.
+The `classify_knuckle_exclusions` input supplies source evidence for four previous `22/XN` positions at X3-X.
+Its initial value is `False`. With `False`, previous operations and results stay the same.
+For `True`, the `crossing_split_contexts_path` input and its previous conditions are necessary.
+
+The Templot 556b source with the previous source identity selects one XA assembly for each of `XO-001:A:X3-X` and `XO-001:B:X3-X`.
+It selects no XN assembly there.
+B15 makes four positions at the ends of parts with different names: `main-side wing knuckle` and `turnout-side wing knuckle`.
+The `strictly_inside_actual_timber_outline` value is `true` for each end. Thus, the E001 method is not applicable.
+The [new software](../../tracktemplate/compatibility/chair_crossing_endpoint_exclusions.py) examines the source identities and exact connections between these parts.
+
+This change makes no new assembly or component. The 261 assemblies and all previous identities, codes and positions stay the same.
+With all previous inputs, the results are:
+
+| Data | Result |
+| --- | ---: |
+| `analysis_position_count` | 355 |
+| `represented_source_position_count` | 349 |
+| `unrepresented_source_position_count` | 6 |
+| `finite_source_exclusion_count` | 2 |
+| `source_endpoint_exclusion_count` | 4 |
+| `unresolved_source_position_count` | 0 |
+| `existing_shared_support_count` | 48 |
+
+The four new results give no evidence that XA holds the parts at those ends.
+The two E001 results stay in a different group. Their values stay the same. This result supplies no evidence for physical fit.
+
+The [new tests](../../tests/validate_phase9b_catalogue_crossing_endpoints.py) give a `RED` result before the product change.
+All ten new tests and 175 related regression tests give PASS results. The `skips` value is `0`.
+The independent review gives PASS results for all four positions and 12 exact connections.
+Three tests show that the software rejects changes to the previous source inputs. The 126 previous files and their hashes stay the same.
+
+Local evidence and independent reviews are in `tmp/knuckle-exclusions/`.
+This result uses evidence from previous FreeCAD tests. No new test uses FreeCAD or its display.
+The previous exact candidate and all previous evidence with FAIL results stay the same.
+The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. This result gives no new acceptance.
+No repair is available from the previous limit of `2/2`. LMS work stays stopped.

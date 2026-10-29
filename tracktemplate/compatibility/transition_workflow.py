@@ -3001,7 +3001,7 @@ class ModularCoreLayoutWorkflowSession:
         include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
         include_r2_exit=False, include_r1_exit=False, classify_e001_exclusions=False,
         crossing_zy_contexts_path=None, crossing_pair_contexts_path=None,
-        crossing_split_contexts_path=None,
+        crossing_split_contexts_path=None, classify_knuckle_exclusions=False,
     ):
         """Inspect retained chairs and every exclusion on a private crossover."""
         from tracktemplate.compatibility.chair_catalogue_placement import (
@@ -3032,6 +3032,8 @@ class ModularCoreLayoutWorkflowSession:
             arguments["crossing_pair_contexts_path"] = crossing_pair_contexts_path
         if crossing_split_contexts_path is not None:
             arguments["crossing_split_contexts_path"] = crossing_split_contexts_path
+        if classify_knuckle_exclusions is not False:
+            arguments["classify_knuckle_exclusions"] = classify_knuckle_exclusions
         return preview_private_catalogue_crossover_chairs(
             self.module, source_document, crossover_id, catalogue_path,
             self._private_catalogue_crossover_preview_factory,
