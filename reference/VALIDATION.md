@@ -317,6 +317,42 @@ It does not validate the product, its display behaviour or product performance.
 It gives no project authority for one more test, phase exit or acceptance decision.
 The repair limits and evidence for FAIL results stay the same.
 
+### Manual FreeCAD test on GitHub
+
+The [manual workflow](../.github/workflows/native-geometry-pilot.yml) defines one test on `ubuntu-24.04` for this repository on GitHub.
+Its only start condition is `workflow_dispatch`. The project owner must give authority for a test in a different decision.
+It uses no sensitive evidence or user data and starts no FreeCAD display.
+
+The [test](../tests/hosted_transition_geometry_suite.py) uses FreeCAD's `unittest` operation to do the [Phase 6 test](../tests/freecad_validate_phase6_transition_exact_geometry.py).
+The `assert` checks and success sentinel stay the same.
+The installed `org.freecad.FreeCAD` and its necessary software must have the identities in the [compatibility contract](contracts/phase1-compatibility.json).
+
+The [launcher](../tools/hosted_native_geometry_pilot.py) uses the [validation launcher](../tools/freecad_validation_guard.py) with these limits:
+
+| Control | Limit |
+| --- | ---: |
+| `MemoryMax` | 4096 MiB |
+| `MemorySwapMax` | 0 |
+| `CPUQuota` | 100% |
+| `TasksMax` | 128 |
+| FreeCAD time | 900 seconds |
+| Installation time | 10 minutes |
+| FreeCAD workflow step | 17 minutes |
+| Complete workflow | 30 minutes |
+
+Before FreeCAD starts, `MemAvailable` must be 12 GiB or more.
+The difference between `MemAvailable` and the 4096 MiB limit is 8 GiB or more at that check.
+This check does not stop the test if `MemAvailable` then decreases to less than 8 GiB.
+During the test, the launcher records `MemAvailable`, `SwapTotal`, `SwapFree` and the data from `/proc/pressure/memory`. Missing data gives a FAIL result.
+This validation profile changes no control for local validation.
+
+The 4096 MiB value is a limit for this test. No measured data show if this value is sufficient.
+The previous test gave a PASS result with a time limit of 900 seconds. It has no recorded value for maximum `RSS`.
+
+A PASS result must have the specified number of tests, the initial success sentinel, measured data and evidence that no test process stays active.
+A test with project authority must supply evidence for installation, process controls and the FreeCAD result on GitHub.
+The workflow puts results and diagnostic files in `benchmark-output/hosted-native-geometry`.
+
 ### Programmatic regression pipeline
 
 Before you start a FreeCAD validation command, select a memory limit in MiB
