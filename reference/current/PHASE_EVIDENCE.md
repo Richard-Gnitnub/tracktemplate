@@ -2585,6 +2585,66 @@ This result gives no acceptance for physical fit, production, product performanc
 It changes no rights state.
 Phase 9B stays Open at 3/6. More work on LMS chairs is not permitted until after Phase 11.
 
+## P chair component `PJAW` — 2026-10-28
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/application/chair_research.py) uses 13 lengths and `rail_fish_ratio` from a `ChairDefinition` to make the `PJAW` component for the source condition `loose_pin=False`.
+The result contains two separate `Solid` shapes with `part_id` values of `spacer` and `body`.
+The result has `face_count = 23` and `length_basis = "full-size"`.
+The inputs have `reference-only` status. The output stays in private-development status.
+
+The [geometry test](../../tests/validate_phase9b_chair_p_outer_jaw_geometry.py) and the [package test](../../tests/validate_phase9b_chair_p_outer_jaw.py) give PASS results.
+The tests compare all 21 records in `faces` from the previous Templot 556b source data.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_p_outer_jaw.py) gives a PASS result with the qualified host profile.
+The result contains `"native_tests": 1`, `"skips": 0` and `"negative_controls": 11`.
+All tests and controls give PASS results.
+
+The previous controls for the FreeCAD process stay active. Cleanup gives a PASS result.
+The test creates no `App.Document`. This change has no GUI test result.
+Independent reviews of the source, tests and FreeCAD results give PASS results.
+The evidence stays in `tmp/p-chair-outer-jaw/`.
+
+The result does not include the complete P chair or chair positions.
+PR #221, the preserved XO-001 candidate and previous evidence with a FAIL result stay unchanged.
+The previous `2/2` repair limit permits no more repairs.
+
+This result gives no acceptance for physical fit, persistence, production, export behaviour, product performance or phase exits.
+It changes no rights state.
+Phase 9B stays Open at 3/6. D-P9-018 does not permit more work on LMS chairs until after Phase 11.
+
+## Assembly of P chair components — 2026-10-29
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [software](../../tracktemplate/application/chair_research.py) makes one assembly from three components in one `ChairDefinition`.
+The software that constructs each component stays the same.
+The result contains four `Solid` shapes: `base-plinth`, `rail-seat`, `outer-jaw:spacer` and `outer-jaw:body`.
+
+Each dimension that two components use must have the same value in the two components.
+The source condition is `base.chair_inner_length_mm == seat.table_centre_from_gauge_face_mm + table_centre_from_inner_end_mm`.
+The inputs have `reference-only` status. The output stays in private-development status.
+
+The [test for standalone Python](../../tests/validate_phase9b_chair_p_assembly.py) gives a PASS result for all seven tests. It ignores no test.
+The previous `S1`, `S1J`, `L1`, `PSEAT` and `PJAW` tests also give PASS results.
+
+The [FreeCAD test](../../tests/freecad_validate_phase9b_chair_p_assembly.py) gives a PASS result for its one test. It ignores no test.
+It does checks of all four shapes and 14 interfaces from the source.
+It also gives PASS results for 11 checks of invalid states.
+The maximum difference from the source values is `5.7e-14 mm`.
+Independent reviews of the source, tests and FreeCAD results give PASS results.
+
+The test makes no `App.Document`. This change has no GUI test result.
+The previous controls for the FreeCAD process stay active. Cleanup gives a PASS result.
+The evidence stays in `tmp/p-chair-structural-assembly/`. It includes the previous results with FAIL and their failure classifications.
+
+The result includes no other chair components or chair positions. This assembly is not a complete P chair.
+PR #221, the preserved XO-001 candidate and the previous `2/2` repair limit stay the same.
+
+This result gives no acceptance for physical fit, production, product performance or phase exits.
+It changes no rights state.
+Phase 9B stays `Open` at 3/6. More work on LMS chairs is not permitted until after Phase 11.
+
 ## L1 selection at S13, T1 and T2 — 2026-10-28
 
 This Level 2 result supplies evidence for chair selection and part of Exit 9B-3.
