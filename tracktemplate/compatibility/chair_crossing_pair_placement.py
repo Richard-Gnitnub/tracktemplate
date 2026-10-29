@@ -1,4 +1,4 @@
-"""Place retained AA/CD/DD/EF assemblies on sixteen fixed XO-001 records.
+"""Place fixed retained crossing assemblies on qualified XO-001 records.
 
 Templot 556b math_unit.pas selects one assembly on rail 3 with rail 2
 as its companion. B15 preserves those rails as wing rails at X4-A and
@@ -12,7 +12,9 @@ import math
 
 from tracktemplate.application.chair_crossing_pair_catalogue import (
     CROSSING_PAIR_CONTEXT_IDS,
+    CROSSING_SPLIT_CONTEXT_IDS,
     prepare_crossing_pair_catalogue,
+    prepare_crossing_split_catalogue,
 )
 from tracktemplate.compatibility.chair_pair_placement import _host_context
 from tracktemplate.domain.chair_placement import place_paired_chair
@@ -33,6 +35,16 @@ _INHERITED = (
     (("B", "X6-C"), "XO-001:INHERITED-LONG:B:005"),
     (("B", "X7-D"), "XO-001:INHERITED-LONG:B:006"),
     (("B", "X8-E"), "XO-001:INHERITED-LONG:B:007"),
+)
+_SPLIT_SPECS = (
+    ("X3-X", "XA", 23,
+     (("turnout-side wing rail", 23, "XA"),
+      ("main-side wing rail", 23, "XA"))),
+    ("X5-B", "BB", 26,
+     (("vee point rail", 26, "BB/BC"),
+      ("vee splice rail", 25, "AB"),
+      ("turnout-side wing flare", 25, "AB"),
+      ("main-side wing flare", 25, "AB"))),
 )
 
 
@@ -56,8 +68,42 @@ def prepare_crossing_pairs(
     Catalogue revalidation remains at the native admission boundary.
     """
     prepared = prepare_crossing_pair_catalogue(contexts_path)
-    _require(tuple(item.run for item in prepared) == CROSSING_PAIR_CONTEXT_IDS,
-             "all four ordered crossing contexts are required")
+    specifications = tuple(
+        (name, family, source_code,
+         tuple((rail, code, label) for rail in rails))
+        for name, family, source_code, code, label, rails in _SPECS
+    )
+    return _prepare_crossings(
+        module, document, signature, positions, timbers, base_z, prepared,
+        CROSSING_PAIR_CONTEXT_IDS, specifications,
+    )
+
+
+def prepare_crossing_splits(
+    module, document, signature, positions, timbers, base_z, contexts_path,
+):
+    """Place four XA/BB assemblies for twelve source-qualified records.
+
+    Templot 556b math_unit.pas:30944-30974 supplies XA wing constituents;
+    31246-31296 supplies BB wing and vee constituents. B15 creates separate
+    candidates for named rail segments (43470-43503). Its four XN knuckle
+    records therefore remain excluded: continuity alone is not support
+    evidence. Retained crops, shears and base twist are not reapplied.
+    """
+    return _prepare_crossings(
+        module, document, signature, positions, timbers, base_z,
+        prepare_crossing_split_catalogue(contexts_path),
+        CROSSING_SPLIT_CONTEXT_IDS, _SPLIT_SPECS,
+    )
+
+
+def _prepare_crossings(
+    module, document, signature, positions, timbers, base_z, prepared,
+    context_ids, specifications,
+):
+    """Apply the shared fixed-source checks and proper common host frame."""
+    _require(tuple(item.run for item in prepared) == context_ids,
+             "all ordered crossing contexts are required")
     selections = {item.run: item for item in prepared}
     configuration = json.loads(signature)["configuration"]
     source_hash = hashlib.sha256(signature.encode()).hexdigest()
@@ -74,15 +120,18 @@ def prepare_crossing_pairs(
              "canonical turnout owners differ")
     timber_map = {item["stable_identity"]: item for item in timbers}
     _require(len(timber_map) == len(timbers), "timber identities repeat")
-    specifications = {item[0]: item[1:] for item in _SPECS}
+    by_name = {item[0]: item[1:] for item in specifications}
     inherited = dict(_INHERITED)
     records = {}
     for identity, position in positions.items():
         name, rail = (position["prototype_timber_identifier"],
                       position["rail_name"])
-        if name not in specifications or rail not in specifications[name][-1]:
+        if name not in by_name:
             continue
-        _, _, code, label, _ = specifications[name]
+        rail_specs = {item[0]: item[1:] for item in by_name[name][-1]}
+        if rail not in rail_specs:
+            continue
+        code, label = rail_specs[rail]
         owner = position["parent_turnout_identity"]
         _require(owner in owners, "unqualified turnout owner")
         side = owners[owner]
@@ -102,10 +151,10 @@ def prepare_crossing_pairs(
                  "canonical source ownership or assignment differs")
         records[key] = position
     expected = {(side, name, rail) for side in ("A", "B")
-                for name, *_, rails in _SPECS for rail in rails}
-    _require(set(records) == expected, "all sixteen source records are required")
+                for name, *_, rails in specifications for rail, *_ in rails}
+    _require(set(records) == expected, "all qualified source records are required")
     frozen_records = _encoded([positions, timbers])
-    groups = {name: [] for name in CROSSING_PAIR_CONTEXT_IDS}
+    groups = {name: [] for name in context_ids}
     witnesses, companions = {}, {}
     for side in ("A", "B"):
         config = configuration["turnout_" + side.lower() + "_config"]
@@ -114,11 +163,11 @@ def prepare_crossing_pairs(
                  "only the qualified right-hand gauge is supported")
         direction = module._turnout_orientation_sign(config["orientation"])
         _require(direction in (-1.0, 1.0), "unsupported travel direction")
-        for name, family, code, _, _, rails in _SPECS:
+        for name, family, code, rails in specifications:
             context_id = "RH-" + name
             selection = selections[context_id]
             recipe = selection.context
-            owner, mate = (records[side, name, rail] for rail in rails)
+            owner, *mates = (records[side, name, rail] for rail, *_ in rails)
             source = timber_map[owner["timber_identity"]]["source_configuration"]
             is_inherited = (side, name) in inherited
             if is_inherited:
@@ -128,7 +177,8 @@ def prepare_crossing_pairs(
             local_x = source["path_station" if is_inherited else "local_x"]
             _require(type(local_x) in (int, float) and math.isfinite(local_x)
                      and owner["source_configuration"]["timber"] == source
-                     == mate["source_configuration"]["timber"]
+                     and all(mate["source_configuration"]["timber"] == source
+                             for mate in mates)
                      and selection.label == recipe["family"] == family
                      and recipe["chair_code"] == code
                      and recipe["context_id"] == context_id
@@ -143,19 +193,19 @@ def prepare_crossing_pairs(
                                                                  station)
             travel = heading if direction > 0 else heading + math.pi
             identity = owner["stable_chair_position_identity"]
-            mate_id = mate["stable_chair_position_identity"]
+            mate_ids = [mate["stable_chair_position_identity"] for mate in mates]
             groups[context_id].append(place_paired_chair(
                 identity, owner["rail_identity"], owner["timber_identity"],
                 (point.x, point.y), travel, base_z, 8.25, 0.45,
             ))
-            companions[mate_id] = identity
+            companions.update((mate_id, identity) for mate_id in mate_ids)
             witnesses[identity] = {
                 "family": family, "source_chair_code": code,
                 "context_id": context_id,
                 "source_model_sha256": selection.model_sha256,
                 "source_context_sha256": recipe["context_sha256"],
                 "source_station_mm": local_x, "host_station_mm": station,
-                "source_rail_code": 3, "mate_position_ids": [mate_id],
+                "source_rail_code": 3, "mate_position_ids": mate_ids,
                 "placement_convention": "source-paired-common-timber-frame.v1",
                 "physical_fit": "NOT_PROVED",
             }

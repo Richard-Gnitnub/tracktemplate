@@ -1,4 +1,4 @@
-"""Admit four qualified AA/CD/DD/EF contexts for private XO-001 use."""
+"""Admit fixed qualified crossing contexts for private XO-001 use."""
 
 from tracktemplate.application.chair_catalogue import CatalogueChair, _require
 from tracktemplate.application.chair_crossing_catalogue import _prepare_contexts
@@ -14,6 +14,11 @@ _SPECIFICATIONS = (
     ("RH-X8-E", "EF", 28, 33),
 )
 CROSSING_PAIR_CONTEXT_IDS = ("RH-X4-A", "RH-X6-C", "RH-X7-D", "RH-X8-E")
+CROSSING_SPLIT_CONTEXT_IDS = ("RH-X3-X", "RH-X5-B")
+_SPLIT_SPECIFICATIONS = (
+    ("RH-X3-X", "XA", 23, 33),
+    ("RH-X5-B", "BB", 26, 43),
+)
 
 
 def prepare_crossing_pair_catalogue(path):
@@ -34,4 +39,26 @@ def verify_crossing_pair_catalogue(selections):
              == CROSSING_PAIR_CONTEXT_IDS,
              "Expected the complete ordered AA/CD/DD/EF catalogue")
     _require(prepare_crossing_pair_catalogue(selections[0].catalogue_path)
+             == selections, "Crossing catalogue or prepared state changed")
+
+
+def prepare_crossing_split_catalogue(path):
+    """Read the two retained XA/BB models; do not admit knuckle supports."""
+    return _prepare_contexts(
+        path, CROSSING_PAIR_CATALOGUE_SHA256, _SPLIT_SPECIFICATIONS,
+        ("Private X3-X wing and X5-B wing/vee source supports only.",
+         "XN knuckle records remain unqualified.",
+         "No physical-fit, production, export or rights acceptance."),
+    )
+
+
+def verify_crossing_split_catalogue(selections):
+    """Recheck both complete source selections before native mutation."""
+    _require(isinstance(selections, tuple)
+             and len(selections) == len(CROSSING_SPLIT_CONTEXT_IDS)
+             and all(isinstance(item, CatalogueChair) for item in selections)
+             and tuple(item.run for item in selections)
+             == CROSSING_SPLIT_CONTEXT_IDS,
+             "Expected the complete ordered XA/BB catalogue")
+    _require(prepare_crossing_split_catalogue(selections[0].catalogue_path)
              == selections, "Crossing catalogue or prepared state changed")
