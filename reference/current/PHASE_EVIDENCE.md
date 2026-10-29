@@ -2833,20 +2833,21 @@ No repair is available from the previous limit of `2/2`. LMS work stays stopped.
 This Level 2 result supplies evidence for part of Exit 9B-3.
 The optional `crossing_pair_contexts_path` input adds eight assemblies for 16 source positions on XO-001.
 The initial input is `None`. With `None`, previous operations and their results stay the same.
-The new operation needs `include_single_rail=True`. It does not need the ZY input.
+`include_single_rail=True` is necessary for the new operation. The ZY input is optional.
 
 The [source adapter](../../tracktemplate/compatibility/chair_crossing_pair_placement.py) validates the data for `RH-X4-A`, `RH-X6-C`, `RH-X7-D` and `RH-X8-E`.
-It uses four previous `.FCStd` files with 42, 27, 33 and 33 components, respectively.
+It uses four previous `.FCStd` files. In that sequence, the files contain 42, 27, 33 and 33 components.
 The eight assemblies add 270 components. Templot 556b is the source.
-All canonical identities and codes stay the same.
+All previous identities and codes stay the same.
 
 The [tests with standalone Python](../../tests/validate_phase9b_catalogue_crossing_pairs.py) give `RED` results before this change and PASS results after this change.
 The [adapter tests](../../tests/validate_phase9b_catalogue_crossing_pairs_adapter.py) examine previous product behaviour, assembly groups, optional inputs and checks after source changes.
 All 16 new tests and 145 related regression tests give PASS results.
-An independent comparison gives PASS results for 56 numbers from the eight assemblies and 180 numbers from component positions.
-No test constructs new geometry.
+`actual-source-comparison.py` independently compares 56 numbers from the eight assemblies and 180 numbers from component positions.
+It gives a PASS result.
+The tests do not construct new chair components.
 
-With all previous inputs, including ZY, the adapter tests give these results:
+With all previous inputs, which include ZY, the adapter tests give these results:
 
 | Data | Result |
 | --- | ---: |
@@ -2858,12 +2859,13 @@ With all previous inputs, including ZY, the adapter tests give these results:
 | `unresolved_source_position_count` | 16 |
 
 The previous 249 assemblies and the two E001 results stay the same.
-The 16 XA/BB source positions still have no new assembly.
+The 16 XA/BB source positions have no new assembly.
+
 Previous FreeCAD tests give evidence for the four files. No new test uses FreeCAD or its display.
 The previous evidence supplies no new visual result for the eight assemblies.
 Local source checks, `RED` results, failure classifications, test results and independent reviews are in `tmp/paired-crossing/`.
 
-The frozen exact candidate with 261 assemblies and its files stay the same.
+The previous exact candidate with 261 assemblies and its files stay the same.
 The previous evidence with FAIL results also stays the same. This result gives no new acceptance.
 The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
 
