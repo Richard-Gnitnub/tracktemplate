@@ -576,7 +576,7 @@ def _block_context_exclusion(position, mate, prepared):
 def preview_private_catalogue_crossover_chairs(
     module, source_document, crossover_id, catalogue_path, create_preview,
     *, paired_contexts_path=None, include_central_cc=False,
-    include_check_ends=False, include_single_rail=False,
+    include_check_ends=False, include_single_rail=False, correct_heel_l1=False,
 ):
     """Preview supported retained chairs with complete crossover accounting.
 
@@ -588,7 +588,13 @@ def preview_private_catalogue_crossover_chairs(
     component frames. Invalid evidence fails before native creation.
     Check ends add eight CCL/CCR assemblies to that complete baseline.
     The single-rail option adds 34 source-qualified S1, S1J and L1 assemblies.
+    The explicit heel successor replaces ten derived S1 previews with L1,
+    retaining the canonical records and the default regression behaviour.
     """
+    _require(type(correct_heel_l1) is bool,
+             "correct_heel_l1 requires an actual Boolean")
+    _require(not correct_heel_l1 or include_single_rail is True,
+             "heel correction requires the single-rail supplement")
     _require(type(include_single_rail) is bool,
              "include_single_rail requires an actual Boolean")
     _require(not include_single_rail or (
@@ -683,7 +689,16 @@ def preview_private_catalogue_crossover_chairs(
         singles, single_witnesses, verify_singles = prepare_single_rails(
             module, source_document, signature, positions, timbers, base_z,
             catalogue_path,
+            **({"correct_heel_l1": True} if correct_heel_l1 else {}),
         )
+        if correct_heel_l1:
+            corrected = {identity for identity, witness in single_witnesses.items()
+                         if witness.get("original_family") == "S1"}
+            _require(len(corrected) == 10 and corrected <= {
+                placement.position_id for placement in families["S1"]
+            }, "heel correction must replace exactly ten existing S1 placements")
+            families["S1"] = tuple(placement for placement in families["S1"]
+                                   if placement.position_id not in corrected)
         families.update(singles)
     selected_ids = {item.position_id for values in families.values()
                     for item in values}
@@ -871,6 +886,9 @@ def preview_private_catalogue_crossover_chairs(
             if include_single_rail:
                 receipt["limits"].extend((
                     "The single-rail supplement uses source body and fixing frames.",
+                    "Ten heel preview families are corrected from S1 to L1; all "
+                    "other accepted placements and canonical records are preserved."
+                    if correct_heel_l1 else
                     "Previous accepted assignments are preserved; complete Templot "
                     "assignment equivalence is not claimed.",
                 ))
@@ -879,6 +897,7 @@ def preview_private_catalogue_crossover_chairs(
                 paired_contexts_path=paired_contexts_path,
                 include_central_cc=True, include_check_ends=True,
                 **({"include_single_rail": True} if include_single_rail else {}),
+                **({"correct_heel_l1": True} if correct_heel_l1 else {}),
             )
         return create_preview(
             catalogue_path, families, shapes, receipt, verify_all_sources,

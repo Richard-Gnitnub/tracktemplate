@@ -1,9 +1,10 @@
-"""Bind 34 additional single-rail chairs to the fixed private XO-001 source.
+"""Bind single-rail chairs to the fixed private XO-001 source.
 
 Source-informed selection from Templot 556b math_unit.pas:29551-29665,
 29750-29831 and 37587-37603, GPL-3.0-or-later. See NOTICE.md and
-reference/PROVENANCE.md. Canonical assignments and accepted placements
-remain unchanged; this is not general source or physical-fit admission.
+reference/PROVENANCE.md. Canonical assignments remain unchanged. An explicit
+successor corrects ten heel preview families; this is not general source
+or physical-fit admission.
 """
 
 from collections import Counter
@@ -50,7 +51,7 @@ def _family(module, dimensions, timber, station, rail):
         _angle, y, _branch = _source_pose(module, dimensions, station - 4 / 3, 4)
         gap = y - 16.5
         _require(10.75 / 3 < gap < 15 / 3, "heel clearance interval changed")
-        return "L1" if rail == 2 or gap < 13.25 / 3 else "S1"
+        return "L1" if rail in (2, 3) or gap < 13.25 / 3 else "S1"
     if timber == "T14":
         _angle, y, _branch = _source_pose(module, dimensions, station + 4 / 3, 2)
         _require(9.25 / 3 < 16.5 - y < 11 / 3,
@@ -69,14 +70,18 @@ def _family(module, dimensions, timber, station, rail):
 
 def prepare_single_rails(
     module, document, signature, positions, timbers, base_z, catalogue_path,
+    *, correct_heel_l1=False,
 ):
     """Return complete groups, source witnesses and a late host verifier.
 
     The caller first qualifies the unchanged whole XO-001 signature and
-    hosts through the paired catalogue. This function admits only its 17
-    named source contexts on each turnout. B4 extensions must retain the
+    hosts through the paired catalogue. The default admits 17 named source
+    contexts per turnout. The explicit successor adds five heel corrections
+    per turnout. B4 extensions must retain the
     original source identity and station; envelope stations are not used.
     """
+    _require(type(correct_heel_l1) is bool,
+             "correct_heel_l1 requires an actual Boolean")
     rails_by_timber = {
         "S13": {"curved switch and closure rail": 2,
                 "turnout-side stock rail": 4},
@@ -90,6 +95,11 @@ def prepare_single_rails(
         "X9-F": {"main-side stock rail": 1, "turnout-side stock rail": 4,
                  "vee splice rail": 2, "vee point rail": 3},
     }
+    if correct_heel_l1:
+        for timber in ("S13", "T1", "T2"):
+            rails_by_timber[timber]["straight switch and closure rail"] = 3
+            if timber != "T2":
+                rails_by_timber[timber]["main-side stock rail"] = 1
     family_groups = {"S1": "SupplementS1", "S1J": "SupplementS1J", "L1": "L1"}
     configuration = json.loads(signature)["configuration"]
     _require(configuration["crossover_id"] == "XO-001",
@@ -116,12 +126,20 @@ def prepare_single_rails(
         timber_id = position["timber_identity"]
         expected_id = ("XO-001:chair:" + timber_id.lower().replace(":", "-")
                        + ":" + position["rail_name"].replace(" ", "-"))
+        heel_correction = timber in ("S13", "T1", "T2") and rail in (1, 3)
         _require(key in expected and key not in candidates
                  and identity == position["stable_chair_position_identity"]
-                 == expected_id and position["special_assignment_deferred"] is True,
+                 == expected_id
+                 and position["special_assignment_deferred"] is (not heel_correction),
                  "single-rail source ownership is inconsistent")
+        if heel_correction:
+            _require(type(position.get("chair_code")) is int
+                     and position["chair_code"] == 1
+                     and position.get("chair_code_label") == "S1",
+                     "heel correction requires the original S1 assignment")
         candidates[key] = position
-    _require(set(candidates) == expected, "all 34 single-rail positions are required")
+    _require(set(candidates) == expected,
+             "all qualified single-rail positions are required")
     dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
     groups = {name: [] for name in family_groups.values()}
     witnesses = {}
@@ -155,6 +173,9 @@ def prepare_single_rails(
                          and local_x == layout[timber],
                          "single-rail timber differs from its source station")
                 family = _family(module, dimensions, timber, local_x, rail)
+                heel_correction = timber in ("S13", "T1", "T2") and rail in (1, 3)
+                _require(not heel_correction or family == "L1",
+                         "heel source no longer selects L1")
                 angle, gauge_y, branch = _source_pose(module, dimensions, local_x, rail)
                 station = config["toe_chainage"] + direction * local_x
                 _require(0 <= station <= data[side]["total"],
@@ -180,8 +201,11 @@ def prepare_single_rails(
                     "templot_global_fixing_angle_parity": False,
                     "physical_fit": "NOT_PROVED",
                 }
+                if heel_correction:
+                    witnesses[identity]["original_family"] = "S1"
     _require(Counter(item["family"] for item in witnesses.values())
-             == {"L1": 16, "S1": 14, "S1J": 4}, "qualified family counts changed")
+             == {"L1": 26 if correct_heel_l1 else 16, "S1": 14, "S1J": 4},
+             "qualified family counts changed")
 
     def verify():
         current, _data, current_objects = _host_context(module, document, configuration)
