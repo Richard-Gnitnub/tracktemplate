@@ -320,14 +320,14 @@ The repair limits and evidence for FAIL results stay the same.
 ### Manual FreeCAD test on GitHub
 
 The [manual workflow](../.github/workflows/native-geometry-pilot.yml) defines one test on `ubuntu-24.04` for this repository on GitHub.
-Its only start condition is `workflow_dispatch`. A test needs separate authority from the project owner.
-It uses no private input and starts no FreeCAD display.
+Its only start condition is `workflow_dispatch`. The project owner must give authority for a test in a different decision.
+It uses no sensitive evidence or user data and starts no FreeCAD display.
 
-The [test suite](../tests/hosted_transition_geometry_suite.py) uses FreeCAD's `unittest` operation to execute the original [Phase 6 test](../tests/freecad_validate_phase6_transition_exact_geometry.py).
-The original assertions and success sentinel stay the same.
-The installed `org.freecad.FreeCAD` and its required software must have the exact identities in the [compatibility contract](contracts/phase1-compatibility.json).
+The [test](../tests/hosted_transition_geometry_suite.py) uses FreeCAD's `unittest` operation to do the [Phase 6 test](../tests/freecad_validate_phase6_transition_exact_geometry.py).
+The `assert` checks and success sentinel stay the same.
+The installed `org.freecad.FreeCAD` and its necessary software must have the identities in the [compatibility contract](contracts/phase1-compatibility.json).
 
-The [pilot launcher](../tools/hosted_native_geometry_pilot.py) uses the existing [validation guard](../tools/freecad_validation_guard.py) with these limits:
+The [launcher](../tools/hosted_native_geometry_pilot.py) uses the [validation launcher](../tools/freecad_validation_guard.py) with these limits:
 
 | Control | Limit |
 | --- | ---: |
@@ -340,15 +340,18 @@ The [pilot launcher](../tools/hosted_native_geometry_pilot.py) uses the existing
 | FreeCAD workflow step | 17 minutes |
 | Complete workflow | 30 minutes |
 
-Before FreeCAD starts, `MemAvailable` must be at least 12 GiB.
-The 4096 MiB limit leaves 8 GiB at that check. This check does not stop the test if `MemAvailable` subsequently falls below 8 GiB.
-The launcher records `MemAvailable`, swap data and pressure data during execution. Missing data gives a FAIL result.
-This profile replaces no workstation control.
+Before FreeCAD starts, `MemAvailable` must be 12 GiB or more.
+The difference between `MemAvailable` and the 4096 MiB limit is 8 GiB or more at that check.
+This check does not stop the test if `MemAvailable` then decreases to less than 8 GiB.
+During the test, the launcher records `MemAvailable`, `SwapTotal`, `SwapFree` and the data from `/proc/pressure/memory`. Missing data gives a FAIL result.
+This validation profile changes no control for local validation.
 
-The 4096 MiB value is an experimental limit. The previous test gave a PASS result within its 900-second limit, with no maximum `RSS` measurement.
-A PASS result needs the exact test count, original success sentinel, resource measurements and evidence that no test process stays active.
-Installation, process controls and the FreeCAD result on GitHub need evidence from a test with separate project authority.
-Results and diagnostic files go to `benchmark-output/hosted-native-geometry`.
+The 4096 MiB value is a limit for this test. No measured data show if this value is sufficient.
+The previous test gave a PASS result with a time limit of 900 seconds. It has no recorded value for maximum `RSS`.
+
+A PASS result must have the specified number of tests, the initial success sentinel, measured data and evidence that no test process stays active.
+A test with project authority must supply evidence for installation, process controls and the FreeCAD result on GitHub.
+The workflow puts results and diagnostic files in `benchmark-output/hosted-native-geometry`.
 
 ### Programmatic regression pipeline
 
