@@ -1,0 +1,197 @@
+name: Private L1 validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Independently admitted stage
+        required: true
+        type: choice
+        options:
+          - readiness
+          - native
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue230-native-geometry
+  cancel-in-progress: false
+
+jobs:
+  l1-private:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/main' && github.run_attempt == 1
+    environment: l1-private-validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 140
+    env:
+      L1_STAGE: ${{ inputs.stage }}
+    steps:
+      - name: Record the bounded job start
+        shell: bash
+        run: echo "L1_JOB_START_SECONDS=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Check out reviewed controls on main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Check out the separately reviewed candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 155cbb0353ca59a144df697197d8a4a68a91beef
+          path: candidate
+          persist-credentials: false
+
+      - name: Verify reviewed scope before private acquisition
+        id: prepare
+        timeout-minutes: 2
+        env:
+          L1_PRIVATE_CONTROL: ${{ secrets.L1_PRIVATE_CONTROL }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          l1_work="$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE"
+          mkdir -m 700 "$l1_work"
+          mkdir -m 700 "$l1_work/evidence"
+          exec >> "$l1_work/evidence/prepare.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py prepare
+
+      - name: Install the unchanged qualified runtime
+        id: install
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/install.log" 2>&1
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y flatpak dbus-user-session
+          sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
+          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
+          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
+          pilot_uid="$(id -u)"
+          test "$pilot_uid" -ne 0
+          pilot_manager="user@${pilot_uid}.service"
+          pilot_group="/user.slice/user-${pilot_uid}.slice/${pilot_manager}"
+          sudo loginctl enable-linger "$(id -un)"
+          sudo systemctl start "$pilot_manager"
+          systemctl show "$pilot_manager" -p ActiveState -p ControlGroup -p Delegate -p DelegateControllers
+          test "$(systemctl show "$pilot_manager" -p ActiveState --value)" = active
+          test "$(systemctl show "$pilot_manager" -p ControlGroup --value)" = "$pilot_group"
+          test "$(systemctl show "$pilot_manager" -p Delegate --value)" = yes
+          pilot_delegated="$(systemctl show "$pilot_manager" -p DelegateControllers --value)"
+          pilot_available="$(cat "/sys/fs/cgroup${pilot_group}/cgroup.controllers")"
+          printf 'Delegated controllers: %s\nAvailable controllers: %s\n' "$pilot_delegated" "$pilot_available"
+          for pilot_controller in cpu memory pids; do
+            case " $pilot_delegated " in
+              *" $pilot_controller "*) ;;
+              *) echo "Required delegation missing: $pilot_controller" >&2; exit 1 ;;
+            esac
+            case " $pilot_available " in
+              *" $pilot_controller "*) ;;
+              *) echo "Required kernel controller missing: $pilot_controller" >&2; exit 1 ;;
+            esac
+          done
+          echo "XDG_RUNTIME_DIR=/run/user/${pilot_uid}" >> "$GITHUB_ENV"
+          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${pilot_uid}/bus" >> "$GITHUB_ENV"
+
+          test ! -e /home/richard
+          sudo install -d -m 700 -o "$(id -u)" -g "$(id -g)" /home/richard
+
+      - name: Acquire only the approved encrypted inputs
+        id: acquire
+        timeout-minutes: 2
+        env:
+          L1_PRIVATE_INPUT_READ_TOKEN: ${{ secrets.L1_PRIVATE_INPUT_READ_TOKEN }}
+          L1_PRIVATE_INPUT_PASSPHRASE: ${{ secrets.L1_PRIVATE_INPUT_PASSPHRASE }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/acquisition.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py acquire
+
+      - name: Execute the admitted native unittest stage
+        id: native
+        timeout-minutes: 123
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/execution.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py run
+
+      - name: Preserve diagnostics and verify cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 2
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: ${{ steps.native.outcome }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          mkdir -p -m 700 "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence"
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/finalizer.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py finalize
+
+      - name: Publish readable evidence to the approved private destination
+        id: publication
+        if: always()
+        timeout-minutes: 2
+        env:
+          L1_PRIVATE_CONTROL: ${{ secrets.L1_PRIVATE_CONTROL }}
+          L1_PRIVATE_EVIDENCE_WRITE_TOKEN: ${{ secrets.L1_PRIVATE_EVIDENCE_WRITE_TOKEN }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          mkdir -p -m 700 "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence"
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/publication.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py publish
+
+      - name: Preserve the allowlisted public summary
+        id: summary_artifact
+        timeout-minutes: 1
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l1-public-summary-${{ github.run_id }}-${{ inputs.stage }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-publish-${{ github.run_id }}-${{ inputs.stage }}/summary.json
+
+      - name: Require complete proof and publication
+        timeout-minutes: 1
+        if: always()
+        env:
+          L1_SUMMARY_UPLOAD: ${{ steps.summary_artifact.outcome }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          timeout 10s python3 tools/hosted_l1_private_validation.py finish >/dev/null 2>&1
