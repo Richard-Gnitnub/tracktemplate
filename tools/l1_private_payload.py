@@ -1,9 +1,9 @@
-"""Bounded private L1 transport primitives; no transfer or execution authority.
+"""Bounded L1 archive primitives; no transfer or execution authority.
 
-The reviewed coordinator pins encrypted input bytes before acquisition.
-Plaintext manifests and diagnostics stay private. Failed output files stay
-available for recovery. Readable evidence belongs only in the approved
-private repository; the public summary admits no paths or diagnostic text.
+The public coordinator pins approved archive bytes before acquisition.
+Archive validation and extraction are unchanged. Historical encryption
+helpers remain available for preserved evidence; the public workflow does
+not call them. The fixed summary admits no paths or diagnostic text.
 """
 
 from contextlib import contextmanager
@@ -210,7 +210,7 @@ def _archive_records(archive_path):
 
 
 def read_manifest(archive_path):
-    """Read the bounded manifest only after pinned-ciphertext decryption."""
+    """Read the bounded manifest from a byte-verified input archive."""
     archive, members = _archive_records(archive_path)
     with archive:
         matches = [item for item in members if item.name == MANIFEST_MEMBER]
