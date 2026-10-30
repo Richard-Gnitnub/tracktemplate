@@ -15,6 +15,12 @@ import sys
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools import validation_execution_policy as execution_policy  # noqa: E402
+
+
 SENTINEL = "TRACKTEMPLATE_REGRESSION_PIPELINE="
 PROFILES = (
     "standalone",
@@ -218,9 +224,13 @@ def _guard_module():
     return freecad_validation_guard
 
 
-def _run_step(step, root, log, evidence_dir):
+def _run_step(
+    step, root, log, evidence_dir, *, local_owner_exception=None,
+):
     """Preserve proof output; resource or cleanup failure cannot pass."""
     environment = dict(os.environ, **dict(step.environment))
+    if local_owner_exception is not None:
+        environment[execution_policy.EXCEPTION_ENV] = local_owner_exception
     if step.freecad_limits is None:
         return subprocess.run(
             step.command, cwd=root, env=environment, stdout=log,
@@ -307,6 +317,7 @@ def run_pipeline(
     steps,
     root,
     run_directory,
+    local_owner_exception=None,
 ):
     """Run ordered steps, stopping after a failed prerequisite."""
     if profile not in PROFILES:
@@ -314,6 +325,14 @@ def run_pipeline(
 
     steps = tuple(steps)
     _validate_steps(steps)
+    exception_receipt = None
+    if profile != "standalone" or any(
+        step.freecad_limits is not None for step in steps
+    ):
+        exception_receipt = execution_policy.require_local_exception(
+            profile, local_owner_exception,
+        )
+        execution_policy.report_exception(exception_receipt)
     root = pathlib.Path(root).resolve()
     run_directory = pathlib.Path(run_directory)
     if not run_directory.is_absolute():
@@ -353,6 +372,7 @@ def run_pipeline(
                 return_code = _run_step(
                     step, root, log,
                     run_directory / (step.name + "-resources"),
+                    local_owner_exception=local_owner_exception,
                 )
                 command_started = True
             except OSError as error:
@@ -415,6 +435,7 @@ def run_pipeline(
         "completed_count": len(results),
         "failed": failed,
         "log_directory": _display_path(run_directory, root),
+        "local_owner_exception": exception_receipt,
         "passed": passed,
         "profile": profile,
         "requested_count": len(steps),
@@ -446,8 +467,19 @@ def main(argv=None):
     )
     parser.add_argument("--memory-max-mib", type=int)
     parser.add_argument("--timeout-seconds", type=int)
+    parser.add_argument(
+        "--local-owner-exception",
+        help=(
+            "Reference to the owner's explicit exception for this local "
+            "FreeCAD workload; acknowledgement does not grant authority"
+        ),
+    )
     arguments = parser.parse_args(argv)
     try:
+        if arguments.profile != "standalone":
+            execution_policy.require_local_exception(
+                arguments.profile, arguments.local_owner_exception,
+            )
         steps = build_steps(
             arguments.profile,
             memory_max_mib=arguments.memory_max_mib,
@@ -460,6 +492,7 @@ def main(argv=None):
         steps=steps,
         root=ROOT,
         run_directory=default_run_directory(),
+        local_owner_exception=arguments.local_owner_exception,
     )
     return int(bool(summary["failed"]))
 

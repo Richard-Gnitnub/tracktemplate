@@ -9636,6 +9636,36 @@ def validate_ontology_mutation() -> None:
     )
 
 
+def validate_hosted_policy_acceptance_mutations() -> None:
+    """Reject lost acceptance and invented execution or transfer authority."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = document["decisions"][-1]
+    for name, field, value, diagnostic in (
+        ("status", "status", "Proposed", "owner authority drifted"),
+        ("decided_on", "decided_on", None, "owner authority drifted"),
+        ("panel_required_under_current_policy", "panel_required_under_current_policy", False, "owner authority drifted"),
+        ("authority", "authority", "Unlimited local execution.", "accepted boundary drifted"),
+        ("decision", "decision", "Use local fallback.", "accepted boundary drifted"),
+        ("exclusions", "exclusions", "No limits remain.", "accepted boundary drifted"),
+        ("preparation-only", "authority", record["authority"].split(
+            "\n\nOwner acceptance — 2026-10-30:",
+        )[0], "accepted boundary drifted"),
+        ("unapproved-l1-dispatch", "exclusions", record["exclusions"].replace(
+            "gives no separate authority",
+            "gives separate authority",
+        ), "accepted boundary drifted"),
+    ):
+        changed = copy.deepcopy(record)
+        changed[field] = value
+        expect_rejected(
+            "hosted-policy/acceptance-" + name,
+            lambda item=changed: progress._validate_dgov026_decision(
+                item, set(record),
+            ),
+            diagnostic,
+        )
+
+
 def main() -> None:
     """Run every durable in-memory adversarial mutation."""
     validate_product_vision_mutations()
@@ -9674,6 +9704,7 @@ def main() -> None:
     validate_agents_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()
+    validate_hosted_policy_acceptance_mutations()
     summary = {
         "escaped": 0,
         "independent_protections": len(PROTECTIONS),

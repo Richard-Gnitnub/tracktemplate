@@ -25,6 +25,9 @@ in [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md). Put measurement
 results for a bounded scope in a dated report under `reference/benchmarks/`.
 Do not use this document as a tranche log.
 
+The [execution-location policy](#validation-execution-location) applies before
+each command in this document. A command example does not give execution authority.
+
 The existing detailed command catalogue remains pending a separate bounded
 simplification because it contains retained validation obligations. This
 document responsibility controls new changes. It does not authorise more
@@ -274,6 +277,109 @@ existing compatibility contract. Other versions do not have this qualification.
 Do not use `uv init` in this repository. Do not add a root `uv.lock`. A package
 manager migration is a different authorised task.
 
+<a id="validation-execution-location"></a>
+
+### Validation execution location
+
+**Accepted standing policy:** The project owner accepted
+[D-GOV-026](current/PHASE_EVIDENCE.md#hosted-validation-policy-panel) on 2026-10-30
+as reviewed in [PR #234](https://github.com/Richard-Gnitnub/tracktemplate/pull/234).
+Each test still needs the authorised bounded scope specified below.
+This section is the canonical owner for validation execution location.
+The Change Validation skill applies these rules to each selected test.
+
+#### Tests that must operate on GitHub
+
+Do the following tests on machines that GitHub supplies. Use an authorised bounded scope for the tests, inputs and resources:
+
+| Specified tests | Repository evidence for this routing |
+| --- | --- |
+| Automated FreeCAD or OCCT exact construction, assembly, regeneration, boolean operations, tessellation and export comparisons. This includes representative native chair tests and transition geometry tests. | The [transition pipeline](../tools/run_regression_pipeline.py) and [hosted pilot](../.github/workflows/native-geometry-pilot.yml) execute exact geometry. This group includes small construction tests without a claim that each test uses much memory. |
+| Complete or combined chair, turnout, crossover and legacy equivalence or lifecycle proofs, including XO-001 and TO-001. | [PR #217](https://github.com/Richard-Gnitnub/tracktemplate/pull/217) records concurrent native/GUI validation and workstation memory pressure. The [XO-001 benchmark](benchmarks/2026-07-19-b14-crossover-xo-001.md) records session memory, not a maximum value. |
+| Repeated or scaled native or real-GUI performance and resource tests. | The [transition performance profile](../tools/phase6_transition_pipeline_performance.py) repeats fresh-process and warm tests. The geometry and GUI profiles below include repeated construction. |
+
+These groups define the specified tests. They do not define a new numerical
+memory threshold, product tolerance or performance requirement.
+If the test group is unknown, stop before FreeCAD starts.
+A test name such as `smoke` does not change its group.
+
+Local source parsing, Ruff and standalone analytical, railway, contract and
+source-record checks remain available when they do not start FreeCAD or Qt.
+Previously bounded runtime and readiness probes can remain local when they
+construct no geometry and open no documents. They still need their applicable
+execution authority and safety controls. A usual operator session is
+outside this automated-validation policy.
+
+#### Authorised bounded scope and necessary executions
+
+The project owner authorises one bounded scope. Change Validation records:
+
+- The work item, purpose, named test entry, expected test counts and sentinels.
+- The permitted implementation changes and exact tested commit for each execution.
+- The input identities and provenance.
+- The authority for remote processing, logs and output publication.
+- The qualified FreeCAD profile and GitHub machine class.
+- The memory, swap, CPU and task limits, deadlines and serial execution rule.
+- The recovery checkpoint, evidence retention, process containment and cleanup checks.
+- The applicable independent reviews, failure rules, repair allowance and stop conditions.
+
+Within that authorised bounded scope, necessary executions on GitHub do not need an individual owner decision.
+This includes the original proof after a classified failure and an authorised repair.
+Record the changed commit and review.
+Do not repeat a failed test without assessment or through an automatic retry.
+Preserve each failed result.
+
+[TESTING_POLICY.md](TESTING_POLICY.md) still controls failure classification,
+repairs and changes to assertions or oracles.
+An exhausted allowance or a recorded stop remains in force.
+
+New owner authority is necessary for a larger test or input set, a different runtime or increased limits.
+It is also necessary for paid capacity or a change to a stop condition.
+An environment variable that identifies GitHub does not authorise a bounded scope for a test.
+If the GitHub method is absent, unavailable or fails, stop. Do not start a local replacement automatically.
+
+#### Local execution with a recorded owner decision
+
+Before a specified test operates locally, the project owner must authorise that local execution in a recorded decision.
+The decision must identify the test, inputs, resource limits and permitted executions.
+Preserve that decision with the test evidence.
+Keep all existing recovery, resource, failure and cleanup controls.
+
+The local `transition` and `transition-gui` pipeline profiles must receive
+`--local-owner-exception REFERENCE`. The FreeCAD bridge launchers must receive
+`TRACKTEMPLATE_LOCAL_VALIDATION_EXCEPTION=REFERENCE` for each command invocation.
+The reference identifies the applicable owner decision. It gives no additional project authority.
+Change Validation must verify that the decision includes the selected test and limits.
+
+These checks prevent unintended starts through the usual local entry points.
+They do not verify the owner's identity or prevent direct FreeCAD commands.
+The same policy applies to direct commands and the preserved resource guard.
+Do not bypass the entry checks through a different launcher.
+The separately reviewed GitHub pilot keeps its exact execution checks.
+The local entry points do not become GitHub methods through a `CI` variable.
+
+#### Evidence and input restrictions
+
+The [licensing boundary](LICENSING_BOUNDARIES.md) and
+[provenance owner](PROVENANCE.md) control input and output rights.
+A public repository gives no authority to upload ignored archives, private
+catalogues, operator documents or generated research geometry.
+If authority for remote processing or publication is absent, stop that test.
+Do not transfer private inputs to make a test on GitHub possible.
+
+Use the applicable [readiness checks](#validation-harness-readiness).
+The original assertions, exact counts, sentinels, actual resource measurements and verified cleanup are mandatory.
+Missing mandatory safety data or cleanup evidence stops the test.
+Report incomplete supplementary measurements as limitations. They cannot replace mandatory evidence.
+
+Preserve raw results under the [recovery policy](RECOVERY_AND_BACKUP.md).
+Temporary retention of GitHub artifacts does not replace independent preservation.
+
+Headless evidence does not replace mandatory real-GUI evidence.
+A specified GUI test needs a qualified GitHub GUI method or a recorded owner decision that authorises local execution.
+The current GitHub pilot qualifies neither GUI behaviour nor private chair inputs.
+This policy gives no product, physical-fit, rights, production, phase-exit or release acceptance.
+
 <a id="validation-harness-readiness"></a>
 
 ### Validation before large FreeCAD tests
@@ -320,7 +426,8 @@ The repair limits and evidence for FAIL results stay the same.
 ### Manual FreeCAD test on GitHub
 
 The [manual workflow](../.github/workflows/native-geometry-pilot.yml) defines one test on `ubuntu-24.04` for this repository on GitHub.
-Its only start condition is `workflow_dispatch`. The project owner must give authority for a test in a different decision.
+Its only start condition is `workflow_dispatch`. Use the authorised bounded scope and
+authority from the [execution-location policy](#validation-execution-location).
 It uses no sensitive evidence or user data and starts no FreeCAD display.
 
 The [test](../tests/hosted_transition_geometry_suite.py) uses FreeCAD's `unittest` operation to do the [Phase 6 test](../tests/freecad_validate_phase6_transition_exact_geometry.py).
@@ -346,8 +453,9 @@ This check does not stop the test if `MemAvailable` then decreases to less than 
 During the test, the launcher records `MemAvailable`, `SwapTotal`, `SwapFree` and the data from `/proc/pressure/memory`. Missing data gives a FAIL result.
 This validation profile changes no control for local validation.
 
-The 4096 MiB value is a limit for this test. No measured data show if this value is sufficient.
-The previous test gave a PASS result with a time limit of 900 seconds. It has no recorded value for maximum `RSS`.
+The 4096 MiB value is a limit for this test. The bounded result in
+[run 40980935631](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/40980935631)
+does not qualify a different geometry test or measurement of all resource use.
 
 A PASS result must have the specified number of tests, the initial success sentinel, measured data and evidence that no test process stays active.
 A test with project authority must supply evidence for installation, process controls and the FreeCAD result on GitHub.
@@ -359,13 +467,18 @@ Before you start a FreeCAD validation command, select a memory limit in MiB
 and a time limit in seconds. Set `validation_memory_mib` to the selected memory
 limit. Set `validation_seconds` to the selected time limit.
 
-Use the local pipeline as the usual concise entry point for regression tests:
+Use the local pipeline for standalone regression tests. The native profiles
+below need a recorded owner decision that authorises local execution under the
+[execution-location policy](#validation-execution-location).
+Verify that decision's bounded scope and limits. Then set `validation_owner_reference` to that recorded decision:
 
 ```bash
 .venv/bin/python tools/run_regression_pipeline.py
 .venv/bin/python tools/run_regression_pipeline.py --profile transition \
+  --local-owner-exception "$validation_owner_reference" \
   --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
 .venv/bin/python tools/run_regression_pipeline.py --profile transition-gui \
+  --local-owner-exception "$validation_owner_reference" \
   --memory-max-mib "$validation_memory_mib" --timeout-seconds "$validation_seconds"
 ```
 

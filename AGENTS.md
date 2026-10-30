@@ -126,7 +126,7 @@
   contract, dependency, hash, link and progress matrix.
 - Classify every failure under the testing policy before changing retained
   source, tests, fixtures or oracles. Rerun the original proof after repair.
-- Use the qualified FreeCAD profile for host checks. A process exit without its
+- Use `tracktemplate-change-validation` and the [execution-location policy](reference/VALIDATION.md#validation-execution-location) before FreeCAD or geometry checks. Use the qualified FreeCAD profile for host checks. A process exit without its
   success sentinel is not evidence.
 - Headless checks do not replace real-GUI evidence for display, selection,
   operator workflows, persistence, export or visible performance.
