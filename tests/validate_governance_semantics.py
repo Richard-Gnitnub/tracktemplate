@@ -9651,8 +9651,8 @@ def validate_hosted_policy_acceptance_mutations() -> None:
             "\n\nOwner acceptance — 2026-10-30:",
         )[0], "accepted boundary drifted"),
         ("unapproved-l1-dispatch", "exclusions", record["exclusions"].replace(
-            "No separate L1 dispatch, confidential-input transfer",
-            "Authorise L1 dispatch, confidential-input transfer",
+            "gives no separate authority",
+            "gives separate authority",
         ), "accepted boundary drifted"),
     ):
         changed = copy.deepcopy(record)
