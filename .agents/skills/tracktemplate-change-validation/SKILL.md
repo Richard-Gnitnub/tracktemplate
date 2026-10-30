@@ -79,6 +79,16 @@ Before evidence selection for exporter interruption, read these owners:
 
 ## Validation rules
 
+### Select the execution location
+
+Before any FreeCAD or geometry test, apply the canonical
+[execution-location policy](../../../reference/VALIDATION.md#validation-execution-location).
+Classify the test. Verify the approved test, input and resource scope before
+execution. Keep the exact owner decision and run evidence together.
+Use its hosted route, local permission or lightweight-check provision as applicable.
+An invocation reference records authority; it does not grant it.
+Do not infer local permission from a missing or failed hosted route.
+
 ### Prepare for large FreeCAD tests
 
 This skill supplies the procedure for the

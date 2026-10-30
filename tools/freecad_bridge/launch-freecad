@@ -5,6 +5,10 @@ export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
+"${project_root}/.venv/bin/python" \
+    "${project_root}/tools/validation_execution_policy.py" \
+    --workload freecad-gui-bridge \
+    --local-owner-exception "${TRACKTEMPLATE_LOCAL_VALIDATION_EXCEPTION:-}"
 guard="${project_root}/tools/freecad_validation_guard.py"
 entry="${bridge_dir}/launch-freecad"
 if [[ "${TRACKTEMPLATE_VALIDATION_RESERVED_ENTRY:-}" != "${entry}" ]]; then

@@ -688,6 +688,8 @@ class GuiLeaseTests(unittest.TestCase):
         (project / "tools/freecad_validation_guard.py").write_text(
             "import sys\nsys.exit(23)\n",
         )
+        admission = "tools/validation_execution_policy.py"
+        (project / admission).write_bytes((ROOT / admission).read_bytes())
         (bridge / "freecad-cli").write_text("#!/bin/sh\nexit 1\n")
         (bridge / "freecad-cli").chmod(0o700)
         (project / ".devtools/freecad-cli/addon/FreecadCli").mkdir(parents=True)
@@ -727,6 +729,9 @@ class GuiLeaseTests(unittest.TestCase):
                         TRACKTEMPLATE_VALIDATION_RESERVED_ENTRY=reserved,
                         TRACKTEMPLATE_VALIDATION_MEMORY_MAX_MIB="256",
                         TRACKTEMPLATE_VALIDATION_TIMEOUT_SECONDS="3",
+                        TRACKTEMPLATE_LOCAL_VALIDATION_EXCEPTION=(
+                            "fixture-only-mocked-guard-refusal"
+                        ),
                     )
                     completed = subprocess.run(
                         [str(script), "/bin/true"], env=environment,

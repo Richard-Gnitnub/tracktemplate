@@ -8,6 +8,80 @@ The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md),
 [risk snapshot](../history/phase-closeouts/PHASE9A_RISKS.json) preserve its history.
 The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
+<a id="hosted-validation-policy-panel"></a>
+
+## D-GOV-026 proposed validation execution policy — 2026-10-30
+
+**Owner decision:** Pending. Richard authorised preparation of a Level 3
+standing-policy change and one reviewed draft PR. That instruction does not
+accept the proposed delegation or authorise integration.
+
+**Decision for acceptance:** Adopt the
+[validation execution policy](../VALIDATION.md#validation-execution-location).
+Require GitHub execution for its covered tests. Permit necessary hosted runs
+within one approved test, input and resource scope without a decision for
+each run. Require explicit owner permission for covered local tests.
+Do not permit an automatic local replacement. Keep all specified failure,
+repair, confidentiality, recovery and GUI evidence requirements.
+
+The [decision register](gate-decisions.json) preserves the preparation
+instruction. The source baseline is `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
+Its post-merge [CI run 41017516406](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41017516406)
+gave a PASS result. The policy uses test categories from existing geometry
+tests and benchmarks. It invents no memory threshold.
+
+**Safety/risk panel:** Richard is the deciding project owner. `/root` owns
+the change and technical documentation. `/root/hosted_policy_controls`
+implements the local launch checks. `/root/hosted_policy_risk` independently
+examined the evidence, authority and risks before implementation.
+The agents share one team and workspace; this is not external independence.
+The independent source/security review gave a PASS result for the launch
+checks and their offline evidence. The one Documentation Review remains a
+separate control before publication.
+
+The recommendation is **Proceed with bounded conditions**. No dissent was
+reported. [Issue #213](https://github.com/Richard-Gnitnub/tracktemplate/issues/213)
+and [PR #217](https://github.com/Richard-Gnitnub/tracktemplate/pull/217) support
+isolation from the workstation. They do not establish a FreeCAD memory leak.
+[PR #233](https://github.com/Richard-Gnitnub/tracktemplate/pull/233) and
+[run 40980935631](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/40980935631)
+prove only the hosted transition test: one native test, no skips and verified
+cleanup. The test took 0.624 seconds. Its observed 58.527 MiB memory maximum
+and 0.577604 CPU seconds are sampled lower bounds. They do not qualify chair
+capacity, total resource use, GUI execution or private-input transfer.
+
+The [risk register](risks.json) retains every risk and duty. No risk closes.
+PR-13 retains recovery and independent-preservation duties. PR-06, PR-07,
+PR-09 and PR-21 retain input, output and rights restrictions. PR-01 retains
+GUI coverage duties. PR-15 retains performance uncertainty. PR-22 retains
+owner authority for this decision. The proposed routing reduces workstation
+exposure but proves no product performance improvement.
+
+| Condition | Owner and deadline |
+| --- | --- |
+| Verify test, input, resource and repair scope. Record each tested commit, result and cleanup. | Change Validation, before each run and before reporting its result. |
+| Verify remote-processing and publication permission. Private Templot archives and generated research geometry are not admitted by this proposal. | Provenance owner, before any transfer. |
+| Preserve independent recovery evidence. Temporary hosted artifacts are insufficient as the sole recovery copy. | Project owner and Change Validation, before execution and before artifact expiry. |
+| Check local refusal, explicit permission references, unchanged resource guards and lightweight checks. Complete independent source/security review. | Implementation and independent Quality Review, before draft publication. |
+| Complete the finite Documentation Review and deterministic validation. Present the exact draft for the owner's decision. | Technical Author Lead, before acceptance. |
+
+The launch checks prevent accidental local execution through the usual entry
+points. They do not authenticate owner consent or prevent direct commands.
+The policy also controls those commands. No hosted GUI route or private-chair
+input route is qualified by this change.
+
+**Resulting authority:** None until owner acceptance. The proposal supplies
+no additional test, retry, repair, limit increase or merge authority.
+The current authorised L1 implementation continues on its separate branch.
+Its native qualification needs an approved hosted scope or explicit local
+permission. No private source transfer follows from this proposal.
+
+Phase 9B stays Open at 3/6. The historical 2/2 allowance remains consumed.
+Frozen XO-001 evidence stays unchanged. LMS stays paused. Issue #213 pressure
+monitoring stays parked. No physical-fit, rights, production, release or
+phase-exit acceptance follows. This Level 3 governance and safety task is the
+explicit exception to the usual governance-change budget.
+
 <a id="candidate-bound-documentation-exception-panel"></a>
 
 ## D-GOV-025 candidate-bound documentation exception — 2026-10-20

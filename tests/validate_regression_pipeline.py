@@ -253,6 +253,7 @@ def _validate_resource_failure_cannot_pass():
                 summary = pipeline.run_pipeline(
                     profile="transition", steps=(step,), root=root,
                     run_directory=root / str(index),
+                    local_owner_exception="fixture-only-mocked-resource-test",
                 )
             assert summary["failed"] == ["native"]
             assert summary["results"][0]["sentinel_found"] is True

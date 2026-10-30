@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 9,
-  "updated_on": "2026-10-20",
+  "updated_on": "2026-10-30",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -134,6 +134,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#candidate-bound-documentation-exception-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#candidate-bound-documentation-exception-panel"
+    },
+    {
+      "id": "D-GOV-026",
+      "decided_on": null,
+      "status": "Proposed",
+      "decision": "Adopt the validation execution policy in reference/VALIDATION.md#validation-execution-location. Require GitHub execution for covered tests. Permit necessary hosted runs within one approved test, input and resource scope without a decision for each run. Require explicit owner permission for covered local tests. Permit no automatic local replacement. Preserve all specified failure, repair, confidential-input, recovery and GUI evidence requirements.",
+      "authority": "Prepare a standing policy change making GitHub-hosted execution mandatory for resource-heavy FreeCAD and geometry validation. Define the covered workloads from repository evidence. Heavy local execution requires my explicit exception; there must be no automatic local fallback.\n\nPermit required hosted runs within an approved workload, input and resource scope without fresh approval for each run. Preserve existing failure classification, repair limits, confidential-input controls and GUI evidence requirements.\n\nUse the existing validation policy as the canonical owner. Update agent and validation-skill routing where necessary, and add focused protection against accidental local execution. Keep lightweight local checks available.\n\nUse the repository’s Level 3 process for the standing authority change and return a reviewed draft PR and decision for my acceptance. Keep this change bounded; continue the authorised L1 implementation without reopening pressure-monitoring work.",
+      "exclusions": "Preparation authority only; owner acceptance and integration remain pending. No additional test, repair, retry, increased limit, private-input transfer, physical-fit, rights, production, release or phase-exit acceptance. Historical 2/2 remains consumed; Phase 9B stays Open at 3/6; LMS stays paused; frozen evidence remains unchanged. Issue #213 pressure monitoring stays parked. Continue the already authorised L1 implementation separately.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#hosted-validation-policy-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#hosted-validation-policy-panel"
     }
   ]
 }
