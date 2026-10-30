@@ -76,6 +76,30 @@ class L1PrivateControls(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'Input archive changed'):
                     pilot.download_asset(record, Path(temporary) / 'bad.tar')
 
+    def test_acquisition_uses_main_repository_and_refuses_previous_repository(self):
+        repository = 'Richard-Gnitnub/tracktemplate'
+        data = b'approved-tar-bytes'
+        record = {'asset_id': 123, 'bytes': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest()}
+        opener = Mock()
+        opener.open.return_value = io.BytesIO(data)
+        with self.subTest(boundary='download'), tempfile.TemporaryDirectory() as temporary:
+            with patch.object(pilot.urllib.request, 'build_opener', return_value=opener):
+                pilot.download_asset(record, Path(temporary) / 'inputs.tar')
+            self.assertEqual(opener.open.call_args.args[0].full_url,
+                             f'https://api.github.com/repos/{repository}/releases/assets/123')
+        metadata = {'private': False, 'full_name': repository,
+                    'owner': {'login': 'Richard-Gnitnub'}}
+        with self.subTest(boundary='main metadata'):
+            with patch.object(pilot, 'api_request', return_value=metadata) as request:
+                pilot.validate_input_repository()
+                request.assert_called_once_with(f'https://api.github.com/repos/{repository}')
+        previous = dict(metadata, full_name='Richard-Gnitnub/tracktemplate-validation-private')
+        with self.subTest(boundary='previous repository'):
+            with patch.object(pilot, 'api_request', return_value=previous):
+                with self.assertRaisesRegex(ValueError, 'Public input repository differs'):
+                    pilot.validate_input_repository()
+
     def test_entire_manifest_destination_map_is_checked_before_writes(self):
         rows = [{'id': str(index), 'path': '/approved/' + str(index),
                  'sha256': 'a' * 64, 'bytes': 3} for index in range(10)]
