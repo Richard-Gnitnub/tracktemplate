@@ -40,7 +40,7 @@ CANDIDATE = '155cbb0353ca59a144df697197d8a4a68a91beef'
 ENTRY_SHA256 = '20cd1694979830099e1e6988300c1c8bc9ea1dbc59ad7a5cef1832a0fe4bcc71'
 SCOPE = 'L1-current-source-600-900-600-v4'
 SCOPE_SHA256 = '0bec3956e4116740d702f6f09301430999f01b2935a54ae1c48f64cf9754f20f'
-INPUT_REPOSITORY = 'Richard-Gnitnub/tracktemplate-validation-private'
+INPUT_REPOSITORY = 'Richard-Gnitnub/tracktemplate'
 DEPLOYMENT_ROOT = Path('/home/richard')
 SENTINELS = {
     'readiness': 'L1 current-source hosted readiness passed',
