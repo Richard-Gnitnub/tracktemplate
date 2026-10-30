@@ -10,13 +10,14 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
 <a id="hosted-validation-policy-panel"></a>
 
-## D-GOV-026 proposed validation execution policy — 2026-10-30
+## D-GOV-026 accepted validation execution policy — 2026-10-30
 
-**Owner decision:** Pending. Richard authorised preparation of a Level 3
-standing-policy change and one reviewed draft PR. That instruction does not
-accept the proposed authority for necessary test executions or authorise integration.
+**Owner decision:** Accepted. Richard accepted D-GOV-026 as reviewed in
+[PR #234](https://github.com/Richard-Gnitnub/tracktemplate/pull/234) on 2026-10-30.
+The [decision register](gate-decisions.json) preserves his full acceptance
+and the previous instruction to prepare the policy. The PR merge did not supply this acceptance.
 
-**Decision for acceptance:** Adopt the
+**Accepted decision:** Adopt the
 [validation execution policy](../VALIDATION.md#validation-execution-location).
 Make GitHub execution mandatory for its specified tests.
 Authorise necessary executions on GitHub within one bounded scope for tests, inputs and resources.
@@ -26,8 +27,12 @@ Each specified local test needs a recorded owner decision that authorises local 
 Do not start an automatic local replacement. Keep all specified failure,
 repair, input-restriction, recovery and GUI evidence requirements.
 
-The [decision register](gate-decisions.json) preserves the preparation
-instruction. The source baseline is `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
+The reviewed PR head is `eea8b1a160cc533223a0f6939cda47f22eadde81`.
+Its [CI run 41025763875](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41025763875)
+gave PASS results for 150 validators. Independent result review gave PASS.
+The merge commit is `ed2424801ff15b2f9f263cece3465c3450b73f4b`.
+
+The source baseline for the policy draft was `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
 Its post-merge [CI run 41017516406](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41017516406)
 gave a PASS result. The policy uses test categories from existing geometry
 tests and benchmarks. It invents no memory threshold.
@@ -39,8 +44,10 @@ examined the evidence, authority and risks before implementation.
 The agents share one team and workspace. This is not external independence.
 
 The independent source/security review gave a PASS result for the launch
-checks and their offline evidence. The one Documentation Review remains a
-separate control before publication.
+checks and their offline evidence. The one Documentation Review returned
+`APPROVED_WITH_EXACT_CORRECTIONS`. The implementing agent applied all 46 corrections.
+Final document validation gave PASS at `23192c36c7d21c52b86112bbb4f1eaa0c14f021e`.
+The reviewed PR head preserves those document bytes.
 
 The recommendation is **Proceed with bounded conditions**. The panel recorded no disagreement. [Issue #213](https://github.com/Richard-Gnitnub/tracktemplate/issues/213)
 and [PR #217](https://github.com/Richard-Gnitnub/tracktemplate/pull/217) support
@@ -58,13 +65,13 @@ PR-13 keeps recovery and independent-preservation duties. PR-06, PR-07,
 PR-09 and PR-21 keep input, output and rights restrictions.
 
 PR-01 keeps GUI coverage duties. PR-15 keeps performance uncertainty.
-PR-22 keeps owner authority for this decision. The proposed routing reduces workstation
+PR-22 keeps owner authority for this decision. The routing reduces workstation
 exposure but proves no product performance improvement.
 
 | Condition | Owner and deadline |
 | --- | --- |
 | Verify test, input, resource and repair scope. Record each tested commit, result and cleanup. | Change Validation, before each run and before reporting its result. |
-| Verify the authority for remote processing and publication. Private Templot archives and generated research geometry are not admitted by this proposal. | Provenance owner, before any transfer. |
+| Verify the authority for remote processing and publication. Private Templot archives and generated research geometry are not admitted by this decision. | Provenance owner, before any transfer. |
 | Preserve independent recovery evidence. Temporary artifacts on GitHub are insufficient as the only recovery copy. | Project owner and Change Validation, before execution and before artifact expiry. |
 | Check local refusal, references to recorded owner decisions, unchanged resource guards and lightweight checks. Complete independent source/security review. | Implementation and independent Quality Review, before draft publication. |
 | Complete the finite Documentation Review and deterministic validation. Present the exact draft for the owner's decision. | Technical Author Lead, before acceptance. |
@@ -73,11 +80,13 @@ The launch checks prevent unintended local execution through the usual entry
 points. They do not verify that the owner gave authority or prevent direct commands.
 The policy also controls those commands. This change qualifies no GitHub GUI method or private-chair input method.
 
-**Resulting authority:** None until owner acceptance. The proposal supplies
-no additional test, retry, repair, limit increase or merge authority.
+**Resulting authority:** The standing execution policy applies.
+Necessary GitHub executions within an authorised bounded scope need no individual owner decision.
+This acceptance gives no separate authority for the owner's "L1 dispatch" or "confidential-input transfer".
+It gives no additional repair, retry, limit increase or merge authority.
 The current authorised L1 implementation continues on its separate branch.
-Its native qualification needs an authorised bounded scope on GitHub or a recorded owner decision that authorises local execution.
-No private source transfer follows from this proposal.
+Its bounded scope for tests on GitHub, necessary inputs and resource limits need owner approval before execution.
+Do not do its specified tests on the workstation.
 
 Phase 9B stays Open at 3/6. The historical 2/2 allowance remains consumed.
 Frozen XO-001 evidence stays unchanged. LMS stays paused. Issue #213 pressure

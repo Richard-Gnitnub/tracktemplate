@@ -1414,14 +1414,14 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "PROJECT_PLAN.md lost the Core/Layout paragraph separation",
     )
     compact_plan = plan.replace(required_separator, required_separator.replace("\n\n", "\n"), 1)
-    # Preserve the two accepted additions and one exact pending proposal.
+    # Preserve all three accepted additions.
     for decision_id, expected_digest in (
         ('D-P9-018',
          'c9a090af7402fef052700aeea35b9c9120a98e6e8109ff25de9bd486bc10f316'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
-         'bacd1195d475df92560e7fe95203b1d792782cacea22c0049acff923301ea819'),
+         'b89d26ea39fb09bc7ddf5010711985b763c045c2f75621cd448cf180e387d964'),
     ):
         added_rows = [
             line for line in compact_plan.splitlines()
@@ -7904,35 +7904,35 @@ def _validate_dp9_017_admission(evidence: str) -> None:
 
 
 def _validate_dgov026_decision(record, fields):
-    """Keep preparation authority distinct from standing-policy acceptance."""
+    """Bind the accepted policy to its exact owner decision and limits."""
     panel = (
         "reference/current/PHASE_EVIDENCE.md#hosted-validation-policy-panel"
     )
     _require(
         isinstance(record, dict) and set(record) == fields
         and record["id"] == "D-GOV-026"
-        and record["decided_on"] is None
-        and record["status"] == "Proposed"
+        and record["decided_on"] == "2026-10-30"
+        and record["status"] == "Accepted"
         and record["evidence"] == panel
         and record["panel_record"] == panel
         and record["panel_required_under_current_policy"] is True,
-        "D-GOV-026 proposal identity or pending authority drifted",
+        "D-GOV-026 accepted identity or owner authority drifted",
     )
     for field, digest in (
-        ("authority", "c65ac40d4230a4f78429c5bb3c5ca4d55cd8b9bcfbefe52f55bfe3dbe3f15df2"),
+        ("authority", "e5aed5f0440b1b860df253c68afc48cd3bf5c6e648ffa875e69581890bb85d90"),
         ("decision", "a4263fb9abe860b451e478e2b8b15b096e5876d09c0dcab9d7b5d48e41ddd5b7"),
-        ("exclusions", "5be48f92aa9d6a367f53d7ba3e4e98029785dd7e7f13a6f853b2131a33fc9f08"),
+        ("exclusions", "b92438847a2e735e59f5df7b9efd26e934c6be11a063967fc8d1f0de48e741cb"),
     ):
         value = record[field]
         _require(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
-            "D-GOV-026 " + field + " preparation boundary drifted",
+            "D-GOV-026 " + field + " accepted boundary drifted",
         )
 
 
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep twelve accepted decisions and one bounded, unaccepted proposal."""
+    """Keep the thirteen accepted decisions and their exact bounded authority."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)

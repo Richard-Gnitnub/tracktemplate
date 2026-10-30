@@ -281,9 +281,10 @@ manager migration is a different authorised task.
 
 ### Validation execution location
 
-**Proposed standing policy:** [D-GOV-026](current/PHASE_EVIDENCE.md#hosted-validation-policy-panel)
-needs project-owner acceptance before its authority for necessary test executions applies.
-Preparation of this change gives no additional execution authority.
+**Accepted standing policy:** The project owner accepted
+[D-GOV-026](current/PHASE_EVIDENCE.md#hosted-validation-policy-panel) on 2026-10-30
+as reviewed in [PR #234](https://github.com/Richard-Gnitnub/tracktemplate/pull/234).
+Each test still needs the authorised bounded scope specified below.
 This section is the canonical owner for validation execution location.
 The Change Validation skill applies these rules to each selected test.
 
