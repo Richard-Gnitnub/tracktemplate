@@ -673,7 +673,7 @@ Path: `.agents/skills/tracktemplate-change-validation/SKILL.md`
 
 Before FreeCAD or geometry validation, use this skill to select the execution
 location under [VALIDATION.md](VALIDATION.md#validation-execution-location).
-That policy owns covered tests, approved scope and local execution permission.
+That policy owns the specified tests, authorised bounded scope and authority for local execution.
 The skill verifies authority before it starts a test.
 
 Use it to select the proportionate validation for a proposed or completed

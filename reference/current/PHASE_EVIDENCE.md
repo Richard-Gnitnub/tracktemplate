@@ -14,15 +14,17 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
 **Owner decision:** Pending. Richard authorised preparation of a Level 3
 standing-policy change and one reviewed draft PR. That instruction does not
-accept the proposed delegation or authorise integration.
+accept the proposed authority for necessary test executions or authorise integration.
 
 **Decision for acceptance:** Adopt the
 [validation execution policy](../VALIDATION.md#validation-execution-location).
-Require GitHub execution for its covered tests. Permit necessary hosted runs
-within one approved test, input and resource scope without a decision for
-each run. Require explicit owner permission for covered local tests.
-Do not permit an automatic local replacement. Keep all specified failure,
-repair, confidentiality, recovery and GUI evidence requirements.
+Make GitHub execution mandatory for its specified tests.
+Authorise necessary executions on GitHub within one bounded scope for tests, inputs and resources.
+These executions need no individual owner decision.
+Each specified local test needs a recorded owner decision that authorises local execution.
+
+Do not start an automatic local replacement. Keep all specified failure,
+repair, input-restriction, recovery and GUI evidence requirements.
 
 The [decision register](gate-decisions.json) preserves the preparation
 instruction. The source baseline is `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
@@ -34,53 +36,55 @@ tests and benchmarks. It invents no memory threshold.
 the change and technical documentation. `/root/hosted_policy_controls`
 implements the local launch checks. `/root/hosted_policy_risk` independently
 examined the evidence, authority and risks before implementation.
-The agents share one team and workspace; this is not external independence.
+The agents share one team and workspace. This is not external independence.
+
 The independent source/security review gave a PASS result for the launch
 checks and their offline evidence. The one Documentation Review remains a
 separate control before publication.
 
-The recommendation is **Proceed with bounded conditions**. No dissent was
-reported. [Issue #213](https://github.com/Richard-Gnitnub/tracktemplate/issues/213)
+The recommendation is **Proceed with bounded conditions**. The panel recorded no disagreement. [Issue #213](https://github.com/Richard-Gnitnub/tracktemplate/issues/213)
 and [PR #217](https://github.com/Richard-Gnitnub/tracktemplate/pull/217) support
 isolation from the workstation. They do not establish a FreeCAD memory leak.
 [PR #233](https://github.com/Richard-Gnitnub/tracktemplate/pull/233) and
 [run 40980935631](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/40980935631)
-prove only the hosted transition test: one native test, no skips and verified
-cleanup. The test took 0.624 seconds. Its observed 58.527 MiB memory maximum
-and 0.577604 CPU seconds are sampled lower bounds. They do not qualify chair
-capacity, total resource use, GUI execution or private-input transfer.
+prove only the transition test on GitHub: one native test, no skips and verified
+cleanup. The test duration was 0.624 seconds.
 
-The [risk register](risks.json) retains every risk and duty. No risk closes.
-PR-13 retains recovery and independent-preservation duties. PR-06, PR-07,
-PR-09 and PR-21 retain input, output and rights restrictions. PR-01 retains
-GUI coverage duties. PR-15 retains performance uncertainty. PR-22 retains
-owner authority for this decision. The proposed routing reduces workstation
+Its observed 58.527 MiB memory maximum and 0.577604 CPU seconds are sampled lower bounds.
+They do not qualify chair capacity, total resource use, GUI execution or private-input transfer.
+
+The [risk register](risks.json) keeps every risk and duty. No risk closes.
+PR-13 keeps recovery and independent-preservation duties. PR-06, PR-07,
+PR-09 and PR-21 keep input, output and rights restrictions.
+
+PR-01 keeps GUI coverage duties. PR-15 keeps performance uncertainty.
+PR-22 keeps owner authority for this decision. The proposed routing reduces workstation
 exposure but proves no product performance improvement.
 
 | Condition | Owner and deadline |
 | --- | --- |
 | Verify test, input, resource and repair scope. Record each tested commit, result and cleanup. | Change Validation, before each run and before reporting its result. |
-| Verify remote-processing and publication permission. Private Templot archives and generated research geometry are not admitted by this proposal. | Provenance owner, before any transfer. |
-| Preserve independent recovery evidence. Temporary hosted artifacts are insufficient as the sole recovery copy. | Project owner and Change Validation, before execution and before artifact expiry. |
-| Check local refusal, explicit permission references, unchanged resource guards and lightweight checks. Complete independent source/security review. | Implementation and independent Quality Review, before draft publication. |
+| Verify the authority for remote processing and publication. Private Templot archives and generated research geometry are not admitted by this proposal. | Provenance owner, before any transfer. |
+| Preserve independent recovery evidence. Temporary artifacts on GitHub are insufficient as the only recovery copy. | Project owner and Change Validation, before execution and before artifact expiry. |
+| Check local refusal, references to recorded owner decisions, unchanged resource guards and lightweight checks. Complete independent source/security review. | Implementation and independent Quality Review, before draft publication. |
 | Complete the finite Documentation Review and deterministic validation. Present the exact draft for the owner's decision. | Technical Author Lead, before acceptance. |
 
-The launch checks prevent accidental local execution through the usual entry
-points. They do not authenticate owner consent or prevent direct commands.
-The policy also controls those commands. No hosted GUI route or private-chair
-input route is qualified by this change.
+The launch checks prevent unintended local execution through the usual entry
+points. They do not verify that the owner gave authority or prevent direct commands.
+The policy also controls those commands. This change qualifies no GitHub GUI method or private-chair input method.
 
 **Resulting authority:** None until owner acceptance. The proposal supplies
 no additional test, retry, repair, limit increase or merge authority.
 The current authorised L1 implementation continues on its separate branch.
-Its native qualification needs an approved hosted scope or explicit local
-permission. No private source transfer follows from this proposal.
+Its native qualification needs an authorised bounded scope on GitHub or a recorded owner decision that authorises local execution.
+No private source transfer follows from this proposal.
 
 Phase 9B stays Open at 3/6. The historical 2/2 allowance remains consumed.
 Frozen XO-001 evidence stays unchanged. LMS stays paused. Issue #213 pressure
-monitoring stays parked. No physical-fit, rights, production, release or
-phase-exit acceptance follows. This Level 3 governance and safety task is the
-explicit exception to the usual governance-change budget.
+monitoring stays paused.
+
+No physical-fit, rights, production, release or phase-exit acceptance follows.
+The usual governance-change budget does not apply to this Level 3 governance and safety task.
 
 <a id="candidate-bound-documentation-exception-panel"></a>
 

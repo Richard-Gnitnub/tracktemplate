@@ -83,11 +83,12 @@ Before evidence selection for exporter interruption, read these owners:
 
 Before any FreeCAD or geometry test, apply the canonical
 [execution-location policy](../../../reference/VALIDATION.md#validation-execution-location).
-Classify the test. Verify the approved test, input and resource scope before
-execution. Keep the exact owner decision and run evidence together.
-Use its hosted route, local permission or lightweight-check provision as applicable.
-An invocation reference records authority; it does not grant it.
-Do not infer local permission from a missing or failed hosted route.
+Select the test group. Verify the authorised bounded scope for the test, inputs and resources before execution.
+Keep the exact owner decision with the evidence for that test.
+Use the policy's applicable GitHub method, local authority or provision for lightweight checks.
+
+A reference in the command records project authority. It gives no additional project authority.
+A missing or failed GitHub method gives no authority for local execution.
 
 ### Prepare for large FreeCAD tests
 
