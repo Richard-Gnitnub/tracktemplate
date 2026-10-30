@@ -42,6 +42,7 @@ ENTRY_SHA256 = '20cd1694979830099e1e6988300c1c8bc9ea1dbc59ad7a5cef1832a0fe4bcc71
 SCOPE = 'L1-current-source-600-900-600-v4'
 SCOPE_SHA256 = '0bec3956e4116740d702f6f09301430999f01b2935a54ae1c48f64cf9754f20f'
 INPUT_REPOSITORY = 'Richard-Gnitnub/tracktemplate-validation-private'
+DEPLOYMENT_ROOT = Path('/home/richard')
 SENTINELS = {
     'readiness': 'L1 current-source hosted readiness passed',
     'native': 'L1 current-source hosted native validation passed',
@@ -399,7 +400,7 @@ def acquire(stage, work):
             }, 'Recovery readiness absent')
     deployed = []
     # This root is created/chowned by setup, never by an archive member.
-    allowed = Path('/home/richard')
+    allowed = DEPLOYMENT_ROOT
     require(allowed.is_dir() and allowed.resolve() == allowed
             and allowed.stat().st_uid == os.getuid(), 'Private target root unavailable')
     for row in config['inputs']:
@@ -607,7 +608,7 @@ def cleanup_staging(work, preserved):
             row = json.loads(receipt_path.read_text())
             destination = Path(row['path'])
             require(destination.is_absolute()
-                    and destination.is_relative_to('/home/richard')
+                    and destination.is_relative_to(DEPLOYMENT_ROOT)
                     and '..' not in destination.parts, 'Staged destination refused')
             targets.append((destination, row['sha256'], True))
     except (OSError, ValueError, KeyError, TypeError):

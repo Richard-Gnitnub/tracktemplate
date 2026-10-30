@@ -407,7 +407,7 @@ class L1PrivateControls(unittest.TestCase):
                 self.assertIn(['systemctl', '--user', 'stop', unit + '.timer', unit + '.service'], commands)
 
     def test_finalizer_preserves_staging_until_primary_readback(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / 'tmp') as temporary:
+        with tempfile.TemporaryDirectory() as temporary:
             work = Path(temporary)
             (work / 'evidence').mkdir()
             staged = work / 'deployed-input'
@@ -420,7 +420,7 @@ class L1PrivateControls(unittest.TestCase):
             self.assertTrue((work / 'evidence/process-finalization.json').exists())
 
     def test_staging_cleanup_needs_preservation_and_removes_only_exact_paths(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / 'tmp') as temporary:
+        with tempfile.TemporaryDirectory() as temporary:
             work = Path(temporary)
             (work / 'evidence/native/native').mkdir(parents=True)
             (work / 'unpacked/inputs').mkdir(parents=True)
@@ -445,10 +445,11 @@ class L1PrivateControls(unittest.TestCase):
             archive.write_bytes(b'permitted evidence')
             preserved = {'sha256': pilot.digest(archive), 'bytes': archive.stat().st_size,
                          'asset_id': 123}
-            with self.assertRaises(ValueError):
-                pilot.cleanup_staging(work, dict(preserved, asset_id=0))
-            self.assertTrue(all(path.exists() for path in expected))
-            result = pilot.cleanup_staging(work, preserved)
+            with patch.object(pilot, 'DEPLOYMENT_ROOT', work):
+                with self.assertRaises(ValueError):
+                    pilot.cleanup_staging(work, dict(preserved, asset_id=0))
+                self.assertTrue(all(path.exists() for path in expected))
+                result = pilot.cleanup_staging(work, preserved)
             self.assertTrue(result['cleanup'])
             self.assertEqual(len(result['staging_inputs_removed']), 10)
             self.assertEqual(len(result['staging_files_removed']), 23)
@@ -458,7 +459,7 @@ class L1PrivateControls(unittest.TestCase):
 
     def test_staging_cleanup_follows_primary_readback_and_precedes_supplement(self):
         for primary_fails in (False, True):
-            with self.subTest(primary_fails=primary_fails), tempfile.TemporaryDirectory(dir=ROOT / 'tmp') as temporary:
+            with self.subTest(primary_fails=primary_fails), tempfile.TemporaryDirectory() as temporary:
                 work = Path(temporary)
                 (work / 'evidence').mkdir()
                 staged = work / 'staged-input'
@@ -492,6 +493,7 @@ class L1PrivateControls(unittest.TestCase):
                 metadata = [{'private': True, 'full_name': pilot.INPUT_REPOSITORY},
                             {'id': 429232376, 'assets': []}]
                 with (patch.dict(os.environ, environment),
+                      patch.object(pilot, 'DEPLOYMENT_ROOT', work),
                       patch.object(original, '_clearance', return_value=True),
                       patch.object(pilot, 'api_request', side_effect=metadata),
                       patch.object(pilot, 'upload_private_asset', side_effect=upload)):
@@ -502,7 +504,7 @@ class L1PrivateControls(unittest.TestCase):
 
     def test_staging_cleanup_refuses_changed_input_or_link(self):
         for linked in (False, True):
-            with self.subTest(linked=linked), tempfile.TemporaryDirectory(dir=ROOT / 'tmp') as temporary:
+            with self.subTest(linked=linked), tempfile.TemporaryDirectory() as temporary:
                 work = Path(temporary)
                 (work / 'evidence').mkdir()
                 (work / 'evidence/process-finalization.json').write_text(json.dumps({
@@ -520,11 +522,35 @@ class L1PrivateControls(unittest.TestCase):
                 archive.write_bytes(b'permitted evidence')
                 preserved = {'sha256': pilot.digest(archive), 'bytes': archive.stat().st_size,
                              'asset_id': 123}
-                result = pilot.cleanup_staging(work, preserved)
+                with patch.object(pilot, 'DEPLOYMENT_ROOT', work):
+                    result = pilot.cleanup_staging(work, preserved)
                 self.assertFalse(result['cleanup'])
                 self.assertTrue(result['errors'])
+                reason = 'Linked staging cleanup refused' if linked else 'Staged input changed'
+                self.assertIn(reason, '\n'.join(result['errors']))
                 self.assertTrue(staged.exists())
                 self.assertTrue(original_input.exists())
+
+    def test_staging_cleanup_production_root_refuses_outside_file(self):
+        self.assertEqual(pilot.DEPLOYMENT_ROOT, Path('/home/richard'))
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            self.assertFalse(work.is_relative_to(pilot.DEPLOYMENT_ROOT))
+            (work / 'evidence').mkdir()
+            (work / 'evidence/process-finalization.json').write_text(json.dumps({
+                'cleanup': True, 'errors': [], 'seconds': 0}))
+            staged = work / 'outside-input'
+            staged.write_bytes(b'restricted input')
+            (work / 'evidence/deployed-01.json').write_text(json.dumps({
+                'path': str(staged), 'sha256': pilot.digest(staged)}))
+            archive = work / 'evidence.tar'
+            archive.write_bytes(b'permitted evidence')
+            preserved = {'sha256': pilot.digest(archive), 'bytes': archive.stat().st_size,
+                         'asset_id': 123}
+            result = pilot.cleanup_staging(work, preserved)
+            self.assertFalse(result['cleanup'])
+            self.assertIn('Staged destination refused', '\n'.join(result['errors']))
+            self.assertTrue(staged.exists())
 
     def test_workflow_has_no_private_raw_upload_or_local_fallback(self):
         text = (ROOT / '.github/workflows/l1-private-validation.yml').read_text()
