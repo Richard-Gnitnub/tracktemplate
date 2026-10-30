@@ -104,6 +104,7 @@ jobs:
             benchmark-output/hosted-native-geometry/summary.json
             benchmark-output/hosted-native-geometry/host.jsonl
             benchmark-output/hosted-native-geometry/clearance.json
+            benchmark-output/hosted-native-geometry/deadline-clearance.json
             benchmark-output/hosted-native-geometry/guard/result.json
             benchmark-output/hosted-native-geometry/guard/control.json
             benchmark-output/hosted-native-geometry/guard/ownership.json

@@ -374,6 +374,197 @@ class HostedResultTests(unittest.TestCase):
                 self.assert_failed(self.assess(guard=guard), "MEMORY_LIMIT")
 
 
+class DeadlineResultTests(unittest.TestCase):
+    def test_failed_cancellation_needs_independent_true_clearance(self):
+        result = good_guard()
+        result["deadline_cancellation_exit"] = 5
+        for clearance in (False, None, "true", 1, True):
+            with self.subTest(clearance=clearance):
+                assessment = pilot.assess_result(
+                    result, qualified_output(), native_report(),
+                    [live_sample()], True, deadline_clearance=clearance,
+                )
+                self.assertEqual(assessment["status"],
+                                 "PASS" if clearance is True else "FAIL")
+                if clearance is not True:
+                    self.assertEqual(assessment["classification"],
+                                     "CLEANUP_FAILURE")
+
+    def test_unexpected_cancellation_exit_cannot_be_overridden(self):
+        result = good_guard()
+        result["deadline_cancellation_exit"] = 1
+        assessment = pilot.assess_result(
+            result, qualified_output(), native_report(), [live_sample()],
+            True, deadline_clearance=True,
+        )
+        self.assertEqual(assessment["status"], "FAIL")
+        self.assertEqual(assessment["classification"], "CLEANUP_FAILURE")
+
+    def test_deadline_proof_does_not_override_other_failures(self):
+        for changes, classification in (
+            ({"cleanup_proved": False}, "CLEANUP_FAILURE"),
+            ({"status": "failed", "failure_reason": "deadline-exceeded"},
+             "TIMEOUT"),
+            ({"status": "failed", "failure_reason": "memory-limit"},
+             "MEMORY_LIMIT"),
+            ({"status": "failed", "process_exit": 1,
+              "failure_reason": "payload-nonzero"}, "GEOMETRY_FAILURE"),
+        ):
+            with self.subTest(classification=classification):
+                result = good_guard()
+                result["deadline_cancellation_exit"] = 5
+                result.update(changes)
+                assessment = pilot.assess_result(
+                    result, qualified_output(), native_report(),
+                    [live_sample()], True, deadline_clearance=True,
+                )
+                self.assertEqual(assessment["status"], "FAIL")
+                self.assertEqual(assessment["classification"], classification)
+
+
+class DeadlineClearanceTests(unittest.TestCase):
+    watchdog = "tracktemplate-validation-0123456789abcdef0123456789abcdef"
+
+    def properties(self, suffix, load_state="not-found"):
+        values = {
+            "Id": self.watchdog + suffix,
+            "LoadState": load_state,
+            "ActiveState": "inactive",
+            "SubState": "dead",
+            "Job": "",
+        }
+        if suffix == ".service":
+            values.update(MainPID="0", ControlPID="0", ControlGroup="")
+        return values
+
+    def readback(self, suffix, load_state="not-found"):
+        return "".join(name + "=" + value + "\n" for name, value in
+                       self.properties(suffix, load_state).items())
+
+    def probe(self, *, outputs=None, fail_suffix=None, failure=None,
+              result=None):
+        result = good_guard() if result is None else result
+        result.setdefault("watchdog", self.watchdog)
+        observed = []
+        outputs = outputs or {}
+
+        def command(argv, **kwargs):
+            observed.append(list(argv))
+            self.assertEqual(argv[:4],
+                             ["systemctl", "--user", "show", "--all"])
+            unit = argv[-1]
+            self.assertIn(unit, [self.watchdog + ".timer",
+                                 self.watchdog + ".service"])
+            suffix = ".timer" if unit.endswith(".timer") else ".service"
+            fields = list(self.properties(suffix))
+            self.assertEqual(argv[4:-1:2], ["-p"] * len(fields))
+            self.assertEqual(set(argv[5:-1:2]), set(fields))
+            self.assertFalse(kwargs["check"])
+            self.assertTrue(kwargs["capture_output"])
+            self.assertTrue(kwargs["text"])
+            self.assertEqual(kwargs["timeout"], 15)
+            if suffix == fail_suffix and isinstance(failure, Exception):
+                raise failure
+            return subprocess.CompletedProcess(
+                argv, failure if suffix == fail_suffix else 0,
+                outputs.get(suffix, self.readback(suffix)), "query diagnostic",
+            )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            with patch.object(pilot, "OUTPUT", directory), patch.object(
+                pilot.subprocess, "run", side_effect=command,
+            ):
+                proved = pilot._deadline_clearance(result)
+            receipt = json.loads(
+                (directory / "deadline-clearance.json").read_text(),
+            )
+        self.assertIs(receipt["proved"], proved)
+        self.assertEqual(receipt["watchdog"], result.get("watchdog"))
+        self.assertEqual([row["command"] for row in receipt["observations"]],
+                         observed)
+        for row in receipt["observations"]:
+            if "error" not in row:
+                self.assertEqual(row["stderr"], "query diagnostic")
+                suffix = (".timer" if row["command"][-1].endswith(".timer")
+                          else ".service")
+                self.assertEqual(row["stdout"], outputs.get(
+                    suffix, self.readback(suffix),
+                ))
+                self.assertIn("returncode", row)
+        return proved, observed
+
+    def test_loaded_or_unloaded_inactive_deadline_units_are_proved(self):
+        for timer in ("loaded", "not-found"):
+            for service in ("loaded", "not-found"):
+                with self.subTest(timer=timer, service=service):
+                    proved, observed = self.probe(outputs={
+                        ".timer": self.readback(".timer", timer),
+                        ".service": self.readback(".service", service),
+                    })
+                    self.assertIs(proved, True)
+                    self.assertEqual(len(observed), 2)
+
+    def test_active_missing_duplicate_or_wrong_unit_readback_is_rejected(self):
+        for suffix in (".timer", ".service"):
+            original = self.readback(suffix)
+            variants = (
+                original.replace("ActiveState=inactive", "ActiveState=active"),
+                original.replace("SubState=dead", "SubState=running"),
+                original.replace("LoadState=not-found", "LoadState=error"),
+                original.replace("Job=\n", "Job=123 /job/123\n"),
+                original.replace("Id=" + self.watchdog,
+                                 "Id=tracktemplate-validation-foreign"),
+                original + "Id=" + self.watchdog + suffix + "\n",
+                "", "malformed output\n",
+                *(original.replace(name + "=" + value + "\n", "")
+                  for name, value in self.properties(suffix).items()),
+            )
+            for output in variants:
+                with self.subTest(suffix=suffix, output=output):
+                    self.assertIs(self.probe(outputs={suffix: output})[0],
+                                  False)
+
+    def test_service_processes_or_control_group_cannot_pass(self):
+        original = self.readback(".service")
+        for field, value in (("MainPID", "900"), ("ControlPID", "901"),
+                             ("ControlGroup", "/user.slice/owned.service")):
+            with self.subTest(field=field):
+                output = original.replace(
+                    field + "=" + self.properties(".service")[field],
+                    field + "=" + value,
+                )
+                self.assertIs(self.probe(outputs={".service": output})[0],
+                              False)
+
+    def test_errors_and_timeouts_cannot_prove_clearance(self):
+        for suffix in (".timer", ".service"):
+            for failure in (
+                1, OSError("query unavailable"),
+                subprocess.TimeoutExpired("systemctl", 15),
+            ):
+                with self.subTest(suffix=suffix, failure=str(failure)):
+                    self.assertIs(self.probe(fail_suffix=suffix,
+                                             failure=failure)[0], False)
+
+    def test_invalid_owned_name_or_unproved_cleanup_never_queries(self):
+        variants = [
+            {"watchdog": value} for value in (
+                None, "", "--all", self.watchdog + ".service",
+                "tracktemplate-validation-" + "g" * 32,
+                "tracktemplate-validation-" + "0" * 31,
+                self.watchdog + "\n",
+            )
+        ] + [{"cleanup_proved": False}]
+        for changes in variants:
+            with self.subTest(changes=changes):
+                result = good_guard()
+                result.update(changes)
+                proved, observed = self.probe(result=result)
+                self.assertIs(proved, False)
+                self.assertEqual(observed, [])
+
+
 class NativeWrapperTests(unittest.TestCase):
     def load_wrapper(self):
         path = ROOT / "tests/hosted_transition_geometry_suite.py"
@@ -412,6 +603,38 @@ class NativeWrapperTests(unittest.TestCase):
         )
         self.assertIn(RUNTIME_SENTINEL, output.getvalue())
         self.assertIn(PROFILE, output.getvalue())
+
+    def test_verbose_runner_keeps_runtime_report_on_its_own_line(self):
+        module = self.load_wrapper()
+        report = {"compatibility_evaluation": {
+            "status": "qualified", "matched_profile_id": PROFILE,
+            "mismatches": [],
+        }}
+        output = io.StringIO()
+        with (
+            patch("tracktemplate.bootstrap.require_qualified_runtime",
+                  return_value=report),
+            patch.object(module.runpy, "run_path", side_effect=lambda _path:
+                         print(GEOMETRY_SENTINEL)) as run_path,
+            contextlib.redirect_stdout(output),
+        ):
+            result = unittest.TextTestRunner(stream=output, verbosity=2).run(
+                unittest.TestSuite([
+                    module.TestTransitionGeometry("test_transition"),
+                ]),
+            )
+        self.assertTrue(result.wasSuccessful(), result.errors)
+        self.assertEqual(result.testsRun, 1)
+        self.assertEqual(result.skipped, [])
+        run_path.assert_called_once_with(str(
+            ROOT / "tests/freecad_validate_phase6_transition_exact_geometry.py"
+        ))
+        assessment = pilot.assess_result(
+            good_guard(), output.getvalue(), "", [live_sample()], True,
+        )
+        self.assertEqual(assessment["status"], "PASS", output.getvalue())
+        self.assertEqual(sum(line.startswith(RUNTIME_SENTINEL)
+                             for line in output.getvalue().splitlines()), 1)
 
     def test_original_validator_failure_propagates(self):
         module = self.load_wrapper()
@@ -719,6 +942,63 @@ class HostedSetupTests(unittest.TestCase):
 
 
 class HostObservationTests(unittest.TestCase):
+    def test_main_requires_fresh_deadline_clearance_for_every_exit(self):
+        read_text = Path.read_text
+
+        def host_read(path, *args, **kwargs):
+            if path == Path("/proc/meminfo"):
+                return meminfo()
+            if path == Path("/proc/pressure/memory"):
+                return live_sample()["memory.pressure"]
+            return read_text(path, *args, **kwargs)
+
+        for cancellation_exit in (0, 5):
+            for cleared in (False, True):
+                with self.subTest(exit=cancellation_exit, cleared=cleared):
+                    result = good_guard()
+                    result["deadline_cancellation_exit"] = cancellation_exit
+                    result["watchdog"] = DeadlineClearanceTests.watchdog
+
+                    def guarded_run(_argv, *, evidence_dir, **_kwargs):
+                        evidence_dir.mkdir()
+                        (evidence_dir / "stdout").write_text(
+                            qualified_output(),
+                        )
+                        (evidence_dir / "stderr").write_text(native_report())
+                        (evidence_dir / "measurements.jsonl").write_text(
+                            json.dumps(live_sample()) + "\n",
+                        )
+                        return result
+
+                    with tempfile.TemporaryDirectory() as temporary:
+                        output = Path(temporary) / "evidence"
+                        with (
+                            patch.object(pilot, "OUTPUT", output),
+                            patch.object(pilot, "_identity", return_value={
+                                "source_commit": "1" * 40,
+                            }),
+                            patch.dict(pilot.os.environ, hosted_environment()),
+                            patch.object(Path, "read_text", host_read),
+                            patch.object(pilot.guard, "run_guarded_flatpak",
+                                         side_effect=guarded_run),
+                            patch.object(pilot, "_clearance",
+                                         return_value=True),
+                            patch.object(pilot, "_deadline_clearance",
+                                         return_value=cleared) as clearance,
+                            contextlib.redirect_stdout(io.StringIO()),
+                        ):
+                            exit_code = pilot.main()
+                        clearance.assert_called_once_with(result)
+                        self.assertEqual(exit_code, 0 if cleared else 1)
+                        summary = json.loads(
+                            (output / "summary.json").read_text(),
+                        )
+                        self.assertEqual(summary["status"],
+                                         "PASS" if cleared else "FAIL")
+                        if not cleared:
+                            self.assertEqual(summary["classification"],
+                                             "CLEANUP_FAILURE")
+
     def test_observation_write_failure_cannot_interrupt_guard_cleanup(self):
         read_text = Path.read_text
         path_open = Path.open
@@ -765,6 +1045,8 @@ class HostObservationTests(unittest.TestCase):
                     side_effect=simulated_guard,
                 ) as guarded,
                 patch.object(pilot, "_clearance", return_value=True),
+                patch.object(pilot, "_deadline_clearance", return_value=True,
+                             create=True),
                 patch.object(pilot.time, "sleep"),
                 contextlib.redirect_stdout(io.StringIO()),
             ):
