@@ -2611,6 +2611,7 @@ class ModularCoreLayoutWorkflowSession:
         private_catalogue_preview_factory=None,
         private_catalogue_p_preview_factory=None,
         private_catalogue_s1j_preview_factory=None,
+        private_catalogue_l1_preview_factory=None,
         private_catalogue_crossover_preview_factory=None,
     ):
         staged = staged or atomic
@@ -2640,6 +2641,9 @@ class ModularCoreLayoutWorkflowSession:
         )
         self._private_catalogue_s1j_preview_factory = (
             private_catalogue_s1j_preview_factory
+        )
+        self._private_catalogue_l1_preview_factory = (
+            private_catalogue_l1_preview_factory
         )
         self._private_catalogue_crossover_preview_factory = (
             private_catalogue_crossover_preview_factory
@@ -2995,6 +2999,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_p_preview_factory,
         )
 
+    def preview_private_catalogue_heel_l1_chairs(
+        self, source_document, crossover_id, catalogue_path,
+    ):
+        """Inspect ten private heel L1 placements after canonical changes."""
+        from tracktemplate.compatibility.chair_heel_l1_placement import (
+            preview_private_catalogue_heel_l1_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_heel_l1_chairs(
+            self.module, source_document, crossover_id, catalogue_path,
+            self._private_catalogue_l1_preview_factory,
+        )
+
     def preview_private_catalogue_crossover_chairs(
         self, source_document, crossover_id, catalogue_path,
         *, paired_contexts_path=None, include_central_cc=False,
@@ -3064,6 +3082,7 @@ def load_modular_transition_workflow_session(
     private_catalogue_preview_factory=None,
     private_catalogue_p_preview_factory=None,
     private_catalogue_s1j_preview_factory=None,
+    private_catalogue_l1_preview_factory=None,
     private_catalogue_crossover_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
@@ -3129,6 +3148,7 @@ def load_modular_transition_workflow_session(
         private_catalogue_s1j_preview_factory=(
             private_catalogue_s1j_preview_factory
         ),
+        private_catalogue_l1_preview_factory=private_catalogue_l1_preview_factory,
         private_catalogue_crossover_preview_factory=(
             private_catalogue_crossover_preview_factory
         ),
