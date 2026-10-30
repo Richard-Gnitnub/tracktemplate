@@ -98,7 +98,8 @@ def _qualified_runtime(stdout):
         raise ValueError("Qualified runtime mismatch")
 
 
-def assess_result(result, stdout, stderr, samples, clearance):
+def assess_result(result, stdout, stderr, samples, clearance, *,
+                  deadline_clearance=False):
     """Require native assertions, contained execution and complete evidence."""
     reason = result.get("failure_reason") or result.get(
         "execution_failure_reason"
@@ -123,7 +124,10 @@ def assess_result(result, stdout, stderr, samples, clearance):
         return _failure("GEOMETRY_FAILURE", reason or "Nonzero native exit")
     if result.get("status") != "completed" or reason:
         return _failure("SETUP_FAILURE", reason or "Guard did not complete")
-    if result.get("deadline_cancellation_exit") != 0:
+    cancellation = result.get("deadline_cancellation_exit")
+    if cancellation != 0 and not (
+        cancellation == 5 and deadline_clearance is True
+    ):
         return _failure("CLEANUP_FAILURE", "Deadline cancellation unproved")
     expected_kernel = {
         "memory.max": str(4096 * 1024**2),
@@ -272,6 +276,56 @@ def _clearance():
         time.sleep(0.1)
 
 
+def _deadline_clearance(result):
+    """Read back the owned deadline units without changing guard evidence."""
+    watchdog = result.get("watchdog")
+    receipt = {"watchdog": watchdog, "proved": False, "observations": []}
+    if (result.get("cleanup_proved") is not True
+            or not isinstance(watchdog, str)
+            or not re.fullmatch(r"tracktemplate-validation-[0-9a-f]{32}",
+                                watchdog)):
+        _write(OUTPUT / "deadline-clearance.json", receipt)
+        return False
+    proved = True
+    for suffix in (".timer", ".service"):
+        expected = {
+            "Id": watchdog + suffix, "LoadState": "not-found",
+            "ActiveState": "inactive", "SubState": "dead", "Job": "",
+        }
+        if suffix == ".service":
+            expected.update(MainPID="0", ControlPID="0", ControlGroup="")
+        command = ["systemctl", "--user", "show", "--all"]
+        for field in expected:
+            command.extend(["-p", field])
+        command.append(watchdog + suffix)
+        observation = {"command": command}
+        receipt["observations"].append(observation)
+        try:
+            completed = subprocess.run(
+                command, cwd=ROOT, check=False, text=True,
+                capture_output=True, timeout=15,
+            )
+            observation.update(returncode=completed.returncode,
+                               stdout=completed.stdout,
+                               stderr=completed.stderr)
+            pairs = [line.split("=", 1)
+                     for line in completed.stdout.splitlines()]
+            values = dict(pairs)
+            if (completed.returncode != 0 or len(pairs) != len(expected)
+                    or values.get("LoadState") not in ("loaded", "not-found")):
+                proved = False
+                continue
+            expected["LoadState"] = values["LoadState"]
+            if values != expected:
+                proved = False
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            observation["error"] = repr(error)
+            proved = False
+    receipt["proved"] = proved
+    _write(OUTPUT / "deadline-clearance.json", receipt)
+    return proved
+
+
 def main():
     """Run only on the explicit hosted workflow; retain every outcome."""
     OUTPUT.mkdir(parents=True, exist_ok=True)
@@ -331,10 +385,15 @@ def main():
             [json.loads(line) for line in samples_path.read_text().splitlines()]
             if samples_path.exists() else []
         )
+        deadline_clearance = _deadline_clearance(result)
+        clearance = _clearance()
         summary = assess_result(
             result, (OUTPUT / "guard/stdout").read_text(),
-            (OUTPUT / "guard/stderr").read_text(), samples, _clearance(),
+            (OUTPUT / "guard/stderr").read_text(), samples,
+            clearance and deadline_clearance,
+            deadline_clearance=deadline_clearance,
         )
+        summary["deadline_cleanup_proved"] = deadline_clearance
         if any("error" in row for row in host_observations):
             summary = _failure(
                 "EVIDENCE_INCOMPLETE", "Host telemetry unavailable",

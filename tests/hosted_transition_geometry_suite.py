@@ -26,7 +26,7 @@ class TestTransitionGeometry(unittest.TestCase):
             "linux-x86_64-flatpak-freecad-1.1.4-"
             "py3.13.15-qt6.11.2-coin4.0.10",
         )
-        print("TRACKTEMPLATE_HOSTED_RUNTIME=" + json.dumps(report), flush=True)
+        print("\nTRACKTEMPLATE_HOSTED_RUNTIME=" + json.dumps(report), flush=True)
         runpy.run_path(str(
             ROOT / "tests/freecad_validate_phase6_transition_exact_geometry.py"
         ))
