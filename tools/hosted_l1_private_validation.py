@@ -134,11 +134,15 @@ def validate_readiness(review, config, current_run, control):
 
 def qualified_runtime(stdout):
     prefix = 'TRACKTEMPLATE_B16_FOUNDATION='
-    lines = [line[len(prefix):] for line in stdout.splitlines()
-             if line.startswith(prefix)]
-    require(len(lines) == 1, 'Expected one foundation report')
+    frames = [prefix, *(f'{selector.rsplit(".", 1)[1]} ({selector}) ... {prefix}'
+                        for selector in SELECTORS.values())]
+    lines = [line[len(frame):] for line in stdout.splitlines()
+             for frame in frames if line.startswith(frame)]
+    require(stdout.count(prefix) == 1 and len(lines) == 1,
+            'Expected one foundation report')
     report = json.loads(lines[0])
-    require(report.get('status') == 'modular-foundation-ready'
+    require(isinstance(report, dict)
+            and report.get('status') == 'modular-foundation-ready'
             and report.get('matched_profile_id') == original.EXPECTED_PROFILE
             and report.get('document_mutation') is False
             and report.get('workflow_launched') is False,
