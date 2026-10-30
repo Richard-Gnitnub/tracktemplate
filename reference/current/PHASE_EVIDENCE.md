@@ -14,8 +14,8 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
 **Owner decision:** Accepted. Richard accepted D-GOV-026 as reviewed in
 [PR #234](https://github.com/Richard-Gnitnub/tracktemplate/pull/234) on 2026-10-30.
-The [decision register](gate-decisions.json) preserves his complete acceptance
-and the earlier preparation instruction. The PR merge did not supply this acceptance.
+The [decision register](gate-decisions.json) preserves his full acceptance
+and the previous instruction to prepare the policy. The PR merge did not supply this acceptance.
 
 **Accepted decision:** Adopt the
 [validation execution policy](../VALIDATION.md#validation-execution-location).
@@ -32,7 +32,7 @@ Its [CI run 41025763875](https://github.com/Richard-Gnitnub/tracktemplate/action
 gave PASS results for 150 validators. Independent result review gave PASS.
 The merge commit is `ed2424801ff15b2f9f263cece3465c3450b73f4b`.
 
-The preparation source baseline was `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
+The source baseline for the policy draft was `0d8f3d2b16c0aeec9a05068a445614ec34c50cca`.
 Its post-merge [CI run 41017516406](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41017516406)
 gave a PASS result. The policy uses test categories from existing geometry
 tests and benchmarks. It invents no memory threshold.
@@ -45,7 +45,7 @@ The agents share one team and workspace. This is not external independence.
 
 The independent source/security review gave a PASS result for the launch
 checks and their offline evidence. The one Documentation Review returned
-`APPROVED_WITH_EXACT_CORRECTIONS`. All 46 corrections were applied.
+`APPROVED_WITH_EXACT_CORRECTIONS`. The implementing agent applied all 46 corrections.
 Final document validation gave PASS at `23192c36c7d21c52b86112bbb4f1eaa0c14f021e`.
 The reviewed PR head preserves those document bytes.
 
@@ -82,11 +82,11 @@ The policy also controls those commands. This change qualifies no GitHub GUI met
 
 **Resulting authority:** The standing execution policy applies.
 Necessary GitHub executions within an authorised bounded scope need no individual owner decision.
-This acceptance supplies no separate L1 dispatch, private-input transfer, repair,
-retry, limit increase or merge authority.
+This acceptance gives no separate authority for the owner's "L1 dispatch" or "confidential-input transfer".
+It gives no additional repair, retry, limit increase or merge authority.
 The current authorised L1 implementation continues on its separate branch.
-Its hosted scope, necessary inputs and resource limits need owner approval before execution.
-Keep its heavy tests off the workstation.
+Its bounded scope for tests on GitHub, necessary inputs and resource limits need owner approval before execution.
+Do not do its specified tests on the workstation.
 
 Phase 9B stays Open at 3/6. The historical 2/2 allowance remains consumed.
 Frozen XO-001 evidence stays unchanged. LMS stays paused. Issue #213 pressure
