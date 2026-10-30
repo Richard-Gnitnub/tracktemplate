@@ -1421,7 +1421,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
-         'bacd1195d475df92560e7fe95203b1d792782cacea22c0049acff923301ea819'),
+         'a7ef8537575309f118ad8d189e5eb1ff30854c80e71b11afe6aabffc6d07e369'),
     ):
         added_rows = [
             line for line in compact_plan.splitlines()
@@ -7920,8 +7920,8 @@ def _validate_dgov026_decision(record, fields):
     )
     for field, digest in (
         ("authority", "c65ac40d4230a4f78429c5bb3c5ca4d55cd8b9bcfbefe52f55bfe3dbe3f15df2"),
-        ("decision", "a4263fb9abe860b451e478e2b8b15b096e5876d09c0dcab9d7b5d48e41ddd5b7"),
-        ("exclusions", "5be48f92aa9d6a367f53d7ba3e4e98029785dd7e7f13a6f853b2131a33fc9f08"),
+        ("decision", "1c3cf6857997c34590173ecd9a66a0ba1189243b8379c4c5bee4692ac7715389"),
+        ("exclusions", "af7d6f00f2436164a0c12aa4252bd7d623aede6c45fedbb5f91af8477c0e894f"),
     ):
         value = record[field]
         _require(
