@@ -9,6 +9,7 @@ import io
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -519,6 +520,202 @@ class PilotIdentityTests(unittest.TestCase):
         self.assertTrue(actions)
         for action in actions:
             self.assertRegex(action, r"^[A-Za-z0-9_./-]+@[0-9a-f]{40}$")
+
+
+_SETUP_STUB = r"""import json
+import os
+from pathlib import Path
+import sys
+
+command = [Path(sys.argv[0]).name, *sys.argv[1:]]
+with open(os.environ["SETUP_CALLS"], "a") as stream:
+    stream.write(json.dumps(command) + "\n")
+fixture = json.loads(Path(os.environ["SETUP_FIXTURE"]).read_text())
+manager = "user@1001.service"
+group = "/user.slice/user-1001.slice/" + manager
+output = "benchmark-output/hosted-native-geometry"
+if command == ["mkdir", "-p", output]:
+    Path(output).mkdir(parents=True)
+elif command == ["tee", output + "/setup.log"]:
+    data = sys.stdin.read()
+    Path(output, "setup.log").write_text(data)
+    sys.stdout.write(data)
+elif command == ["id", "-u"]:
+    print("1001")
+elif command == ["id", "-un"]:
+    print("runner")
+elif command[:2] == ["sudo", "apt-get"]:
+    assert command[2:] in (
+        ["update"],
+        ["install", "--no-install-recommends", "-y", "flatpak",
+         "dbus-user-session"],
+    ), command
+elif command[:2] == ["sudo", "flatpak"]:
+    assert command[2] in ("remote-add", "install", "update"), command
+elif command == ["sudo", "loginctl", "enable-linger", "runner"]:
+    pass
+elif command == ["sudo", "systemctl", "start", manager]:
+    pass
+elif command[:3] == ["sudo", "systemctl", "set-property"]:
+    print("Cannot set property Delegate, or unknown property.",
+          file=sys.stderr)
+    sys.exit(1)
+elif command[:3] == ["systemctl", "show", manager]:
+    arguments = command[3:]
+    properties = []
+    while arguments:
+        option = arguments.pop(0)
+        if option == "-p":
+            properties.append(arguments.pop(0))
+        else:
+            assert option == "--value", command
+    if fixture.get("failed_property") in properties:
+        print("Injected systemctl query failure", file=sys.stderr)
+        sys.exit(1)
+    for name in properties:
+        value = fixture["properties"][name]
+        print(value if "--value" in command else name + "=" + value)
+elif command == ["cat", "/sys/fs/cgroup" + group + "/cgroup.controllers"]:
+    if fixture["kernel_controllers"] is None:
+        print("Injected cgroup read failure", file=sys.stderr)
+        sys.exit(1)
+    print(fixture["kernel_controllers"])
+else:
+    raise AssertionError("Unexpected command: " + repr(command))
+"""
+
+
+class HostedSetupTests(unittest.TestCase):
+    """Run the workflow's setup shell with no access to host commands."""
+
+    def setup_shell(self):
+        path = ROOT / ".github/workflows/native-geometry-pilot.yml"
+        workflow = path.read_text()
+        setup = workflow.split("        id: setup\n", 1)[1]
+        body = setup.split("        run: |\n", 1)[1]
+        body = body.split("\n      - name:", 1)[0]
+        lines = body.splitlines()
+        self.assertTrue(all(not line or line.startswith("          ")
+                            for line in lines))
+        return "\n".join(line[10:] for line in lines) + "\n"
+
+    def execute_setup(self, *, properties=None, kernel_controllers=None,
+                      failed_property=None, unreadable_kernel=False):
+        fixture = {
+            "properties": {
+                "ActiveState": "active",
+                "ControlGroup": (
+                    "/user.slice/user-1001.slice/user@1001.service"
+                ),
+                "Delegate": "yes",
+                "DelegateControllers": "pids memory cpu",
+            },
+            "kernel_controllers": "cpuset cpu io memory pids",
+            "failed_property": failed_property,
+        }
+        fixture["properties"].update(properties or {})
+        if kernel_controllers is not None:
+            fixture["kernel_controllers"] = kernel_controllers
+        if unreadable_kernel:
+            fixture["kernel_controllers"] = None
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            binary = directory / "bin"
+            binary.mkdir()
+            stub = binary / "stub"
+            stub.write_text(f"#!{sys.executable}\n" + _SETUP_STUB)
+            stub.chmod(0o700)
+            for command in ("sudo", "id", "systemctl", "cat", "mkdir", "tee"):
+                (binary / command).symlink_to(stub)
+            inputs = directory / "fixture.json"
+            inputs.write_text(json.dumps(fixture))
+            calls = directory / "calls.jsonl"
+            environment_file = directory / "github-env"
+            result = subprocess.run(
+                ["/bin/bash", "--noprofile", "--norc", "-c",
+                 self.setup_shell()],
+                cwd=directory,
+                env={
+                    "PATH": str(binary),
+                    "GITHUB_RUN_ATTEMPT": "1",
+                    "GITHUB_ENV": str(environment_file),
+                    "SETUP_FIXTURE": str(inputs),
+                    "SETUP_CALLS": str(calls),
+                },
+                text=True, capture_output=True, timeout=10, check=False,
+            )
+            observed = [
+                json.loads(line) for line in calls.read_text().splitlines()
+            ]
+            exported = (environment_file.read_text()
+                        if environment_file.exists() else "")
+        return result, observed, exported
+
+    def assert_refused_after_query(self, result, calls, exported):
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertTrue(any(command[:2] == ["systemctl", "show"]
+                            for command in calls), calls)
+        self.assertEqual(exported, "")
+
+    def test_existing_delegation_admits_without_runtime_mutation(self):
+        result, calls, exported = self.execute_setup()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(["sudo", "loginctl", "enable-linger", "runner"], calls)
+        self.assertIn(
+            ["sudo", "systemctl", "start", "user@1001.service"], calls,
+        )
+        self.assertIn(
+            ["cat", "/sys/fs/cgroup/user.slice/user-1001.slice/"
+             "user@1001.service/cgroup.controllers"], calls,
+        )
+        self.assertEqual(exported.splitlines(), [
+            "XDG_RUNTIME_DIR=/run/user/1001",
+            "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus",
+        ])
+        self.assertFalse(any("set-property" in command or "restart" in command
+                             for command in calls), calls)
+
+    def test_inactive_wrong_or_undelegated_manager_is_refused(self):
+        for name, value in (
+            ("ActiveState", "inactive"), ("ActiveState", ""),
+            ("ActiveState", "active\ninactive"),
+            ("ControlGroup", "/user.slice/user-1002.slice/user@1002.service"),
+            ("ControlGroup", ""), ("Delegate", "no"),
+            ("Delegate", ""), ("Delegate", "yes\nno"),
+        ):
+            with self.subTest(name=name, value=value):
+                self.assert_refused_after_query(*self.execute_setup(
+                    properties={name: value},
+                ))
+
+    def test_missing_or_malformed_unit_controllers_are_refused(self):
+        for controllers in (
+            "", "memory pids", "cpu pids", "cpu memory", "cpux memory pids",
+        ):
+            with self.subTest(controllers=controllers):
+                self.assert_refused_after_query(*self.execute_setup(
+                    properties={"DelegateControllers": controllers},
+                ))
+
+    def test_missing_or_malformed_kernel_controllers_are_refused(self):
+        for controllers in (
+            "", "memory pids", "cpu pids", "cpu memory", "cpu memory pidsx",
+        ):
+            with self.subTest(controllers=controllers):
+                self.assert_refused_after_query(*self.execute_setup(
+                    kernel_controllers=controllers,
+                ))
+
+    def test_failed_metadata_or_kernel_queries_are_refused(self):
+        for name in ("ActiveState", "ControlGroup", "Delegate",
+                     "DelegateControllers"):
+            with self.subTest(name=name):
+                self.assert_refused_after_query(*self.execute_setup(
+                    failed_property=name,
+                ))
+        self.assert_refused_after_query(*self.execute_setup(
+            unreadable_kernel=True,
+        ))
 
 
 class HostObservationTests(unittest.TestCase):

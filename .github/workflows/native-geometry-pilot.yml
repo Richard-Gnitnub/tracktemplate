@@ -41,9 +41,27 @@ jobs:
           sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
           pilot_uid="$(id -u)"
           test "$pilot_uid" -ne 0
+          pilot_manager="user@${pilot_uid}.service"
+          pilot_group="/user.slice/user-${pilot_uid}.slice/${pilot_manager}"
           sudo loginctl enable-linger "$(id -un)"
-          sudo systemctl start "user@${pilot_uid}.service"
-          sudo systemctl set-property "user@${pilot_uid}.service" Delegate=yes
+          sudo systemctl start "$pilot_manager"
+          systemctl show "$pilot_manager" -p ActiveState -p ControlGroup -p Delegate -p DelegateControllers
+          test "$(systemctl show "$pilot_manager" -p ActiveState --value)" = active
+          test "$(systemctl show "$pilot_manager" -p ControlGroup --value)" = "$pilot_group"
+          test "$(systemctl show "$pilot_manager" -p Delegate --value)" = yes
+          pilot_delegated="$(systemctl show "$pilot_manager" -p DelegateControllers --value)"
+          pilot_available="$(cat "/sys/fs/cgroup${pilot_group}/cgroup.controllers")"
+          printf 'Delegated controllers: %s\nAvailable controllers: %s\n' "$pilot_delegated" "$pilot_available"
+          for pilot_controller in cpu memory pids; do
+            case " $pilot_delegated " in
+              *" $pilot_controller "*) ;;
+              *) echo "Required delegation missing: $pilot_controller" >&2; exit 1 ;;
+            esac
+            case " $pilot_available " in
+              *" $pilot_controller "*) ;;
+              *) echo "Required kernel controller missing: $pilot_controller" >&2; exit 1 ;;
+            esac
+          done
           echo "XDG_RUNTIME_DIR=/run/user/${pilot_uid}" >> "$GITHUB_ENV"
           echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${pilot_uid}/bus" >> "$GITHUB_ENV"
 
