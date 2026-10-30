@@ -224,6 +224,59 @@ class L1PrivateControls(unittest.TestCase):
             with self.assertRaises(ValueError):
                 pilot.qualified_runtime(output)
 
+    def test_runtime_report_accepts_exact_unittest_progress_frames(self):
+        record = {'status': 'modular-foundation-ready',
+                  'matched_profile_id': original.EXPECTED_PROFILE,
+                  'document_mutation': False, 'workflow_launched': False}
+        report = 'TRACKTEMPLATE_B16_FOUNDATION=' + json.dumps(record)
+        # Readiness prefix is captured verbatim from run41108114397 stdout.
+        prefixes = (
+            '',
+            'test_readiness (hosted_l1_current_source_suite.L1CurrentSource.test_readiness) ... ',
+            'test_canonical_600_900_600 (hosted_l1_current_source_suite.L1CurrentSource.test_canonical_600_900_600) ... ',
+        )
+        for prefix in prefixes:
+            with self.subTest(prefix=prefix):
+                pilot.qualified_runtime(prefix + report + '\nok\n')
+
+    def test_runtime_report_rejects_duplicate_or_unexpected_framing(self):
+        record = {'status': 'modular-foundation-ready',
+                  'matched_profile_id': original.EXPECTED_PROFILE,
+                  'document_mutation': False, 'workflow_launched': False}
+        report = 'TRACKTEMPLATE_B16_FOUNDATION=' + json.dumps(record)
+        progress = 'test_readiness (hosted_l1_current_source_suite.L1CurrentSource.test_readiness) ... '
+        native = 'test_canonical_600_900_600 (hosted_l1_current_source_suite.L1CurrentSource.test_canonical_600_900_600) ... '
+        for output in ('', report + '\n' + report,
+                       progress + report + '\n' + report,
+                       report + '\n' + progress + report,
+                       progress + report + '\n' + native + report,
+                       'noise ' + report, ' ' + progress + report,
+                       progress.replace(' ... ', ' ...  ') + report,
+                       progress.replace('test_readiness', 'test_other') + report,
+                       report + '\nnoise ' + report):
+            with self.subTest(output=output):
+                with self.assertRaises(ValueError):
+                    pilot.qualified_runtime(output)
+
+    def test_runtime_report_rejects_malformed_objects_and_unsafe_fields(self):
+        record = {'status': 'modular-foundation-ready',
+                  'matched_profile_id': original.EXPECTED_PROFILE,
+                  'document_mutation': False, 'workflow_launched': False}
+        payloads = ['{', '[]', 'null', 'true', '1', '"text"']
+        payloads.extend(json.dumps(dict(record, **{key: value})) for key, value in (
+            ('status', 'blocked'), ('matched_profile_id', 'unqualified'),
+            ('document_mutation', True), ('workflow_launched', True),
+            ('document_mutation', 0), ('workflow_launched', 0),
+        ))
+        for prefix in (
+                '',
+                'test_readiness (hosted_l1_current_source_suite.L1CurrentSource.test_readiness) ... ',
+                'test_canonical_600_900_600 (hosted_l1_current_source_suite.L1CurrentSource.test_canonical_600_900_600) ... '):
+            for payload in payloads:
+                with self.subTest(prefix=prefix, payload=payload):
+                    with self.assertRaises(ValueError):
+                        pilot.qualified_runtime(prefix + 'TRACKTEMPLATE_B16_FOUNDATION=' + payload)
+
     def test_native_receipt_requires_all_comparisons_and_cleanup(self):
         receipt = {'status': 'PASS', 'stage': 'native',
                    'profile': original.EXPECTED_PROFILE,
