@@ -1,4 +1,4 @@
-name: Private L1 validation
+name: L1 validation
 
 on:
   workflow_dispatch:
@@ -47,11 +47,11 @@ jobs:
           path: candidate
           persist-credentials: false
 
-      - name: Verify reviewed scope before private acquisition
+      - name: Verify reviewed scope before input acquisition
         id: prepare
         timeout-minutes: 2
         env:
-          L1_PRIVATE_CONTROL: ${{ secrets.L1_PRIVATE_CONTROL }}
+          L1_PRIVATE_CONTROL: ${{ vars.L1_PRIVATE_CONTROL }}
         shell: bash
         run: |
           set +x
@@ -110,12 +110,9 @@ jobs:
           test ! -e /home/richard
           sudo install -d -m 700 -o "$(id -u)" -g "$(id -g)" /home/richard
 
-      - name: Acquire only the approved encrypted inputs
+      - name: Acquire only the approved public inputs
         id: acquire
         timeout-minutes: 2
-        env:
-          L1_PRIVATE_INPUT_READ_TOKEN: ${{ secrets.L1_PRIVATE_INPUT_READ_TOKEN }}
-          L1_PRIVATE_INPUT_PASSPHRASE: ${{ secrets.L1_PRIVATE_INPUT_PASSPHRASE }}
         shell: bash
         run: |
           set +x
@@ -156,22 +153,92 @@ jobs:
           exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/finalizer.log" 2>&1
           python3 tools/hosted_l1_private_validation.py finalize
 
-      - name: Publish readable evidence to the approved private destination
+      - name: Seal the primary diagnostic archive
+        id: seal
+        if: always()
+        timeout-minutes: 1
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/seal.log" 2>&1
+          python3 tools/hosted_l1_private_validation.py seal
+
+      - name: Preserve primary evidence
+        id: primary_artifact
+        if: always() && steps.seal.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l1-primary-${{ github.run_id }}-${{ inputs.stage }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-private-${{ github.run_id }}-${{ inputs.stage }}/evidence.tar
+
+      - name: Read back the exact primary artifact
+        id: primary_readback
+        if: always() && steps.primary_artifact.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.primary_artifact.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/l1-private-${{ github.run_id }}-${{ inputs.stage }}/readback-primary
+
+      - name: Verify preservation and finish staging cleanup
         id: publication
         if: always()
-        timeout-minutes: 2
+        timeout-minutes: 1
         env:
-          L1_PRIVATE_CONTROL: ${{ secrets.L1_PRIVATE_CONTROL }}
-          L1_PRIVATE_EVIDENCE_WRITE_TOKEN: ${{ secrets.L1_PRIVATE_EVIDENCE_WRITE_TOKEN }}
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_artifact.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_readback.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_artifact.outputs.artifact-id }}
         shell: bash
         run: |
           set +x
           set -euo pipefail
           umask 077
           ulimit -c 0
-          mkdir -p -m 700 "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence"
           exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/publication.log" 2>&1
           python3 tools/hosted_l1_private_validation.py publish
+
+      - name: Preserve final diagnostics and cleanup evidence
+        id: final_artifact
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l1-evidence-${{ github.run_id }}-${{ inputs.stage }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-private-${{ github.run_id }}-${{ inputs.stage }}/publication.tar
+
+      - name: Read back the exact final artifact
+        id: final_readback
+        if: always() && steps.final_artifact.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_artifact.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/l1-private-${{ github.run_id }}-${{ inputs.stage }}/readback-final
+
+      - name: Verify final preservation and prepare summary
+        id: complete
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PUBLICATION: ${{ steps.publication.outcome }}
+          L1_FINAL_UPLOAD: ${{ steps.final_artifact.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_readback.outcome }}
+          L1_FINAL_ID: ${{ steps.final_artifact.outputs.artifact-id }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          timeout 10s python3 tools/hosted_l1_private_validation.py complete >/dev/null 2>&1
 
       - name: Preserve the allowlisted public summary
         id: summary_artifact

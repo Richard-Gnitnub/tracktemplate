@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Coordinate the single approved private L1 workload on GitHub.
+"""Coordinate the single approved public L1 workload on GitHub.
 
-The workflow captures stdout/stderr before invoking this module. This tool
-never prints a public diagnostic. Only the payload module's strict summary
-may become public. Readable evidence is uploaded solely to the approved
-owner-only private repository. Approval records bind an already authorised
-scope; they do not authenticate consent.
+The workflow preserves complete diagnostics as ordinary Actions artifacts.
+Approved inputs are downloaded anonymously and verified before extraction.
+Approval records bind an already authorised scope; they do not authenticate
+consent. Historical private-oriented filenames remain compatibility names.
 """
 
 from contextlib import ExitStack
@@ -79,10 +78,10 @@ def limits(stage):
 
 
 def require_finalization_time(stage, environ, now):
-    """Reserve five minutes inside the unchanged 140-minute job limit."""
+    """Reserve ten minutes for artifact readback within the 140-minute job."""
     started = int(environ['L1_JOB_START_SECONDS'])
     require(0 <= now - started
-            <= 140 * 60 - limits(stage).timeout_seconds - 300,
+            <= 140 * 60 - limits(stage).timeout_seconds - 600,
             'Insufficient job time for proof and finalization')
 
 
@@ -196,7 +195,7 @@ def command(*args, cwd=ROOT):
 
 
 def prepare(stage, work):
-    """Validate public code and owner-side access audit before acquisition."""
+    """Validate reviewed code and public-input scope before acquisition."""
     require(os.getuid() != 0 and not sys.flags.optimize, 'Unsafe interpreter')
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     admission = validate_host(os.environ, Path('/proc/meminfo').read_text())
@@ -211,12 +210,11 @@ def prepare(stage, work):
             'Reviewed handling record absent')
     access = control['access_review']
     require(access['status'] == 'PASS' and access['audited_at_utc']
-            and access['collaborators'] == ['Richard-Gnitnub']
+            and access['owner'] == 'Richard-Gnitnub'
             and access['environment'] == 'l1-private-validation'
             and access['branches'] == ['main'] and access['tags'] == []
-            and access['private_repository'] == INPUT_REPOSITORY
-            and access['private_actions_enabled'] is False
-            and access['private_pages_enabled'] is False,
+            and access['input_repository'] == INPUT_REPOSITORY
+            and access['repository_public'] is True,
             'Owner-side access audit missing or differs')
     require(set(control['control_files_sha256']) == set(CONTROL_FILES),
             'Incomplete control source review')
@@ -240,15 +238,15 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def download_asset(record, token, target, *, maximum_bytes=64 * 1024**2):
-    """Never forward the private-repository token to a storage redirect."""
+def download_asset(record, target, *, maximum_bytes=payload.MAX_ARCHIVE_BYTES):
+    """Download only the reviewed public release asset without credentials."""
     require(type(record['asset_id']) is int and record['asset_id'] > 0,
             'Invalid asset identity')
     require(type(record['bytes']) is int and 0 < record['bytes'] <= maximum_bytes,
-            'Invalid ciphertext size')
+            'Invalid input archive size')
     url = f"https://api.github.com/repos/{INPUT_REPOSITORY}/releases/assets/{record['asset_id']}"
     request = urllib.request.Request(url, headers={
-        'Authorization': 'Bearer ' + token, 'Accept': 'application/octet-stream',
+        'Accept': 'application/octet-stream',
         'X-GitHub-Api-Version': '2022-11-28',
     })
     opener = urllib.request.build_opener(NoRedirect)
@@ -272,11 +270,11 @@ def download_asset(record, token, target, *, maximum_bytes=64 * 1024**2):
         remaining = record['bytes']
         while remaining:
             data = response.read(min(1024 * 1024, remaining))
-            require(data, 'Truncated ciphertext')
+            require(data, 'Truncated input archive')
             stream.write(data)
             remaining -= len(data)
-        require(not response.read(1), 'Oversized ciphertext')
-    require(digest(target) == record['sha256'], 'Ciphertext changed')
+        require(not response.read(1), 'Oversized input archive')
+    require(digest(target) == record['sha256'], 'Input archive changed')
 
 
 def validate_input_map(config, manifest):
@@ -365,25 +363,8 @@ def emergency_cleanup(work, owner, context=None):
 def acquire(stage, work):
     control = json.loads((work / 'control.json').read_text())
     validate_host(os.environ, Path('/proc/meminfo').read_text())
-    encrypted = work / 'inputs.tar.gpg'
-    download_asset(control['ciphertext'], os.environ.pop('L1_PRIVATE_INPUT_READ_TOKEN'),
-                   encrypted)
-    passphrase = os.environ.pop('L1_PRIVATE_INPUT_PASSPHRASE').encode() + b'\n'
-    require(17 <= len(passphrase) <= 4096 and passphrase.count(b'\n') == 1,
-            'Invalid passphrase transport')
-    read_fd, write_fd = os.pipe()
-    try:
-        os.write(write_fd, passphrase)
-        os.close(write_fd)
-        write_fd = None
-        payload.decrypt_inputs(encrypted, work / 'inputs.tar', read_fd,
-                               control['ciphertext']['sha256'],
-                               control['ciphertext']['bytes'],
-                               work / 'evidence/decryption.log')
-    finally:
-        os.close(read_fd)
-        if write_fd is not None:
-            os.close(write_fd)
+    validate_input_repository()
+    download_asset(control['input_archive'], work / 'inputs.tar')
     manifest = payload.read_manifest(work / 'inputs.tar')
     extracted = payload.extract_archive(work / 'inputs.tar', manifest, work / 'unpacked')
     config = json.loads(extracted['run-config'].read_text())
@@ -514,7 +495,10 @@ def run(stage, work):
 
 
 def evidence_archive(work, destination, *, late=False):
-    """Archive private diagnostics; omit restricted input copies and bytes."""
+    """Archive available diagnostics; omit retained input copies and bytes."""
+    require(not destination.exists() and not destination.is_symlink(),
+            'Evidence archive already exists')
+    partial = destination.with_name(destination.name + '.partial')
     config_path = work / 'run-config.json'
     config = json.loads(config_path.read_text()) if config_path.exists() else {}
     input_hashes = {row['sha256'] for row in config.get('inputs', [])}
@@ -522,7 +506,7 @@ def evidence_archive(work, destination, *, late=False):
     selected = ([work / 'evidence/publication.json', work / 'evidence/publication.log',
                  work / 'evidence/finalization.json']
                 if late else sorted((work / 'evidence').rglob('*')))
-    with tarfile.open(destination, 'x') as archive:
+    with tarfile.open(partial, 'x') as archive:
         for path in selected:
             require(not path.is_symlink(), 'Linked evidence refused')
             if path.is_file():
@@ -540,6 +524,12 @@ def evidence_archive(work, destination, *, late=False):
         info = tarfile.TarInfo('evidence-manifest.json')
         info.size, info.mode = len(content), 0o600
         archive.addfile(info, io.BytesIO(content))
+    require(partial.stat().st_size <= 512 * 1024**2,
+            'Evidence transport bound exceeded')
+    # Expose the exact upload path only after the retained ceiling passes.
+    # Hard-link creation is exclusive; a failed archive remains as .partial.
+    os.link(partial, destination)
+    partial.unlink()
     return {'sha256': digest(destination), 'bytes': destination.stat().st_size}
 
 
@@ -639,50 +629,46 @@ def cleanup_staging(work, preserved):
     return result
 
 
-def api_request(method, url, token, *, archive=None):
-    """Call fixed GitHub endpoints without redirects or credential logging."""
+def api_request(url):
+    """Read fixed GitHub metadata anonymously; refuse redirects and non-200."""
     parsed = urllib.parse.urlsplit(url)
-    require(parsed.scheme == 'https' and parsed.hostname in (
-        'api.github.com', 'uploads.github.com',
-    ) and not parsed.username and not parsed.password, 'Unsupported private endpoint')
-    headers = {'Authorization': 'Bearer ' + token,
-               'Accept': 'application/vnd.github+json',
-               'X-GitHub-Api-Version': '2022-11-28'}
-    with ExitStack() as stack:
-        body = None
-        if archive is not None:
-            require(archive.stat().st_size <= 512 * 1024**2, 'Evidence transport bound exceeded')
-            body = stack.enter_context(archive.open('rb'))
-            headers.update({'Content-Type': 'application/x-tar',
-                            'Content-Length': str(archive.stat().st_size)})
-        request = urllib.request.Request(url, data=body, headers=headers, method=method)
-        try:
-            response = stack.enter_context(urllib.request.build_opener(NoRedirect).open(request, timeout=30))
-            require(response.status == (201 if method == 'POST' else 200),
-                    'Private evidence HTTP success status differs')
+    require(parsed.scheme == 'https' and parsed.hostname == 'api.github.com'
+            and not parsed.username and not parsed.password,
+            'Unsupported public endpoint')
+    request = urllib.request.Request(url, headers={
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    })
+    try:
+        with urllib.request.build_opener(NoRedirect).open(request, timeout=30) as response:
+            require(response.status == 200, 'Public metadata HTTP status differs')
             content = response.read(1024 * 1024 + 1)
             require(len(content) <= 1024 * 1024, 'Oversized GitHub metadata')
             return json.loads(content)
-        except urllib.error.HTTPError as error:
-            raise ValueError('Private evidence HTTP status ' + str(error.code)) from None
-        except urllib.error.URLError:
-            raise ValueError('Private evidence transport failed') from None
+    except urllib.error.URLError:
+        raise ValueError('Public metadata transport failed') from None
 
 
-def upload_private_asset(path, name, release_id, token, work):
-    identity = {'sha256': digest(path), 'bytes': path.stat().st_size}
-    url = (f'https://uploads.github.com/repos/{INPUT_REPOSITORY}/releases/'
-           f'{release_id}/assets?name=' + urllib.parse.quote(name, safe=''))
-    record = api_request('POST', url, token, archive=path)
-    require(record.get('name') == name and record.get('state') == 'uploaded'
-            and record.get('size') == identity['bytes']
-            and type(record.get('id')) is int and record['id'] > 0,
-            'Private asset receipt differs')
-    readback = work / (name + '.readback')
-    download_asset({'asset_id': record['id'], **identity}, token, readback,
-                   maximum_bytes=512 * 1024**2)
-    require(digest(readback) == identity['sha256'], 'Private asset readback differs')
-    return {**identity, 'asset_id': record['id']}
+def validate_input_repository():
+    metadata = api_request(f'https://api.github.com/repos/{INPUT_REPOSITORY}')
+    require(metadata.get('private') is False
+            and metadata.get('full_name') == INPUT_REPOSITORY
+            and metadata.get('owner', {}).get('login') == 'Richard-Gnitnub',
+            'Public input repository differs')
+
+
+def verify_artifact(source, readback, upload, download, artifact_id):
+    """Require successful same-run Actions transport and exact returned bytes."""
+    require(upload == download == 'success'
+            and artifact_id.isdigit() and int(artifact_id) > 0,
+            'Artifact publication or download failed')
+    require(not readback.is_symlink() and readback.is_file(),
+            'Artifact readback unavailable')
+    identity = {'sha256': digest(source), 'bytes': source.stat().st_size,
+                'asset_id': int(artifact_id)}
+    require(readback.stat().st_size == identity['bytes']
+            and digest(readback) == identity['sha256'], 'Artifact readback differs')
+    return identity
 
 
 def public_summary(stage, work, evidence, publication_complete):
@@ -724,66 +710,63 @@ def public_summary(stage, work, evidence, publication_complete):
     return payload.validate_public_summary(summary)
 
 
-def publish(stage, work, public):
-    """Publish primary diagnostics and one bounded publication supplement.
+def seal(work):
+    """Seal available diagnostics before the first standard artifact upload."""
+    return evidence_archive(work, work / 'evidence.tar')
 
-    After the supplement, only fixed-schema public operations remain. A
-    failed final upload stops with incomplete evidence; it is never retried.
+
+def publish(stage, work, public):
+    """Verify primary readback, clean staging, and seal final diagnostics.
+
+    The workflow performs transport with pinned ordinary artifact actions.
+    A failed primary readback retains staging and is recorded in the final
+    diagnostics archive. Neither transport nor cleanup is retried.
     """
-    token = os.environ.pop('L1_PRIVATE_EVIDENCE_WRITE_TOKEN')
-    control = json.loads(os.environ.pop('L1_PRIVATE_CONTROL'))
-    require(control['workflow_commit'] == os.environ['GITHUB_SHA']
-            and control['scope_id'] == SCOPE and control['stage'] == stage
-            and control['independent_review'] == 'PASS', 'Publication scope differs')
-    for relative in CONTROL_FILES:
-        require(digest(ROOT / relative) == control['control_files_sha256'][relative],
-                'Publication controls changed')
-    release_id = control['evidence_release_id']
-    require(type(release_id) is int and release_id > 0, 'Private release absent')
-    metadata = api_request('GET', f'https://api.github.com/repos/{INPUT_REPOSITORY}', token)
-    require(metadata.get('private') is True and metadata.get('full_name') == INPUT_REPOSITORY,
-            'Evidence destination is not private')
-    release = api_request('GET', f'https://api.github.com/repos/{INPUT_REPOSITORY}/releases/{release_id}', token)
-    require(release.get('id') == release_id, 'Frozen private release differs')
-    run_id = os.environ['GITHUB_RUN_ID']
-    prefix = f'l1-evidence-{run_id}-{stage}'
-    require(not any(row.get('name') in (prefix + '.tar', prefix + '-publication.tar')
-                    for row in release.get('assets', [])), 'Evidence already exists; no overwrite')
-    evidence = {'sha256': '0' * 64, 'bytes': 0, 'asset_id': 0}
     publication = {'primary': None, 'errors': [], 'retention_days': 30,
-                   'delete_not_before_verified_independent_preservation': True,
-                   'uploaded_epoch_seconds': time.time(),
-                   'deletion_deadline_epoch_seconds': time.time() + 30 * 86400}
-    archive = work / 'evidence.tar'
+                   'delete_not_before_verified_independent_preservation': True}
     try:
-        evidence_archive(work, archive)
-        evidence.update(sha256=digest(archive), bytes=archive.stat().st_size)
-        evidence = upload_private_asset(archive, prefix + '.tar', release_id, token, work)
+        evidence = verify_artifact(
+            work / 'evidence.tar', work / 'readback-primary/evidence.tar',
+            os.environ.get('L1_PRIMARY_UPLOAD', ''),
+            os.environ.get('L1_PRIMARY_DOWNLOAD', ''),
+            os.environ.get('L1_PRIMARY_ID', ''),
+        )
         publication['primary'] = evidence
         cleanup = cleanup_staging(work, evidence)
         require(cleanup['cleanup'], 'Plaintext staging cleanup incomplete')
-    except (OSError, ValueError, KeyError, TypeError, tarfile.TarError):
+    except (OSError, ValueError, KeyError, TypeError):
         publication['errors'].append(traceback.format_exc())
     write(work / 'evidence/publication.json', publication)
-    late = work / 'publication.tar'
+    # Include all available diagnostics when the first upload failed too.
+    evidence_archive(work, work / 'publication.tar')
+    return 0 if not publication['errors'] else 1
+
+
+def complete(stage, work, public):
+    """Verify final artifact readback before emitting the fixed summary."""
+    evidence = {'sha256': '0' * 64, 'bytes': 0, 'asset_id': 0}
     complete = False
     try:
-        evidence_archive(work, late, late=True)
-        supplement = upload_private_asset(late, prefix + '-publication.tar', release_id, token, work)
-        complete = publication['primary'] is not None and not publication['errors']
-        # This fixed numeric/digest receipt contains no private diagnostics.
-        write(work / 'late-asset-receipt.json', supplement)
-    except (OSError, ValueError, KeyError, TypeError, tarfile.TarError):
+        evidence = verify_artifact(
+            work / 'publication.tar', work / 'readback-final/publication.tar',
+            os.environ.get('L1_FINAL_UPLOAD', ''),
+            os.environ.get('L1_FINAL_DOWNLOAD', ''),
+            os.environ.get('L1_FINAL_ID', ''),
+        )
+        publication = json.loads((work / 'evidence/publication.json').read_text())
+        complete = (os.environ.get('L1_PUBLICATION') == 'success'
+                    and publication['primary'] is not None
+                    and not publication['errors'])
+    except (OSError, ValueError, KeyError, TypeError):
         complete = False
-    # Do not generate private tracebacks after the final evidence boundary.
+    # The final artifact already contains all diagnostic generation. These
+    # fixed-schema operations cannot convert missing evidence into PASS.
     try:
         public.mkdir(mode=0o700, exist_ok=True)
-        summary = public_summary(stage, work, evidence, complete)
-        write(public / 'summary.json', summary)
+        write(public / 'summary.json', public_summary(stage, work, evidence, complete))
         return 0 if complete else 1
     except (OSError, ValueError, KeyError, TypeError):
         return 1
-
 
 def main():
     require(len(sys.argv) == 2, 'Expected one fixed operation')
@@ -797,6 +780,10 @@ def main():
         return run(stage, work)
     elif operation == 'finalize':
         return finalize(stage, work, public)
+    elif operation == 'seal':
+        seal(work)
+    elif operation == 'complete':
+        return complete(stage, work, public)
     elif operation == 'publish':
         return publish(stage, work, public)
     elif operation == 'finish':
@@ -815,6 +802,6 @@ if __name__ == '__main__':
     try:
         raise SystemExit(main())
     except (Exception, KeyboardInterrupt):
-        # The outer shell must already point both descriptors at private logs.
+        # The outer shell must already point both descriptors at evidence logs.
         traceback.print_exc()
         raise SystemExit(1) from None

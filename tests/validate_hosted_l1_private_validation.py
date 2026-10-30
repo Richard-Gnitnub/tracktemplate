@@ -50,27 +50,31 @@ class L1PrivateControls(unittest.TestCase):
 
     def test_finalization_reserve_does_not_raise_limits(self):
         environment = {'L1_JOB_START_SECONDS': '100'}
-        pilot.require_finalization_time('native', environment, 1000)
+        pilot.require_finalization_time('native', environment, 700)
         with self.assertRaises(ValueError):
-            pilot.require_finalization_time('native', environment, 1001)
+            pilot.require_finalization_time('native', environment, 701)
 
-    def test_private_token_is_not_forwarded_to_asset_storage(self):
-        data = b'encrypted-dummy'
+    def test_public_input_download_is_anonymous_and_hash_bound(self):
+        data = b'approved-tar-bytes'
         record = {'asset_id': 123, 'bytes': len(data),
                   'sha256': hashlib.sha256(data).hexdigest()}
         redirect = pilot.urllib.error.HTTPError(
             'https://api.github.com/', 302, 'redirect',
-            {'Location': 'https://release-assets.githubusercontent.com/private?signature=private'},
-            None,
-        )
+            {'Location': 'https://release-assets.githubusercontent.com/approved'}, None)
         opener = Mock()
         opener.open.side_effect = [redirect, io.BytesIO(data)]
         with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / 'inputs.tar'
             with patch.object(pilot.urllib.request, 'build_opener', return_value=opener):
-                pilot.download_asset(record, 'private-token', Path(temporary) / 'cipher')
-        first, second = [call.args[0] for call in opener.open.call_args_list]
-        self.assertEqual(first.get_header('Authorization'), 'Bearer private-token')
-        self.assertIsNone(second.get_header('Authorization'))
+                pilot.download_asset(record, target)
+            self.assertEqual(target.read_bytes(), data)
+        for call in opener.open.call_args_list:
+            self.assertIsNone(call.args[0].get_header('Authorization'))
+        opener.open.side_effect = [io.BytesIO(b'x' * len(data))]
+        with tempfile.TemporaryDirectory() as temporary:
+            with patch.object(pilot.urllib.request, 'build_opener', return_value=opener):
+                with self.assertRaisesRegex(ValueError, 'Input archive changed'):
+                    pilot.download_asset(record, Path(temporary) / 'bad.tar')
 
     def test_entire_manifest_destination_map_is_checked_before_writes(self):
         rows = [{'id': str(index), 'path': '/approved/' + str(index),
@@ -162,28 +166,28 @@ class L1PrivateControls(unittest.TestCase):
             pilot.validate_readiness(good, config, '42',
                                      dict(control, control_files_sha256={}))
 
-    def test_private_metadata_requires_exact_http_success_status(self):
-        for method, status, accepted in (
-            ('GET', 200, True), ('POST', 201, True),
-            ('GET', 201, False), ('POST', 200, False),
-            ('POST', 202, False),
-        ):
-            with self.subTest(method=method, status=status):
-                response = io.BytesIO(b'{"id": 1}')
-                response.status = status
-                opener = Mock()
-                opener.open.return_value = response
-                with patch.object(pilot.urllib.request, 'build_opener',
-                                  return_value=opener):
-                    if accepted:
-                        self.assertEqual(pilot.api_request(
-                            method, 'https://api.github.com/private',
-                            'dummy-token'), {'id': 1})
-                    else:
-                        with self.assertRaises(ValueError):
-                            pilot.api_request(
-                                method, 'https://api.github.com/private',
-                                'dummy-token')
+    def test_public_repository_requires_exact_owner_visibility_and_status(self):
+        good = {'private': False, 'full_name': pilot.INPUT_REPOSITORY,
+                'owner': {'login': 'Richard-Gnitnub'}}
+        for field, value in (('private', True), ('full_name', 'other/repository'),
+                             ('owner', {'login': 'other'})):
+            with patch.object(pilot, 'api_request', return_value=dict(good, **{field: value})):
+                with self.assertRaises(ValueError):
+                    pilot.validate_input_repository()
+        with patch.object(pilot, 'api_request', return_value=good):
+            pilot.validate_input_repository()
+        for status in (200, 201):
+            response = io.BytesIO(b'{}')
+            response.status = status
+            opener = Mock()
+            opener.open.return_value = response
+            with patch.object(pilot.urllib.request, 'build_opener', return_value=opener):
+                if status == 200:
+                    self.assertEqual(pilot.api_request('https://api.github.com/repos/example'), {})
+                else:
+                    with self.assertRaises(ValueError):
+                        pilot.api_request('https://api.github.com/repos/example')
+            self.assertIsNone(opener.open.call_args.args[0].get_header('Authorization'))
 
     def test_runtime_adapter_uses_exact_foundation_report(self):
         record = {'status': 'modular-foundation-ready',
@@ -249,30 +253,77 @@ class L1PrivateControls(unittest.TestCase):
                                          bad_stderr, samples, cleanup)['status'],
                              'FAIL')
 
-    def test_private_upload_requires_exact_receipt_and_digest_readback(self):
+    def test_artifact_requires_upload_download_and_exact_readback(self):
         with tempfile.TemporaryDirectory() as temporary:
             work = Path(temporary)
-            archive = work / 'dummy.tar'
-            archive.write_bytes(b'dummy permitted evidence')
-            record = {'id': 123, 'name': 'dummy.tar', 'state': 'uploaded',
-                      'size': archive.stat().st_size}
-            def readback(binding, token, destination, **kwargs):
-                self.assertEqual(binding['asset_id'], 123)
-                self.assertEqual(token, 'dummy-token')
-                destination.write_bytes(archive.read_bytes())
-            with (patch.object(pilot, 'api_request', return_value=record) as request,
-                  patch.object(pilot, 'download_asset', side_effect=readback)):
-                result = pilot.upload_private_asset(archive, 'dummy.tar', 429232376,
-                                                    'dummy-token', work)
-            self.assertEqual(result, {'asset_id': 123, 'bytes': archive.stat().st_size,
-                                      'sha256': pilot.digest(archive)})
-            self.assertIn('/releases/429232376/assets?name=dummy.tar', request.call_args.args[1])
-            with (patch.object(pilot, 'api_request', return_value=dict(record, size=1)),
-                  patch.object(pilot, 'download_asset') as download):
+            source, readback = work / 'source.tar', work / 'readback.tar'
+            source.write_bytes(b'evidence')
+            readback.write_bytes(source.read_bytes())
+            good = ('success', 'success', '123')
+            result = pilot.verify_artifact(source, readback, *good)
+            self.assertEqual(result, {'sha256': pilot.digest(source), 'bytes': 8, 'asset_id': 123})
+            for values in (('failure', 'success', '123'), ('success', 'failure', '123'),
+                           ('success', 'success', '0'), ('success', 'success', '')):
                 with self.assertRaises(ValueError):
-                    pilot.upload_private_asset(archive, 'dummy.tar', 429232376,
-                                                'dummy-token', work)
-                download.assert_not_called()
+                    pilot.verify_artifact(source, readback, *values)
+            readback.write_bytes(b'changed!')
+            with self.assertRaises(ValueError):
+                pilot.verify_artifact(source, readback, *good)
+
+    def test_complete_requires_publication_success_and_final_readback(self):
+        for fault in ('none', 'publication', 'readback', 'cleanup'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                (work / 'evidence').mkdir()
+                (work / 'readback-final').mkdir()
+                (work / 'publication.tar').write_bytes(b'completed evidence')
+                (work / 'readback-final/publication.tar').write_bytes(
+                    b'changed' if fault == 'readback' else b'completed evidence')
+                (work / 'evidence/publication.json').write_text(json.dumps({
+                    'primary': {'asset_id': 123}, 'errors': []}))
+                (work / 'evidence/finalization.json').write_text(json.dumps({
+                    'cleanup': fault != 'cleanup', 'staging_inputs_removed': list(range(10))}))
+                (work / 'evidence/assessment.json').write_text(json.dumps({
+                    'status': 'PASS', 'completed_native_tests': 1,
+                    'native_receipt': {'sentinel': pilot.SENTINELS['readiness'],
+                                       'input_bindings_unchanged': True}}))
+                environment = {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '42',
+                               'L1_FINAL_UPLOAD': 'success', 'L1_FINAL_DOWNLOAD': 'success',
+                               'L1_FINAL_ID': '124',
+                               'L1_PUBLICATION': 'failure' if fault == 'publication' else 'success'}
+                with patch.dict(os.environ, environment):
+                    pilot.complete('readiness', work, work / 'public')
+                summary = json.loads((work / 'public/summary.json').read_text())
+                self.assertEqual(summary['outcome'], 'PASS' if fault == 'none' else 'INCOMPLETE')
+
+    def test_evidence_archive_cap_precedes_both_upload_paths(self):
+        from types import SimpleNamespace
+        limit = 512 * 1024**2
+        real_stat = Path.stat
+        for name in ('evidence.tar', 'publication.tar'):
+            for size in (limit, limit + 1):
+                with self.subTest(name=name, size=size), tempfile.TemporaryDirectory() as temporary:
+                    work = Path(temporary)
+                    (work / 'evidence').mkdir()
+                    destination = work / name
+                    partial = work / (name + '.partial')
+                    def measured(path, *args, **kwargs):
+                        if path == partial:
+                            return SimpleNamespace(st_size=size)
+                        return real_stat(path, *args, **kwargs)
+                    with patch.object(Path, 'stat', measured):
+                        if size > limit:
+                            with self.assertRaisesRegex(ValueError, 'Evidence transport bound exceeded'):
+                                pilot.evidence_archive(work, destination)
+                        else:
+                            pilot.evidence_archive(work, destination)
+                    self.assertEqual(destination.exists(), size <= limit)
+                    self.assertEqual(partial.exists(), size > limit)
+                    if size <= limit:
+                        before = destination.read_bytes()
+                        with self.assertRaises((ValueError, FileExistsError)):
+                            pilot.evidence_archive(work, destination)
+                        self.assertEqual(destination.read_bytes(), before)
 
     def test_readable_archive_omits_exact_and_byte_identical_input_copies(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -295,58 +346,37 @@ class L1PrivateControls(unittest.TestCase):
                 self.assertEqual(archive.extractfile('evidence/result.json').read(),
                                  b'permitted-result')
 
-    def test_failure_publication_keeps_primary_and_finite_late_diagnostics(self):
-        for failed_upload in (None, 1, 2):
-            with self.subTest(failed_upload=failed_upload), tempfile.TemporaryDirectory() as temporary:
-                work = Path(temporary) / 'private'
-                (work / 'evidence').mkdir(parents=True, mode=0o700)
-                (work / 'evidence/prepare.log').write_text('PRIVATE-TRACEBACK-MARKER')
-                (work / 'evidence/publication.log').write_text('PRIVATE-LATE-MARKER')
-                public = Path(temporary) / 'public'
-                control = {'workflow_commit': 'a' * 40, 'scope_id': pilot.SCOPE,
-                           'stage': 'readiness', 'independent_review': 'PASS',
-                           'evidence_release_id': 429232376,
-                           'control_files_sha256': {name: pilot.digest(ROOT / name)
-                                                    for name in pilot.CONTROL_FILES}}
-                environment = {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '42',
-                               'L1_PRIVATE_CONTROL': json.dumps(control),
-                               'L1_PRIVATE_EVIDENCE_WRITE_TOKEN': 'dummy-write-secret'}
-                calls = []
-
-                def upload(path, name, release, token, root):
-                    calls.append(name)
-                    self.assertEqual(release, 429232376)
-                    self.assertEqual(token, 'dummy-write-secret')
-                    if len(calls) == failed_upload:
-                        raise ValueError('PRIVATE-PUBLICATION-FAILURE')
-                    return {'sha256': pilot.digest(path), 'bytes': path.stat().st_size,
-                            'asset_id': 120 + len(calls)}
-
-                metadata = [{'private': True, 'full_name': pilot.INPUT_REPOSITORY},
-                            {'id': 429232376, 'assets': []}]
-                with (patch.dict(os.environ, environment),
-                      patch.object(original, '_clearance', return_value=True),
-                      patch.object(pilot, 'api_request', side_effect=metadata),
-                      patch.object(pilot, 'upload_private_asset', side_effect=upload)):
-                    pilot.finalize('readiness', work, public)
-                    status = pilot.publish('readiness', work, public)
-                self.assertEqual(status, 0 if failed_upload is None else 1)
-                self.assertEqual(len(calls), 2)  # One primary and one supplement, no retry.
-                summary = json.loads((public / 'summary.json').read_text())
+    def test_failure_publication_preserves_diagnostics_and_cannot_pass(self):
+        for failed in ('none', 'primary', 'final'):
+            with self.subTest(failed=failed), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                (work / 'evidence').mkdir()
+                (work / 'evidence/prepare.log').write_text('TRACEBACK-MARKER')
+                (work / 'evidence/publication.log').write_text('LATE-MARKER')
+                for name in ('readback-primary', 'readback-final'):
+                    (work / name).mkdir()
+                env = {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '42',
+                       'L1_PRIMARY_UPLOAD': 'success', 'L1_PRIMARY_DOWNLOAD': 'success',
+                       'L1_PRIMARY_ID': '121', 'L1_FINAL_UPLOAD': 'success',
+                       'L1_FINAL_DOWNLOAD': 'success', 'L1_FINAL_ID': '122'}
+                with patch.dict(os.environ, env), patch.object(original, '_clearance', return_value=True):
+                    pilot.finalize('readiness', work, work / 'public')
+                    pilot.seal(work)
+                    (work / 'readback-primary/evidence.tar').write_bytes(
+                        b'wrong' if failed == 'primary' else (work / 'evidence.tar').read_bytes())
+                    self.assertEqual(pilot.publish('readiness', work, work / 'public'),
+                                     1 if failed == 'primary' else 0)
+                    (work / 'readback-final/publication.tar').write_bytes(
+                        b'wrong' if failed == 'final' else (work / 'publication.tar').read_bytes())
+                    pilot.complete('readiness', work, work / 'public')
+                summary = json.loads((work / 'public/summary.json').read_text())
                 self.assertEqual(summary['outcome'], 'INCOMPLETE')
-                self.assertEqual(summary['evidence']['asset_id'],
-                                 0 if failed_upload == 1 else 121)
-                self.assertNotIn('PRIVATE-', json.dumps(summary))
-                self.assertNotIn('dummy-write-secret', json.dumps(summary))
-                with tarfile.open(work / 'evidence.tar') as archive:
-                    self.assertEqual(archive.extractfile('evidence/prepare.log').read(),
-                                     b'PRIVATE-TRACEBACK-MARKER')
+                self.assertNotIn('MARKER', json.dumps(summary))
                 with tarfile.open(work / 'publication.tar') as archive:
-                    self.assertEqual(archive.extractfile('evidence/publication.log').read(),
-                                     b'PRIVATE-LATE-MARKER')
+                    self.assertEqual(archive.extractfile('evidence/prepare.log').read(), b'TRACEBACK-MARKER')
+                    self.assertEqual(archive.extractfile('evidence/publication.log').read(), b'LATE-MARKER')
                     receipt = json.load(archive.extractfile('evidence/publication.json'))
-                    self.assertEqual(bool(receipt['errors']), failed_upload == 1)
-                self.assertNotIn('L1_PRIVATE_EVIDENCE_WRITE_TOKEN', os.environ)
+                    self.assertEqual(bool(receipt['errors']), failed == 'primary')
 
     def test_emergency_cleanup_refuses_missing_or_live_process_telemetry(self):
         from types import SimpleNamespace
@@ -462,45 +492,28 @@ class L1PrivateControls(unittest.TestCase):
             with self.subTest(primary_fails=primary_fails), tempfile.TemporaryDirectory() as temporary:
                 work = Path(temporary)
                 (work / 'evidence').mkdir()
+                (work / 'readback-primary').mkdir()
                 staged = work / 'staged-input'
                 staged.write_bytes(b'restricted input')
                 (work / 'evidence/deployed-01.json').write_text(json.dumps({
                     'path': str(staged), 'sha256': pilot.digest(staged)}))
-                (work / 'evidence/publication.log').write_text('private publication diagnostics')
-                control = {'workflow_commit': 'a' * 40, 'scope_id': pilot.SCOPE,
-                           'stage': 'readiness', 'independent_review': 'PASS',
-                           'evidence_release_id': 429232376,
-                           'control_files_sha256': {name: pilot.digest(ROOT / name)
-                                                    for name in pilot.CONTROL_FILES}}
-                environment = {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '42',
-                               'L1_PRIVATE_CONTROL': json.dumps(control),
-                               'L1_PRIVATE_EVIDENCE_WRITE_TOKEN': 'dummy-token'}
-                calls = []
-                def upload(path, name, release, token, root):
-                    calls.append(name)
-                    if len(calls) == 1:
-                        self.assertTrue(staged.exists())
-                        self.assertFalse((work / 'evidence/finalization.json').exists())
-                        if primary_fails:
-                            raise ValueError('Primary readback failed')
-                    else:
-                        self.assertEqual(staged.exists(), primary_fails)
-                        with tarfile.open(path) as archive:
-                            self.assertEqual('evidence/finalization.json' in archive.getnames(),
-                                             not primary_fails)
-                    return {'asset_id': 100 + len(calls), 'sha256': pilot.digest(path),
-                            'bytes': path.stat().st_size}
-                metadata = [{'private': True, 'full_name': pilot.INPUT_REPOSITORY},
-                            {'id': 429232376, 'assets': []}]
-                with (patch.dict(os.environ, environment),
-                      patch.object(pilot, 'DEPLOYMENT_ROOT', work),
-                      patch.object(original, '_clearance', return_value=True),
-                      patch.object(pilot, 'api_request', side_effect=metadata),
-                      patch.object(pilot, 'upload_private_asset', side_effect=upload)):
+                (work / 'evidence/publication.log').write_text('publication diagnostics')
+                env = {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '42',
+                       'L1_PRIMARY_UPLOAD': 'success', 'L1_PRIMARY_DOWNLOAD': 'success',
+                       'L1_PRIMARY_ID': '123'}
+                with (patch.dict(os.environ, env), patch.object(pilot, 'DEPLOYMENT_ROOT', work),
+                      patch.object(original, '_clearance', return_value=True)):
                     pilot.finalize('readiness', work, work / 'public')
+                    pilot.seal(work)
+                    self.assertTrue(staged.exists())
+                    self.assertFalse((work / 'evidence/finalization.json').exists())
+                    (work / 'readback-primary/evidence.tar').write_bytes(
+                        b'wrong' if primary_fails else (work / 'evidence.tar').read_bytes())
                     result = pilot.publish('readiness', work, work / 'public')
                 self.assertEqual(result, 1 if primary_fails else 0)
-                self.assertEqual(len(calls), 2)
+                self.assertEqual(staged.exists(), primary_fails)
+                with tarfile.open(work / 'publication.tar') as archive:
+                    self.assertEqual('evidence/finalization.json' in archive.getnames(), not primary_fails)
 
     def test_staging_cleanup_refuses_changed_input_or_link(self):
         for linked in (False, True):
@@ -566,13 +579,16 @@ class L1PrivateControls(unittest.TestCase):
         self.assertNotIn('*.gpg', upload)
         self.assertNotIn('guard/stdout', upload)
         self.assertNotIn('tee ', text)
-        self.assertEqual(text.count('${{ secrets.L1_PRIVATE_INPUT_READ_TOKEN }}'), 1)
-        self.assertEqual(text.count('${{ secrets.L1_PRIVATE_INPUT_PASSPHRASE }}'), 1)
-        self.assertEqual(text.count('${{ secrets.L1_PRIVATE_EVIDENCE_WRITE_TOKEN }}'), 1)
-        self.assertNotIn('L1_EVIDENCE_PUBLIC_KEY', text)
+        self.assertNotIn('secrets.', text)
+        self.assertNotIn('github-token:', text)
+        self.assertIn('${{ vars.L1_PRIVATE_CONTROL }}', text)
         self.assertNotIn("if: always() && steps.prepare.outcome", text)
-        self.assertEqual(text.count('uses: actions/upload-artifact@'), 1)
+        self.assertEqual(text.count('uses: actions/upload-artifact@'), 3)
+        self.assertEqual(text.count('uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093'), 2)
+        self.assertIn('artifact-ids: ${{ steps.primary_artifact.outputs.artifact-id }}', text)
+        self.assertIn('artifact-ids: ${{ steps.final_artifact.outputs.artifact-id }}', text)
         self.assertIn('summary.json', upload)
+
 
 
 if __name__ == '__main__':
