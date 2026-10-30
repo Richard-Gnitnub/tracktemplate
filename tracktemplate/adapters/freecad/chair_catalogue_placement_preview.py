@@ -215,9 +215,26 @@ def create_private_catalogue_s1j_preview(
     )
 
 
+def create_private_catalogue_l1_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place retained L1 components through the existing private lifecycle.
+
+    Each body and its four fixing frames keep their catalogue identities.
+    This is an explicit unsaved snapshot, with no source-document mutation.
+    """
+    return _create_private_catalogue_preview(
+        catalogue_path, placements, context_shapes, source_receipt,
+        verify_source, family="L1", placement_type=SingleRailPlacement,
+        model_sha256=_L1_MODEL_SHA256, source_names=_L1_SOURCE_NAMES,
+        run="existing-02", source_context="retained-S1-L1-reference-package",
+    )
+
+
 def _create_private_catalogue_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, family, placement_type, model_sha256, source_names,
+    run="basic-04", source_context="fixed-basic-source-context",
 ):
     """Place one fixed family through the shared component lifecycle."""
     if not callable(verify_source):
@@ -227,6 +244,7 @@ def _create_private_catalogue_preview(
         catalogue_path, placements, context_shapes, receipt,
         family=family, placement_type=placement_type,
         model_sha256=model_sha256, source_names=source_names,
+        run=run, source_context=source_context,
     )
 
     def verify_inputs():
