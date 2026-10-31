@@ -3063,3 +3063,42 @@ The XO-001 candidate and all evidence with FAIL results stay the same.
 
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6.
 No repair is available from the previous limit of `2/2`. LMS work stays stopped.
+
+## L1 chairs after changes to canonical state — 2026-10-30
+
+This Level 2 result supplies evidence for part of Exit 9B-3.
+The new `preview_private_catalogue_heel_l1_chairs` command calculates positions from canonical state for the ten L1 chairs at S13, T1 and T2.
+It uses the previous chair component shapes, stable identities and methods to put components in position.
+The `XO-001.FCStd` reference and the initial operation of the complete crossover command stay the same.
+The command makes chair component shapes only when a caller uses it.
+The complete crossover command has the same input limits as before this change.
+
+The seven source and test files have the same bytes as the files in commit `155cbb0353ca59a144df697197d8a4a68a91beef`.
+The [`readiness` test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41114880113) and [`native` test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41116286780) give PASS results.
+Independent result reviews give PASS results.
+The `Generate` operation changes the alignment radius through 600 mm, 900 mm and 600 mm.
+The caller does not make the crossover again.
+
+The `source_frame_comparisons` value is `150` for all ten identities.
+The `component_comparisons` value is `138` for two chairs at the three radii: `S13-A rail 1` and `S13-B rail 3`.
+These chairs supply a sample of the ten chairs.
+The `successful_preview_component_placements` value is `690` for three operations.
+The `rolled_back_component_placements` value is `230` before removal, with a `total_materialised_component_placements` value of `920`.
+
+Checks of `stale_source_rejected`, `wrong_frame_rejections`, `preview_undo_redo` and `late_verification_rollback` give PASS results.
+The sentinel and cleanup checks give PASS results. The `skips` value is `0`.
+
+The tests used FreeCAD without its display.
+This supplies evidence for `native_portion` in `L1-QUALIFICATION-001`. The `gui_portion` stays `OPEN`.
+Evidence from the FreeCAD display is necessary for alignment, the groups in the display, selection and the active view in this L1 operation.
+Previous FreeCAD display evidence for `P` chairs applies to the methods that both commands use.
+It does not supply evidence for this L1 operation in the FreeCAD display.
+
+The exact candidate for XO-001 and all previous evidence with FAIL results stay the same.
+No repair is available from the previous `2/2` limit.
+This result gives no acceptance for the complete crossover operation, physical fit, product performance, production or phase exit.
+It gives no positive rights claim.
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+The [evidence](https://github.com/Richard-Gnitnub/tracktemplate/releases/download/validation-l1-current-source-b53cc4e/l1-native-41116286780-reviewed-evidence.tar) contains the test results and independent reviews.
+Its SHA-256 is `6061358800717ce6d1b3f460ea369a3cadfc0d3602aaaf69b434098a662a8f04`.

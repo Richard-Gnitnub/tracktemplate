@@ -80,7 +80,16 @@
       "CHAIR_FAMILY_ORDINARY",
       "frog"
     ],
-    "product_exceptions": []
+    "product_exceptions": [
+      {
+        "path": "tracktemplate/compatibility/chair_heel_l1_placement.py",
+        "token": "CHAIR_FAMILY_ORDINARY",
+        "line": 106,
+        "review_id": "TERM-R02",
+        "reason": "This check compares the S1 input with CHAIR_FAMILY_ORDINARY from B15. The term stays review-required.",
+        "retirement_gate": "TERM-R02: S1-07, S1-08 and S1-10."
+      }
+    ]
   },
   "terms": [
     {
@@ -369,7 +378,8 @@
         "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43155",
         "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43164",
         "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43216",
-        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:44495"
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:44495",
+        "tracktemplate/compatibility/chair_heel_l1_placement.py:106"
       ],
       "question": "What exact source classification does ordinary carry for the S1 family, and what independently evidenced successor term is appropriate?",
       "owner_role": "Phase 9 chair evidence and railway-domain reviewer",
