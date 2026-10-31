@@ -3102,3 +3102,32 @@ It gives no positive rights claim.
 
 The [evidence](https://github.com/Richard-Gnitnub/tracktemplate/releases/download/validation-l1-current-source-b53cc4e/l1-native-41116286780-reviewed-evidence.tar) contains the test results and independent reviews.
 Its SHA-256 is `6061358800717ce6d1b3f460ea369a3cadfc0d3602aaaf69b434098a662a8f04`.
+
+## L1 FreeCAD display test preparation — 2026-10-31
+
+This Level 2 work prepares one test for `L1-QUALIFICATION-001` and part of Exit 9B-3.
+The [workflow](../../.github/workflows/l1-gui-validation.yml) uses the [test](../../tests/hosted_l1_gui_suite.py) through the [launcher](../../tools/hosted_l1_gui_validation.py).
+Its `readiness` and `gui` stages use the same test. Each stage requires one test with no skips.
+
+The `readiness` stage opens a verified copy of the source file. It does not construct chairs.
+The `gui` stage changes the radius through 600 mm, 900 mm and 600 mm for all ten L1 chairs.
+It checks the `Generate` operation, component positions, selection and the FreeCAD display.
+
+All 96 tests with standalone Python give PASS results. Syntax and Ruff checks give PASS results.
+Independent quality and security review gives a PASS result for preparation.
+The product source, ten inputs, previous exact candidate and previous evidence stay the same.
+No FreeCAD or display test ran during preparation.
+The `gui_portion` of `L1-QUALIFICATION-001` stays `OPEN`.
+
+The project owner authorises both stages, their limits and public test evidence.
+The owner will merge the reviewed pull request. Recovery must give a PASS result before the first stage.
+Independent review must confirm the `readiness` PASS result before the `gui` stage starts.
+The second stage also requires independent result and image review.
+
+The [validation policy](../VALIDATION.md#validation-execution-location) owns the execution conditions.
+The authority gives no retry, local execution or new repair allowance.
+
+Preparation results, input hashes and independent reviews are in `tmp/l1-gui-preparation/`.
+This preparation gives no acceptance for physical fit, rights, production, performance or phase exit.
+No repair is available from the previous `2/2` limit.
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
