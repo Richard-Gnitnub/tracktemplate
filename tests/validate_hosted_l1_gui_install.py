@@ -250,6 +250,143 @@ class InstallerControls(unittest.TestCase):
         self.assertFalse((self.work / 'evidence/installer-result.json').exists())
         self.assertFalse(self.commands)
 
+    def completion_race(self, *, during_sample=False, first=False,
+                        fresh=None, malformed_sample=False, deadline=False,
+                        partial_fields=None):
+        """Finish between a live unit read and its resource observation."""
+        self.complete_after = 10**9
+        trigger = 1 if first else 2
+        raced = False
+        sample_reads = 0
+        original_sample = installer.guard._sample
+
+        def remove_group(group):
+            for item in group.iterdir():
+                item.unlink()
+            group.rmdir()
+
+        def finish(group):
+            nonlocal raced
+            raced = True
+            self.state = 'exited'
+            remove_group(group)
+            if deadline:
+                self.clock = 575
+
+        def show(unit, limit):
+            row = self.show(unit, limit)
+            group = installer.CGROUP_ROOT / row['ControlGroup'].lstrip('/')
+            if not raced and not during_sample and self.reads == trigger:
+                finish(group)
+                return row  # The observation predates the actual exit.
+            if raced and self.state in ('exited', 'inactive'):
+                if not self.residual:
+                    remove_group(group)
+                    row['ControlGroup'] = ''
+                if self.state == 'exited':
+                    row.update(fresh or {})
+            return row
+
+        def sample(group):
+            nonlocal sample_reads
+            sample_reads += 1
+            row = original_sample(group)
+            if during_sample and not raced and sample_reads == trigger:
+                finish(group)
+                row['memory.peak'] = 'invalid' if malformed_sample else None
+                row.update(partial_fields or {})
+            return row
+
+        with (
+            patch.object(installer, '_show', show),
+            patch.object(installer.guard, '_sample', sample),
+        ):
+            return installer.run(self.work)
+
+    def test_completion_between_live_read_and_group_check(self):
+        self.assertEqual(self.completion_race(), 0)
+        result = self.result()
+        self.assertEqual(result['resources']['samples'], 1)
+        self.assertEqual(result['exit_status'], 0)
+        self.assertTrue(result['cleanup'])
+        evidence = result['completion_recheck']
+        self.assertEqual(evidence['before']['SubState'], 'running')
+        self.assertEqual(evidence['after']['SubState'], 'exited')
+        self.assertEqual(sum('systemd-run' in row for row in self.commands), 1)
+        self.assertEqual(sum('stop' in row for row in self.commands), 1)
+
+    def test_completion_during_resource_read_keeps_only_complete_samples(self):
+        self.assertEqual(self.completion_race(during_sample=True), 0)
+        result = self.result()
+        self.assertEqual(result['resources']['samples'], 1)
+        self.assertEqual(result['resources']['memory_peak_bytes'], 2048)
+        self.assertTrue(result['cleanup'])
+        self.assertIn('completion_recheck', result)
+
+    def test_completion_recheck_cannot_accept_a_live_unit(self):
+        fresh = {'SubState': 'running', 'MainPID': '100',
+                 'ExecMainExitTimestampMonotonic': '0',
+                 'ControlGroup': ('/system.slice/'
+                                  'tracktemplate-l1-install-42.service')}
+        self.assertEqual(self.completion_race(fresh=fresh), 1)
+        self.assertIn('Live installer cgroup disappeared',
+                      self.result()['errors'][0])
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
+    def test_completion_recheck_cannot_acquire_a_foreign_invocation(self):
+        self.assertEqual(self.completion_race(
+            fresh={'InvocationID': 'b' * 32}), 1)
+        self.assertFalse(self.result()['cleanup'])
+        self.assertFalse(any('stop' in row for row in self.commands))
+
+    def test_completion_recheck_keeps_failed_exit(self):
+        self.assertEqual(self.completion_race(fresh={
+            'ActiveState': 'failed', 'SubState': 'failed',
+            'ExecMainStatus': '100', 'Result': 'exit-code',
+        }), 1)
+        self.assertEqual(self.result()['exit_status'], 100)
+        self.assertTrue(self.result()['cleanup'])
+
+    def test_completion_recheck_requires_prior_complete_measurements(self):
+        self.assertEqual(self.completion_race(first=True), 1)
+        self.assertEqual(self.result()['resources'], {})
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
+    def test_malformed_complete_sample_is_not_an_exit_race(self):
+        self.assertEqual(self.completion_race(
+            during_sample=True, malformed_sample=True), 1)
+        self.assertNotIn('completion_recheck', self.result())
+        self.assertIn('invalid', self.result()['errors'][0])
+
+    def test_missing_final_field_does_not_hide_malformed_numeric_data(self):
+        self.assertEqual(self.completion_race(
+            during_sample=True, partial_fields={'memory.current': 'invalid'}),
+            1)
+        self.assertNotIn('completion_recheck', self.result())
+        self.assertIn('invalid', self.result()['errors'][0])
+        self.assertTrue(self.result()['cleanup'])
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
+    def test_missing_final_field_does_not_hide_malformed_cpu_data(self):
+        self.assertEqual(self.completion_race(
+            during_sample=True, partial_fields={'cpu.stat': 'usage_usec -1'}),
+            1)
+        self.assertNotIn('completion_recheck', self.result())
+        self.assertIn('Invalid installer CPU sample', self.result()['errors'][0])
+        self.assertTrue(self.result()['cleanup'])
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
+    def test_completion_recheck_keeps_original_deadline(self):
+        self.assertEqual(self.completion_race(deadline=True), 1)
+        self.assertIn('deadline', self.result()['errors'][0])
+        self.assertTrue(self.result()['cleanup'])
+
+    def test_completion_recheck_does_not_replace_process_cleanup(self):
+        self.residual = True
+        self.assertEqual(self.completion_race(), 1)
+        self.assertFalse(self.result()['cleanup'])
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
     def test_missing_or_malformed_ownership_is_not_clearance(self):
         self.assertFalse(installer.cleanup(self.work)['cleanup'])
         path = self.work / 'evidence/installer-ownership.json'
