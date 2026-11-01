@@ -250,6 +250,21 @@ PRODUCT_CALLER_ROUTES = (
     ),
 )
 
+_TURNOUT_DIMENSIONS_BINDING = "rea_c10_dimensions"
+_TURNOUT_DIMENSIONS_CALLERS = (
+    "_turnout_find_overlap",
+    "_build_curve_inheriting_c10_turnout",
+    "solve_rea_c10_crossover_geometry",
+    "crossover_inherited_timber_records",
+    "_shared_timber_candidate",
+    "_shared_timber_envelope_record",
+    "crossover_shared_timber_envelope_context",
+    "_shared_timber_build_envelope",
+    "_chair_turnout_rail_records",
+    "_chair_turnout_timber_records",
+    "CrossoverManagerPanel.update_chainage_range",
+    "TurnoutManagerDialog.update_host_summary",
+)
 _TURNOUT_TOE_RANGE_BINDING = "turnout_valid_toe_range"
 _TURNOUT_TOE_RANGE_CALLERS = (
     "_build_curve_inheriting_c10_turnout",
@@ -1006,6 +1021,9 @@ class ModularTransitionWorkflowSession:
     def __init__(self, host, modular_functions):
         self._host = host
         self._modular_functions = dict(modular_functions)
+        self._turnout_dimensions_enabled = (
+            _TURNOUT_DIMENSIONS_BINDING in self.module.__dict__
+        )
         self._turnout_toe_range_enabled = (
             _TURNOUT_TOE_RANGE_BINDING in self.module.__dict__
         )
@@ -1205,6 +1223,10 @@ class ModularTransitionWorkflowSession:
                 vector_factory,
             )
         )
+        if self._turnout_dimensions_enabled:
+            self._host_functions[_TURNOUT_DIMENSIONS_BINDING] = (
+                turnout.rea_c10_dimensions
+            )
         if self._turnout_toe_range_enabled:
             self._host_functions[_TURNOUT_TOE_RANGE_BINDING] = (
                 turnout.turnout_valid_toe_range
@@ -1631,6 +1653,49 @@ class ModularTransitionWorkflowSession:
                 return self._crossover_preflight.original_solver
             return namespace.get(name)
 
+        if (
+            (_TURNOUT_DIMENSIONS_BINDING in namespace)
+            != self._turnout_dimensions_enabled
+        ):
+            raise TransitionWorkflowError(
+                "The inherited turnout dimensions route has a mixed binding."
+            )
+        if self._turnout_dimensions_enabled:
+            selected = turnout.rea_c10_dimensions
+            if (
+                self._host_functions.get(_TURNOUT_DIMENSIONS_BINDING)
+                is not selected
+                or namespace.get(_TURNOUT_DIMENSIONS_BINDING) is not selected
+                or getattr(selected, "__globals__", None)
+                is not turnout.__dict__
+            ):
+                raise TransitionWorkflowError(
+                    "The modular turnout dimensions calculation is unavailable."
+                )
+            for caller_name in _TURNOUT_DIMENSIONS_CALLERS:
+                if "." in caller_name:
+                    class_name, method_name = caller_name.split(".", 1)
+                    owner = namespace.get(class_name)
+                    caller = (
+                        getattr(owner, "__dict__", {}).get(method_name)
+                        if isinstance(owner, type) else None
+                    )
+                else:
+                    caller = inherited_caller(caller_name)
+                code = getattr(caller, "__code__", None)
+                caller_globals = getattr(caller, "__globals__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or _TURNOUT_DIMENSIONS_BINDING not in code.co_names
+                    or caller_globals is not namespace
+                    or caller_globals.get(_TURNOUT_DIMENSIONS_BINDING)
+                    is not selected
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited turnout dimensions caller {!r} is "
+                        "unavailable or mixed.".format(caller_name)
+                    )
         if (
             (_TURNOUT_TOE_RANGE_BINDING in namespace)
             != self._turnout_toe_range_enabled

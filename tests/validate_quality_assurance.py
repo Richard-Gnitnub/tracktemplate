@@ -608,7 +608,9 @@ def validate_documentation_profile(
             'Make and validate the Templot chairs through the TrackTemplate path that the project uses',
             'Record source coverage and unresolved geometry accurately',
             'Preserve the LMS model and its evidence with a FAIL result',
-            'Complete independent review and the Documentation Review lifecycle for this documentation alignment',
+            'all REA B and C turnout sizes to Phase 9B for completion before Phase 10',
+            'Extend one shared turnout/crossover engine before the remaining chair coverage',
+            'Keep each new B/C combination Pending until the necessary evidence has PASS results',
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

@@ -6760,12 +6760,12 @@ def validate_documentation_profile_mutations() -> None:
             "Exits 9B-1, 9B-3 and 9B-6 stay Pending",
         ),
         (
-            "merge-authorised", "| Next action |",
-            "Complete independent review and the Documentation Review "
-            "lifecycle for this documentation alignment",
-            "Merge now",
-            "Complete independent review and the Documentation Review "
-            "lifecycle for this documentation alignment",
+            "source-qualification-waived", "| Next action |",
+            "Keep each new B/C combination Pending until the necessary evidence "
+            "has PASS results",
+            "Treat every new B/C combination as qualified without evidence",
+            "Keep each new B/C combination Pending until the necessary evidence "
+            "has PASS results",
         ),
         (
             "stop-boundary-waived", "| Next action |",
@@ -9639,7 +9639,12 @@ def validate_ontology_mutation() -> None:
 def validate_hosted_policy_acceptance_mutations() -> None:
     """Reject lost acceptance and invented execution or transfer authority."""
     document = json.loads(read("reference/current/gate-decisions.json"))
-    record = document["decisions"][-1]
+    records = [
+        item for item in document["decisions"]
+        if item.get("id") == "D-GOV-026"
+    ]
+    assert len(records) == 1, "Expected exactly one D-GOV-026 decision"
+    record = records[0]
     for name, field, value, diagnostic in (
         ("status", "status", "Proposed", "owner authority drifted"),
         ("decided_on", "decided_on", None, "owner authority drifted"),
