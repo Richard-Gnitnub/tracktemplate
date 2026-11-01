@@ -856,6 +856,107 @@ class GuiProofContracts(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.suite._preserved(before, changed)
 
+    def _cross_document_selection(self):
+        # FreeCAD 1.1.4 filters omitted document names by the active document.
+        active = SimpleNamespace(name='source')
+        selected = [SimpleNamespace(DocumentName='foreign', ObjectName='Keep',
+                                    SubElementNames=('Face1',))]
+
+        def selection(document=None):
+            return [item for item in selected if document == '*'
+                    or item.DocumentName == (document or active.name)]
+
+        document_state = [{'name': 'source', 'native': 'hash-a',
+                           'view': 'hash-b', 'camera': 'camera-a'}]
+
+        def state():
+            return {
+                'active': active.name,
+                'documents': copy.deepcopy(document_state),
+                'selection': tuple((item.DocumentName, item.ObjectName,
+                                    tuple(item.SubElementNames))
+                                   for item in selection()),
+            }
+
+        native = SimpleNamespace(HELPERS={}, extract_helper=Mock(side_effect=[
+            {'_images': None, '_archive_state': None},
+            {'_settle': None, '_document_state': state,
+             '_active_document_state': None},
+            {'_gui_generate': None},
+        ]))
+        gui_host = SimpleNamespace(Selection=SimpleNamespace(
+            getSelectionEx=selection,
+        ))
+        helpers = self.suite._helpers(native, None, gui_host, None, None)
+        return helpers, active, selected, document_state
+
+    def test_selection_snapshot_survives_active_document_change(self):
+        helpers, active, selected, documents = self._cross_document_selection()
+        selected.append(SimpleNamespace(
+            DocumentName='source', ObjectName='Track', SubElementNames=(),
+        ))
+        expected = (('foreign', 'Keep', ('Face1',)), ('source', 'Track', ()))
+        before = helpers.state()
+        self.assertEqual(before['selection'], expected)
+        self.assertEqual(before['documents'], documents)
+        active.name = 'preview'
+        after = helpers.state()
+        self.assertEqual(after['active'], 'preview')
+        self.assertEqual(after['selection'], expected)
+        self.suite._preserved(before, after)
+
+    def test_foreign_selection_loss_and_changes_are_not_hidden(self):
+        for change in ('missing', 'document', 'object', 'subelement'):
+            with self.subTest(change=change):
+                helpers, active, selected, _ = self._cross_document_selection()
+                before = helpers.state()
+                active.name = 'preview'
+                if change == 'missing':
+                    selected.clear()
+                elif change == 'document':
+                    selected[0].DocumentName = 'different'
+                elif change == 'object':
+                    selected[0].ObjectName = 'Different'
+                else:
+                    selected[0].SubElementNames = ('Face2',)
+                with self.assertRaises(AssertionError):
+                    self.suite._preserved(before, helpers.state())
+
+    def test_witness_baseline_requires_settled_selection_and_exact_identity(self):
+        marker = SimpleNamespace(Document=SimpleNamespace(Name='foreign'),
+                                 Name='Keep')
+        for observed in (
+            (), (('different', 'Keep', ()),),
+            (('foreign', 'Different', ()),),
+            (('foreign', 'Keep', ('Face1',)),),
+            (('foreign', 'Keep', ()), ('source', 'Track', ())),
+        ):
+            with self.subTest(observed=observed):
+                gui_host = SimpleNamespace(Selection=SimpleNamespace(
+                    getSelection=lambda document: [marker],
+                ))
+                helpers = SimpleNamespace(settle=Mock(), state=lambda: {
+                    'selection': observed,
+                })
+                with self.assertRaises(AssertionError):
+                    self.suite._witness_baseline(helpers, gui_host, marker)
+
+        selected = [marker]
+        gui_host = SimpleNamespace(Selection=SimpleNamespace(
+            getSelection=lambda document: list(selected),
+        ))
+        helpers = SimpleNamespace(settle=selected.clear,
+                                  state=lambda: {'selection': ()})
+        with self.assertRaises(AssertionError):
+            self.suite._witness_baseline(helpers, gui_host, marker)
+
+        selected.append(marker)
+        expected = {'selection': (('foreign', 'Keep', ()),)}
+        helpers = SimpleNamespace(settle=Mock(), state=lambda: expected)
+        self.assertEqual(
+            self.suite._witness_baseline(helpers, gui_host, marker), expected,
+        )
+
     def test_start_schedules_one_unittest_and_exits_qt_from_actual_result(self):
         for passed, count, skips, exit_code in (
             (True, 1, [], 0), (False, 1, [], 1),

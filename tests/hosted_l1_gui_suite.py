@@ -158,9 +158,19 @@ def _helpers(native, app, gui, qtcore, qtwidgets):
             "old": SimpleNamespace(_write=_write),
         },
     )["_gui_generate"]
+
+    def state():
+        # Preview activation must not hide the unrelated selection witness.
+        result = states["_document_state"]()
+        result["selection"] = tuple(
+            (item.DocumentName, item.ObjectName, tuple(item.SubElementNames))
+            for item in gui.Selection.getSelectionEx("*")
+        )
+        return result
+
     return SimpleNamespace(
         images=image_helpers["_images"], generate=generate,
-        settle=states["_settle"], state=states["_document_state"],
+        settle=states["_settle"], state=state,
         active=states["_active_document_state"],
     )
 
@@ -223,6 +233,15 @@ def _preserved(before, after):
     assert all(current.get(item["name"]) == item
                for item in before["documents"])
     assert after["selection"] == before["selection"]
+
+
+def _witness_baseline(helpers, gui, marker):
+    """Capture the unrelated selection witness before chair preview."""
+    helpers.settle()
+    assert gui.Selection.getSelection("*") == [marker]
+    baseline = helpers.state()
+    assert baseline["selection"] == ((marker.Document.Name, marker.Name, ()),)
+    return baseline
 
 
 class L1Gui(unittest.TestCase):
@@ -415,9 +434,7 @@ class L1Gui(unittest.TestCase):
             app.setActiveDocument(source.Name)
             gui.Selection.clearSelection()
             gui.Selection.addSelection(marker)
-            assert gui.Selection.getSelection() == [marker]
-            helpers.settle()
-            baseline = helpers.state()
+            baseline = _witness_baseline(helpers, gui, marker)
             preselection = chair_reference_preview._preselection_snapshot(
                 app, gui,
             )
