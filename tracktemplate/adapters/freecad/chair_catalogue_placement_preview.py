@@ -231,6 +231,30 @@ def create_private_catalogue_l1_preview(
     )
 
 
+def create_private_catalogue_cc_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place the fixed LH rail-1 CC through the existing common-frame lifecycle.
+
+    All 33 retained parts, including fixings, share each proper rigid frame.
+    The caller qualifies the finite TO-001 stock/check pairs before this entry.
+    """
+    prepared = prepare_catalogue_chair(
+        catalogue_path, "CC", run="context-native-02",
+    )
+    _require(len(prepared.components) == 33
+             and tuple(item.name for item in prepared.components[-16:])
+             == _CC_FIXING_NAMES,
+             "central CC component identities differ", family="CC")
+    return _create_private_catalogue_preview(
+        catalogue_path, placements, context_shapes, source_receipt,
+        verify_source, family="CC", placement_type=PairedChairPlacement,
+        model_sha256=_CC_MODEL_SHA256,
+        source_names=tuple(item.name for item in prepared.components),
+        run="context-native-02", source_context=prepared.context,
+    )
+
+
 def _create_private_catalogue_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, family, placement_type, model_sha256, source_names,

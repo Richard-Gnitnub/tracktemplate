@@ -3195,3 +3195,39 @@ The evidence preserves the use of the full previous `2/2` repair limit. The proj
 
 This result gives no acceptance for physical fit, production or phase exit. It gives no positive rights claim.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+## Central CC chairs on TO-001 — 2026-11-01
+
+This Level 2 change supplies more construction evidence for Exit 9B-3.
+The [source adapter](../../tracktemplate/compatibility/chair_turnout_check_placement.py) adds a separate private display of three CC assemblies on the fixed left-hand `TO-001` turnout.
+The selected timbers are X2-Y, X3-X and X4-A. Each assembly supports the main-side stock rail and check rail.
+
+Retained Templot 556b calculations select the parallel central CC branch for these six source positions.
+The same 33 catalogue components form each assembly. All components use one rotation and translation, including the 16 fixing components.
+The source calculation uses rail 1 without the right-hand rotation. It does not need different chair geometry.
+The current catalogue reader, geometry constructors and private display recovery stay the same.
+
+The [standalone tests](../../tests/validate_phase9b_turnout_central_cc.py) give RED before implementation and PASS after implementation.
+All 14 tests pass. They check the six source identities, component frames, input rejection, source changes and the application entry.
+Seven related regression suites pass.
+
+An independent comparison checks all 99 component positions and 4,746 vertices against source expectations that were frozen before candidate comparison.
+The maximum difference is `1.2710574864626038e-13 mm`. This is an arithmetic result, not a physical-fit tolerance.
+The comparison also checks 2,604 vertices from the complete source requests. All six negative controls pass.
+The source comparison uses the retained catalogue and three host points recovered from retained timber data.
+Document access uses test doubles. The result does not prove native solids or display behaviour.
+
+Previous native and GUI evidence applies to the unchanged CC geometry, rigid transformations and private display recovery.
+No new FreeCAD, GUI or full-XO test ran for this change. Fresh native and GUI evidence for these three assemblies remains absent.
+Source, test and review evidence is in `tmp/to001-chair-placement/`.
+
+The 168 source identities, analytical labels and original physical exclusions stay the same.
+The previous 59 S1/S1J and 14 P positions stay the same. The new route represents six more positions with three assemblies.
+The combined routes account for 79 positions. They do not form one complete turnout display.
+The other 89 positions comprise 24 shared supports and 65 positions outside these routes.
+The 65 positions comprise ten paired-switch positions, seven L1 positions, seven check-rail positions and 41 crossing positions.
+Their final assembly count needs source evidence.
+
+The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
+This result gives no acceptance for physical fit, rights, production, performance or phase exit.
+Phase 9B stays Open at 3/6. The previous `2/2` allowance stays consumed. LMS work stays stopped.
