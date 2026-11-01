@@ -21,6 +21,9 @@ from tracktemplate.compatibility.chair_reference_preview import (
 from tracktemplate.compatibility.crossover_host_integration_recovery import (
     CrossoverHostIntegrationRecoveryAdapter,
 )
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_operation,
+)
 
 
 HOOK_NAMES = (
@@ -466,6 +469,9 @@ class CrossoverDependentRecalculationAdapter:
 
     def _validate_export(self, *args, **kwargs):
         pending = self._caller_request(self._invocation(), validated=False)
+        if (pending is not None and pending["request"]["output_mode"]
+                == self.module.OUTPUT_REPLACE):
+            refuse_rea_operation(self.module.App.ActiveDocument)
         result = self.originals[HOOK_NAMES[1]](*args, **kwargs)
         if pending is None:
             return result
@@ -551,6 +557,7 @@ class CrossoverDependentRecalculationAdapter:
         return result
 
     def _remove(self, document):
+        refuse_rea_operation(document)
         pending = self._caller_request(self._invocation())
         if pending is not None and pending["source"] is not None:
             _require(id(document) == pending["document_id"]

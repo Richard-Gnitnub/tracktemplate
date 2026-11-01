@@ -2,6 +2,16 @@ name: Native geometry pilot
 
 on:
   workflow_dispatch:
+    inputs:
+      workload:
+        description: Bounded native workload
+        required: true
+        type: choice
+        default: transition
+        options:
+          - transition
+          - rea-bc-readiness
+          - rea-bc-native
 
 permissions:
   contents: read
@@ -65,9 +75,11 @@ jobs:
           echo "XDG_RUNTIME_DIR=/run/user/${pilot_uid}" >> "$GITHUB_ENV"
           echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${pilot_uid}/bus" >> "$GITHUB_ENV"
 
-      - name: Run one contained native geometry test
+      - name: Run the selected contained native workload
         id: native
         timeout-minutes: 17
+        env:
+          TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}
         run: python3 tools/hosted_native_geometry_pilot.py
 
       - name: Record workflow stage outcomes
@@ -75,6 +87,7 @@ jobs:
         env:
           PILOT_SETUP: ${{ steps.setup.outcome }}
           PILOT_NATIVE: ${{ steps.native.outcome }}
+          PILOT_WORKLOAD: ${{ inputs.workload }}
         run: |
           python3 - <<'PY'
           import json
@@ -84,6 +97,7 @@ jobs:
           output.mkdir(parents=True, exist_ok=True)
           record = {
               'source_commit': os.environ['GITHUB_SHA'],
+              'workload': os.environ['PILOT_WORKLOAD'],
               'setup': os.environ['PILOT_SETUP'],
               'native': os.environ['PILOT_NATIVE'],
           }
