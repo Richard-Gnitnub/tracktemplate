@@ -196,13 +196,20 @@ def _owned(shown, intent, owner=None):
 
 def _sample(group):
     sample = guard._sample(group)
-    _require(all(value is not None for value in sample.values()),
-             'Installer resource telemetry incomplete')
     for name in ('memory.current', 'memory.peak', 'memory.swap.current',
                  'pids.current'):
-        _require(int(sample[name]) >= 0, 'Invalid installer resource sample')
-    cpu = dict(line.split() for line in sample['cpu.stat'].splitlines())
-    _require(int(cpu['usage_usec']) >= 0, 'Invalid installer CPU sample')
+        if sample[name] is not None:
+            _require(int(sample[name]) >= 0,
+                     'Invalid installer resource sample')
+    if sample['cpu.stat'] is not None:
+        cpu = dict(line.split() for line in sample['cpu.stat'].splitlines())
+        _require(int(cpu['usage_usec']) >= 0, 'Invalid installer CPU sample')
+    # Preserve an interrupted final read for one owned completion check.
+    # Malformed data and incomplete data in a live group still fail.
+    if any(value is None for value in sample.values()) and not group.exists():
+        return sample
+    _require(all(value is not None for value in sample.values()),
+             'Installer resource telemetry incomplete')
     sample['monotonic_seconds'] = time.monotonic()
     return sample
 
@@ -313,12 +320,21 @@ def run(work):
             if terminated:
                 result.update(exit_status=int(shown['ExecMainStatus']),
                               terminal_unit=shown)
-            # A failed service can already have released its cgroup. Keep
-            # its exit status and prior measurements; absence is no sample.
-            if group.exists():
-                samples.append(_sample(group))
+            sample = _sample(group)
+            if all(value is not None for value in sample.values()):
+                samples.append(sample)
             else:
+                # Unit state and cgroup files are not read atomically.
+                # Confirm completion once within the original deadline.
+                evidence = {'before': shown, 'unavailable_sample': sample}
+                result['completion_recheck'] = evidence
+                shown = _show(intent['unit'], operation_deadline)
+                evidence['after'] = shown
+                _owned(shown, intent, owner)
+                terminated = int(shown['ExecMainExitTimestampMonotonic']) > 0
                 _require(terminated, 'Live installer cgroup disappeared')
+                result.update(exit_status=int(shown['ExecMainStatus']),
+                              terminal_unit=shown)
             if terminated:
                 _require(shown['ExecMainCode'] == '1'
                          and result['exit_status'] == 0
