@@ -630,6 +630,7 @@ def validate_composition_boundary():
     catalogue_s1j_preview_factory = lambda *args: None
     catalogue_l1_preview_factory = lambda *args: None
     catalogue_cc_preview_factory = lambda *args: None
+    catalogue_turnout_single_rail_preview_factory = lambda *args: None
     catalogue_crossover_preview_factory = lambda *args: None
     routing = {"route": "modular"}
     session = types.SimpleNamespace(routing_record=lambda: routing)
@@ -653,6 +654,9 @@ def validate_composition_boundary():
             ),
             "private_catalogue_l1_preview_factory": catalogue_l1_preview_factory,
             "private_catalogue_cc_preview_factory": catalogue_cc_preview_factory,
+            "private_catalogue_turnout_single_rail_preview_factory": (
+                catalogue_turnout_single_rail_preview_factory
+            ),
             "private_catalogue_crossover_preview_factory": (
                 catalogue_crossover_preview_factory
             ),
@@ -686,6 +690,9 @@ def validate_composition_boundary():
                 ),
                 create_private_catalogue_l1_preview=catalogue_l1_preview_factory,
                 create_private_catalogue_cc_preview=catalogue_cc_preview_factory,
+                create_private_catalogue_turnout_single_rail_preview=(
+                    catalogue_turnout_single_rail_preview_factory
+                ),
                 create_private_catalogue_crossover_preview=(
                     catalogue_crossover_preview_factory
                 ),
