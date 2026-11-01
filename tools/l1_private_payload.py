@@ -341,7 +341,7 @@ def _symmetric_home(log):
                     # retaining secrets; it cannot serve an agent socket.
                     try:
                         status = (process / "stat").read_text().split()[2]
-                    except FileNotFoundError:
+                    except (FileNotFoundError, ProcessLookupError):
                         break
                     if status == "Z":
                         break

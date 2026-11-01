@@ -1,6 +1,8 @@
 """Offline protection checks for private inputs and readable evidence."""
 
 import copy
+from contextlib import contextmanager
+import errno
 import hashlib
 import io
 import os
@@ -9,6 +11,7 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -295,6 +298,98 @@ class EncryptionTests(unittest.TestCase):
             payload.encrypt_inputs(self.source, existing, self.passphrase_fd(),
                                    self.case / "overwrite.log")
         self.assertEqual(existing.read_bytes(), b"preserved ciphertext")
+
+
+class SymmetricHomeCleanupTests(unittest.TestCase):
+    @contextmanager
+    def isolated_cleanup(self, stat_error=None, clearance=b""):
+        home = "/dummy-isolated-gpg-home"
+        completed = payload.subprocess.CompletedProcess
+        with (
+            patch.object(payload.tempfile, "TemporaryDirectory") as temporary,
+            patch.object(payload.subprocess, "run", side_effect=[
+                completed([], 0, b""), completed([], 0, b"D 123\n"),
+                completed([], 0, b""), completed([], 0, clearance),
+            ]) as run,
+            patch.object(payload.Path, "read_bytes",
+                         return_value=b"gpg-agent\0" + home.encode() + b"\0"),
+            patch.object(payload.Path, "exists", return_value=True),
+            patch.object(payload.Path, "read_text", side_effect=stat_error,
+                         return_value="123 (gpg-agent) S") as read_stat,
+            patch.object(payload.time, "monotonic", side_effect=(0, 6)),
+            patch.object(payload.time, "sleep"),
+        ):
+            temporary.return_value.__enter__.return_value = home
+            try:
+                yield read_stat
+            finally:
+                self.assertEqual(run.call_count, 4)
+                self.assertEqual(run.call_args_list[2].args[0], [
+                    "gpgconf", "--homedir", home, "--kill", "gpg-agent",
+                ])
+                self.assertEqual(run.call_args_list[3].args[0], [
+                    "gpg-connect-agent", "--homedir", home, "--no-autostart",
+                    "GETINFO pid", "/bye",
+                ])
+
+    def test_vanished_process_preserves_successful_body(self):
+        for number in (errno.ENOENT, errno.ESRCH):
+            with self.subTest(errno=number), self.isolated_cleanup(
+                OSError(number, "process vanished"),
+            ) as read_stat:
+                body_ran = False
+                with payload._symmetric_home(io.BytesIO()):
+                    body_ran = True
+                self.assertTrue(body_ran)
+                read_stat.assert_called_once()
+
+    def test_vanished_process_preserves_original_body_error(self):
+        for number in (errno.ENOENT, errno.ESRCH):
+            with self.subTest(errno=number), self.isolated_cleanup(
+                OSError(number, "process vanished"),
+            ) as read_stat:
+                original = payload.PayloadError("output creation refused")
+                with self.assertRaises(payload.PayloadError) as raised:
+                    with payload._symmetric_home(io.BytesIO()):
+                        raise original
+                self.assertIs(raised.exception, original)
+                read_stat.assert_called_once()
+
+    def test_other_stat_errors_still_propagate(self):
+        for number in (errno.EACCES, errno.EIO):
+            for body_failed in (False, True):
+                error = OSError(number, "stat unavailable")
+                with (
+                    self.subTest(errno=number, body_failed=body_failed),
+                    self.isolated_cleanup(error) as read_stat,
+                ):
+                    original = payload.PayloadError("output creation refused")
+                    with self.assertRaises(type(error)) as raised:
+                        with payload._symmetric_home(io.BytesIO()):
+                            if body_failed:
+                                raise original
+                    self.assertIs(raised.exception, error)
+                    if body_failed:
+                        self.assertIs(error.__context__, original)
+                    read_stat.assert_called_once()
+
+    def test_active_endpoint_still_refused(self):
+        with self.isolated_cleanup(clearance=b"D 123\n") as read_stat:
+            with self.assertRaisesRegex(
+                payload.PayloadError, "isolated agent endpoint remains active",
+            ):
+                with payload._symmetric_home(io.BytesIO()):
+                    pass
+            read_stat.assert_not_called()
+
+    def test_live_process_deadline_still_refused(self):
+        with self.isolated_cleanup() as read_stat:
+            with self.assertRaisesRegex(
+                payload.PayloadError, "isolated agent cleanup uncertain",
+            ):
+                with payload._symmetric_home(io.BytesIO()):
+                    pass
+            read_stat.assert_called_once()
 
 
 if __name__ == "__main__":
