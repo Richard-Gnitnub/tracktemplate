@@ -155,9 +155,22 @@ def _owned(shown, intent, owner=None):
         'KillMode': 'control-group', 'Restart': 'no',
         'SendSIGKILL': 'yes', 'Type': 'exec', 'RemainAfterExit': 'yes',
     }
+    exit_time = shown.get('ExecMainExitTimestampMonotonic')
+    # RemainAfterExit can keep a completed service active after systemd
+    # releases its cgroup. This still needs the retained exact owner below.
+    successful_exit = (
+        shown.get('ActiveState') == 'active'
+        and shown.get('SubState') == 'exited'
+        and shown.get('ExecMainCode') == '1'
+        and shown.get('ExecMainStatus') == '0'
+        and shown.get('Result') == 'success'
+        and isinstance(exit_time, str)
+        and re.fullmatch(r'[1-9][0-9]*', exit_time)
+    )
     stopped_group = (owner is not None
                      and shown.get('ControlGroup') == ''
-                     and shown.get('ActiveState') in ('inactive', 'failed')
+                     and (shown.get('ActiveState') in ('inactive', 'failed')
+                          or successful_exit)
                      and shown.get('MainPID') == '0'
                      and shown.get('ControlPID') == '0')
     _require(all(shown.get(name) == value
