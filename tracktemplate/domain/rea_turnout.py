@@ -18,25 +18,29 @@ _SOURCE_MAX_RADIUS = 99995000.0  # control_room.pas:486; source sentinel.
 _SOURCE_ARCHIVE_SHA256 = (
     "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3"
 )
+
+
 # Prototype inches and RAM ratios, switch_select.pas:1749-1858.
-_SWITCH_DATA = {
-    "B": {
-        "planing": 88.0, "heel": 257.0, "radius": 7356.0,
-        "planing_ratio": 32.0, "switch_rail": 270.0, "stock_rail": 360.0,
-        "timber_intervals": (
-            3.5, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
-            28.5, 28.5, 28.5, 26.0, 24.0,
-        ),
-    },
-    "C": {
-        "planing": 110.0, "heel": 329.0, "radius": 11520.0,
-        "planing_ratio": 40.0, "switch_rail": 342.0, "stock_rail": 432.0,
-        "timber_intervals": (
-            3.5, 28.5, 28.5, 28.5, 30.0, 30.0, 30.0,
-            30.0, 30.0, 30.0, 30.0, 30.0, 26.0, 24.0,
-        ),
-    },
-}
+def _switch_data(switch_size):
+    """Return fresh source values without shared mutable module state."""
+    return {
+        "B": {
+            "planing": 88.0, "heel": 257.0, "radius": 7356.0,
+            "planing_ratio": 32.0, "switch_rail": 270.0, "stock_rail": 360.0,
+            "timber_intervals": (
+                3.5, 28.0, 28.0, 28.0, 28.0, 28.0, 28.0,
+                28.5, 28.5, 28.5, 26.0, 24.0,
+            ),
+        },
+        "C": {
+            "planing": 110.0, "heel": 329.0, "radius": 11520.0,
+            "planing_ratio": 40.0, "switch_rail": 342.0, "stock_rail": 432.0,
+            "timber_intervals": (
+                3.5, 28.5, 28.5, 28.5, 30.0, 30.0, 30.0,
+                30.0, 30.0, 30.0, 30.0, 30.0, 26.0, 24.0,
+            ),
+        },
+    }[switch_size]
 
 
 class ReaTurnoutError(ValueError):
@@ -162,7 +166,7 @@ def rea_turnout_dimensions(spec):
             "unsupported-improvised-crossing",
             "The improvised vee-length branch is not construction-qualified.",
         )
-    switch = _SWITCH_DATA[spec.switch_size]
+    switch = _switch_data(spec.switch_size)
     gauge = 16.5
     flange = 1.0
     scale_ratio = 76.2
@@ -561,7 +565,7 @@ def rea_turnout_timber_stations(spec):
     # the 12-inch timber width, not the legacy 10-inch sleeper width.
     add("J2", "switch front", -52.5 * inch, 12.0 * inch)
     add("J1", "switch front", -24.5 * inch, 12.0 * inch)
-    intervals = _SWITCH_DATA[spec.switch_size]["timber_intervals"]
+    intervals = _switch_data(spec.switch_size)["timber_intervals"]
     station = 0.0
     for index, spacing in enumerate(intervals):
         station += spacing * inch
