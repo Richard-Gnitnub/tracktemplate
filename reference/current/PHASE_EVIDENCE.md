@@ -3539,3 +3539,48 @@ input/output permissions. LMS development stays paused until after Phase 11
 under [D-P9-018](#lms-chair-record-and-templot-development-panel).
 This decision accepts no physical fit, production, rights, performance,
 release, phase exit or Phase 10 entry.
+
+
+<a id="rea-bc-source-geometry"></a>
+
+## REA B/C source geometry — 2026-11-01
+
+**Level 2 result under [D-P9-019](#rea-bc-scope-panel):** An explicit B/C
+specification supplies dimensions, rails and timbers to the shared turnout
+and crossover calculations. The result is temporary. It cannot create or
+change a FreeCAD document.
+
+The source context is Templot 556b with regular crossings, automatic curve
+fitting and square-on timbers. It uses 16.5 mm gauge, 1 mm flangeways and
+1:76.2 scale. It does not select the source option that forces equalized
+timbering. The fixed C10 calculations and TO-001/XO-001 regression evidence
+stay unchanged.
+
+The [independent source test](../../tests/validate_phase9b_rea_bc_source.py)
+gives PASS for eight tests without skips. Its 88 cases include all 32 menu
+combinations, continuous ratios and source boundaries. They compare 7,480
+scalar values and 2,987 timber records. Six turnout-side rail paths also
+pass 1,163 comparisons with source calculations.
+
+The [consumer test](../../tests/validate_phase9b_rea_bc_consumers.py) gives
+PASS for six tests without skips. It checks the existing turnout mapping,
+both hands, both travel directions and straight or curved hosts. It also
+checks the existing crossover solver, minimum radius, invalid inputs and
+refusal to store the temporary result. Independent source and quality
+reviews support this bounded result, with the qualification gaps below.
+The unchanged C10 test passes all 85 inputs and 170 comparisons. Python
+syntax and style checks pass.
+
+Full qualification of each matrix entry stays Pending. This change has no
+native or GUI proof. Stored B/C objects, their editing and remaining chair
+coverage are not qualified. The source default for exit sleepers needs a
+separate explicit profile. The inherited module length is not evidence for
+that profile. Source labels beyond the recorded suffixes stay empty.
+
+Next, qualify the source exit profile and the stored B/C specification.
+Then complete the corrected TO-001 native and GUI checks and remaining
+chair coverage. Reuse the existing constructors and validation controls.
+
+Phase 9B stays Open at 3/6. This result accepts no physical fit, rights,
+production, performance, release or phase exit. LMS development stays paused
+until after Phase 11. Historical failed evidence and repair records stay.

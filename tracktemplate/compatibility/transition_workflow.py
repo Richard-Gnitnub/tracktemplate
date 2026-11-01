@@ -2531,6 +2531,24 @@ class ModularTransitionWorkflowSession:
         self._bind_modular()
         return self._host.launch_workflow()
 
+    def prepare_rea_turnout_geometry(self, *args, **kwargs):
+        """Prepare explicit source B/C records without document admission."""
+        from tracktemplate.compatibility.rea_turnout import (
+            ReaTurnoutGeometryAdapter,
+        )
+
+        self._validate_binding()
+        return ReaTurnoutGeometryAdapter(self.module).turnout(*args, **kwargs)
+
+    def prepare_rea_crossover_geometry(self, *args, **kwargs):
+        """Prepare both source B/C roads through the shared calculation."""
+        from tracktemplate.compatibility.rea_turnout import (
+            ReaTurnoutGeometryAdapter,
+        )
+
+        self._validate_binding()
+        return ReaTurnoutGeometryAdapter(self.module).crossover(*args, **kwargs)
+
 
 @dataclass(frozen=True)
 class _CoreLayoutExportAdapter:
@@ -2962,6 +2980,20 @@ class ModularCoreLayoutWorkflowSession:
             self.module, source_document, turnout_id, package, manifest_text,
             model_request, self._s1_reference_preview_factory,
             source_selection_filter=exclude_turnout_heel_l1,
+        )
+
+    def prepare_rea_turnout_geometry(self, *args, **kwargs):
+        """Expose the transient source calculation through the live session."""
+        self.routing_record()
+        return self._calculation_session.prepare_rea_turnout_geometry(
+            *args, **kwargs,
+        )
+
+    def prepare_rea_crossover_geometry(self, *args, **kwargs):
+        """Expose transient paired-road preparation without a commit route."""
+        self.routing_record()
+        return self._calculation_session.prepare_rea_crossover_geometry(
+            *args, **kwargs,
         )
 
     def preview_s1j_reference_chairs(
