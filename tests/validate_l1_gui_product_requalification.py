@@ -1,9 +1,12 @@
 """Test exact product repair admission without FreeCAD or hosted execution."""
 
 import copy
+from contextlib import contextmanager
+from functools import partial
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -20,6 +23,7 @@ import validate_l1_gui_lifecycle_controls as diagnostic  # noqa: E402
 
 
 REPAIR_PATH = 'tracktemplate/adapters/freecad/chair_reference_preview.py'
+HISTORICAL_SOURCE = '37012966a66a5b827a01e97604d80a161bbeb2f3'
 REPAIR = {
     'scope_id': 'L1-GUI-PREVIEW-ACTIVATION-001',
     'base_commit': 'ad554906172df31008d3a16672f392cdc6473325',
@@ -54,6 +58,47 @@ def repaired_authority(stage='gui'):
                       display_limits=vars(gui.display_limits(stage)))
         record.pop('gui_readiness_review')
     return record
+
+
+@contextmanager
+def historical_source():
+    """Read real historical Git objects without using the moving checkout."""
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory) / 'source'
+        subprocess.run(
+            ['git', 'clone', '--quiet', '--shared', '--no-checkout',
+             str(ROOT), str(root)],
+            check=True, capture_output=True, timeout=30,
+        )
+        command = partial(gui.native.command, cwd=root)
+        command('git', '-c', 'core.hooksPath=/dev/null', 'switch', '--quiet',
+                '--detach', HISTORICAL_SOURCE)
+        yield root, command
+
+
+@contextmanager
+def historical_admission(root, command):
+    """Keep Git and source checks real; replace only hosted side effects."""
+    record = repaired_authority('readiness')
+    commit = command('git', 'rev-parse', 'HEAD')
+    record['source_commit'] = commit
+    record['product_requalification']['source_commit'] = commit
+    record['gui_recovery']['source_commit'] = commit
+    record['control_files_sha256'] = {
+        name: gui.digest(root / name) for name in gui.CONTROL_FILES
+    }
+    environ = dict(prior.environment(), L1_GUI_STAGE='readiness',
+                   GITHUB_SHA=commit, L1_GUI_CONTROL=json.dumps(record))
+    with (
+        patch.dict(gui.os.environ, environ, clear=True),
+        patch.object(gui.os, 'getuid', return_value=1000),
+        patch.object(gui.resource, 'setrlimit'),
+        patch.object(gui, 'validate_host', return_value={}),
+        patch.object(gui, 'ROOT', root),
+        patch.object(gui.native, 'command', new=command),
+        patch.object(gui, 'write') as write,
+    ):
+        yield record, write
 
 
 class ProductRequalification(unittest.TestCase):
@@ -181,32 +226,35 @@ class ProductRequalification(unittest.TestCase):
                     gui.validate_frozen_source(repaired_authority())
 
     def test_prepare_admits_only_the_actual_reviewed_product_bytes(self):
-        record = repaired_authority('readiness')
-        record['control_files_sha256'] = {
-            name: gui.digest(ROOT / name) for name in gui.CONTROL_FILES
-        }
-        environ = dict(prior.environment(), L1_GUI_STAGE='readiness',
-                       L1_GUI_CONTROL=json.dumps(record))
-        original_command = gui.native.command
-
-        def command(*args):
-            if args[:2] == ('git', 'rev-parse'):
-                return record['source_commit']
-            if args[:2] == ('git', 'status'):
-                return ''
-            return original_command(*args)
-
+        self.assertEqual(gui.BASE, REPAIR['base_commit'])
+        self.assertEqual(gui.PRODUCT_REPAIR, REPAIR)
         with (
-            patch.dict(gui.os.environ, environ, clear=True),
-            patch.object(gui.os, 'getuid', return_value=1000),
-            patch.object(gui.resource, 'setrlimit'),
-            patch.object(gui, 'validate_host', return_value={}),
-            patch.object(gui.native, 'command', side_effect=command),
-            patch.object(gui, 'write') as write,
+            historical_source() as (root, command),
+            historical_admission(root, command) as (record, write),
         ):
-            gui.prepare(Path('/unused-admission-test'))
+            gui.prepare(root / 'admission')
             self.assertEqual(write.call_count, 3)
             self.assertEqual(write.call_args_list[1].args[1], record)
+
+    def test_prepare_rejects_real_extra_source_before_writing_admission(self):
+        with historical_source() as (root, command):
+            extra = root / 'tracktemplate/__init__.py'
+            extra.write_text(extra.read_text(encoding='utf-8')
+                             + '\n# Extra product change in rejection fixture.\n',
+                             encoding='utf-8')
+            command('git', 'add', '--', 'tracktemplate/__init__.py')
+            command('git', '-c', 'user.name=Admission fixture',
+                    '-c', 'user.email=fixture@example.invalid',
+                    '-c', 'commit.gpgsign=false',
+                    '-c', 'core.hooksPath=/dev/null', 'commit', '--quiet',
+                    '-m', 'Add source mutation for admission rejection test')
+            with historical_admission(root, command) as (_, write):
+                with self.assertRaisesRegex(
+                    ValueError, 'Product requalification changed other frozen '
+                    'source',
+                ):
+                    gui.prepare(root / 'admission')
+                write.assert_not_called()
 
     def test_prepare_rejects_other_product_before_writing_admission(self):
         record = repaired_authority('readiness')
