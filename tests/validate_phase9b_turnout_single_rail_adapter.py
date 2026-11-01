@@ -28,6 +28,7 @@ from tracktemplate.domain.check_end_placement import (  # noqa: E402
 )
 from tracktemplate.domain.single_rail_placement import (  # noqa: E402
     SingleRailPlacement,
+    place_left_hand_single_rail,
     prepare_single_rail_placements,
 )
 
@@ -47,8 +48,8 @@ SELECTED = (
 )
 
 
-def fixture():
-    """Give selected identities invented proper body and fixing frames."""
+def fixture(include_corrected=True):
+    """Keep seven invented frames; add five source-qualified heel frames."""
     values = []
     for timber, rail, family in SELECTED:
         body = S1Placement(
@@ -60,6 +61,11 @@ def fixture():
             **vars(body), family=family,
             fixing_frames=(body,) * (4 if family == "L1" else 3),
         ))
+    if include_corrected:
+        from validate_phase9b_turnout_heel_l1_frames import FROZEN, arguments
+
+        values.extend(place_left_hand_single_rail(**arguments(row))
+                      for row in FROZEN)
     return tuple(values)
 
 
@@ -177,14 +183,14 @@ class TurnoutSingleRailAdapterTests(unittest.TestCase):
         self.assertEqual(len(layers), 42)
         self.assertEqual(receipt["contract_id"],
                          "tracktemplate.private-catalogue-turnout-single-rail.v1")
-        self.assertEqual(receipt["placement_count"], 7)
+        self.assertEqual(receipt["placement_count"], 12)
         self.assertEqual(receipt["component_count"], 40)
         self.assertEqual(receipt["family_count"], 2)
         self.assertEqual(receipt["source_receipt"], {"source": ["kept"]})
         self.assertEqual(receipt["project_status"], "reference-only")
         self.assertFalse(receipt["production_geometry_authorized"])
         self.assertFalse(receipt["geometry_rebuilt"])
-        for family, count, components in (("L1", 6, 23), ("S1", 1, 17)):
+        for family, count, components in (("L1", 11, 23), ("S1", 1, 17)):
             item = receipt["families"][family]
             self.assertEqual(item["placement_count"], count)
             self.assertEqual(item["component_count"], components)
@@ -204,6 +210,61 @@ class TurnoutSingleRailAdapterTests(unittest.TestCase):
         changed = (ShapeDouble(context=True),) + layers[1:]
         with self.assertRaises(ValueError):
             verify(changed)
+
+    def test_five_corrected_heel_component_frames(self):
+        boundary = AdapterBoundary()
+        receipt = boundary.run().prepare()[1]
+        records = {p["position_id"]: p for p in
+                   receipt["families"]["L1"]["placements"]}
+        components = 0
+        for value in fixture()[7:]:
+            record = records[value.position_id]
+            self.assertEqual(len(record["components"]), 23)
+            for component in record["components"]:
+                name = component["source_name"]
+                frame = value
+                if name in boundary.namespace["_CC_FIXING_NAMES"]:
+                    index = boundary.namespace["_CC_FIXING_NAMES"].index(name)
+                    frame = value.fixing_frames[index // 4]
+                for field in ("origin_mm", "x_axis", "y_axis"):
+                    self.assertEqual(component[field], getattr(frame, field))
+                self.assertEqual(component["placement_identity"], (
+                    value.position_id,
+                    boundary.namespace["_L1_MODEL_SHA256"], name,
+                ))
+                components += 1
+        self.assertEqual(components, 115)
+
+    def test_seven_previous_frames_and_component_identities_preserved(self):
+        boundary = AdapterBoundary()
+        receipt = boundary.run().prepare()[1]
+        for value in fixture(include_corrected=False):
+            family = receipt["families"][value.family]
+            record = next(p for p in family["placements"]
+                          if p["position_id"] == value.position_id)
+            self.assertEqual(record["rail_id"], value.rail_id)
+            self.assertEqual(record["timber_id"], value.timber_id)
+            for field in ("origin_mm", "x_axis", "y_axis"):
+                self.assertEqual(record[field], getattr(value, field))
+                for component in record["components"]:
+                    self.assertEqual(component[field], getattr(value, field))
+            names = boundary.namespace[f"_{value.family}_SOURCE_NAMES"]
+            self.assertEqual(tuple(p["source_name"]
+                                   for p in record["components"]), names)
+
+    def test_each_corrected_heel_and_its_l1_family_are_required(self):
+        values = fixture()
+        for index in range(7, 12):
+            wrong = replace(values[index], family="S1",
+                            fixing_frames=values[index].fixing_frames[:3])
+            for candidate in (values[:index] + values[index + 1:],
+                              values[:index] + (wrong,) + values[index + 1:]):
+                boundary = AdapterBoundary()
+                with self.subTest(index=index), self.assertRaises(ValueError):
+                    boundary.run(candidate)
+                boundary.materialise.assert_not_called()
+        with self.assertRaises(ValueError):
+            AdapterBoundary().run(fixture(include_corrected=False))
 
     def test_source_and_both_catalogues_are_checked_at_shared_boundary(self):
         boundary = AdapterBoundary()
@@ -334,7 +395,10 @@ class TurnoutSingleRailAdapterTests(unittest.TestCase):
         self.assertIs(getattr(session, "_" + FACTORY), factory)
 
     def test_source_binding_reaches_adapter_with_exact_selected_set(self):
-        from validate_phase9b_turnout_single_rail import preview, source_case
+        from validate_phase9b_turnout_single_rail import (
+            corrected_source_case,
+            preview,
+        )
 
         boundary = AdapterBoundary()
 
@@ -343,9 +407,9 @@ class TurnoutSingleRailAdapterTests(unittest.TestCase):
             result.verify()
             return result
 
-        result = preview(source_case(), create)
+        result = preview(corrected_source_case(), create)
         self.assertEqual(result.receipt["selected_family_counts"],
-                         {"L1": 6, "S1": 1})
+                         {"L1": 11, "S1": 1})
         self.assertEqual(len(result.specs), 42)
         self.assertEqual(boundary.catalogue_check.call_count, 2)
 

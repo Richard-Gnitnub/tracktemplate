@@ -258,7 +258,7 @@ def create_private_catalogue_cc_preview(
 def create_private_catalogue_turnout_single_rail_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
 ):
-    """Place six retained L1 and one S1 assembly on the fixed LH TO-001.
+    """Place eleven retained L1 and one S1 assembly on fixed LH TO-001.
 
     Exact source identities and indexed fixing frames are mandatory.
     Both families share copied context and the existing transaction.
@@ -280,6 +280,11 @@ def create_private_catalogue_turnout_single_rail_preview(
         ("T2", "curved-switch-and-closure-rail", "L1"),
         ("T2", "turnout-side-stock-rail", "S1"),
         ("T14", "curved-switch-and-closure-rail", "L1"),
+        ("S13", "main-side-stock-rail", "L1"),
+        ("S13", "straight-switch-and-closure-rail", "L1"),
+        ("T1", "main-side-stock-rail", "L1"),
+        ("T1", "straight-switch-and-closure-rail", "L1"),
+        ("T2", "straight-switch-and-closure-rail", "L1"),
     )
     expected = {
         (f"TO-001:chair:to-001-timber-{timber.lower()}:{rail}",
@@ -288,7 +293,7 @@ def create_private_catalogue_turnout_single_rail_preview(
     }
     require({(p.position_id, p.rail_id, p.timber_id, p.family)
              for p in placements} == expected,
-            "the seven fixed TO-001 single-rail identities are required")
+            "the twelve fixed TO-001 single-rail identities are required")
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     selections = []
@@ -348,7 +353,7 @@ def create_private_catalogue_turnout_single_rail_preview(
             "geometry_rebuilt": False,
             "track_placements_added": len(placements),
             "limits": [
-                "Only seven fixed TO-001 single-rail positions are placed.",
+                "Only twelve fixed TO-001 single-rail positions are placed.",
                 "No physical-fit, production, export or phase acceptance.",
                 "Source overlaps and hidden mating closures remain.",
                 "No source XML placement, scale or frame conversion reapplied.",

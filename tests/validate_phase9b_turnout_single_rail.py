@@ -136,6 +136,86 @@ def source_case():
     return source
 
 
+
+HEEL_RAILS = {1: "main-side stock rail", 3: "straight switch and closure rail"}
+HEEL_SELECTION = (("S13", 1), ("S13", 3), ("T1", 1), ("T1", 3), ("T2", 3))
+
+
+def heel_identity(name, rail):
+    return (f"TO-001:chair:to-001-timber-{name.lower()}:"
+            + HEEL_RAILS[rail].replace(" ", "-"))
+
+
+def corrected_source_case():
+    """Add five original S1 records, including T2's frame refusal.
+
+    These explicit source metadata fixtures do not substitute for the
+    separately retained 168-position source comparison.
+    """
+    source = source_case()
+    module = source.module
+    module.CHAIR_ASSIGNMENT_CONFIRMED = "confirmed ordinary or turnout assignment"
+    module.CHAIR_FAMILY_ORDINARY = "ordinary running-rail chair"
+    module.CHAIR_CLASS_SOURCE = "source-derived prototype requirement"
+    analysis, rails, timbers = source.context[2], source.context[4], source.context[5]
+    for rail_code, rail_name in HEEL_RAILS.items():
+        rail = next((r for r in rails if r["name"] == rail_name), None)
+        if rail is None:
+            rail = {}
+            rails.append(rail)
+        rail.update({
+            "stable_identity": "TO-001:rail:" + rail_name.replace(" ", "-"),
+            "name": rail_name, "rail_role": "stock rail" if rail_code == 1 else rail_name,
+            "parent_turnout_identity": "TO-001", "parent_crossover_identity": "",
+            "source_configuration": {
+                "gauge_face": rail_name + " gauge face",
+                "outer_face": rail_name + " outer face",
+                "gauge_orientation_source": "mapped named turnout rail faces",
+                "rail_geometry_revision": 2,
+            },
+        })
+    for index, (name, rail_code) in enumerate(HEEL_SELECTION, 7):
+        rail = next(r for r in rails if r["name"] == HEEL_RAILS[rail_code])
+        timber = next(t for t in timbers if t["identifier"] == name)
+        record = dict(
+            stable_chair_position_identity=heel_identity(name, rail_code),
+            rail_identity=rail["stable_identity"], rail_name=rail["name"],
+            rail_role=rail["rail_role"], timber_identity=timber["stable_identity"],
+            prototype_timber_identifier=name, timber_identifier=name,
+            parent_turnout_identity="TO-001", parent_crossover_identity="",
+            chair_code=1, chair_code_label="S1", chair_family=module.CHAIR_FAMILY_ORDINARY,
+            chair_subtype=("REA S1 ordinary chair beyond the C-switch block-chair zone"
+                           if name == "S13" else "REA S1 ordinary closure-region chair; "
+                           "L1 clearance selection awaits detailed bridge-chair assignment"),
+            handedness="not applicable", assignment_status=module.CHAIR_ASSIGNMENT_CONFIRMED,
+            assignment_complete_in_current_stage=True, special_assignment_deferred=False,
+            deliberate_omission=False, stale_signature_state=False, validation_status="validated",
+            key_direction_sign=0, key_orientation="requires a configurable key-direction policy",
+            key_orientation_classification="dimension requiring later confirmation",
+            source_or_assumed_classification=module.CHAIR_CLASS_SOURCE,
+            chair_footprint_parameters={"dimension_classification": module.CHAIR_CLASS_SOURCE},
+            source_configuration={"rail": copy.deepcopy(rail["source_configuration"]),
+                                  "timber": copy.deepcopy(timber["source_configuration"])},
+        )
+        old_id = f"invented-unselected-{index:03d}"
+        old = next(p for p in analysis["positions"]
+                   if p["stable_chair_position_identity"] == old_id)
+        analysis["positions"][analysis["positions"].index(old)] = record
+        old_exclusion = next(p for p in source.plan["analytical_only"]
+                             if p["chair_position_identity"] == old_id)
+        source.plan["analytical_only"].remove(old_exclusion)
+        original = dict(chair_position_identity=record["stable_chair_position_identity"],
+                        rail_identity=record["rail_identity"], timber_identity=record["timber_identity"],
+                        chair_code=1, chair_label="S1")
+        if name == "T2":
+            original.update(reason="gauge normal is not perpendicular to the local rail tangent",
+                            unresolved_special=True, deliberate_omission=False)
+            source.plan["analytical_only"].append(original)
+        else:
+            original["base_z"] = source.plan["instances"][0]["base_z"]
+            source.plan["instances"].append(original)
+    return source
+
 def binding():
     return importlib.import_module(
         "tracktemplate.compatibility.chair_turnout_single_rail_placement",
@@ -155,17 +235,18 @@ def preview(source, factory=None, *, select=selection):
 
 class TurnoutSingleRailTests(unittest.TestCase):
     def test_seven_source_choices_and_canonical_inputs_preserved(self):
-        source = source_case()
+        source = corrected_source_case()
         before = copy.deepcopy((source.context, source.plan))
         _path, placements, _shapes, receipt, verify = preview(source)
-        self.assertEqual(len(placements), 7)
+        self.assertEqual(len(placements), 12)
         self.assertEqual([p.position_id for p in placements],
-                         sorted(identity(*item) for item in SELECTED))
+                         sorted([identity(*item) for item in SELECTED]
+                                + [heel_identity(*item) for item in HEEL_SELECTION]))
         for p in placements:
             self.assertEqual(p.family, "S1" if p.position_id == identity("T2", 4) else "L1")
-        self.assertEqual(receipt["selected_family_counts"], {"L1": 6, "S1": 1})
-        self.assertEqual(receipt["represented_source_position_count"], 7)
-        self.assertEqual(len(receipt["remaining_positions"]), 161)
+        self.assertEqual(receipt["selected_family_counts"], {"L1": 11, "S1": 1})
+        self.assertEqual(receipt["represented_source_position_count"], 12)
+        self.assertEqual(len(receipt["remaining_positions"]), 156)
         self.assertEqual(receipt["original_analytical_exclusions"], before[1]["analytical_only"])
         with (patch.dict(sys.modules, {"FreeCAD": source.app}),
               patch.object(binding(), "verify_catalogue_sources")):
@@ -186,10 +267,10 @@ class TurnoutSingleRailTests(unittest.TestCase):
                              ("template_width", 33), ("track_gauge", 18.83),
                              ("chair_analysis_signature", "changed")):
             with self.subTest(field=field):
-                source = source_case()
+                source = corrected_source_case()
                 source.context[1][field] = value
                 self.assert_refused(source)
-        source = source_case()
+        source = corrected_source_case()
         source.plan["rail_profile"]["rail_depth_mm"] += 1e-9
         self.assert_refused(source)
 
@@ -201,7 +282,7 @@ class TurnoutSingleRailTests(unittest.TestCase):
                              ("deliberate_omission", True),
                              ("key_direction_sign", 1), ("stale_signature_state", True)):
             with self.subTest(field=field):
-                source = source_case()
+                source = corrected_source_case()
                 record = next(p for p in source.context[2]["positions"]
                               if p["stable_chair_position_identity"] == identity("S13", 2))
                 record[field] = value
@@ -209,7 +290,7 @@ class TurnoutSingleRailTests(unittest.TestCase):
 
     def test_missing_duplicate_and_partition_guards(self):
         for change in ("missing", "duplicate", "overlap", "unowned"):
-            source = source_case()
+            source = corrected_source_case()
             records = source.context[2]["positions"]
             record = next(p for p in records
                           if p["stable_chair_position_identity"] == identity("S13", 2))
@@ -225,7 +306,7 @@ class TurnoutSingleRailTests(unittest.TestCase):
 
     def test_nominal_station_and_mounting_guards(self):
         for change in ("station", "centre", "heading", "datum", "extended"):
-            source = source_case()
+            source = corrected_source_case()
             timber = next(t for t in source.context[5] if t["identifier"] == "S13")
             if change == "station":
                 timber["source_configuration"]["local_x"] += 1e-6
@@ -240,7 +321,7 @@ class TurnoutSingleRailTests(unittest.TestCase):
             self.assert_refused(source)
 
     def test_family_selection_and_catalogue_substitution_guards(self):
-        source = source_case()
+        source = corrected_source_case()
         source.module._rea_c10_turnout_outer_gauge_point_at_x = (
             lambda _dimensions, station: (station, 12.0, .05)
         )
@@ -251,11 +332,11 @@ class TurnoutSingleRailTests(unittest.TestCase):
                 result = selection(path, family, run=run)
                 setattr(result, field, value)
                 return result
-            self.assert_refused(source_case(), select=changed)
+            self.assert_refused(corrected_source_case(), select=changed)
 
     def test_late_source_and_host_changes_are_rejected(self):
         for change in ("source", "host"):
-            source = source_case()
+            source = corrected_source_case()
             def factory(_path, _placements, _shapes, _receipt, verify):
                 if change == "source":
                     source.context[2]["positions"][-1]["stale_signature_state"] = True

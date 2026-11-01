@@ -133,7 +133,7 @@ def place_left_hand_single_rail(
     position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
     base_z_mm, *, family, source_rail_code, source_angle_rad, source_gauge_y_mm,
 ):
-    """Place retained S1/L1 parts on LH source rails 2 or 4, in mm/radians.
+    """Place retained S1/L1 parts on LH source rails 1-4, in mm/radians.
 
     Gauge Y is measured from the main gauge face, without RH reflection.
     The caller qualifies the nominal station, source family and host.
@@ -150,8 +150,12 @@ def place_left_hand_single_rail(
     gauge_y = _finite_number(source_gauge_y_mm, "source_gauge_y_mm")
     if (family not in ("S1", "L1")
             or type(source_rail_code) is not int
-            or source_rail_code not in (2, 4)
-            or not 0 < angle < math.pi / 2 or gauge_y <= 0):
+            or source_rail_code not in (1, 2, 3, 4)
+            or (source_rail_code in (1, 3)
+                and (angle != 0
+                     or gauge_y != (0 if source_rail_code == 1 else 16.5)))
+            or (source_rail_code in (2, 4)
+                and (not 0 < angle < math.pi / 2 or gauge_y <= 0))):
         raise ValueError("Single rails require the qualified LH C10 source pose")
     tangent = (math.cos(heading), math.sin(heading))
     normal = (-tangent[1], tangent[0])
@@ -179,7 +183,7 @@ def place_left_hand_single_rail(
         (-half_pitch, half_pitch) if family == "L1" else (0.0,)
     ))
     cosine, sine = math.cos(angle), math.sin(angle)
-    reversed_rail = source_rail_code == 4
+    reversed_rail = source_rail_code in (3, 4)
     sign = -1 if reversed_rail else 1
     delta = -sign * (outer - inner) / 2 * sine
     anchor = (delta * cosine, gauge_y + delta * sine)

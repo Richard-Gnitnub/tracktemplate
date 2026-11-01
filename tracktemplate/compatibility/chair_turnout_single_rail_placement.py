@@ -1,9 +1,9 @@
-"""Bind seven retained single-rail assemblies to the fixed TO-001 source.
+"""Bind twelve retained single-rail assemblies to the fixed TO-001 source.
 
-Templot 556b math_unit.pas:29551-29665 selects six L1 and one S1.
+Templot 556b math_unit.pas:29551-29665 selects eleven L1 and one S1.
 Source-informed adaptation is GPL-3.0-or-later; see NOTICE.md and
 reference/PROVENANCE.md. Canonical labels, analytical exclusions and all
-existing preview routes remain unchanged. This is not fit admission.
+unrelated preview routes remain unchanged. This is not fit admission.
 """
 
 import copy
@@ -27,6 +27,7 @@ from tracktemplate.compatibility.chair_single_rail_placement import (
     _source_pose,
 )
 from tracktemplate.compatibility.chair_turnout_check_placement import (
+    _ANALYSIS_SHA256,
     _configuration,
     _host,
     _timber_frame,
@@ -36,9 +37,13 @@ from tracktemplate.domain.single_rail_placement import (
 )
 
 
-_RAILS = ((2, "curved switch and closure rail"),
+_RAILS = ((1, "main-side stock rail"),
+          (2, "curved switch and closure rail"),
+          (3, "straight switch and closure rail"),
           (4, "turnout-side stock rail"))
 _SELECTION = (
+    ("S13", 1, "L1"), ("S13", 3, "L1"),
+    ("T1", 1, "L1"), ("T1", 3, "L1"), ("T2", 3, "L1"),
     ("S13", 2, "L1"), ("S13", 4, "L1"),
     ("T1", 2, "L1"), ("T1", 4, "L1"),
     ("T14", 2, "L1"), ("T2", 2, "L1"), ("T2", 4, "S1"),
@@ -73,7 +78,7 @@ def _source_binding(position, rail, timber, original, name, rail_code):
     expected = {
         "stable_chair_position_identity": identity,
         "rail_identity": rail_id, "rail_name": rail_name,
-        "rail_role": "stock rail" if rail_code == 4 else rail_name,
+        "rail_role": "stock rail" if rail_code in (1, 4) else rail_name,
         "timber_identity": timber_id,
         "prototype_timber_identifier": name, "timber_identifier": name,
         "parent_turnout_identity": "TO-001", "parent_crossover_identity": "",
@@ -88,6 +93,27 @@ def _source_binding(position, rail, timber, original, name, rail_code):
         "subtype and keying arrangement",
         "key_orientation_classification": "dimension requiring later confirmation",
     }
+    heel = rail_code in (1, 3)
+    if heel:
+        expected.update({
+            "chair_code": 1, "chair_code_label": "S1",
+            "chair_family": "ordinary running-rail chair",
+            "chair_subtype": (
+                "REA S1 ordinary chair beyond the C-switch block-chair zone"
+                if name == "S13" else
+                "REA S1 ordinary closure-region chair; L1 clearance selection "
+                "awaits detailed bridge-chair assignment"
+            ),
+            "assignment_status": "confirmed ordinary or turnout assignment",
+            "special_assignment_deferred": False,
+            "validation_status": "validated",
+            "key_orientation": "requires a configurable key-direction policy",
+            "source_or_assumed_classification": "source-derived prototype requirement",
+        })
+        _require(isinstance(position.get("chair_footprint_parameters"), dict)
+                 and position["chair_footprint_parameters"].get("dimension_classification")
+                 == "source-derived prototype requirement",
+                 "the original heel dimension classification differs")
     _require(all(position.get(key) == value for key, value in expected.items())
              and type(position.get("chair_code")) is int,
              "the selected chair identity or deferred assignment differs")
@@ -113,17 +139,80 @@ def _source_binding(position, rail, timber, original, name, rail_code):
     _require(original.get("chair_position_identity") == identity
              and original.get("rail_identity") == rail_id
              and original.get("timber_identity") == timber_id
-             and original.get("chair_label") == "L1"
-             and original.get("reason") == "special chair assignment remains analytical"
-             and original.get("deliberate_omission") is False
-             and original.get("unresolved_special") is True,
-             "the original analytical exclusion differs")
+             and original.get("chair_label") == ("S1" if heel else "L1"),
+             "the original physical-plan binding differs")
+    if not heel or name == "T2":
+        reason = ("gauge normal is not perpendicular to the local rail tangent"
+                  if heel else "special chair assignment remains analytical")
+        _require(original.get("reason") == reason
+                 and original.get("deliberate_omission") is False
+                 and original.get("unresolved_special") is True,
+                 "the original analytical exclusion differs")
+    else:
+        _require(type(original.get("chair_code")) is int
+                 and original["chair_code"] == 1
+                 and _finite(original.get("base_z")),
+                 "the original S1 physical instance differs")
+
+
+def exclude_turnout_heel_l1(module, document, source, placements, excluded):
+    """Keep five source-selected L1 chairs out of the fixed TO S1 preview.
+
+    Apply before S1 frame recovery so T2's original refusal cannot restore
+    an S1 body. Other source contexts retain their existing selection.
+    Qualification uses the same source predicates as the L1 preview.
+    """
+    signature, analysis, settings, plan, rails, timbers = source
+    context = json.loads(signature)
+    if (context.get("kind") != "turnout"
+            or context.get("configuration", {}).get("turnout_id") != "TO-001"
+            or context.get("analysis", {}).get("geometry_signature")
+            != _ANALYSIS_SHA256):
+        return placements, excluded
+    config = _fixed_source(_configuration, module, context, settings, plan)
+    positions = _indexed(analysis["positions"], "stable_chair_position_identity")
+    rail_map = _indexed(rails, "stable_identity")
+    timber_map = _indexed(timbers, "stable_identity")
+    instances = _indexed(plan["instances"], "chair_position_identity")
+    originals = _indexed(plan["analytical_only"], "chair_position_identity")
+    _require(not instances.keys() & originals.keys(), "physical-plan records repeat")
+    _obj, host, _signature = _fixed_source(_host, module, document, config)
+    dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
+    layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0), "identifier")
+    corrections = {}
+    for name, rail_code, _family_name in _SELECTION:
+        if rail_code not in (1, 3):
+            continue
+        identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
+                    + dict(_RAILS)[rail_code].replace(" ", "-"))
+        _require(identity in positions, "a source heel position is missing")
+        position = positions[identity]
+        timber = timber_map.get(position.get("timber_identity"), {})
+        original = (originals if name == "T2" else instances).get(identity, {})
+        _source_binding(position, rail_map.get(position.get("rail_identity"), {}),
+                        timber, original, name, rail_code)
+        _fixed_source(_timber_frame, module, host, config, timber, layout.get(name, {}))
+        station = timber["source_configuration"]["local_x"]
+        _require(_family(module, dimensions, name, station, rail_code) == "L1",
+                 "the heel source no longer selects L1")
+        corrections[identity] = {
+            "position_id": identity, "chair_code": 1,
+            "rail_id": position["rail_identity"], "timber_id": position["timber_identity"],
+            "reason": "Source selects L1; use the TO-001 single-rail catalogue preview.",
+            "replacement_family": "L1", "source_rail_code": rail_code,
+            "original_position": copy.deepcopy(position),
+            "original_plan_record": copy.deepcopy(original),
+        }
+    remaining = [item for item in excluded if item["position_id"] not in corrections]
+    remaining.extend(corrections.values())
+    return (tuple(p for p in placements if p.position_id not in corrections),
+            sorted(remaining, key=lambda item: item["position_id"]))
 
 
 def preview_private_catalogue_turnout_single_rail_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
 ):
-    """Create seven private assemblies without changing analytical records.
+    """Create twelve private assemblies without changing source records.
 
     Admission is limited to the fixed left-hand TO-001 source. The source
     clearance selects S1 at T2 rail 4 despite its raw L1 candidate label.
@@ -163,12 +252,14 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     for name, rail_code, family in _SELECTION:
         identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
                     + dict(_RAILS)[rail_code].replace(" ", "-"))
-        _require(identity in positions and identity in excluded,
-                 "a selected position is missing or already physical")
+        heel = rail_code in (1, 3)
+        originals = instances if heel and name != "T2" else excluded
+        _require(identity in positions and identity in originals,
+                 "a selected position or its original plan record is missing")
         position = positions[identity]
         timber = timber_map.get(position.get("timber_identity"), {})
         _source_binding(position, rail_map.get(position.get("rail_identity"), {}),
-                        timber, excluded[identity], name, rail_code)
+                        timber, originals[identity], name, rail_code)
         station, point, heading = _fixed_source(
             _timber_frame, module, host, config, timber, layout.get(name, {}),
         )
@@ -194,6 +285,7 @@ def preview_private_catalogue_turnout_single_rail_chairs(
             "source_branch": branch, "source_handing": "LH",
             "source_model_sha256": prepared[family].model_sha256,
             "original_position": copy.deepcopy(position),
+            "original_plan_record": copy.deepcopy(originals[identity]),
             "physical_fit": "NOT_PROVED",
         })
     shapes, verify_source = _context_shapes_and_verifier(
@@ -215,13 +307,18 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         "source_context_signature": "sha256:" + hashlib.sha256(signature.encode()).hexdigest(),
         "source_analysis_signature": analysis["geometry_signature"],
         "analysis_position_count": len(positions),
-        "selected_family_counts": {"L1": 6, "S1": 1},
-        "represented_source_position_count": 7,
+        "selected_family_counts": {"L1": 11, "S1": 1},
+        "represented_source_position_count": 12,
         "selected_positions": sorted(selected, key=lambda item: item["position_id"]),
+        "corrected_heel_positions": sorted(
+            (item for item in selected if item["source_rail_code"] in (1, 3)),
+            key=lambda item: item["position_id"],
+        ),
         "remaining_positions": [copy.deepcopy(position)
                                 for identity, position in sorted(positions.items())
                                 if identity not in represented],
         "original_analytical_exclusions": copy.deepcopy(plan["analytical_only"]),
+        "original_physical_instances": copy.deepcopy(plan["instances"]),
         "source_base_z_mm": datums[0],
         "embedding_basis": "unchanged existing source-plan base_z",
         "model_support_adjustments_applied": False,
@@ -229,7 +326,7 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         "limits": ["Private fixed TO-001 reference; no physical-fit acceptance.",
                    "Original analytical labels and exclusions remain unchanged.",
                    "No production, export, persistence or live-update authority.",
-                   "Five existing S1/L1 discrepancies remain outside this route."],
+                   "Five original S1 records select L1 only in this private preview."],
     }
     ordered = tuple(sorted(placements, key=lambda item: item.position_id))
     return create_preview(catalogue_path, ordered, shapes, receipt, verify_inputs)

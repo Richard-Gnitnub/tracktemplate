@@ -2888,10 +2888,15 @@ class ModularCoreLayoutWorkflowSession:
             preview_s1_reference_chairs,
         )
 
+        from tracktemplate.compatibility.chair_turnout_single_rail_placement import (
+            exclude_turnout_heel_l1,
+        )
+
         self.routing_record()
         return preview_s1_reference_chairs(
             self.module, source_document, turnout_id, package, manifest_text,
             model_request, self._s1_reference_preview_factory,
+            source_selection_filter=exclude_turnout_heel_l1,
         )
 
     def preview_s1j_reference_chairs(
@@ -2918,11 +2923,16 @@ class ModularCoreLayoutWorkflowSession:
             preview_s1_s1j_reference_chairs,
         )
 
+        from tracktemplate.compatibility.chair_turnout_single_rail_placement import (
+            exclude_turnout_heel_l1,
+        )
+
         self.routing_record()
         return preview_s1_s1j_reference_chairs(
             self.module, source_document, turnout_id, s1_package,
             s1_manifest_text, s1j_package, s1j_manifest_text, model_request,
             self._s1_s1j_reference_preview_factory,
+            source_selection_filter=exclude_turnout_heel_l1,
         )
 
     def preview_s1_s1j_crossover_reference_chairs(
@@ -3038,7 +3048,7 @@ class ModularCoreLayoutWorkflowSession:
     def preview_private_catalogue_turnout_single_rail_chairs(
         self, source_document, turnout_id, catalogue_path,
     ):
-        """Inspect seven retained single-rail assemblies on fixed TO-001."""
+        """Inspect twelve retained single-rail assemblies on fixed TO-001."""
         from tracktemplate.compatibility.chair_turnout_single_rail_placement import (
             preview_private_catalogue_turnout_single_rail_chairs,
         )
