@@ -590,6 +590,155 @@ class ReadinessSetupRegressions(unittest.TestCase):
                              'BASELINE-FAILURE')
 
 
+class InstallationFailureRegressions(unittest.TestCase):
+    def fixture(self, work):
+        (work / 'evidence').mkdir()
+        for name in ('prepare.log', 'gui-authority.json', 'admission.json',
+                     'install.log', 'installer-intent.json',
+                     'installer-ownership.json', 'installer-result.json',
+                     'installer-output.log', 'finalizer.log'):
+            (work / 'evidence' / name).write_text('{}')
+        return dict(environment(), L1_PREPARE='success',
+                    L1_INSTALL='failure', L1_ACQUIRE='skipped',
+                    L1_RUN='skipped')
+
+    def finalize(self, work, values, *, cleanup=True, flatpak=None,
+                 clearance=True):
+        service = SimpleNamespace(cleanup=Mock(return_value={
+            'cleanup': cleanup, 'errors': [] if cleanup else ['not empty'],
+        }))
+        with (patch.dict(os.environ, values, clear=True),
+              patch.object(gui, 'installer', service, create=True),
+              patch.object(gui, 'shutil', SimpleNamespace(
+                  which=lambda name: flatpak), create=True),
+              patch.object(gui.original, '_clearance',
+                           return_value=clearance) as probe):
+            result = gui.finalize(work, work / 'public')
+        process = json.loads((
+            work / 'evidence/process-finalization.json').read_text())
+        return result, process, service.cleanup, probe
+
+    def test_failed_install_proves_owned_runtime_never_started(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            values = self.fixture(work)
+            result, process, cleanup, probe = self.finalize(work, values)
+            self.assertEqual(result, 0)
+            self.assertTrue(process['cleanup'])
+            self.assertTrue(process['never_started'])
+            cleanup.assert_called_once_with(work)
+            probe.assert_not_called()
+
+    def test_failed_install_requires_empty_installer(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            values = self.fixture(work)
+            result, process, _, _ = self.finalize(
+                work, values, cleanup=False)
+            self.assertEqual(result, 1)
+            self.assertFalse(process['cleanup'])
+            self.assertFalse(process.get('never_started', False))
+
+    def test_installed_flatpak_keeps_foreign_instance_clearance(self):
+        for clear in (False, True):
+            with (self.subTest(clearance=clear),
+                  tempfile.TemporaryDirectory() as temporary):
+                work = Path(temporary)
+                values = self.fixture(work)
+                result, process, _, probe = self.finalize(
+                    work, values, flatpak='/usr/bin/flatpak', clearance=clear)
+                probe.assert_called_once_with()
+                self.assertEqual(process['cleanup'], clear)
+                self.assertEqual(result, 0 if clear else 1)
+
+    def test_failed_install_rejects_unknown_or_later_state(self):
+        for name in ('run-config.json', 'inputs.tar',
+                     'evidence/acquisition.log', 'evidence/guard/result.json',
+                     'evidence/display-start-intent.json', 'evidence/unknown'):
+            with (self.subTest(name=name),
+                  tempfile.TemporaryDirectory() as temporary):
+                work = Path(temporary)
+                values = self.fixture(work)
+                target = work / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('{}')
+                result, process, _, _ = self.finalize(work, values)
+                self.assertEqual(result, 1)
+                self.assertFalse(process['cleanup'])
+
+    def test_install_wrapper_is_used_with_original_outer_deadline(self):
+        workflow = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        block = workflow.split('id: install', 1)[1].split(
+            '- name: Acquire only', 1)[0]
+        self.assertIn('timeout-minutes: 10', block)
+        self.assertIn('hosted_l1_gui_validation.py install', block)
+        self.assertNotIn('sudo apt-get update', block)
+
+    def test_failed_install_rejects_links_and_inconsistent_outcomes(self):
+        for change in ('link', 'acquired', 'ran', 'prepare_unknown'):
+            with (self.subTest(change=change),
+                  tempfile.TemporaryDirectory() as temporary):
+                work = Path(temporary)
+                values = self.fixture(work)
+                if change == 'link':
+                    (work / 'evidence/installer-samples.jsonl').symlink_to(
+                        work / 'absent')
+                else:
+                    values[{'acquired': 'L1_ACQUIRE', 'ran': 'L1_RUN',
+                            'prepare_unknown': 'L1_PREPARE'}[change]] = (
+                                'success' if change != 'prepare_unknown'
+                                else 'unknown')
+                result, process, _, _ = self.finalize(work, values)
+                self.assertEqual(result, 1)
+                self.assertFalse(process['cleanup'])
+
+    def test_failed_install_cleanup_never_becomes_a_test_pass(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            values = self.fixture(work)
+            values.update(
+                L1_PRIMARY_UPLOAD='success', L1_PRIMARY_DOWNLOAD='success',
+                L1_PRIMARY_ID='121', L1_FINAL_UPLOAD='success',
+                L1_FINAL_DOWNLOAD='success', L1_FINAL_ID='122',
+                L1_PUBLICATION='success',
+            )
+            (work / 'evidence/install.log').write_text('APT-SETUP-FAILED')
+            result, _, _, _ = self.finalize(work, values)
+            self.assertEqual(result, 0)
+            with patch.dict(os.environ, values, clear=True):
+                for name in ('readback-primary', 'readback-final'):
+                    (work / name).mkdir()
+                gui.native.seal(work)
+                (work / 'readback-primary/evidence.tar').write_bytes(
+                    (work / 'evidence.tar').read_bytes())
+                self.assertEqual(gui.publish(work), 0)
+                (work / 'readback-final/publication.tar').write_bytes(
+                    (work / 'publication.tar').read_bytes())
+                self.assertEqual(gui.complete(work, work / 'public'), 1)
+            summary = json.loads((work / 'public/summary.json').read_text())
+            self.assertEqual(summary['outcome'], 'INCOMPLETE')
+            self.assertNotIn('tests', summary)
+            self.assertEqual((work / 'evidence/install.log').read_text(),
+                             'APT-SETUP-FAILED')
+
+    def test_runtime_cleanup_keeps_original_receipt_and_installer_failure(self):
+        for clean in (False, True):
+            with (self.subTest(installer_cleanup=clean),
+                  tempfile.TemporaryDirectory() as temporary):
+                work = Path(temporary)
+                values = self.fixture(work)
+                values.update(L1_INSTALL='success', L1_ACQUIRE='success',
+                              L1_RUN='success')
+                result, process, _, probe = self.finalize(
+                    work, values, cleanup=clean)
+                probe.assert_called_once_with()
+                retained = json.loads((
+                    work / 'evidence/runtime-finalization.json').read_text())
+                self.assertTrue(retained['cleanup'])
+                self.assertEqual(process['cleanup'], clean)
+                self.assertEqual(result, 0 if clean else 1)
+
+
 class GuiProofContracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
