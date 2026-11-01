@@ -1338,7 +1338,9 @@ def _validate_owner_view(plan: str) -> None:
         'Make and validate the Templot chairs through the TrackTemplate path that the project uses',
         'Record source coverage and unresolved geometry accurately',
         'Preserve the LMS model and its evidence with a FAIL result',
-        'Complete independent review and the Documentation Review lifecycle for this documentation alignment',
+        'all REA B and C turnout sizes to Phase 9B for completion before Phase 10',
+        'Extend one shared turnout/crossover engine before the remaining chair coverage',
+        'Keep each new B/C combination Pending until its required evidence passes',
     ):
         _require(
             fragment in owner_view,
@@ -1346,11 +1348,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         '08466b883890ebea25814fb3e6a360396bb071ecd40aa7a114820472f381b7f4',
-        'f74b01318e2128b9e13024e67a65e924df2b8e8c5c24e2ffe7183643a794cac5',
+        'e49cb6922d4b7dd11b4436420376dc29d3b5977f5272fde86db7d855e7657433',
         '2b0934f85362b3286b2822563086f615d070b7e86b1452543104362a6ecca755',
         '71030a1fdbdbc15423fa655c1c354faa3406debc84d376a611e73b98c2ccb688',
-        '7e8380443e7e9c868e501654033ca09f130c9d308810b124d4af98b004a9b2d3',
-        'd38437d78ed96da99ee692d0785ac053b8ea22325cc28adefabf12bfce7ebcfa',
+        'ae3d69b94faf33e3d001569e9c739d9a682632b0b4d3833d123ff3ea57fbccf2',
+        '1b309bf00447e8cdcdf92ee168e74331cc5d3a8e3f1cb6b77d7fee16310ad412',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1369,6 +1371,7 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9b-exit-5-acceptance-panel"),
          ("D-P9-017", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-4-acceptance-panel"),
+         ("D-P9-019", "current/PHASE_EVIDENCE.md#rea-bc-scope-panel"),
          ("D-P9-018", "current/PHASE_EVIDENCE.md"
           "#lms-chair-record-and-templot-development-panel")),
         "project-plan owner view closeout or acceptance route drifted",
@@ -1414,10 +1417,12 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "PROJECT_PLAN.md lost the Core/Layout paragraph separation",
     )
     compact_plan = plan.replace(required_separator, required_separator.replace("\n\n", "\n"), 1)
-    # Preserve all three accepted additions.
+    # Preserve the exact authorised dashboard additions.
     for decision_id, expected_digest in (
         ('D-P9-018',
          'c9a090af7402fef052700aeea35b9c9120a98e6e8109ff25de9bd486bc10f316'),
+        ('D-P9-019',
+         '473eb6fbdf04af6254b66b2cb478dfb70876af844a80cc7c1f7cdf6cf348a409'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -7931,20 +7936,115 @@ def _validate_dgov026_decision(record, fields):
         )
 
 
+def _validate_dp9_019_decision(record, fields):
+    """Bind B/C scope and sequence to the owner's exact bounded authority."""
+    panel = "reference/current/PHASE_EVIDENCE.md#rea-bc-scope-panel"
+    _require(
+        isinstance(record, dict) and set(record) == fields
+        and record["id"] == "D-P9-019"
+        and record["decided_on"] == "2026-11-01"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-019 scope identity or panel authority drifted",
+    )
+    for field, expected in (
+        ("authority", "2466545cd97930e27291a383d68a6faad9d7138870acdd51c37f3d534fef2d82"),
+        ("decision", "d79fb5dba9cf596ea86c9fd4b60c308e0bb856ab5651ff327f46328c73be84cd"),
+        ("exclusions", "e33440a4c3ffde55af2e6642fd1118f7e65270132828f34becd204dd0285b8b5"),
+    ):
+        value = record[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == expected,
+            "D-P9-019 " + field + " authority or boundary drifted",
+        )
+
+
+def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
+    """Keep the source menu, wider domain and exact owner quote distinct."""
+    panel = _section(evidence, "D-P9-019 REA B and C turnout scope — 2026-11-01")
+    _require(
+        evidence.count('<a id="rea-bc-scope-panel"></a>') == 1
+        and _blockquote_paragraphs(panel) == [
+            _semantic_text(paragraph)
+            for paragraph in record["authority"].split("\n\n")
+        ],
+        "D-P9-019 exact owner instruction or panel route drifted",
+    )
+    rows = _structured_table_rows(
+        panel, ("Crossing ratio", "REA B", "REA C"), "REA B/C combinations",
+    )
+    ratios = (
+        "4", "4.5", "4.75", "5", "5.25", "5.5", "5.75", "6",
+        "6.25", "6.5", "7", "7.5", "8", "9", "10", "12",
+    )
+    _require(list(rows) == ["1:" + ratio for ratio in ratios],
+             "REA B/C source selector combinations drifted")
+    common_b = {"5.5", "6", "6.5", "7", "7.5", "8"}
+    common_c = {"8", "9", "10"}
+    for ratio, row in zip(ratios, rows.values()):
+        expected = [
+            "Common; Pending" if ratio in common else "Pending"
+            for common in (common_b, common_c)
+        ]
+        _require(row[1:] == expected,
+                 "REA B/C combination status drifted: " + ratio)
+    regions = _structured_table_rows(
+        panel, ("Continuous region or input", "Source finding and required result"),
+        "REA B/C continuous domain",
+    )
+    expected_regions = {
+        'n < 0.5; invalid or non-finite input': (
+            'c607a3d84ee63e4cf7c754e6fad77b462c4a31d07eb2cfda938828b353a059bc'
+        ),
+        '0.5 <= n < 1.5': (
+            '3354309c9477f98ed85cc8e3e6aff45f271e7dba9792be228d71e9ccea97cc8a'
+        ),
+        '1.5 <= n < 4': (
+            'b00588a2c14511347c3d99e79aba196a42e0ec4f31e447367230f66beaf0b832'
+        ),
+        '4 <= n < H': (
+            '87532124ca54a9a1cfcf3a740ea76cecbbb4f83df0d388d6ce876f4b41af4dcb'
+        ),
+        'n = H': (
+            '609423278058bc9b58c41089f1c39330fdc1d05146572c4b1aad4052dd010bf5'
+        ),
+        'n > H': (
+            '2160cd2560a0104e549359cb1778635471f1066199a0ece1476ddacda22b40f0'
+        ),
+        'n >= 20.125': (
+            'db832b9e50d70ef7b9a6aaa6e7a0ac53b515e93c6258a9cfcea39822b816a1af'
+        ),
+    }
+    _require(
+        list(regions) == list(expected_regions)
+        and "OTHER" in _semantic_text(panel),
+        "REA B/C continuous source regions drifted",
+    )
+    for region, expected in expected_regions.items():
+        _require(
+            hashlib.sha256(
+                _semantic_text(regions[region][1]).encode("utf-8"),
+            ).hexdigest() == expected,
+            "REA B/C source finding or qualification boundary drifted: " + region,
+        )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep the thirteen accepted decisions and their exact bounded authority."""
+    """Keep the fourteen accepted decisions and their exact bounded authority."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-10-30",
+        and document["updated_on"] == "2026-11-01",
         "Phase 9B current decision header drifted",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 13
+        and len(records) == 14
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7960,6 +8060,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_016_decision(records[8], set(records[0]))
     _validate_dp9_017_decision(records[9], set(records[0]))
     _validate_dgov026_decision(records[12], set(records[0]))
+    _validate_dp9_019_decision(records[13], set(records[0]))
     for index, identity, expected_digest in (
         (10, 'D-P9-018',
          'be3af2a2720606f2ebc0f48a2ffccd64a0466ea5c9ed022727ba5fbf0aaa5458'),
@@ -8152,6 +8253,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
          ("D-P9-015", "#phase-9b-exit-5-acceptance-panel"),
          ("D-P9-017", "#phase-9b-exit-4-acceptance-panel"),
+         ("D-P9-019", "#rea-bc-scope-panel"),
          ("D-P9-018", "#lms-chair-record-and-templot-development-panel")),
         "Phase 9B evidence owner-view route drifted",
     )
@@ -9056,8 +9158,8 @@ def _validate_decisions(plan: str) -> None:
         and "history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
         in decision_section
         and "current decision register" in decision_flat
-        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-018 "
-        "and D-GOV-024" in decision_flat,
+        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-019, "
+        "D-GOV-024, D-GOV-025 and D-GOV-026" in decision_flat,
         "Phase 7 closeout or current decision-register ownership is missing",
     )
     plan_ids = set(
@@ -9075,7 +9177,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017", "D-P9-018",
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017", "D-P9-018", "D-P9-019",
            "D-GOV-023",
            "D-GOV-024", "D-GOV-025", "D-GOV-026"},
         "project-plan decisions differ from the current and frozen registers",
@@ -10845,6 +10947,10 @@ def main() -> None:
     _validate_dp9_013_policy(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_013_architecture(_read(ARCHITECTURE_PATH))
     _validate_phase9b_decisions(_load_json(CURRENT_DECISIONS_PATH))
+    _validate_dp9_019_combinations(
+        _read(CURRENT_EVIDENCE_PATH),
+        _load_json(CURRENT_DECISIONS_PATH)["decisions"][-1],
+    )
     _validate_dgov024_panel(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_014_policy(
         _read(CURRENT_EVIDENCE_PATH), _read(ROOT / "reference/ARCHITECTURE.md"),
