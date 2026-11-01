@@ -348,6 +348,7 @@ def _confirmed_positions(module, analysis, chair_code):
 def _preview_reference_chairs(
     module, source_document, turnout_id, package, manifest_text, model_request,
     create_preview, *, family, chair_code, select_positions,
+    source_selection_filter=None,
 ):
     """Create a separate unsaved reference view; leave the source intact.
 
@@ -360,12 +361,20 @@ def _preview_reference_chairs(
         raise ValueError(
             f"The {family} reference preview adapter is unavailable."
         )
+    if source_selection_filter is not None and not callable(source_selection_filter):
+        raise TypeError("The source selection filter must be callable")
     signature_text, analysis, settings, plan, rails, timbers = (
         _open_source_context(
             module, source_document, turnout_id, family,
         )
     )
     placements, excluded = select_positions(module, analysis, plan)
+    if source_selection_filter is not None:
+        placements, excluded = source_selection_filter(
+            module, source_document,
+            (signature_text, analysis, settings, plan, rails, timbers),
+            placements, excluded,
+        )
     placements, excluded, recovered = _recover_positions(
         module, analysis, plan, rails, timbers, placements, excluded, chair_code,
     )
@@ -455,13 +464,14 @@ def _select_s1_s1j_positions(module, analysis, plan):
 
 def preview_s1_reference_chairs(
     module, source_document, turnout_id, package, manifest_text, model_request,
-    create_preview,
+    create_preview, *, source_selection_filter=None,
 ):
     """Create the existing private S1 snapshot from current C10 analysis."""
     return _preview_reference_chairs(
         module, source_document, turnout_id, package, manifest_text,
         model_request, create_preview, family="S1", chair_code=1,
         select_positions=_select_positions,
+        source_selection_filter=source_selection_filter,
     )
 
 
@@ -485,6 +495,7 @@ def preview_s1j_reference_chairs(
 def preview_s1_s1j_reference_chairs(
     module, source_document, turnout_id, s1_package, s1_manifest_text,
     s1j_package, s1j_manifest_text, model_request, create_preview,
+    *, source_selection_filter=None,
 ):
     """Create one private S1/S1J snapshot from one current C10 context.
 
@@ -496,7 +507,7 @@ def preview_s1_s1j_reference_chairs(
     return _preview_s1_s1j_reference_chairs(
         module, source_document, turnout_id, s1_package, s1_manifest_text,
         s1j_package, s1j_manifest_text, model_request, create_preview,
-        entity_kind="turnout",
+        entity_kind="turnout", source_selection_filter=source_selection_filter,
     )
 
 
@@ -522,11 +533,13 @@ def preview_s1_s1j_crossover_reference_chairs(
 def _preview_s1_s1j_reference_chairs(
     module, source_document, entity_id, s1_package, s1_manifest_text,
     s1j_package, s1j_manifest_text, model_request, create_preview,
-    *, entity_kind,
+    *, entity_kind, source_selection_filter=None,
 ):
     """Bind both families to one source snapshot and one transaction."""
     if not callable(create_preview):
         raise ValueError("The S1/S1J reference preview adapter is unavailable.")
+    if source_selection_filter is not None and not callable(source_selection_filter):
+        raise TypeError("The source selection filter must be callable")
     signature_text, analysis, settings, plan, rails, timbers = (
         _open_source_context(
             module, source_document, entity_id, "S1/S1J",
@@ -536,6 +549,12 @@ def _preview_s1_s1j_reference_chairs(
     s1_placements, s1j_placements, excluded = _select_s1_s1j_positions(
         module, analysis, plan,
     )
+    if source_selection_filter is not None:
+        s1_placements, excluded = source_selection_filter(
+            module, source_document,
+            (signature_text, analysis, settings, plan, rails, timbers),
+            s1_placements, excluded,
+        )
     s1_placements, excluded, s1_recovered = _recover_positions(
         module, analysis, plan, rails, timbers, s1_placements, excluded, 1,
     )
