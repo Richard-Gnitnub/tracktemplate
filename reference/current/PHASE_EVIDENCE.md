@@ -3268,32 +3268,35 @@ The conditions in [PROVENANCE.md](../PROVENANCE.md) and [LICENSING_BOUNDARIES.md
 This result gives no acceptance for physical fit, production, product performance or phase exit. It gives no third-party permission.
 Phase 9B stays Open at 3/6. The frozen history for `2/2` stays the same. LMS work stays stopped.
 
-## Five L1 heel corrections on TO-001 — 2026-11-01
+## Five L1 corrections on TO-001 — 2026-11-01
 
-This Level 2 change corrects five private chair displays for Exit 9B-3.
+This Level 2 change corrects five chair displays for Exit 9B-3. The output keeps its private-development status.
 The source selects `L1` at `S13` and `T1` with `source_rail_code` equal to `1` or `3`, and at `T2` with that value equal to `3`.
-The [turnout command](../../tracktemplate/compatibility/chair_turnout_single_rail_placement.py) uses 115 components from the retained L1 model at these five positions.
-The chair shapes stay the same. Turnout and crossover placement use the same source calculations.
+The [turnout command](../../tracktemplate/compatibility/chair_turnout_single_rail_placement.py) uses 115 preserved L1 components at these five positions.
+The chair shapes stay the same. The turnout and crossover commands use the same software to calculate positions from source data.
 
-The operator's S1 and combined S1/S1J commands exclude these five S1 displays before frame recovery.
-The S1 command selects 49 assemblies. The combined command selects 49 S1 and five S1J assemblies.
-The single-rail command selects eleven L1 and one S1 assembly. The previous seven placements stay the same.
-The initial source records and physical plan stay the same, including the T2 frame refusal.
-Low-level reference functions keep their previous behaviour when no selection filter is supplied.
-The operator commands always supply the correction filter.
+The workflow's S1 and S1/S1J commands do not select these five S1 displays before `_recover_positions` operates.
+The S1 command selects 49 assemblies. The S1/S1J command selects 49 S1 and five S1J assemblies.
+The `preview_private_catalogue_turnout_single_rail_chairs` command selects eleven L1 and one S1 assembly. The previous seven `SingleRailPlacement` values stay the same.
 
-Focused tests give FAIL results before the changes and PASS results after them.
-Independent comparison checks five body frames, twenty fixing frames and all 115 replacement components against retained source evidence.
-It compares 4,865 retained BRep vertices and 4,680 source-output points.
-The maximum numerical difference is `1.6077746776921858e-13 mm`. This value is not a physical-fit tolerance.
-The independent check uses the actual workflow commands with document and host doubles. It preserves all 168 source records.
+The initial source data and `plan` stay the same. The `T2` diagnostic stays `gauge normal is not perpendicular to the local rail tangent`.
+The functions `preview_s1_reference_chairs` and `preview_s1_s1j_reference_chairs` keep their previous behaviour when the caller supplies no `source_selection_filter`.
+The workflow commands always supply `exclude_turnout_heel_l1`.
 
-Previous native and display evidence applies to the retained shapes and unchanged transaction software.
-This cycle performs no new native, display or full-XO test. Native and display qualification for the exact TO-001 placements stays necessary before Exit 9B-3 acceptance.
-The source comparisons, tests, failed evidence and independent reviews are in `tmp/to001-heel-l1/`.
+The tests give FAIL results before the changes and PASS results after them.
+The independent check compares five `SingleRailPlacement` values, twenty `fixing_frames` values and all 115 replacement components with preserved source evidence.
+It compares 4,865 points from preserved `*.Shape.brp` files and 4,680 points from source output.
+The maximum difference is `1.6077746776921858e-13 mm`. This value is not a tolerance for physical fit.
 
-Coverage stays at 86 of 168 positions. The five family corrections add no positions.
-Of the remaining 82 positions, 24 have an empty `chair_code_label` and 58 have labels.
+The independent check uses the workflow commands with test software for the `document` and `_host` inputs. It preserves all 168 source data items.
+
+Previous FreeCAD and display evidence applies to the preserved shapes and the software that keeps the previous display condition.
+The implementing agent did no new FreeCAD, display or full `XO-001` test for this change. FreeCAD and display evidence for these TO-001 positions stays necessary before Exit 9B-3 acceptance.
+The source evidence, test results with PASS or FAIL status, and independent reviews are in `tmp/to001-heel-l1/`.
+
+The routes still include 86 of 168 positions. The five L1 corrections add no positions.
+Of the remaining 82 positions, 24 have `chair_code_label` equal to `""` and 58 have other values.
+
 The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
 This result gives no acceptance for physical fit, production, product performance or phase exit. It gives no third-party permission.
-Phase 9B stays Open at 3/6. The historical `2/2` record stays the same. LMS work stays stopped.
+Phase 9B stays Open at 3/6. The frozen history for `2/2` stays the same. LMS work stays stopped.
