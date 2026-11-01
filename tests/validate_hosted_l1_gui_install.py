@@ -174,6 +174,76 @@ class InstallerControls(unittest.TestCase):
         self.assertEqual(installer.run(self.work), 0)
         self.assertTrue(installer.cleanup(self.work)['cleanup'])
 
+    def released_exit(self, unit, deadline, *, remove_group=False):
+        row = self.show(unit, deadline)
+        if self.state in ('exited', 'inactive'):
+            group = installer.CGROUP_ROOT / row['ControlGroup'].lstrip('/')
+            row['ControlGroup'] = ''
+            if remove_group:
+                for item in group.iterdir():
+                    item.unlink()
+                group.rmdir()
+        return row
+
+    def test_successful_exit_can_release_group_before_explicit_stop(self):
+        # Hosted run 41286458961 reported active/exited, zero PIDs, exit 0
+        # and an empty ControlGroup after the installation command ended.
+        with patch.object(installer, '_show', self.released_exit):
+            self.assertEqual(installer.run(self.work), 0)
+        result = self.result()
+        self.assertEqual(result['exit_status'], 0)
+        self.assertEqual(result['terminal_unit']['ControlGroup'], '')
+        self.assertEqual(result['terminal_unit']['SubState'], 'exited')
+        self.assertTrue(result['cleanup'])
+        self.assertGreater(result['resources']['samples'], 0)
+        self.assertEqual(sum('systemd-run' in row for row in self.commands), 1)
+        self.assertEqual(sum('stop' in row for row in self.commands), 1)
+
+    def test_successful_exit_with_removed_group_keeps_prior_measurements(self):
+        def removed(unit, deadline):
+            return self.released_exit(unit, deadline, remove_group=True)
+
+        with patch.object(installer, '_show', removed):
+            self.assertEqual(installer.run(self.work), 0)
+        result = self.result()
+        self.assertTrue(result['cleanup'])
+        self.assertTrue(result['finalization']['cgroup_removed'])
+        self.assertEqual(result['resources']['memory_peak_bytes'], 2048)
+
+    def test_released_exit_does_not_replace_empty_process_proof(self):
+        self.residual = True
+        with patch.object(installer, '_show', self.released_exit):
+            self.assertEqual(installer.run(self.work), 1)
+        self.assertEqual(self.result()['status'], 'FAIL')
+        self.assertFalse(self.result()['cleanup'])
+        self.assertFalse(Path(os.environ['GITHUB_ENV']).exists())
+
+    def test_released_exit_requires_known_owner_and_successful_terminal_state(self):
+        intent = installer._identity(self.work)
+        self.state = 'exited'
+        row = self.released_exit(intent['unit'], 5)
+        owner = {'intent': intent, 'invocation': 'a' * 32,
+                 'cgroup': '/system.slice/' + intent['unit']}
+        self.assertEqual(installer._owned(row, intent, owner), owner)
+        with self.assertRaises(ValueError):
+            installer._owned(row, intent)
+        invalid = {
+            'MainPID': ['100'], 'ControlPID': ['100'],
+            'SubState': ['running'], 'ActiveState': ['activating'],
+            'ExecMainCode': ['0', '2'], 'ExecMainStatus': ['1'],
+            'Result': ['exit-code', 'timeout'],
+            'ExecMainExitTimestampMonotonic': ['', '0', '-1', 'invalid', None],
+            'InvocationID': ['b' * 32], 'User': ['0'],
+            'KillMode': ['process'], 'RuntimeMaxUSec': ['10min'],
+            'ExecStart': ['{ argv[]=/bin/bash /foreign.sh ; }'],
+        }
+        for name, values in invalid.items():
+            for value in values:
+                with self.subTest(property=name, value=value):
+                    with self.assertRaises(ValueError):
+                        installer._owned(dict(row, **{name: value}),
+                                         intent, owner)
+
     def test_local_workspace_cannot_write_cleanup_evidence(self):
         os.environ['RUNNER_ENVIRONMENT'] = 'self-hosted'
         self.assertEqual(installer.run(self.work), 1)
