@@ -3160,3 +3160,34 @@ The project owner authorises more repairs for this task.
 This correction gives no acceptance for physical fit, production, product performance or phase exit.
 It gives no positive rights claim.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+## L1 chair display test on GitHub — 2026-11-01
+
+This Level 2 result supplies the missing FreeCAD display evidence for `L1-QUALIFICATION-001` and part of Exit 9B-3.
+The [readiness test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41308881938) and [complete display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41309891401) give PASS results.
+Independent review confirms these results.
+The initial display test, its ten inputs and its resource limits stay unchanged.
+
+The display test uses ten L1 chairs at 600 mm, 900 mm and 600 mm.
+It completes three `Generate` operations, 30 frame comparisons, 75 checks of visibility and selection, and 690 placements of chair components.
+It completes one test with no skips and the required success sentinel.
+Independent visual review examines all 12 chair images and three radius-dialog images.
+The document state, selection, preselection, input hashes and cleanup give PASS results.
+
+Independent review gives `L1-LIFECYCLE-ACTIVE-01` the result `VERIFIED_REPAIRED_FOR_BOUNDED_L1_WORKFLOW`.
+It supplies the missing runtime evidence for `L1-ACTIVATION-RUNTIME`. The `L1-QUALIFICATION-001.gui_portion` has a PASS result.
+
+The initial workflow for `L1-GUI-41298217983-POSTCONDITION` now gives a PASS result after the supported repair.
+The cause of that previous FAIL result stays unknown. The previous failed evidence stays preserved.
+These results do not prove correct operation for other callers or timing conditions.
+
+The run takes 1,150.38 seconds. FreeCAD has a measured peak of 2,010,689,536 bytes.
+The resource measurements are lower bounds. Cleanup gives a PASS result for FreeCAD, the display and the copied inputs.
+For the host, the `some` and `full` memory-pressure totals each increase by 1 µs. The corresponding owned totals stay zero.
+This result does not qualify the local pressure guard or give product-performance acceptance.
+
+The evidence and independent reviews are in `tmp/l1-preview-activation/gui-41309891401/`.
+Independent preservation and restore checks give PASS results for all 192 result files.
+The previous `2/2` repair allowance stays consumed. The project owner's repair authority for this task stays separate.
+This result gives no acceptance for physical fit, production, rights or phase exit.
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
