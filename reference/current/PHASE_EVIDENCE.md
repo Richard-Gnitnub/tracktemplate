@@ -3195,3 +3195,44 @@ The evidence preserves the use of the full previous `2/2` repair limit. The proj
 
 This result gives no acceptance for physical fit, production or phase exit. It gives no positive rights claim.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+## CC chairs on TO-001 — 2026-11-01
+
+This Level 2 change supplies more evidence for Exit 9B-3.
+The [source adapter](../../tracktemplate/compatibility/chair_turnout_check_placement.py) adds a different display of three CC assemblies on the specified `TO-001` turnout (`Left-hand`).
+The display keeps private-development status. The selected source identities are `X2-Y`, `X3-X` and `X4-A`.
+Each assembly holds the parts with source names `main-side stock rail` and `main-side check rail`.
+
+The preserved Templot 556b software selects the CC type for parallel parts at these six source positions.
+Each assembly has the same 33 chair components. The software turns and moves all components together, with the 16 components that attach the assembly.
+The source record has `source_rail_code` equal to 1, and the software does not turn the parts as it does for `Right-hand`.
+The chair shapes stay the same. The software that reads chair files, makes shapes and keeps the previous display condition stays the same.
+
+The [tests without FreeCAD](../../tests/validate_phase9b_turnout_central_cc.py) gave `RED` before the product change and `PASS` after it.
+All 14 tests give `PASS` results. They check the six source identities, component positions and directions, incorrect inputs, source changes and the API.
+Seven related groups of regression tests give `PASS` results.
+
+An agent who did not change the product froze source results before the candidate check.
+The agent compared all 99 component positions and 4,746 source points with those results.
+The maximum difference is `1.2710574864626038e-13 mm`. The test calculates this difference. It is not a tolerance for physical fit.
+
+The agent also checked 2,604 source points from the complete `raw_requests` records. All six tests of incorrect results gave the required failures.
+The checks use preserved chair files and three points on the alignment calculated from preserved data for `X2-Y`, `X3-X` and `X4-A`.
+The checks do not use a FreeCAD document. The result supplies no evidence that FreeCAD makes or shows these assemblies correctly.
+
+Previous FreeCAD and display evidence is applicable to the CC shapes and the software that moves them and keeps the previous display condition.
+The project did no new FreeCAD, display or complete `XO-001` test for this change. New FreeCAD and display evidence for these three assemblies is not available.
+Source, test and review evidence is in `tmp/to001-chair-placement/`.
+
+The 168 source identities, `chair_code_label` values and initial `analytical_only` records stay the same.
+The previous 59 S1/S1J and 14 P positions stay the same. The new route shows six more positions with three assemblies.
+These routes include 79 positions. They do not make one complete turnout display.
+
+Of the other 89 positions, 24 have `chair_code_label` equal to `""` and 65 are outside these routes.
+The 65 positions include ten with codes `1P/2P` or `3P-11P`, seven with `L1` and seven with `CC`.
+The other 41 positions have codes `AA`, `AB`, `BB/BC`, `CD`, `EF`, `XA`, `XN` and `ZY`.
+Their number of assemblies needs source evidence.
+
+The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
+This result gives no acceptance for physical fit, production, product performance or phase exit. It gives no third-party permission.
+Phase 9B stays Open at 3/6. The previous `2/2` limit is fully used. LMS work stays stopped.

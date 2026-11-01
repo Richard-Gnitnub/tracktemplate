@@ -165,18 +165,18 @@ def place_paired_chair(
     position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
     base_z_mm, main_gauge_offset_mm, retained_y_offset_mm,
 ):
-    """Map a qualified RH source assembly through one rigid host frame.
+    """Map a qualified source assembly through one rigid host frame.
 
     The source frame has X relative to the nominal timber station and Y
-    relative to the main gauge face after the source hand reflection.
+    relative to the main gauge face after any source hand reflection.
     The retained frame is ``(-X, -Y-retained_y_offset_mm, Z)`` with its
     mounting plane already at Z=0. The host point is the centreline at
     that station, not a nearest rail projection. +Y in the world frame
-    is left of travel; the main gauge face is at +main_gauge_offset_mm.
+    is left of travel; main_gauge_offset_mm is a signed offset on that axis.
 
     This is the rigid common-frame convention of Templot5 556b
     math_unit.pas add_jaw/add_seat and chair base transformation, for
-    square, unshoved switch timbers. It does not compare a source jaw
+    square, unshoved source timbers. It does not compare a source jaw
     angle with the tangent of an independently curved rail. Inputs and
     result use model mm and radians; no fit tolerance is applied.
     """
