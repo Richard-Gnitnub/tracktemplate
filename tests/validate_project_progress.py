@@ -1340,7 +1340,7 @@ def _validate_owner_view(plan: str) -> None:
         'Preserve the LMS model and its evidence with a FAIL result',
         'all REA B and C turnout sizes to Phase 9B for completion before Phase 10',
         'Extend one shared turnout/crossover engine before the remaining chair coverage',
-        'Keep each new B/C combination Pending until its required evidence passes',
+        'Keep each new B/C combination Pending until the necessary evidence has PASS results',
     ):
         _require(
             fragment in owner_view,
@@ -1351,8 +1351,8 @@ def _validate_owner_view(plan: str) -> None:
         'e49cb6922d4b7dd11b4436420376dc29d3b5977f5272fde86db7d855e7657433',
         '2b0934f85362b3286b2822563086f615d070b7e86b1452543104362a6ecca755',
         '71030a1fdbdbc15423fa655c1c354faa3406debc84d376a611e73b98c2ccb688',
-        'ae3d69b94faf33e3d001569e9c739d9a682632b0b4d3833d123ff3ea57fbccf2',
-        '1b309bf00447e8cdcdf92ee168e74331cc5d3a8e3f1cb6b77d7fee16310ad412',
+        '8a70f2fc949530c282766c11e5c454341b68e8ee1821cdff3b6130fd69abf0d2',
+        'cdb3997e080bb17a1662f75f7626a3d98b83d57c81283d4ede45728ae0772861',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1422,7 +1422,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-P9-018',
          'c9a090af7402fef052700aeea35b9c9120a98e6e8109ff25de9bd486bc10f316'),
         ('D-P9-019',
-         '473eb6fbdf04af6254b66b2cb478dfb70876af844a80cc7c1f7cdf6cf348a409'),
+         'a3d647f355adae6cb527c66b40c45daa48fa72ec9b62d26ff1b2e3b8b9d55255'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -7950,8 +7950,8 @@ def _validate_dp9_019_decision(record, fields):
     )
     for field, expected in (
         ("authority", "2466545cd97930e27291a383d68a6faad9d7138870acdd51c37f3d534fef2d82"),
-        ("decision", "d79fb5dba9cf596ea86c9fd4b60c308e0bb856ab5651ff327f46328c73be84cd"),
-        ("exclusions", "e33440a4c3ffde55af2e6642fd1118f7e65270132828f34becd204dd0285b8b5"),
+        ("decision", "5c926073c6064e086b54ec797bbc311674922e4d8510268d57eef3c1f417bdd0"),
+        ("exclusions", "9a5779e3e89e096916d1b013852ab4b45f8e7e03872aaa6074ea0d6a2107c51d"),
     ):
         value = record[field]
         _require(
@@ -7991,18 +7991,18 @@ def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
         _require(row[1:] == expected,
                  "REA B/C combination status drifted: " + ratio)
     regions = _structured_table_rows(
-        panel, ("Continuous region or input", "Source finding and required result"),
+        panel, ("Continuous region or input", "Source finding and necessary result"),
         "REA B/C continuous domain",
     )
     expected_regions = {
-        'n < 0.5; invalid or non-finite input': (
-            'c607a3d84ee63e4cf7c754e6fad77b462c4a31d07eb2cfda938828b353a059bc'
+        'n < 0.5, invalid or non-finite input': (
+            'c9e9ff835bd0fb5bd4a076e895cffffd4573904d358262a8c94ca2bb58a68657'
         ),
         '0.5 <= n < 1.5': (
-            '3354309c9477f98ed85cc8e3e6aff45f271e7dba9792be228d71e9ccea97cc8a'
+            '4ea9b1e309abd26bcc5ecc5dc4cc4163de3c72f015cd5ed4ed97b5eec22c84a7'
         ),
         '1.5 <= n < 4': (
-            'b00588a2c14511347c3d99e79aba196a42e0ec4f31e447367230f66beaf0b832'
+            '43290bec30b44a56c6beb39e72df8bebc8e9cc683207e79cd09d42503f99ed94'
         ),
         '4 <= n < H': (
             '87532124ca54a9a1cfcf3a740ea76cecbbb4f83df0d388d6ce876f4b41af4dcb'
@@ -8011,7 +8011,7 @@ def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
             '609423278058bc9b58c41089f1c39330fdc1d05146572c4b1aad4052dd010bf5'
         ),
         'n > H': (
-            '2160cd2560a0104e549359cb1778635471f1066199a0ece1476ddacda22b40f0'
+            '6e300a8ae2a7aa37b4d71324cd34271997e75c9d20e5faa34b1f091e643d2ce5'
         ),
         'n >= 20.125': (
             'db832b9e50d70ef7b9a6aaa6e7a0ac53b515e93c6258a9cfcea39822b816a1af'

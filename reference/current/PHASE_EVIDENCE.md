@@ -516,8 +516,8 @@ Then stop. Do not merge. Do not start one more outcome.
 | What changed | [D-P9-019](#rea-bc-scope-panel) adds all REA B and C turnout sizes to Phase 9B for completion before Phase 10. [D-P9-018](#lms-chair-record-and-templot-development-panel) records the completed LMS chair development model as the owner's "prototype". More LMS chair development is paused until after Phase 11. |
 | What now works | The LMS chair that the project keeps has three parts: a complete casting, a key and a rail. Its native checks and FreeCAD reload give PASS results. Independent review gives PASS WITH FINDINGS for the native development model. |
 | Limitations/findings | The full LMS validation suite gives a FAIL result because STEP reload gives a FAIL result. STEP output is not qualified. Physical fit, production and rights clearance are not accepted. All previous acceptance limits and all 24 risk duties stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | D-P9-019 requires the shared turnout/crossover engine before the remaining chair coverage. Make all chairs in the Templot source for private modelling and TrackTemplate development. Keep the source geometry and provenance. This direction accepts no phase exit and gives no public distribution authority. |
-| Next action | Preserve the corrected C10 baseline and fixed TO-001/XO-001 regressions. Extend one shared turnout/crossover engine before the remaining chair coverage. Make and validate the Templot chairs through the TrackTemplate path that the project uses. Record source coverage and unresolved geometry accurately. Preserve the LMS model and its evidence with a FAIL result. Keep each new B/C combination Pending until its required evidence passes. |
+| Owner decision | D-P9-019 makes the shared turnout/crossover engine necessary before the remaining chair coverage. Make all chairs in the Templot source for private modelling and TrackTemplate development. Keep the source geometry and provenance. This direction accepts no phase exit and gives no public distribution authority. |
+| Next action | Preserve the corrected C10 baseline and the fixed TO-001/XO-001 regression tests. Extend one shared turnout/crossover engine before the remaining chair coverage. Make and validate the Templot chairs through the TrackTemplate path that the project uses. Record source coverage and unresolved geometry accurately. Preserve the LMS model and its evidence with a FAIL result. Keep each new B/C combination Pending until the necessary evidence has PASS results. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
 
@@ -3307,7 +3307,7 @@ Phase 9B stays Open at 3/6. The frozen history for `2/2` stays the same. LMS wor
 
 **Owner decision:** Include all REA B and C turnout sizes in Phase 9B.
 Complete this work before Phase 10. This Level 3 decision changes programme
-scope and work sequence. It accepts no new railway capability or phase exit.
+scope and work sequence. It accepts no new railway behaviour or phase exit.
 Phase 9B stays Open at 3/6.
 
 **Exact owner instruction:**
@@ -3320,7 +3320,7 @@ Phase 9B stays Open at 3/6.
 >
 > Only seek my decision if further Level 3 authority is required.
 
-**Scope and sequence:** Retain the current `regular` crossing and `auto-fit`
+**Scope and sequence:** Keep the current `regular` crossing and `auto-fit`
 entry settings. Use the existing gauge, scale, rail profile, handing, travel
 directions and supported host geometry. This decision adds no other crossing
 form or mixed-size crossover. It does not extend admission of host geometry.
@@ -3328,65 +3328,71 @@ form or mixed-size crossover. It does not extend admission of host geometry.
 [PR #253](https://github.com/Richard-Gnitnub/tracktemplate/pull/253) corrects
 five C10 `TO-001` positions from S1 to L1. Its reviewed head is
 `be10d23006d647f3194020b861284d27df44e179`; its merge commit is
-`7166baefb5e723ccaec6b885277dceb4a9dbe890`. Required CI passed for the
+`7166baefb5e723ccaec6b885277dceb4a9dbe890`. The necessary CI checks gave PASS results for the
 reviewed head and merge commit: [run 41346789746](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41346789746)
 and [run 41347942543](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41347942543).
-Each run passed all 165 validators. Main is clean and synchronised.
+All 165 validators gave PASS results in each run.
+
+The `main` worktree is clean. Its local branch and branch on GitHub are equal.
 Independent review verified recovery and the preserved baseline.
 The correction preserves 86 represented positions out of 168. Exact TO
-native/GUI qualification remains necessary before Exit 9B-3.
+native/GUI qualification stays necessary before Exit 9B-3.
 
-Keep the fixed C10 `TO-001` and `XO-001` cases as permanent regressions.
+Keep the fixed C10 `TO-001` and `XO-001` cases as permanent regression tests.
 First, connect both live consumers to one shared calculation path with equal
-C10 results. Then add explicit B/C inputs through that path before the
+C10 results. Then add specified B/C inputs through that path before the
 remaining chair work. Preserve the frozen B14/B15 references and previous
 native and GUI evidence.
 
 ### First shared-engine change
 
-The first implementation extracts the exact C10 dimension calculation into
+The first change moves the exact C10 dimension calculation into
 `tracktemplate/domain/turnout.py`. The existing transition session connects
 both live turnout and crossover consumers to this function. All twelve direct
 callers use that shared result. The public API, stored data and size admission
-stay unchanged. B14 and B15 remain unchanged comparison references.
+stay unchanged. B14 and B15 stay unchanged comparison references.
 
-Test-first evidence records a failure before implementation. The focused
-standalone test compares 85 input cases with both frozen references. It passes
-170 complete comparisons: 46 value cases and 39 error cases per reference.
+The evidence records a test with a FAIL result before implementation. The
+standalone test compares 85 input cases with both frozen references. All 170
+comparisons give PASS results: 46 value cases and 39 error cases per reference.
 Each value case compares all 88 ordered fields, types and exact float values.
-The test also checks conversion order, diagnostic text and the function AST.
+The test also examines conversion order, diagnostic text and the function AST.
 
-Routing checks pass for twelve callers, 36 refusal cases, eight session and
-rollback cases, and two cases with a wrapped crossover solver. Six paths from
-the actual source confirm use of the shared calculation before construction.
-Five existing turnout, crossover and routing suites pass. Ruff, Python parsing
-and the diff check pass. No FreeCAD or GUI process ran.
+Routing checks give PASS results for twelve callers, 36 refusal cases, eight
+session and rollback cases, and two cases with a wrapped crossover solver.
+Six paths from the actual source show use of the shared calculation before
+construction. Five existing turnout, crossover and routing suites give PASS
+results. Ruff, Python parsing and the diff check give PASS results.
+The agents started no FreeCAD or GUI process.
 
-Two test-fixture defects were classified and corrected. Their initial failures
-remain preserved. No product repair followed the first extraction. Independent
-quality review found no blocker. Independent source review found no discrepancy.
-Existing C10 native and GUI proofs remain
-applicable to this exact extraction. They do not qualify the five corrected TO
-chairs or any new B/C size.
+The agents classified and corrected two test-fixture defects. They preserved
+the initial FAIL results. No product repair followed the first change.
+Independent quality review found no blocker. Independent source review found
+no difference.
 
-The current-register check retains the exact owner decision, 32 combinations
-and seven continuous regions. Independent review found an incomplete check of
-the continuous regions. The correction retains all source limitations; eight
-negative controls reject false qualification or a missing invalid-input region.
-Independent follow-up review passes all nineteen negative controls. Previous
-failures and their classification supplements remain preserved.
+Existing C10 native and GUI evidence stays applicable to this exact change.
+This evidence gives no validation result for the five corrected TO chairs or
+any new B/C size.
 
-### Source combinations and required evidence
+The current-register check preserves the exact owner decision, 32 combinations
+and seven continuous regions. Independent review found a check that did not
+examine all continuous regions. The correction preserves all source limitations.
+Eight negative controls reject false qualification or a missing invalid-input
+region. All nineteen negative controls give PASS results in the independent
+follow-up review. Previous FAIL results and their failure-classification
+supplements stay preserved.
+
+### Source combinations and necessary evidence
 
 Templot 556b selects the REA B and C switches independently of the crossing
 ratio. Let `n` be its dimensionless `RAM` ratio in `1:n`.
-The crossing angle is `atan(1/n)` radians. The source permits other ratios;
-the menu is not a complete list of sizes.
+The crossing angle is `atan(1/n)` radians. Other ratios are permitted in the source.
+The menu is not a full list of sizes.
 
-The following table represents all 32 combinations from the sixteen crossing
-menu values. `Common` identifies the nine quick-set combinations. Every row
-is **Pending** for the expanded scope, including the new C10 obligations.
-Existing bounded C10 proofs keep their previous scope and results.
+This table shows all 32 combinations from the sixteen crossing menu values.
+`Common` identifies the nine quick-set combinations. Every row is **Pending**
+for the expanded scope. This scope includes the new C10 obligations.
+Existing bounded C10 evidence keeps its previous scope and results.
 
 | Crossing ratio | REA B | REA C |
 | --- | --- | --- |
@@ -3407,87 +3413,90 @@ Existing bounded C10 proofs keep their previous scope and results.
 | `1:10` | Pending | Common; Pending |
 | `1:12` | Pending | Pending |
 
-The `OTHER` input permits ratios outside this table. Quarter-unit steps are
-optional. Numerical input acceptance does not prove a usable railway layout.
-The inspected entry paths have a lower limit of `0.5` and no explicit finite
-upper ratio limit. Calculation failures and source gaps remain separate
-constraints.
+The `OTHER` input accepts ratios outside this table. Quarter-unit steps are
+optional. Numerical input acceptance does not show that a railway layout is usable.
+The inspected entry paths have a lower limit of `0.5` and no specified finite
+upper ratio limit. Calculation errors and source gaps stay separate
+limits.
 
-| Continuous region or input | Source finding and required result |
+| Continuous region or input | Source finding and necessary result |
 | --- | --- |
-| `n < 0.5`; invalid or non-finite input | Reject invalid input. Preserve explicit diagnostics. |
-| `0.5 <= n < 1.5` | The source omits normal switch, closure and crossing timber loops. Complete automatic chair placement lacks source evidence. |
-| `1.5 <= n < 4` | The source states that prototype timber information is absent for very short crossings. Custom timber and check-rail work can be necessary. |
+| `n < 0.5`, invalid or non-finite input | Reject invalid input. Preserve clear diagnostics. |
+| `0.5 <= n < 1.5` | The source does not execute the usual switch, closure and crossing timber loops. Full automatic chair placement has no source evidence. |
+| `1.5 <= n < 4` | The source says that prototype timber information is missing for very short crossings. Custom timber and check-rail work can be necessary. |
 | `4 <= n < H` | Compare each applicable calculation branch and its railway outputs. `H` is the selected switch's heel-angle ratio. |
 | `n = H` | The source has a separate straight-closure branch. Compare the source condition and values on both sides. |
-| `n > H` | The source warns of a negative turnout-road radius and unlikely practical use. Usable standard REA placement remains unproved. |
+| `n > H` | The source gives a warning about a negative turnout-road radius and unlikely practical use. No evidence shows usable standard REA placement. |
 | `n >= 20.125` | The source describes its default vee extension as improvised. This source gap also affects part of the C positive-radius region. |
 
 The last row overlaps the heel-angle regions. The source-derived values of
 `H` are approximately `18.417941404843` for B and `22.70237204880366` for C.
-Use the source calculations and conditions, not these rounded values, for
-comparisons. Keep unsupported regions visible. Resolve each source gap or
-obtain a separate owner disposition before a complete B/C claim or Phase 10.
+Use the source calculations and conditions for comparisons. Do not use these
+rounded values. Keep unsupported regions visible. Resolve each source gap or
+get a separate owner disposition before a full B/C claim or Phase 10.
 A scope disposition does not supply missing geometry or engineering evidence.
 
-| Calculation boundary | Required comparison |
+| Calculation boundary | Necessary comparison |
 | --- | --- |
 | B/C switch data | B has six slide, two block-slide and two block-heel positions per side. C has seven, two and three. Compare the source counts, dimensions and selection conditions. |
 | Switch timbers | Compare B `S1–S11` then `T1`, and C `S1–S13` then `T1`. Derive closure timbers and identities from the source. |
 | Vee and wing timber counts | Compare each interval and boundary at `3.875`, `6.875`, `10.125`, `15.125` and `20.125`. |
-| Check-rail working length | Preserve the distinct conditions `n <= 5.99`, `5.99 < n < 12.01` and `n >= 12.01`. |
-| Wing and check extensions; crossing seats | Compare the condition at `10.01`. Keep it distinct from the wing-chair count condition at `10`. |
-| Timber angle | Check applicable source conditions at `5.99` and `6.99`. These do not accept socket fit or a production mode. |
+| Check-rail working length | Preserve the different conditions `n <= 5.99`, `5.99 < n < 12.01` and `n >= 12.01`. |
+| Wing and check extensions, crossing seats | Compare the condition at `10.01`. Keep it separate from the wing-chair count condition at `10`. |
+| Timber angle | Examine applicable source conditions at `5.99` and `6.99`. These do not accept socket fit or a production mode. |
 | Closure radius | Compare short entry, the source radius cap, straight closure and the negative-radius warning. The cap depends on the source profile. |
 
-All new evidence duties below are **Pending**. Reuse a previous proof only
-when its complete source context and tested behaviour are equivalent.
+All new evidence duties below are **Pending**. Use previous evidence again only
+when its full source context and tested behaviour are equivalent.
 
-| Evidence boundary | Required coverage |
+| Evidence boundary | Necessary coverage |
 | --- | --- |
 | Source and railway calculations | Both switches, all menu combinations, other ratios and both sides of each source boundary. Compare rails, timbers, joints, identities and chair selections independently. |
-| Placement | Compare anchors, angles, crops, shears and indexed fixings. Preserve the distinction between positions, shared supports and assemblies. Empty source labels do not prove shared supports. |
-| Host geometry | Both existing hands and travel directions; straight and supported signed curvature; representative radii and applicable minimum-radius conditions. Preserve the different TO/XO radius contracts. |
-| Canonical changes | Bind each size input to stored data and currentness checks. Compare change-back, regeneration, invalid-input refusal, rollback, Undo/Redo and save/reopen. |
-| Exact geometry and GUI | Reuse equivalent component proofs. Use representative hosted native and GUI evidence for distinct new behaviour through existing validation methods. |
-| Independent review | Derive expected results from retained source or separate equations. Expected results must not call the product's selection or placement functions. |
+| Placement | Compare anchors, angles, crops, shears and indexed fixings. Preserve the distinction between positions, shared supports and assemblies. Empty source labels do not show shared supports. |
+| Host geometry | Both existing hands and travel directions, straight and supported signed curvature, representative radii and applicable minimum-radius conditions. Preserve the different TO/XO radius contracts. |
+| Canonical changes | Connect each size input to stored data and currentness checks. Compare change-back, regeneration, invalid-input refusal, rollback, Undo/Redo and save/reopen. |
+| Exact geometry and GUI | Use equivalent component evidence again. Use representative native and GUI evidence from GitHub for each different new behaviour through existing validation methods. |
+| Independent review | Derive expected results from preserved source or separate equations. The software that supplies expected results must not use the product's selection or placement functions. |
 
 ### Safety/risk panel and conditions
 
-Richard chairs the panel and supplies the decision. `/root` owns the change.
+Richard is the panel chair and supplies the decision. `/root` is the change owner.
 `/root/to001_heel_source` supplies the independent source assessment.
-`/root/to001_heel_domain` supplies the architecture assessment and implements
+`/root/to001_heel_domain` supplies the architecture assessment and makes
 the first shared-engine change.
-`/root/to001_heel_quality` independently challenges risks and source claims.
-The challenger wrote no B/C implementation or canonical prose. The agents
-share a team and workspace; this is not external organisational independence.
+`/root/to001_heel_quality` examines risks and source claims independently.
+The challenger wrote no B/C implementation or canonical prose.
+
+The agents are in the same team and workspace. This is not external
+organisational independence.
 
 The recommendation is **Proceed with bounded conditions**. There is no
-unresolved dissent to recording the scope. Source applicability, geometry
-contexts and new native/GUI coverage remain unproved. No risk closes and no
-control gains a stronger effectiveness rating.
+unresolved dissent to this record of the bounded scope. Source applicability,
+geometry contexts and new native/GUI coverage still have no proof. No risk closes.
+No control gets a stronger effectiveness rating.
 
 | Risk and bounded condition | Owner and deadline |
 | --- | --- |
-| PR-01 and QA-R03: prevent a C10 proof from becoming an unsupported B/C claim. Keep the complete combination and evidence tables. | Railway and validation owners, before each new capability claim and before Phase 10. |
-| PR-04, PR-08 and PR-21: distinguish source calculations from prototype evidence. Keep short-angle, irregular and improvised regions unsupported until sufficient evidence or owner disposition exists. | Railway/source owners; project owner decides any authority change, before affected admission or completion. |
+| PR-01 and QA-R03: do not use C10 evidence to make an unsupported B/C claim. Keep the full combination and evidence tables. | Railway and validation owners, before each new capability claim and before Phase 10. |
+| PR-04, PR-08 and PR-21: distinguish source calculations from prototype evidence. Keep the regions with missing or improvised source information unsupported until sufficient evidence or an owner disposition exists. | Railway/source owners. The project owner decides any authority change, before affected admission or completion. |
 | PR-10, PR-16, PR-17 and PR-18: use one shared engine and explicit canonical inputs. Preserve identities, old C10 documents, currentness and recovery. | Architecture, API and FreeCAD object-model owners, before each input or consumer change. |
 | PR-06, PR-07 and PR-09: preserve source, package and output restrictions. Accept no rights, physical fit, rail interface, tolerance or production package through this scope decision. | Licensing/provenance owners and project owner, continuously and before any clearance claim. |
-| PR-13, PR-15 and QA-R04: preserve checkpoints, failed evidence and resource controls. Keep heavy validation on GitHub; use existing methods and representative evidence. | Recovery and Change Validation owners, before each live proof. |
+| PR-13, PR-15 and QA-R04: preserve checkpoints, failed evidence and resource controls. Keep heavy validation on GitHub. Use existing methods and representative evidence. | Recovery and Change Validation owners, before each live proof. |
 | PR-12, PR-20 and PR-22: record scope once through the existing Level 3 owners. Complete the finite documentation lifecycle. | Change owner and Technical Author Lead, before controlled-baseline acceptance. |
 
-The [risk register](risks.json) retains all 24 risk duties. The
+The [risk register](risks.json) keeps all 24 risk duties. The
 [validation owner](../VALIDATION.md), [testing policy](../TESTING_POLICY.md)
 and [recovery owner](../RECOVERY_AND_BACKUP.md) continue to control execution.
-This decision authorises merges after independent review and required checks
-pass for the exact revision. Unlimited evidence-led repairs apply only to
-non-documentation work in this scope. Documentation limits and the historical
-consumed `2/2` allowance remain recorded; neither is reset.
+This decision authorises merges after independent review and PASS results
+from the necessary checks for the exact revision. Unlimited evidence-led
+repairs apply only to non-documentation work in this scope. Documentation
+limits and the historical consumed `2/2` allowance stay recorded. Neither is
+reset.
 
 ### Evidence identities and acceptance limits
 
-The assessments used main `817f9e3460a92006c7632a37635eca78212db8eb` and the
-frozen C10 candidate. They performed no FreeCAD or GUI execution.
+The assessments used `main` `817f9e3460a92006c7632a37635eca78212db8eb` and the
+frozen C10 candidate. The agents started no FreeCAD or GUI process.
 The source archive is `t5_files_556b_06_feb_2025.zip`, SHA-256
 `2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3`.
 Member names below use the archive prefix `T556B_ZIPPED_FOR_UPLOAD/`.
@@ -3500,7 +3509,7 @@ Member names below use the archive prefix `T556B_ZIPPED_FOR_UPLOAD/`.
 | `mint_unit.lfm:131–139`: nine common combinations | `0b460971e843fc6ad43551a3a3ffc6f4ebb368dd27287aa2145faa158c7eb0f0` |
 | `xing_select.pas:103–104,136–182`: other ratios and crossing forms | `f29f6921f1e03a06a664da463a39a06212559497e2bc2b4572d26bfa7c82807a` |
 
-The following records remain ignored evidence. They do not become competing
+These records stay ignored evidence. They do not become competing
 canonical owners or public source copies.
 
 | Evidence path under `tmp/` | SHA-256 |
@@ -3518,13 +3527,14 @@ canonical owners or public source copies.
 
 The governance-budget exception applies because this task changes programme
 scope through Level 3. It changes no product geometry. All six exact Phase 9B
-exit criteria remain unchanged. Only Exits 9B-2, 9B-4 and 9B-5 remain
-Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 remain Pending.
+exit criteria stay unchanged. Only Exits 9B-2, 9B-4 and 9B-5 stay
+Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Project status stays
 `unknown`.
 
 The [licensing boundary](../LICENSING_BOUNDARIES.md) and
-[provenance owner](../PROVENANCE.md) retain all restrictions and existing
+[provenance owner](../PROVENANCE.md) keep all restrictions and existing
 input/output permissions. LMS development stays paused until after Phase 11
 under [D-P9-018](#lms-chair-record-and-templot-development-panel).
 This decision accepts no physical fit, production, rights, performance,
