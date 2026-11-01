@@ -3539,3 +3539,60 @@ input/output permissions. LMS development stays paused until after Phase 11
 under [D-P9-018](#lms-chair-record-and-templot-development-panel).
 This decision accepts no physical fit, production, rights, performance,
 release, phase exit or Phase 10 entry.
+
+
+<a id="rea-bc-source-geometry"></a>
+
+## REA B/C source data — 2026-11-01
+
+**Level 2 result for [D-P9-019](#rea-bc-scope-panel):**
+`ReaTurnoutSpecification` supplies inputs to the turnout and crossover tools.
+The tools return temporary `rails` and `timbers` data. They cannot make or
+change FreeCAD data.
+
+The [source inputs](../../tracktemplate/domain/rea_turnout.py) use
+`source_context = "templot-556b-rea-bh-regular-auto-fit-square-on"`,
+`track_gauge_mm = 16.5`, `flangeway_mm = 1.0` and `model_scale = 76.2`.
+The `source_context_flags` include `force_eq = False`. This change does not
+change C10 or the TO-001/XO-001 regression tests.
+
+All 8 [source tests](../../tests/validate_phase9b_rea_bc_source.py) give PASS
+results. The tests compare product results with source values from the
+independent reviewer. The 88 inputs include all 32 B/C inputs from `MENU`,
+values between those inputs and values at the source limits. The tests
+compare 7,480 values in `dimensions` and 2,987 items in `timbers`.
+They also compare 1,163 values for 6 specified items in `rails`.
+
+All 6 [tests of the product tools](../../tests/validate_phase9b_rea_bc_consumers.py)
+give PASS results. These tests examine the turnout and crossover results,
+the minimum radius and inputs with an invalid state. They also show that
+`CrossoverPreflightAdapter._checked_result` gives `ValueError` for the
+temporary data. The tests identify their conditions.
+Independent review and quality review give PASS results for this bounded
+scope, with the limitations below.
+
+The C10 test gives a PASS result with `input_cases = 85` and
+`complete_observation_equalities = 170`. Python and Ruff checks give PASS
+results.
+
+Each B/C turnout from [D-P9-019](#rea-bc-scope-panel) keeps status `Pending`.
+This result has no test evidence from FreeCAD or `FreeCADGui`. Persistence
+of the B/C inputs and changes to those inputs have no validation evidence.
+These [source diagnostics](../../tracktemplate/domain/rea_turnout.py)
+in `source_gaps` stay:
+
+- `Exit sleeper stations and the rail-length profile are not yet qualified; no R1/R2 source stations are supplied.`
+- `The 60-inch module extension is an inherited product envelope, not source-derived exit sleeper evidence.`
+- `Chair placement and native/GUI construction remain unqualified for this explicit source specification.`
+
+The tools keep `crossing_suffix` empty when the source supplies no value.
+
+Next, validate the source values identified in `source_gaps[0]` and
+persistence of the B/C inputs. Then complete the corrected TO-001 tests in
+FreeCAD and `FreeCADGui`. Complete the remaining chair validation. Use the
+same product tools and validation.
+
+Phase 9B stays `Open` at 3/6. This result gives no acceptance for physical
+fit, production, product performance, release or a phase exit. The rights
+state does not change. LMS work stays stopped until after Phase 11.
+The project keeps evidence with FAIL results and the repair evidence.
