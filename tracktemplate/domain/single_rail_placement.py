@@ -127,3 +127,73 @@ def place_single_rail(
         body.position_id, body.rail_id, body.timber_id,
         body.origin_mm, body.x_axis, body.y_axis, family, tuple(fixings),
     )
+
+
+def place_left_hand_single_rail(
+    position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
+    base_z_mm, *, family, source_rail_code, source_angle_rad, source_gauge_y_mm,
+):
+    """Place retained S1/L1 parts on LH source rails 2 or 4, in mm/radians.
+
+    Gauge Y is measured from the main gauge face, without RH reflection.
+    The caller qualifies the nominal station, source family and host.
+    The fixed body keeps the source midpoint shift and insertion angle.
+    Each indexed fixing keeps its zero local head angle. Native geometry,
+    global/random fixing-angle parity and physical-fit policy do not change.
+    Invalid identities, nonfinite values or unsupported poses raise
+    ValueError. Existing right-hand placements remain a separate operation.
+    """
+    point = _coordinates(host_point_mm, 2, "host_point_mm")
+    heading = _finite_number(travel_heading_rad, "travel_heading_rad")
+    base_z = _finite_number(base_z_mm, "base_z_mm")
+    angle = _finite_number(source_angle_rad, "source_angle_rad")
+    gauge_y = _finite_number(source_gauge_y_mm, "source_gauge_y_mm")
+    if (family not in ("S1", "L1")
+            or type(source_rail_code) is not int
+            or source_rail_code not in (2, 4)
+            or not 0 < angle < math.pi / 2 or gauge_y <= 0):
+        raise ValueError("Single rails require the qualified LH C10 source pose")
+    tangent = (math.cos(heading), math.sin(heading))
+    normal = (-tangent[1], tangent[0])
+
+    def frame(local_angle, origin):
+        cosine, sine = math.cos(local_angle), math.sin(local_angle)
+        return S1Placement(
+            position_id, rail_id, timber_id,
+            (point[0] + origin[0] * tangent[0]
+             + (origin[1] - 8.25) * normal[0],
+             point[1] + origin[0] * tangent[1]
+             + (origin[1] - 8.25) * normal[1], base_z),
+            (cosine * tangent[0] + sine * normal[0],
+             cosine * tangent[1] + sine * normal[1]),
+            (-sine * tangent[0] + cosine * normal[0],
+             -sine * tangent[1] + cosine * normal[1]),
+        )
+
+    # Same frozen model dimensions and source indices as the RH operation.
+    inner, outer = (3.5 / 3, 7 / 3) if family == "L1" else (5.25 / 3, 9.25 / 3)
+    half_pitch = 3.75 / 3 if family == "L1" else 2 / 3
+    centres = [(-half_pitch, inner - 1.75 / 3),
+               (half_pitch, inner - 1.75 / 3)]
+    centres.extend((x, -outer + 1.75 / 3) for x in (
+        (-half_pitch, half_pitch) if family == "L1" else (0.0,)
+    ))
+    cosine, sine = math.cos(angle), math.sin(angle)
+    reversed_rail = source_rail_code == 4
+    sign = -1 if reversed_rail else 1
+    delta = -sign * (outer - inner) / 2 * sine
+    anchor = (delta * cosine, gauge_y + delta * sine)
+    # Cancel native N(x,y)=(-x,-y-.45), then use the LH insertion.
+    body = frame(angle if reversed_rail else math.pi + angle,
+                 (anchor[0] + sign * 0.45 * sine,
+                  anchor[1] - sign * 0.45 * cosine))
+    fixings = []
+    for x, y in centres:
+        source_y = sign * y
+        target = ((x + delta) * cosine - source_y * sine,
+                  (x + delta) * sine + source_y * cosine + gauge_y)
+        fixings.append(frame(math.pi, (target[0] - x, target[1] - y - 0.45)))
+    return SingleRailPlacement(
+        body.position_id, body.rail_id, body.timber_id,
+        body.origin_mm, body.x_axis, body.y_axis, family, tuple(fixings),
+    )

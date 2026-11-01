@@ -255,6 +255,132 @@ def create_private_catalogue_cc_preview(
     )
 
 
+def create_private_catalogue_turnout_single_rail_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place six retained L1 and one S1 assembly on the fixed LH TO-001.
+
+    Exact source identities and indexed fixing frames are mandatory.
+    Both families share copied context and the existing transaction.
+    This private snapshot gives no native-fit or production acceptance.
+    """
+    family = "TurnoutSingleRail"
+
+    def require(condition, message):
+        _require(condition, message, family=family)
+
+    if not callable(verify_source):
+        raise TypeError("Turnout single rails require source verification")
+    placements = prepare_single_rail_placements(placements)
+    selected = (
+        ("S13", "curved-switch-and-closure-rail", "L1"),
+        ("S13", "turnout-side-stock-rail", "L1"),
+        ("T1", "curved-switch-and-closure-rail", "L1"),
+        ("T1", "turnout-side-stock-rail", "L1"),
+        ("T2", "curved-switch-and-closure-rail", "L1"),
+        ("T2", "turnout-side-stock-rail", "S1"),
+        ("T14", "curved-switch-and-closure-rail", "L1"),
+    )
+    expected = {
+        (f"TO-001:chair:to-001-timber-{timber.lower()}:{rail}",
+         f"TO-001:rail:{rail}", f"TO-001:timber:{timber}", label)
+        for timber, rail, label in selected
+    }
+    require({(p.position_id, p.rail_id, p.timber_id, p.family)
+             for p in placements} == expected,
+            "the seven fixed TO-001 single-rail identities are required")
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    selections = []
+    layer_specs = _CONTEXT_SPECS
+    for label, digest, names in (
+        ("L1", _L1_MODEL_SHA256, _L1_SOURCE_NAMES),
+        ("S1", _S1_MODEL_SHA256, _S1_SOURCE_NAMES),
+    ):
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, tuple(p for p in placements if p.family == label),
+            None, receipt, family=label, placement_type=SingleRailPlacement,
+            model_sha256=digest, source_names=names, run="existing-02",
+            source_context="retained-S1-L1-reference-package",
+            source_handing="LH",
+        )
+        prefixed = tuple((label + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((label, prepared, prefixed, prepare))
+
+    def prepare_layers():
+        layers = _context_layers(context_shapes)
+        families = {}
+        verifiers = []
+        for label, _prepared, specs, prepare in selections:
+            components, result, verify = prepare()
+            start = len(layers)
+            layers += components
+            verifiers.append((start, len(layers), verify))
+            result.pop("source_receipt")
+            result["family"] = label
+            result["layers"] = [dict(_measure_layer(shape), name=spec[0])
+                                for spec, shape in zip(specs, components)]
+            families[label] = result
+        result = {
+            "contract_id": (
+                "tracktemplate.private-catalogue-turnout-single-rail.v1"
+            ),
+            "source_receipt": receipt,
+            "families": families,
+            "family_count": len(families),
+            "placement_count": len(placements),
+            "component_count": sum(item["component_count"]
+                                   for item in families.values()),
+            "layer_count": len(layers),
+            "solid_count": sum(item["solid_count"]
+                               for item in families.values()),
+            "layers": [dict(_measure_layer(shape), name=spec[0])
+                       for spec, shape in zip(layer_specs, layers)],
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "length_unit": "mm",
+            "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "proper-source-component-frames-on-retained-brep",
+            "geometry_rebuilt": False,
+            "track_placements_added": len(placements),
+            "limits": [
+                "Only seven fixed TO-001 single-rail positions are placed.",
+                "No physical-fit, production, export or phase acceptance.",
+                "Source overlaps and hidden mating closures remain.",
+                "No source XML placement, scale or frame conversion reapplied.",
+                "Unresolved key direction and original exclusions remain.",
+            ],
+        }
+
+        def verify_layers(stored):
+            require(len(stored) == len(layers), "stored layer count changed")
+            for actual, expected in zip(stored[:2], layers[:2]):
+                require(_same_presented_shape(actual, expected),
+                        "stored context geometry or placement changed")
+                _measure_layer(actual)
+                require(not actual.Faces and not actual.Solids
+                        and len(actual.Edges) == len(expected.Edges),
+                        "stored context is no longer the copied wires")
+            for start, end, verify in verifiers:
+                verify(stored[start:end])
+
+        return layers, result, verify_layers
+
+    def verify_inputs():
+        verify_source()
+        for _label, prepared, _specs, _prepare in selections:
+            verify_catalogue_sources(prepared)
+
+    return _materialise_preview(
+        family, receipt, layer_specs, prepare_layers, verify_inputs,
+        title_suffix="retained catalogue assemblies",
+    )
+
+
 def _create_private_catalogue_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, family, placement_type, model_sha256, source_names,
@@ -285,7 +411,7 @@ def _prepare_catalogue_family(
     catalogue_path, placements, context_shapes, source_receipt,
     *, family, placement_type, model_sha256, source_names,
     run="basic-04", source_context="fixed-basic-source-context",
-    prepared_selection=None,
+    prepared_selection=None, source_handing="RH",
 ):
     """Prepare one fixed assembly without creating a document.
 
@@ -295,6 +421,10 @@ def _prepare_catalogue_family(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(source_handing in ("RH", "LH"),
+            "source handing must be RH or LH")
+    require(source_handing == "RH" or placement_type is SingleRailPlacement,
+            "LH source handing requires single-rail component frames")
     if placement_type is SingleRailPlacement:
         placements = prepare_single_rail_placements(placements)
         require(all(value.family == family for value in placements),
@@ -486,7 +616,9 @@ def _prepare_catalogue_family(
                 contract_id=f"tracktemplate.private-catalogue-{family.lower()}-source-placement.v1",
                 placement="source-single-rail-component-frames.v1",
                 fixing_head_rotation_rad=0.0, random_export_parity=False,
-                fixing_angle_frame="uncurved-RH-source-before-common-host-rotation",
+                fixing_angle_frame=(
+                    f"uncurved-{source_handing}-source-before-common-host-rotation"
+                ),
                 templot_global_fixing_angle_parity=False,
             )
 

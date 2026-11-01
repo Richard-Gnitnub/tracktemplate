@@ -3236,3 +3236,34 @@ Their number of assemblies needs source evidence.
 The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
 This result gives no acceptance for physical fit, production, product performance or phase exit. It gives no third-party permission.
 Phase 9B stays Open at 3/6. The previous `2/2` limit is fully used. LMS work stays stopped.
+
+## Seven more chair assemblies on TO-001 — 2026-11-01
+
+This Level 2 change supplies more evidence for Exit 9B-3.
+The [source adapter](../../tracktemplate/compatibility/chair_turnout_single_rail_placement.py) adds seven private chair assemblies to the specified `TO-001` source (`Left-hand`).
+The selected identities are `S13`, `T1` and `T2`, with `source_rail_code` equal to `2` or `4`, and `T14`, with that value equal to `2`.
+
+The preserved Templot 556b source selects six `L1` assemblies and one `S1` assembly.
+The `S1` assembly is at `T2`, with `source_rail_code` equal to `4`. Its initial `chair_code_label` stays `L1`.
+The software reuses 155 chair components from the preserved files. It changes their positions and directions without changing their shapes.
+The source calculations keep separate positions and directions for the components that attach each assembly.
+
+The three new groups of [tests without FreeCAD](../../tests/validate_phase9b_turnout_single_rail.py) give PASS results after the initial RED results.
+They check source identities, source selection, positions, directions, incorrect inputs and the existing software that keeps the previous display condition.
+Related regression tests give PASS results.
+The source check uses the unchanged 168-position record and the actual software that reads and verifies chair files.
+Separate source calculations check all 155 component positions. These checks give no tolerance for physical fit.
+
+Previous FreeCAD and display evidence applies to the chair shapes and the existing software that moves them and keeps the previous display condition.
+No new FreeCAD, display or complete `XO-001` test ran for this change. FreeCAD and display evidence for these seven assemblies stays necessary before Exit 9B-3 acceptance.
+Source, test, failure and review evidence is in `tmp/to001-single-rail/`.
+
+The previous 59 `S1`/`S1J` positions, 14 `P` positions and three `CC` assemblies stay the same.
+The separate routes now include 86 of the 168 source positions. They do not make one complete turnout display.
+Of the other 82 positions, 24 have `chair_code_label` equal to `""` and 58 are outside these routes.
+Five previous `S1` assignments also disagree with the source: `S13` and `T1` with `source_rail_code` equal to `1` or `3`, and `T2` with that value equal to `3`.
+This change does not correct those five assignments.
+
+The [provenance](../PROVENANCE.md) and [licensing conditions](../LICENSING_BOUNDARIES.md) stay the same.
+This result gives no acceptance for physical fit, production, product performance or phase exit. It gives no third-party permission.
+Phase 9B stays Open at 3/6. The previous `2/2` history stays unchanged. LMS work stays stopped.

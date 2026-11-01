@@ -2613,6 +2613,7 @@ class ModularCoreLayoutWorkflowSession:
         private_catalogue_s1j_preview_factory=None,
         private_catalogue_l1_preview_factory=None,
         private_catalogue_cc_preview_factory=None,
+        private_catalogue_turnout_single_rail_preview_factory=None,
         private_catalogue_crossover_preview_factory=None,
     ):
         staged = staged or atomic
@@ -2648,6 +2649,9 @@ class ModularCoreLayoutWorkflowSession:
         )
         self._private_catalogue_cc_preview_factory = (
             private_catalogue_cc_preview_factory
+        )
+        self._private_catalogue_turnout_single_rail_preview_factory = (
+            private_catalogue_turnout_single_rail_preview_factory
         )
         self._private_catalogue_crossover_preview_factory = (
             private_catalogue_crossover_preview_factory
@@ -3031,6 +3035,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_cc_preview_factory,
         )
 
+    def preview_private_catalogue_turnout_single_rail_chairs(
+        self, source_document, turnout_id, catalogue_path,
+    ):
+        """Inspect seven retained single-rail assemblies on fixed TO-001."""
+        from tracktemplate.compatibility.chair_turnout_single_rail_placement import (
+            preview_private_catalogue_turnout_single_rail_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_turnout_single_rail_chairs(
+            self.module, source_document, turnout_id, catalogue_path,
+            self._private_catalogue_turnout_single_rail_preview_factory,
+        )
+
     def preview_private_catalogue_crossover_chairs(
         self, source_document, crossover_id, catalogue_path,
         *, paired_contexts_path=None, include_central_cc=False,
@@ -3102,6 +3120,7 @@ def load_modular_transition_workflow_session(
     private_catalogue_s1j_preview_factory=None,
     private_catalogue_l1_preview_factory=None,
     private_catalogue_cc_preview_factory=None,
+    private_catalogue_turnout_single_rail_preview_factory=None,
     private_catalogue_crossover_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
@@ -3169,6 +3188,9 @@ def load_modular_transition_workflow_session(
         ),
         private_catalogue_l1_preview_factory=private_catalogue_l1_preview_factory,
         private_catalogue_cc_preview_factory=private_catalogue_cc_preview_factory,
+        private_catalogue_turnout_single_rail_preview_factory=(
+            private_catalogue_turnout_single_rail_preview_factory
+        ),
         private_catalogue_crossover_preview_factory=(
             private_catalogue_crossover_preview_factory
         ),
