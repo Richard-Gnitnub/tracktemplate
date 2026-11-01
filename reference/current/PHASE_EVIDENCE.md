@@ -3160,3 +3160,38 @@ The project owner authorises more repairs for this task.
 This correction gives no acceptance for physical fit, production, product performance or phase exit.
 It gives no positive rights claim.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+## L1 chair display test on GitHub — 2026-11-01
+
+This Level 2 result supplies the missing FreeCAD display evidence for `L1-QUALIFICATION-001` and part of Exit 9B-3.
+The [`readiness` test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41308881938) and [complete display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41309891401) give PASS results.
+Independent review gives PASS results for both tests.
+The initial display test, its ten inputs and all limits for the test stay the same.
+
+The display test uses ten L1 chairs at 600 mm, 900 mm and 600 mm.
+It completes three `Generate` operations, with `body_frame_comparisons=30`, `layer_visibility_selection_checks=75` and `successful_preview_component_placements=690`.
+It completes one test with `skips=0` and gives the success sentinel.
+An independent reviewer visually examines all 12 chair `.png` files and three `radius-input.png` files.
+Checks of `App.Document` conditions, selection, `preselection`, input hashes and cleanup give PASS results.
+
+Independent review gives `L1-LIFECYCLE-ACTIVE-01` the result `VERIFIED_REPAIRED_FOR_BOUNDED_L1_WORKFLOW`.
+The display test supplies the missing evidence for `L1-ACTIVATION-RUNTIME`. The `L1-QUALIFICATION-001.gui_portion` has a PASS result.
+
+The initial workflow for `L1-GUI-41298217983-POSTCONDITION` now gives a PASS result after the reviewed repair.
+The cause of that previous FAIL result stays unknown. The evidence preserves the previous FAIL result.
+These results do not prove correct operation for other callers or different times between operations.
+
+The recorded test time is 1,150.38 seconds. The measured `memory_peak_bytes` value for FreeCAD is `2010689536`.
+The `accounting` value is `sampled-lower-bound`: actual maximum values and final totals can be more than the measured values.
+Cleanup gives a PASS result for FreeCAD, the display and the temporary input files.
+
+For the host, each `total` value for `some` and `full` in `/proc/pressure/memory` increases by 1 µs.
+The related totals for FreeCAD and the display stay at `0`.
+The `local_pressure_guard_qualification` value stays `False`. This result gives no acceptance for product performance.
+
+The evidence and independent reviews are in `tmp/l1-preview-activation/gui-41309891401/`.
+Checks of independent preservation and recovery give PASS results for all 192 result files.
+The evidence preserves the use of the full previous `2/2` repair limit. The project owner authorises more repairs for this task.
+
+This result gives no acceptance for physical fit, production or phase exit. It gives no positive rights claim.
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
