@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import resource
 import secrets
+import shutil
 import subprocess
 import sys
 import time
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import hosted_l1_private_validation as native  # noqa: E402
+from tools import hosted_l1_gui_install as installer  # noqa: E402
 
 
 guard = native.guard
@@ -52,6 +54,8 @@ HANDLING_DECISION = (
 CONTROL_FILES = (*native.CONTROL_FILES,
                  '.github/workflows/l1-gui-validation.yml',
                  'tools/hosted_l1_gui_validation.py', ENTRY,
+                 'tools/hosted_l1_gui_install.py',
+                 'tests/validate_hosted_l1_gui_install.py',
                  'tests/validate_hosted_l1_gui_controls.py')
 FROZEN_PATHS = (
     'tracktemplate', 'TrackTemplate.FCMacro', 'AdvancedTurnout.FCMacro',
@@ -653,11 +657,85 @@ def finalize(work, public):
             )},
         })
         native_result = 0
+    elif os.environ.get('L1_INSTALL') in ('failure', 'cancelled'):
+        native_result = _failed_install_cleanup(work, public)
     else:
-        native_result = native.finalize('gui', work, public)
+        native_result, process = _native_cleanup(work, public)
+        if (work / 'evidence/installer-intent.json').exists():
+            setup = installer.cleanup(work)
+            if not setup['cleanup']:
+                process['cleanup'] = False
+                process['errors'].append('Installer cleanup unproved')
+                native_result = 1
+        write(work / 'evidence/process-finalization.json', process)
     receipt = display_cleanup(work)
     write(work / 'evidence/display-finalization.json', receipt)
     return 0 if native_result == 0 and receipt['cleanup'] else 1
+
+
+def _native_cleanup(work, public):
+    """Keep the native receipt before composing installation cleanup."""
+    path = work / 'evidence/process-finalization.json'
+    retained = work / 'evidence/runtime-finalization.json'
+
+    def retain(destination, record):
+        write(retained if destination == path else destination, record)
+
+    with patch.object(native, 'write', retain):
+        result = native.finalize('gui', work, public)
+    if not retained.is_file():
+        return 1, {'cleanup': False, 'errors': ['Native cleanup receipt absent']}
+    return result, json.loads(retained.read_text())
+
+
+def _failed_install_cleanup(work, public):
+    """Prove a failed setup stopped before any input or GUI execution."""
+    result = {'cleanup': False, 'errors': [], 'workflow_outcomes': {
+        name: os.environ.get(name, '') for name in (
+            'L1_PREPARE', 'L1_INSTALL', 'L1_ACQUIRE', 'L1_RUN',
+        )
+    }}
+    try:
+        expected = {'L1_PREPARE': 'success', 'L1_ACQUIRE': 'skipped',
+                    'L1_RUN': 'skipped'}
+        if not all(os.environ.get(key) == value
+                   for key, value in expected.items()):
+            # An inconsistent workflow cannot use the never-started path.
+            # Preserve the previous runtime clearance attempt and its errors.
+            _, previous = _native_cleanup(work, public)
+            result['errors'].extend(previous['errors'])
+            raise ValueError(
+                'Installation failure has uncertain execution outcomes')
+        evidence = work / 'evidence'
+        allowed = {
+            work: {'evidence', 'control.json', 'installer.sh'},
+            evidence: {
+                'prepare.log', 'gui-authority.json', 'admission.json',
+                'install.log', 'finalizer.log', 'installer-intent.json',
+                'installer-ownership.json', 'installer-result.json',
+                'installer-output.log', 'installer-samples.jsonl',
+                'installer-cleanup.json',
+            },
+        }
+        for directory, names in allowed.items():
+            require(not directory.is_symlink() and directory.is_dir(),
+                    'Installation evidence directory differs')
+            for path in directory.iterdir():
+                require(path.name in names and not path.is_symlink()
+                        and (path == evidence or path.is_file()),
+                        'Unexpected state after installation failure')
+        setup = installer.cleanup(work)
+        require(setup['cleanup'] is True, 'Installer cleanup unproved')
+        if shutil.which('flatpak') is not None:
+            with patch.object(original, 'OUTPUT', evidence):
+                require(original._clearance(), 'Foreign FreeCAD remains')
+        result.update(cleanup=True, never_started=True,
+                      installer_cleanup=setup)
+    except (OSError, ValueError, KeyError, TypeError,
+            subprocess.SubprocessError):
+        result['errors'].append(traceback.format_exc())
+    write(work / 'evidence/process-finalization.json', result)
+    return 0 if result['cleanup'] else 1
 
 
 def exclude_gui_copy(work):
@@ -770,6 +848,8 @@ def main():
     operation = sys.argv[1]
     if operation == 'prepare':
         prepare(work)
+    elif operation == 'install':
+        return installer.run(work)
     elif operation == 'acquire':
         acquire(work)
     elif operation == 'run':

@@ -68,41 +68,7 @@ jobs:
           umask 077
           ulimit -c 0
           exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/install.log" 2>&1
-          test "$GITHUB_RUN_ATTEMPT" = 1
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y flatpak dbus-user-session xvfb xauth
-          sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
-          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
-          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
-          pilot_uid="$(id -u)"
-          test "$pilot_uid" -ne 0
-          pilot_manager="user@${pilot_uid}.service"
-          pilot_group="/user.slice/user-${pilot_uid}.slice/${pilot_manager}"
-          sudo loginctl enable-linger "$(id -un)"
-          sudo systemctl start "$pilot_manager"
-          systemctl show "$pilot_manager" -p ActiveState -p ControlGroup -p Delegate -p DelegateControllers
-          test "$(systemctl show "$pilot_manager" -p ActiveState --value)" = active
-          test "$(systemctl show "$pilot_manager" -p ControlGroup --value)" = "$pilot_group"
-          test "$(systemctl show "$pilot_manager" -p Delegate --value)" = yes
-          pilot_delegated="$(systemctl show "$pilot_manager" -p DelegateControllers --value)"
-          pilot_available="$(cat "/sys/fs/cgroup${pilot_group}/cgroup.controllers")"
-          printf 'Delegated controllers: %s\nAvailable controllers: %s\n' "$pilot_delegated" "$pilot_available"
-          for pilot_controller in cpu memory pids; do
-            case " $pilot_delegated " in
-              *" $pilot_controller "*) ;;
-              *) echo "Required delegation missing: $pilot_controller" >&2; exit 1 ;;
-            esac
-            case " $pilot_available " in
-              *" $pilot_controller "*) ;;
-              *) echo "Required kernel controller missing: $pilot_controller" >&2; exit 1 ;;
-            esac
-          done
-          echo "XDG_RUNTIME_DIR=/run/user/${pilot_uid}" >> "$GITHUB_ENV"
-          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${pilot_uid}/bus" >> "$GITHUB_ENV"
-
-          test ! -e /home/richard
-          sudo install -d -m 700 -o "$(id -u)" -g "$(id -g)" /home/richard
+          python3 tools/hosted_l1_gui_validation.py install
 
       - name: Acquire only the approved public inputs
         id: acquire
