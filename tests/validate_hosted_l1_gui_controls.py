@@ -6,6 +6,8 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 import tempfile
 from types import ModuleType
@@ -347,6 +349,245 @@ class HostedL1GuiControls(unittest.TestCase):
         for line in workflow.splitlines():
             if 'uses:' in line:
                 self.assertRegex(line, r'@[0-9a-f]{40}(?: |$)')
+
+
+class ReadinessSetupRegressions(unittest.TestCase):
+    def checkout_fixture(self, temporary, depth):
+        """Make a local history with an older unchanged frozen baseline."""
+        self.assertTrue(temporary.resolve().is_relative_to(
+            Path(tempfile.gettempdir()).resolve(),
+        ))
+        origin = temporary / 'origin'
+        origin.mkdir()
+        command = gui.native.command
+        command('git', 'init', '--initial-branch=main', cwd=origin)
+        for name in (*gui.CONTROL_FILES, gui.ENTRY):
+            target = origin / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((ROOT / name).read_bytes())
+        frozen = origin / 'tracktemplate/frozen.py'
+        frozen.parent.mkdir()
+        frozen.write_text('FROZEN = True\n')
+        for index in range(3):
+            (origin / 'revision.txt').write_text(str(index))
+            command('git', 'add', '.', cwd=origin)
+            command('git', '-c', 'user.name=Regression Fixture', '-c',
+                    'user.email=fixture@example.invalid', 'commit', '-m',
+                    f'Fixture {index}', cwd=origin)
+            if index == 0:
+                baseline = command('git', 'rev-parse', 'HEAD', cwd=origin)
+        checkout = temporary / 'checkout'
+        depth_args = ('--depth', str(depth)) if depth else ()
+        command('git', 'clone', *depth_args, origin.as_uri(), str(checkout),
+                cwd=temporary)
+        return checkout, baseline
+
+    def prepare_checkout(self, checkout, baseline, work):
+        command = gui.native.command
+        head = command('git', 'rev-parse', 'HEAD', cwd=checkout)
+        record = authority()
+        record.update(
+            stage='readiness', source_base_commit=baseline, source_commit=head,
+            freecad_limits=vars(gui.limits('readiness')),
+            display_limits=vars(gui.display_limits('readiness')),
+            gui_entry_sha256=gui.digest(checkout / gui.ENTRY),
+            control_files_sha256={
+                name: gui.digest(checkout / name) for name in gui.CONTROL_FILES
+            },
+        )
+        record['gui_recovery']['source_commit'] = head
+        values = dict(environment(), GITHUB_SHA=head, L1_GUI_STAGE='readiness',
+                      L1_GUI_CONTROL=json.dumps(record))
+        with (patch.dict(os.environ, values, clear=True),
+              patch.object(gui, 'ROOT', checkout),
+              patch.object(gui, 'BASE', baseline),
+              patch.object(gui, 'validate_host', return_value={}),
+              patch.object(gui.resource, 'setrlimit'),
+              patch.object(gui.native, 'command', side_effect=lambda *args:
+                           command(*args, cwd=checkout))):
+            gui.prepare(work)
+
+    def test_workflow_checkout_supports_historical_frozen_comparison(self):
+        workflow = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        checkout = workflow.split('uses: actions/checkout@', 1)[1].split(
+            '\n      - name:', 1,
+        )[0]
+        configured = re.search(r'^\s+fetch-depth:\s*(\d+)\s*$', checkout,
+                               re.MULTILINE)
+        depth = int(configured.group(1)) if configured else 1
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, baseline = self.checkout_fixture(root, depth)
+            work = root / 'work'
+            (work / 'evidence').mkdir(parents=True)
+            self.prepare_checkout(source, baseline, work)
+            self.assertEqual(json.loads((work / 'control.json').read_text())[
+                'source_base_commit'], baseline)
+
+    def test_missing_baseline_and_changed_frozen_source_remain_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, baseline = self.checkout_fixture(root, 0)
+            work = root / 'work'
+            (work / 'evidence').mkdir(parents=True)
+            for missing in ('f' * 40, 'not-a-commit'):
+                with self.subTest(baseline=missing), self.assertRaises(
+                        subprocess.CalledProcessError):
+                    self.prepare_checkout(source, missing, work)
+                self.assertFalse((work / 'control.json').exists())
+            (source / 'tracktemplate/frozen.py').write_text('FROZEN = False\n')
+            command = gui.native.command
+            command('git', 'add', 'tracktemplate/frozen.py', cwd=source)
+            command('git', '-c', 'user.name=Regression Fixture', '-c',
+                    'user.email=fixture@example.invalid', 'commit', '-m',
+                    'Changed frozen fixture', cwd=source)
+            with self.assertRaisesRegex(ValueError, 'Frozen product'):
+                self.prepare_checkout(source, baseline, work)
+            self.assertFalse((work / 'control.json').exists())
+
+    def failed_prepare_environment(self):
+        return dict(environment(), L1_GUI_STAGE='readiness',
+                    L1_PREPARE='failure', L1_INSTALL='skipped',
+                    L1_ACQUIRE='skipped', L1_RUN='skipped')
+
+    def test_skipped_install_needs_no_flatpak_for_never_started_cleanup(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'evidence/prepare.log').write_text('baseline unavailable')
+            (work / 'evidence/finalizer.log').write_text('')
+            values = self.failed_prepare_environment()
+            with (patch.dict(os.environ, values, clear=True),
+                  patch.object(gui.original, '_clearance',
+                               side_effect=FileNotFoundError('flatpak'))
+                  as clearance):
+                result = gui.finalize(work, work / 'public')
+            self.assertEqual(result, 0)
+            clearance.assert_not_called()
+            process = json.loads((
+                work / 'evidence/process-finalization.json').read_text())
+            self.assertTrue(process['cleanup'])
+            self.assertTrue(process['never_started'])
+            self.assertEqual(process['errors'], [])
+            self.assertEqual(process['workflow_outcomes'], {
+                name: values[name] for name in (
+                    'L1_PREPARE', 'L1_INSTALL', 'L1_ACQUIRE', 'L1_RUN',
+                )
+            })
+
+    def test_uncertain_outcomes_still_require_native_clearance(self):
+        expected = self.failed_prepare_environment()
+        for name in ('L1_PREPARE', 'L1_INSTALL', 'L1_ACQUIRE', 'L1_RUN'):
+            for outcome in (None, '', 'unknown', 'failure', 'cancelled',
+                            'success', 'skipped'):
+                if outcome == expected[name]:
+                    continue
+                with (self.subTest(name=name, outcome=outcome),
+                      tempfile.TemporaryDirectory() as temporary):
+                    work = Path(temporary)
+                    (work / 'evidence').mkdir()
+                    values = dict(expected)
+                    if outcome is None:
+                        values.pop(name)
+                    else:
+                        values[name] = outcome
+                    with (patch.dict(os.environ, values, clear=True),
+                          patch.object(gui.original, '_clearance',
+                                       side_effect=FileNotFoundError('flatpak'))
+                          as clearance):
+                        self.assertEqual(gui.finalize(work, work / 'public'), 1)
+                    clearance.assert_called_once_with()
+                    process = json.loads((
+                        work / 'evidence/process-finalization.json').read_text())
+                    self.assertFalse(process['cleanup'])
+                    self.assertTrue(process['errors'])
+                    self.assertFalse(process.get('never_started', False))
+
+    def test_runtime_input_unknown_or_linked_state_uses_native_finalizer(self):
+        cases = (
+            ('evidence/guard/result.json', 'file'),
+            ('evidence/guard/ownership.json', 'file'),
+            ('evidence/display-start-intent.json', 'file'),
+            ('evidence/display-ownership.json', 'file'),
+            ('evidence/execution.log', 'file'),
+            ('evidence/install.log', 'file'),
+            ('evidence/acquisition.log', 'file'),
+            ('run-config.json', 'file'), ('gui-run-config.json', 'file'),
+            ('inputs.tar', 'file'), ('unpacked', 'directory'),
+            ('gui-entry.FCMacro', 'file'), ('unexpected', 'file'),
+            ('evidence/unexpected', 'file'),
+            ('control.json', 'file-link'),
+            ('control.json', 'dangling-link'),
+            ('evidence/prepare.log', 'file-link'),
+            ('evidence/prepare.log', 'dangling-link'),
+            ('evidence', 'directory-link'),
+        )
+        for name, kind in cases:
+            with (self.subTest(path=name, kind=kind),
+                  tempfile.TemporaryDirectory() as temporary):
+                root = Path(temporary)
+                work = root / 'work'
+                work.mkdir()
+                if kind == 'directory-link':
+                    target = root / 'linked-evidence'
+                    target.mkdir()
+                    (work / name).symlink_to(target, target_is_directory=True)
+                else:
+                    (work / 'evidence').mkdir()
+                    target = work / name
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    if kind == 'directory':
+                        target.mkdir()
+                    elif kind == 'file-link':
+                        linked = root / 'linked-file'
+                        linked.write_text('{}')
+                        target.symlink_to(linked)
+                    elif kind == 'dangling-link':
+                        target.symlink_to(work / 'absent')
+                    else:
+                        target.write_text('{}')
+                with (patch.dict(os.environ, self.failed_prepare_environment(),
+                                 clear=True),
+                      patch.object(gui.native, 'finalize', return_value=1)
+                      as native_finalizer,
+                      patch.object(gui, 'display_cleanup', return_value={
+                          'cleanup': False, 'errors': [],
+                      })):
+                    self.assertEqual(gui.finalize(work, work / 'public'), 1)
+                native_finalizer.assert_called_once_with(
+                    'gui', work, work / 'public',
+                )
+
+    def test_never_started_cleanup_cannot_complete_failed_readiness(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'evidence/prepare.log').write_text('BASELINE-FAILURE')
+            values = dict(
+                self.failed_prepare_environment(),
+                L1_PRIMARY_UPLOAD='success', L1_PRIMARY_DOWNLOAD='success',
+                L1_PRIMARY_ID='121', L1_FINAL_UPLOAD='success',
+                L1_FINAL_DOWNLOAD='success', L1_FINAL_ID='122',
+                L1_PUBLICATION='success',
+            )
+            with (patch.dict(os.environ, values, clear=True),
+                  patch.object(gui.original, '_clearance',
+                               side_effect=FileNotFoundError('flatpak'))):
+                self.assertEqual(gui.finalize(work, work / 'public'), 0)
+                for name in ('readback-primary', 'readback-final'):
+                    (work / name).mkdir()
+                gui.native.seal(work)
+                (work / 'readback-primary/evidence.tar').write_bytes(
+                    (work / 'evidence.tar').read_bytes())
+                self.assertEqual(gui.publish(work), 0)
+                (work / 'readback-final/publication.tar').write_bytes(
+                    (work / 'publication.tar').read_bytes())
+                self.assertEqual(gui.complete(work, work / 'public'), 1)
+            summary = json.loads((work / 'public/summary.json').read_text())
+            self.assertEqual(summary['outcome'], 'INCOMPLETE')
+            self.assertNotIn('tests', summary)
+            self.assertEqual((work / 'evidence/prepare.log').read_text(),
+                             'BASELINE-FAILURE')
 
 
 class GuiProofContracts(unittest.TestCase):

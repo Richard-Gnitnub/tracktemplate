@@ -617,8 +617,44 @@ def validate_gui_receipt(receipt, work, *, stage='gui'):
     require(names == expected_images, 'GUI screenshot witness set differs')
 
 
+def _installation_was_skipped(work):
+    """Recognise only a preparation failure with no later side effects."""
+    expected = {'L1_PREPARE': 'failure', 'L1_INSTALL': 'skipped',
+                'L1_ACQUIRE': 'skipped', 'L1_RUN': 'skipped'}
+    if any(os.environ.get(name) != value for name, value in expected.items()):
+        return False
+    evidence = work / 'evidence'
+    allowed = {
+        work: {'evidence', 'control.json'},
+        evidence: {'prepare.log', 'gui-authority.json', 'admission.json',
+                   'finalizer.log'},
+    }
+    for directory, names in allowed.items():
+        if directory.is_symlink() or not directory.is_dir():
+            return False
+        for path in directory.iterdir():
+            if path.name not in names or path.is_symlink():
+                return False
+            if path != evidence and not path.is_file():
+                return False
+    return True
+
+
 def finalize(work, public):
-    native_result = native.finalize('gui', work, public)
+    started = time.monotonic()
+    if _installation_was_skipped(work):
+        # Workflow outcomes and the complete work inventory prove no launch.
+        # This owns no runtime process; it does not claim test success.
+        write(work / 'evidence/process-finalization.json', {
+            'cleanup': True, 'never_started': True, 'errors': [],
+            'seconds': time.monotonic() - started,
+            'workflow_outcomes': {name: os.environ[name] for name in (
+                'L1_PREPARE', 'L1_INSTALL', 'L1_ACQUIRE', 'L1_RUN',
+            )},
+        })
+        native_result = 0
+    else:
+        native_result = native.finalize('gui', work, public)
     receipt = display_cleanup(work)
     write(work / 'evidence/display-finalization.json', receipt)
     return 0 if native_result == 0 and receipt['cleanup'] else 1
