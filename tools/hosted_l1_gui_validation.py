@@ -7,6 +7,7 @@ record does not authenticate consent or reset the exhausted repair allowance.
 """
 
 from contextlib import ExitStack
+import hashlib
 import json
 import math
 import os
@@ -62,6 +63,102 @@ FROZEN_PATHS = (
     'model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro',
     'tests/hosted_l1_current_source_suite.py', *native.CONTROL_FILES,
 )
+DIAGNOSTIC_SCOPE = 'L1-GUI-LIFECYCLE-DIAGNOSTIC-001'
+DIAGNOSTIC_BASE = 'e6c9a0e3c3215f010138092e23cec7cd0b04794f'
+DIAGNOSTIC_ENTRY_SHA256 = (
+    '1150aab0a68d75a9048bbfd096f60f270d8f452c7333ab692ba063fd878e7012'
+)
+DIAGNOSTIC_READINESS_EVIDENCE = (
+    'de6e779709ea5fd1569f88773becc217d05221ebd333640a697c1774e38b41d9'
+)
+DIAGNOSTIC_READINESS_REVIEW = (
+    '6c4143761b94d2a45d4ce44caa62da2f0fd1ab8059a9bf840bfe04da4b56e8f9'
+)
+DIAGNOSTIC_READINESS_PRESERVATION = (
+    '4ab46479ba9b05e16af9dbc952e214ac1f60cfc5a83c799434c44f3c659f9cd5'
+)
+DIAGNOSTIC_FILES = (
+    'tools/l1_gui_lifecycle_observer.py',
+    'tests/validate_l1_gui_lifecycle_observer.py',
+    'tests/validate_l1_gui_lifecycle_controls.py',
+)
+DIAGNOSTIC_CHANGED_CONTROLS = (
+    '.github/workflows/l1-gui-validation.yml',
+    'tools/hosted_l1_gui_validation.py',
+)
+
+
+def diagnostic_enabled(environ):
+    """Require an explicit boolean dispatch value; default remains off."""
+    value = environ.get('L1_LIFECYCLE_DIAGNOSTIC', 'false')
+    require(value in ('true', 'false'), 'Invalid diagnostic dispatch value')
+    return value == 'true'
+
+
+def validate_diagnostic(record, environ):
+    """Bind observation authority to the preserved failed GUI journey."""
+    diagnostic = record.get('lifecycle_diagnostic')
+    if not diagnostic_enabled(environ):
+        require(diagnostic is None, 'Diagnostic authority/dispatch differs')
+        return False
+    require(selected_stage(environ) == 'gui' and isinstance(diagnostic, dict),
+            'Separate lifecycle diagnostic authority absent')
+    expected = {
+        'scope_id': DIAGNOSTIC_SCOPE, 'execution_authorized': True,
+        'preparation_review': 'PASS', 'failed_run_id': 41298217983,
+        'baseline_commit': DIAGNOSTIC_BASE,
+    }
+    require(all(diagnostic.get(key) == value
+                for key, value in expected.items())
+            and diagnostic.get('execution_authorized') is True
+            and diagnostic.get('automatic_retry') is False
+            and diagnostic.get('product_changes') is False
+            and re.fullmatch(r'[0-9a-f]{64}',
+                             diagnostic.get('preparation_review_sha256', '')),
+            'Lifecycle diagnostic scope or preparation differs')
+    for key, names in (('baseline_controls', CONTROL_FILES),
+                       ('control_files_sha256', DIAGNOSTIC_FILES)):
+        hashes = diagnostic.get(key, {})
+        require(set(hashes) == set(names)
+                and all(re.fullmatch(r'[0-9a-f]{64}', value)
+                        for value in hashes.values()),
+                'Diagnostic source bindings incomplete')
+    ready = record.get('gui_readiness_review', {})
+    require(record.get('gui_entry_sha256') == DIAGNOSTIC_ENTRY_SHA256
+            and ready.get('run_id') == 41297405795
+            and ready.get('evidence_sha256') == DIAGNOSTIC_READINESS_EVIDENCE
+            and ready.get('result_review_sha256') == DIAGNOSTIC_READINESS_REVIEW
+            and ready.get('preservation_review_sha256')
+            == DIAGNOSTIC_READINESS_PRESERVATION,
+            'Preserved diagnostic readiness evidence differs')
+    baseline = dict(record, source_commit=DIAGNOSTIC_BASE,
+                    control_files_sha256=diagnostic['baseline_controls'])
+    validate_readiness(ready, baseline, environ['GITHUB_RUN_ID'])
+    return True
+
+
+def validate_diagnostic_source(record):
+    """Allow only the reviewed observer and its bounded control wiring."""
+    diagnostic = record['lifecycle_diagnostic']
+    changed = native.command(
+        'git', 'diff', '--name-only', DIAGNOSTIC_BASE, '--',
+    ).splitlines()
+    require(set(changed) <= set((*DIAGNOSTIC_FILES,
+                                *DIAGNOSTIC_CHANGED_CONTROLS)),
+            'Diagnostic changed frozen source or fixture')
+    for name, expected in diagnostic['baseline_controls'].items():
+        baseline = subprocess.run(
+            ['git', 'show', f'{DIAGNOSTIC_BASE}:{name}'], cwd=ROOT,
+            capture_output=True, check=True, timeout=15,
+        ).stdout
+        require(hashlib.sha256(baseline).hexdigest() == expected,
+                'Diagnostic baseline control identity differs')
+        if name not in DIAGNOSTIC_CHANGED_CONTROLS:
+            require(digest(ROOT / name) == expected,
+                    'Diagnostic changed a frozen control')
+    for name, expected in diagnostic['control_files_sha256'].items():
+        require(digest(ROOT / name) == expected,
+                'Reviewed diagnostic observer control changed')
 
 
 def selected_stage(environ):
@@ -120,6 +217,7 @@ def validate_host(environ, memory):
 def validate_authority(record, environ):
     """Require a separate explicit GUI scope; native approval is insufficient."""
     stage = selected_stage(environ)
+    diagnostic = validate_diagnostic(record, environ)
     expected = {
         'schema': 1, 'stage': stage, 'scope_id': SCOPE, 'source_base_commit': BASE,
         'source_commit': environ['GITHUB_SHA'], 'owner': 'Richard-Gnitnub',
@@ -161,7 +259,7 @@ def validate_authority(record, environ):
             and review.get('evidence_sha256') == (
                 '6061358800717ce6d1b3f460ea369a3cadfc0d3602aaaf69b434098a662a8f04'),
             'Independent preceding native evidence absent')
-    if stage == 'gui':
+    if stage == 'gui' and not diagnostic:
         validate_readiness(record.get('gui_readiness_review', {}), record,
                            environ['GITHUB_RUN_ID'])
     access = record.get('access_review', {})
@@ -189,6 +287,8 @@ def prepare(work):
             'Frozen product or native entry differs')
     for name, expected in control['control_files_sha256'].items():
         require(digest(ROOT / name) == expected, 'Reviewed GUI control changed')
+    if diagnostic_enabled(os.environ):
+        validate_diagnostic_source(control)
     require(digest(ROOT / ENTRY) == control['gui_entry_sha256'],
             'Reviewed GUI entry changed')
     require(digest(ROOT / 'tools/freecad_validation_guard.py')
@@ -414,11 +514,22 @@ def child_environment(work):
 def write_gui_macro(work):
     """Bind the literal import-safe suite launcher before any FreeCAD start."""
     macro = work / 'gui-entry.FCMacro'
+    observer = ''
+    if diagnostic_enabled(os.environ):
+        control = json.loads((work / 'control.json').read_text())
+        require(control.get('lifecycle_diagnostic', {}).get(
+            'execution_authorized') is True, 'Diagnostic macro not admitted')
+        observer = (
+            f'sys.path.insert(0, {str(ROOT)!r})\n'
+            'from tools import l1_gui_lifecycle_observer as observer\n'
+            f'observer.install({str(work / "evidence")!r})\n'
+        )
     content = ('import sys\n'
                'import FreeCAD as App\n'
                'import FreeCADGui as Gui\n'
                f'sys.path.insert(0, {str(ROOT / "tests")!r})\n'
                'import hosted_l1_gui_suite\n'
+               + observer +
                'hosted_l1_gui_suite.start()\n')
     with macro.open('x', encoding='utf-8') as stream:
         stream.write(content)
@@ -451,6 +562,31 @@ def qualified_runtime(stdout):
         'gui': 'hosted_l1_gui_suite.L1Gui.test_authorised_gui_stage',
     }):
         native.qualified_runtime(stdout)
+
+
+def record_diagnostic_assessment(work, assessment, *, assessor=None):
+    """Retain the original verdict even when observation is incomplete."""
+    try:
+        if assessor is None:
+            from tools import l1_gui_lifecycle_observer
+
+            assessor = l1_gui_lifecycle_observer.assess
+        diagnostic = assessor(work / 'evidence')
+        complete = diagnostic['status'] == 'COMPLETE'
+    except Exception:
+        # Observation cannot prevent preservation of the original assessment.
+        diagnostic = {'status': 'INCOMPLETE',
+                      'errors': [traceback.format_exc()]}
+        complete = False
+    assessment['lifecycle_diagnostic'] = diagnostic
+    if not complete:
+        assessment['product_assessment_before_diagnostic'] = {
+            'status': assessment['status'],
+            'classification': assessment['classification'],
+        }
+        assessment.update(status='FAIL', classification='DIAGNOSTIC_INCOMPLETE')
+    elif assessment['status'] == 'PASS':
+        assessment['classification'] = 'DIAGNOSTIC_NON_REPRODUCTION'
 
 
 def run(work):
@@ -552,6 +688,8 @@ def run(work):
         assessment['elapsed_seconds'] = time.monotonic() - started
         assessment['display_resource_samples'] = len(display_samples)
         assessment['host_resource_samples'] = len(host_samples)
+        if diagnostic_enabled(os.environ):
+            record_diagnostic_assessment(work, assessment)
         write(work / 'evidence/assessment.json', assessment)
     return 0 if assessment['status'] == 'PASS' else 1
 
@@ -832,9 +970,13 @@ def complete(work, public):
                        repair_allowance_remaining=0)
     except (OSError, ValueError, KeyError, TypeError):
         pass
+    if diagnostic_enabled(os.environ):
+        summary.update(scope_id=DIAGNOSTIC_SCOPE, diagnostic_only=True)
+        if summary['outcome'] == 'PASS':
+            summary['outcome'] = 'NON_REPRODUCTION'
     public.mkdir(mode=0o700, exist_ok=True)
     write(public / 'summary.json', summary)
-    return 0 if summary['outcome'] == 'PASS' else 1
+    return 0 if summary['outcome'] in ('PASS', 'NON_REPRODUCTION') else 1
 
 
 def main():
@@ -865,7 +1007,9 @@ def main():
         return complete(work, public)
     elif operation == 'finish':
         summary = json.loads((public / 'summary.json').read_text())
-        return 0 if (summary.get('outcome') == 'PASS'
+        expected = ('NON_REPRODUCTION' if diagnostic_enabled(os.environ)
+                    else 'PASS')
+        return 0 if (summary.get('outcome') == expected
                      and os.environ.get('L1_SUMMARY_UPLOAD') == 'success') else 1
     else:
         raise ValueError('Unsupported operation')

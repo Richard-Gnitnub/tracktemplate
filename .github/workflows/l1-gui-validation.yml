@@ -10,6 +10,11 @@ on:
         options:
           - readiness
           - gui
+      lifecycle_diagnostic:
+        description: Separately approved lifecycle observation only
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,6 +34,7 @@ jobs:
     timeout-minutes: 140
     env:
       L1_GUI_STAGE: ${{ inputs.stage }}
+      L1_LIFECYCLE_DIAGNOSTIC: ${{ inputs.lifecycle_diagnostic && 'true' || 'false' }}
     steps:
       - name: Record the bounded job start
         shell: bash
