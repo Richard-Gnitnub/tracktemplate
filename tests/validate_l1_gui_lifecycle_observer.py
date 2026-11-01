@@ -1,4 +1,8 @@
-"""Exercise lifecycle observation with Python doubles; never start a host."""
+"""Preserve the frozen diagnostic contract with inert host doubles.
+
+These tests execute the hash-pinned historical source. Current product
+activation behavior is checked by validate_chair_preview_activation.py.
+"""
 
 import ast
 import hashlib
@@ -20,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import l1_gui_lifecycle_observer as observer  # noqa: E402
+from tools.hosted_l1_gui_validation import DIAGNOSTIC_BASE  # noqa: E402
 
 
 def extract_functions(path, names, namespace):
@@ -216,7 +221,7 @@ class Gui(ModuleType):
 class Runtime:
     """Run the unchanged lifecycle function, with no FreeCAD import."""
 
-    def __init__(self, fail_operand=None):
+    def __init__(self, fail_operand=None, *, source_root=ROOT):
         self.fail_operand = fail_operand
         self.case = None
         self.caught = None
@@ -228,12 +233,16 @@ class Runtime:
         self.app.selection = self.selection
         self.gui = Gui(self)
         namespace = {"App": self.app, "uuid": uuid}
-        core = ROOT / "tracktemplate/adapters/freecad/core_export_document.py"
+        core = source_root / (
+            "tracktemplate/adapters/freecad/core_export_document.py"
+        )
         names = ("_active_document", "_same_registry", "_selection_snapshot",
                  "_preselection_snapshot", "_restore_selection",
                  "_restore_preselection", "_cleanup")
         extract_functions(core, names, namespace)
-        target = ROOT / "tracktemplate/adapters/freecad/chair_reference_preview.py"
+        target = source_root / (
+            "tracktemplate/adapters/freecad/chair_reference_preview.py"
+        )
         extract_functions(target, ("_require", "_materialise_preview"),
                           namespace)
         self.preview = namespace["_materialise_preview"]
@@ -280,8 +289,24 @@ class Runtime:
 
 
 class LifecycleObserverTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory = tempfile.TemporaryDirectory(prefix="l1-original-source-")
+        cls.addClassCleanup(directory.cleanup)
+        cls.historical_root = Path(directory.name)
+        for name, digest in observer.SOURCE_HASHES.items():
+            source = subprocess.run(
+                ["git", "show", f"{DIAGNOSTIC_BASE}:{name}"], cwd=ROOT,
+                capture_output=True, check=True,
+            ).stdout
+            if hashlib.sha256(source).hexdigest() != digest:
+                raise AssertionError("Historical diagnostic source differs")
+            target = cls.historical_root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(source)
+
     def run_observed(self, directory, failure=None, break_snapshot=False):
-        runtime = Runtime(failure)
+        runtime = Runtime(failure, source_root=self.historical_root)
         capture = observer._Observer(Path(directory), runtime.codes)
         original_snapshot = capture._snapshot
 
@@ -309,7 +334,7 @@ class LifecycleObserverTests(unittest.TestCase):
         script = (
             "import runpy, sys\n"
             f"m = runpy.run_path({str(ROOT / 'tools/l1_gui_lifecycle_observer.py')!r})\n"
-            "m['_source_codes'](m['ROOT'])\n"
+            f"m['_source_codes'](m['Path']({str(self.historical_root)!r}))\n"
             "assert sys.gettrace() is None\n"
             "assert not any(n.startswith(('FreeCAD', 'Part', 'PySide')) "
             "for n in sys.modules)\n"
@@ -319,14 +344,14 @@ class LifecycleObserverTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_fixed_sources_and_code_binding_match_original_bytes(self):
-        codes = observer._source_codes(ROOT)
+        codes = observer._source_codes(self.historical_root)
         self.assertEqual(set(codes), {"test", "journey", "target", "require",
                                      "active", "registry", "selection",
                                      "preselection"})
         self.assertEqual(codes["target"].co_firstlineno, 336)
         for name, expected in observer.SOURCE_HASHES.items():
-            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(),
-                             expected)
+            source = (self.historical_root / name).read_bytes()
+            self.assertEqual(hashlib.sha256(source).hexdigest(), expected)
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises((OSError, ValueError)):
                 observer._source_codes(Path(directory))
@@ -338,17 +363,22 @@ class LifecycleObserverTests(unittest.TestCase):
                 with self.assertRaises((OSError, ValueError)):
                     observer.install(target)
             self.assertEqual(list(target.iterdir()), [])
+            with self.assertRaisesRegex(ValueError, "source identity differs"):
+                observer.install(target)
+            self.assertEqual(list(target.iterdir()), [])
             with patch.object(sys, "gettrace", return_value=lambda *_: None):
                 with self.assertRaisesRegex(ValueError, "trace"):
                     observer.install(target)
             (target / observer.EVENTS).write_text("preserved")
-            with self.assertRaises(FileExistsError):
-                observer.install(target)
+            with patch.object(observer, "ROOT", self.historical_root):
+                with self.assertRaises(FileExistsError):
+                    observer.install(target)
             self.assertEqual((target / observer.EVENTS).read_text(), "preserved")
             link = target / "linked"
             link.symlink_to(target, target_is_directory=True)
-            with self.assertRaises(ValueError):
-                observer.install(link)
+            with patch.object(observer, "ROOT", self.historical_root):
+                with self.assertRaises(ValueError):
+                    observer.install(link)
         self.assertIsNone(sys.gettrace())
 
     def test_actual_short_circuit_and_cleanup_preserve_original_exception(self):
@@ -450,7 +480,7 @@ class LifecycleObserverTests(unittest.TestCase):
 
     def test_observation_adds_no_host_mutators(self):
         for failure in (None, "active", "selection"):
-            baseline = Runtime(failure)
+            baseline = Runtime(failure, source_root=self.historical_root)
             with patch.dict(sys.modules, {"FreeCADGui": baseline.gui}):
                 try:
                     baseline.test_authorised_gui_stage()
@@ -476,8 +506,8 @@ class LifecycleObserverTests(unittest.TestCase):
             self.assertEqual(observer.assess(directory)["status"], "INCOMPLETE")
 
     def test_naturally_executed_code_must_equal_the_compiled_fixed_source(self):
-        runtime = Runtime()
-        fixed = observer._source_codes(ROOT)
+        runtime = Runtime(source_root=self.historical_root)
+        fixed = observer._source_codes(self.historical_root)
         for name in ("target", "require", "active", "registry", "selection",
                      "preselection"):
             self.assertEqual(runtime.codes[name], fixed[name])

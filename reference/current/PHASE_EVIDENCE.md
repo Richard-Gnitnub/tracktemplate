@@ -3131,3 +3131,28 @@ Results for the prepared test, input hashes and independent reviews are in `tmp/
 This work gives no acceptance for physical fit, a positive rights claim, production, product performance or phase exit.
 No repair is available from the previous `2/2` limit.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
+
+## Chair preview activation after view setup — 2026-11-01
+
+This Level 2 correction supports `L1-QUALIFICATION-001` and part of Exit 9B-3.
+The [hosted diagnostic](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41304566238) gives a FAIL result at 600 mm.
+The other test document is active when the product checks the new preview document.
+The test does not reach 900 mm. The cause of the previous 900 mm failure stays unresolved.
+Independent review classifies the observed failure as `implementation-defect`. Cleanup gives a PASS result.
+
+The shared preview method makes its new document active again after view setup.
+It keeps all checks of document identity, document membership, `selection` and `preselection`.
+The geometry, component positions and operation without the FreeCAD display stay the same.
+Standalone regression tests give PASS results for activation, rejected state changes and rollback.
+These tests do not supply evidence from the FreeCAD display.
+
+The hosted launcher admits only the reviewed bytes of the corrected product file.
+All other frozen product files, the original GUI test, inputs and resource limits stay the same.
+New `readiness` evidence and independent review are necessary before the original GUI test operates again.
+The `gui_portion` stays `OPEN`.
+
+Evidence and independent reviews are in `tmp/l1-preview-activation/`.
+The project owner authorises repair, review and integration for this task.
+The previous failures and consumed `2/2` allowance stay preserved. This task has a separate repair exception.
+This correction gives no acceptance for physical fit, rights, production, product performance or phase exit.
+[Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.

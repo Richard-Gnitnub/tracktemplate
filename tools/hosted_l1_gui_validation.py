@@ -63,6 +63,21 @@ FROZEN_PATHS = (
     'model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro',
     'tests/hosted_l1_current_source_suite.py', *native.CONTROL_FILES,
 )
+PRODUCT_REPAIR = {
+    'scope_id': 'L1-GUI-PREVIEW-ACTIVATION-001',
+    'base_commit': BASE,
+    'path': 'tracktemplate/adapters/freecad/chair_reference_preview.py',
+    'baseline_sha256': (
+        '3869a12c81d7ed0eca56547dfe66da87283adfa29952b19a7967149652424604'
+    ),
+    'sha256': (
+        '0f15b9765e7787ef94116f378fa66a2fe4ecee13725796a3474a51e30e4123da'
+    ),
+    'failure_run_id': 41304566238,
+    'authority_sha256': (
+        '60a6466e8022793407ad779986ca42920c3e0ee9886016f0a64f33197fef40af'
+    ),
+}
 DIAGNOSTIC_SCOPE = 'L1-GUI-LIFECYCLE-DIAGNOSTIC-001'
 DIAGNOSTIC_BASE = 'e6c9a0e3c3215f010138092e23cec7cd0b04794f'
 DIAGNOSTIC_ENTRY_SHA256 = (
@@ -93,6 +108,49 @@ def diagnostic_enabled(environ):
     value = environ.get('L1_LIFECYCLE_DIAGNOSTIC', 'false')
     require(value in ('true', 'false'), 'Invalid diagnostic dispatch value')
     return value == 'true'
+
+
+def validate_product_requalification(record, environ):
+    """Bind the single activation repair to separate review and ordinary runs."""
+    repair = record.get('product_requalification')
+    if repair is None:
+        return
+    require(not diagnostic_enabled(environ),
+            'Historical diagnostic cannot admit repaired product')
+    expected = dict(PRODUCT_REPAIR, source_commit=record.get('source_commit'),
+                    independent_review='PASS')
+    require(isinstance(repair, dict)
+            and set(repair) == set(expected) | {'review_sha256'}
+            and all(repair.get(key) == value for key, value in expected.items())
+            and isinstance(repair.get('review_sha256'), str)
+            and re.fullmatch(r'[0-9a-f]{64}', repair['review_sha256'])
+            and record.get('gui_entry_sha256') == DIAGNOSTIC_ENTRY_SHA256,
+            'Exact reviewed product requalification absent or differs')
+
+
+def validate_frozen_source(record):
+    """Keep BASE frozen except for the exact independently reviewed repair."""
+    changed = native.command(
+        'git', 'diff', '--name-status', '--no-renames', BASE, '--', *FROZEN_PATHS,
+    ).splitlines()
+    if record.get('product_requalification') is None:
+        require(not changed, 'Frozen product or native entry differs')
+        return
+    name = PRODUCT_REPAIR['path']
+    require(changed == ['M\t' + name],
+            'Product requalification changed other frozen source')
+    path = ROOT / name
+    require(path.is_file() and not path.is_symlink()
+            and not path.stat().st_mode & 0o111
+            and digest(path) == PRODUCT_REPAIR['sha256'],
+            'Exact reviewed product repair bytes differ')
+    baseline = subprocess.run(
+        ['git', 'show', f'{BASE}:{name}'], cwd=ROOT,
+        capture_output=True, check=True, timeout=15,
+    ).stdout
+    require(hashlib.sha256(baseline).hexdigest()
+            == PRODUCT_REPAIR['baseline_sha256'],
+            'Product repair baseline identity differs')
 
 
 def validate_diagnostic(record, environ):
@@ -195,6 +253,7 @@ def validate_readiness(review, control, current_run):
         'tests': 1, 'skips': 0, 'run_attempt': 1,
         'sentinel': READINESS_SENTINEL, 'cleanup': True,
         'evidence_verified': True, 'independent_preservation': True,
+        'product_requalification': control.get('product_requalification'),
     }
     require(all(review.get(key) == value for key, value in expected.items()),
             'Independent GUI readiness does not match reviewed journey')
@@ -217,6 +276,7 @@ def validate_host(environ, memory):
 def validate_authority(record, environ):
     """Require a separate explicit GUI scope; native approval is insufficient."""
     stage = selected_stage(environ)
+    validate_product_requalification(record, environ)
     diagnostic = validate_diagnostic(record, environ)
     expected = {
         'schema': 1, 'stage': stage, 'scope_id': SCOPE, 'source_base_commit': BASE,
@@ -283,8 +343,7 @@ def prepare(work):
             'Reviewed checkout differs')
     require(not native.command('git', 'status', '--porcelain',
                                '--untracked-files=no'), 'Dirty source checkout')
-    require(not native.command('git', 'diff', BASE, '--', *FROZEN_PATHS),
-            'Frozen product or native entry differs')
+    validate_frozen_source(control)
     for name, expected in control['control_files_sha256'].items():
         require(digest(ROOT / name) == expected, 'Reviewed GUI control changed')
     if diagnostic_enabled(os.environ):

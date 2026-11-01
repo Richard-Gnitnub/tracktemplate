@@ -399,6 +399,7 @@ def _materialise_preview(
             view = gui.getDocument(name).activeView()
             view.viewAxonometric()
             view.fitAll()
+            App.setActiveDocument(name)
         _require(_active_document(App) is document
                  and _same_registry(dict(App.listDocuments()), expected)
                  and _selection_snapshot(App, gui) == selection
