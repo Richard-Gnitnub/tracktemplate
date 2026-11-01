@@ -3132,27 +3132,31 @@ This work gives no acceptance for physical fit, a positive rights claim, product
 No repair is available from the previous `2/2` limit.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
 
-## Chair preview activation after view setup — 2026-11-01
+## Chair display correction after `view.fitAll()` — 2026-11-01
 
-This Level 2 correction supports `L1-QUALIFICATION-001` and part of Exit 9B-3.
-The [hosted diagnostic](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41304566238) gives a FAIL result at 600 mm.
-The other test document is active when the product checks the new preview document.
-The test does not reach 900 mm. The cause of the previous 900 mm failure stays unresolved.
-Independent review classifies the observed failure as `implementation-defect`. Cleanup gives a PASS result.
+This Level 2 correction supplies evidence for `L1-QUALIFICATION-001` and part of Exit 9B-3.
+The [diagnostic on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41304566238) gives a FAIL result at 600 mm.
+The other `App.Document` for the test is active when the product examines the new `App.Document` for the chair display.
+The test stops before the 900 mm test. The cause of the previous FAIL result at 900 mm stays unknown.
 
-The shared preview method makes its new document active again after view setup.
-It keeps all checks of document identity, document membership, `selection` and `preselection`.
-The geometry, component positions and operation without the FreeCAD display stay the same.
-Standalone regression tests give PASS results for activation, rejected state changes and rollback.
+Independent review classifies the FAIL result at 600 mm as `implementation-defect`. Cleanup gives a PASS result.
+
+The `_materialise_preview` method that the callers use makes its new `App.Document` active again after `view.fitAll()`.
+It keeps all checks of `App.Document` identity, the `App.listDocuments()` result, `selection` and `preselection`.
+The shapes and positions of the chair components stay the same. Operation without the FreeCAD display also stays the same.
+Regression tests in standalone Python give PASS results for `App.setActiveDocument()`, rejected `selection`, `preselection` and `App.listDocuments()` changes, and `abortTransaction()`.
 These tests do not supply evidence from the FreeCAD display.
 
-The hosted launcher admits only the reviewed bytes of the corrected product file.
-All other frozen product files, the original GUI test, inputs and resource limits stay the same.
-New `readiness` evidence and independent review are necessary before the original GUI test operates again.
+The launcher on GitHub uses only the reviewed bytes of the corrected product file.
+All other frozen product files, the initial test for the FreeCAD display, its inputs and all limits for the test stay the same.
+New `readiness` evidence and independent review are necessary before that test operates again.
 The `gui_portion` stays `OPEN`.
 
 Evidence and independent reviews are in `tmp/l1-preview-activation/`.
-The project owner authorises repair, review and integration for this task.
-The previous failures and consumed `2/2` allowance stay preserved. This task has a separate repair exception.
-This correction gives no acceptance for physical fit, rights, production, product performance or phase exit.
+The project owner authorises repair, review and merge for this task.
+The evidence preserves the previous FAIL results and the use of the full `2/2` repair limit.
+The project owner authorises more repairs for this task.
+
+This correction gives no acceptance for physical fit, production, product performance or phase exit.
+It gives no positive rights claim.
 [Phase 9B](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) stays `Open` at 3/6. LMS work stays stopped.
