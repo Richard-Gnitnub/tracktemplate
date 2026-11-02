@@ -3894,3 +3894,81 @@ Phase 9B stays `Open` at 3/6.
 LMS work stays stopped.
 The previous 2/2 record and documentation limits do not change.
 The prepared tests give no acceptance for physical fit, the rights state, production, a phase exit or Phase 10.
+
+## D-P9-020 S1 publication — 2026-11-02
+
+<a id="to-single-research-publication-panel"></a>
+
+| Owner view | Current information |
+| --- | --- |
+| Current state | D-P9-020 is `Accepted` for the specified files and conditions below. Phase 9B stays `Open` at 3/6. |
+| What changed | The project owner accepts the specified S1 "source accompaniment and research disposition". |
+| What now works | The specified S1 publication has project authority under the recorded conditions. |
+| Limitations/findings | Source classifications stay the same. The project did not do the FreeCAD tests with or without the display. |
+| Owner decision | **Proceed with bounded conditions.** The owner decision below supplies this authority. |
+| Next action | Publish only the specified files with their source and notices. Then complete the existing checks before the tests start on GitHub. |
+
+This decision supplies the publication authority that the previous [TO-001 record](#to-single-qualification-preparation-panel) did not contain.
+That record and its initial `TRANSFER_HOLD` evidence stay the same.
+The [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research) and [provenance record](../PROVENANCE.md#phase-9a-research-input-provenance) keep their authority.
+This decision changes no production rule or source classification.
+
+**Specified files:** The new source set has 21 files and 934827 bytes.
+Its `MANIFEST.json` SHA-256 is `3686206f6e9b77af69fa33b61ce70ada0f992c58b7752f50fbbff4e69bef6369`.
+The S1 model SHA-256 is `a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb`.
+The `to_base_fixture` SHA-256 is `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+The previous decision keeps its other eight input identities, one `readiness` image, six TO display images and specified diagnostic evidence.
+
+**Panel and evidence:** The project owner is the panel chair and gives the decision.
+`/root` gives the information about the change, and `/root/to001_heel_domain` is the Technical Author Lead.
+`/root/to001_heel_quality` supplies the independent rights and source review.
+That reviewer wrote the previous source analysis but did not write the 21-file source set or the owner decision.
+The review gives no independent acceptance of its own previous analysis.
+
+The source review identifies a `GPL-3.0-or-later` route for the specified files, with source and notices.
+It records no remaining condition that stops this bounded disposition.
+After the owner decision, the independent review gives `PASS` for the specified publication scope.
+This result changes `TO-PUB-001` to `RESOLVED_FOR_EXACT_OWNER_APPROVED_RESEARCH_PUBLICATION`.
+The previous review and its verdict stay available.
+
+| Due risk and condition | Owner and deadline |
+| --- | --- |
+| `PR-06`: Source access could stop while the S1 model stays available. Keep all source files and notices available with the model. | Change owner, before publication and while the model stays available. |
+| `PR-07`: A reader could think that project conditions are licence conditions. Preserve "GPL recipient rights". The project's "research" status adds no licence limit. | Change owner and independent rights reviewer, before publication. |
+| `PR-06` and `PR-07`: A reader could think that publication gives production acceptance. Keep the previous package and source classifications. Give no `project-cleared` status. | Change owner and project owner, at publication and each later use. |
+
+The panel keeps the current `Effective (current scope)` assessments, subject to these conditions.
+Both risks stay `Open`.
+The panel records no unresolved dissent.
+This decision gives no third-party permission and is not evidence of such permission.
+All other requirements in [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) stay the same.
+
+**Owner question, exact record:**
+
+> Approve publication of the reviewed S1 source accompaniment and its bounded research disposition? Exact scope: 21 files, 934,827 bytes; manifest SHA-256 3686206f6e9b77af69fa33b61ce70ada0f992c58b7752f50fbbff4e69bef6369. It contains the unchanged S1 neutral package/manifest, selected construction and fixing source, settings and GPL notices. Publish alongside S1 in Richard-Gnitnub/tracktemplate, preserving GPL recipient rights and source access while the model remains available. No other chair models, source archive or raw face dumps. Diagnostic retention stays 30 days. Existing production and phase boundaries remain unchanged. This extends only your previously approved publication scope.
+
+**Owner answer, exact record:**
+
+> Approve exact source accompaniment and research disposition
+
+**Conditions and exclusions:** Publish all source files and notices with the S1 model in `Richard-Gnitnub/tracktemplate`.
+Keep source access available while the model is available.
+The 30-day diagnostic period does not end this source obligation.
+Preserve the initial inputs, evidence with a `FAIL` result and reviews independently.
+Do not publish the source archive, raw face dumps, other chair models or operator documents under this decision.
+
+The previous test scope, resource limits, recovery, cleanup and independent review controls stay the same.
+This decision gives no result from FreeCAD tests or acceptance for physical fit, production, a package, a release or a phase exit.
+LMS work stays stopped.
+The previous 2/2 record and documentation limits do not change.
+
+**Proof/provenance:**
+
+| Record | SHA-256 |
+| --- | --- |
+| `source-accompaniment-owner-approval.json` | `32ca5a3836ff20d569b34082b364846a654663fe63b746d5b412a81e8cb4a331` |
+| `s1-source-accompaniment-independent-review.json` | `112ed92e48f3db7845de6f91e262e29da2939cb52638a7dc1843091bd8183a19` |
+| `to001-input-publication-admission-independent-review.json` | `196e9e5c0924e7101ee4c808bf9c2bb29a5ac9bd2d726d37abb6a5a595935818` |
+
+The initial [decision record](#to-single-qualification-preparation-panel) keeps SHA-256 `6a63891440b9c5ae6e5b814a4795485e50b9ccb321837891cded533c46c09398`.
+The new decision adds publication authority. The initial decision keeps the same identity in the test controls.
