@@ -45,7 +45,7 @@ def witness(path):
 
 
 def collision_witness(path):
-    if path.is_dir() and not path.is_symlink():
+    if not path.is_symlink() and path.is_dir():
         return witness(path)
     return path.lstat()
 
@@ -217,6 +217,19 @@ class AtomicFilesProof(unittest.TestCase):
                     adapter.open(plan, self.parent)
                 self.assertEqual(adapter.cleanup(), [])
                 self.assertEqual(list(self.parent.glob(".*")), [])
+
+    def test_collision_witness_preserves_symlink_metadata(self):
+        target = self.parent / "observed_symlink"
+        self.make_collision(target, "symlink")
+        # A following lookup would update this deliberately old access time.
+        os.utime(target, ns=(1, 2), follow_symlinks=False)
+        before = target.lstat()
+        for _ in range(2):
+            self.assertEqual(collision_witness(target), before)
+            after = target.lstat()
+            self.assertEqual(after, before)
+            for field in ("st_atime_ns", "st_mtime_ns", "st_ctime_ns"):
+                self.assertEqual(getattr(after, field), getattr(before, field))
 
     def test_open_rejects_existing_destination(self):
         for kind in ("empty", "nonempty", "file", "symlink"):
