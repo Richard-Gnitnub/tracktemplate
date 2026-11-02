@@ -3657,65 +3657,89 @@ LMS work stays stopped.
 
 ## REA B/C source selection and display — 2026-11-02
 
-This Level 2 result advances [D-P9-019](#rea-bc-scope-panel).
-The selected source record adds `E1` and `E2` to each road.
-Its identity is `templot-556b-00-D0GAF-32mm-full-exit`.
-The 32 mm length comes from Templot 556b `gauge_unit.pas`, lines 1197–1207,
+This Level 2 result supplies evidence for [D-P9-019](#rea-bc-scope-panel).
+The selected source data adds `E1` and `E2` to each turnout.
+The source identity is `templot-556b-00-D0GAF-32mm-full-exit`.
+
+The source of the 32 mm length is Templot 556b `gauge_unit.pas`, lines 1197–1207,
 and `math_unit.pas`, line 2079.
 The positions use `plain_track_unit.pas`, lines 602–633, and
 `math_unit.pas`, lines 23009–23045 and 23595–23616.
-The body ends use `math_unit.pas`, lines 31949–32113.
-The existing turnout and crossover tools supply the placement.
-The change preserves existing rails, timbers, connectors and host limits.
-Without this selection, the stored data stays in `schema = 1`.
-The selection uses `schema = 2`; inputs with an unknown source record are rejected.
+The end positions of `E1` and `E2` use `math_unit.pas`, lines 31949–32113.
+The turnout and crossover tools supply these positions.
 
-The [source tests](../../tests/validate_rea_exit_sleepers.py) cover 88 inputs,
-176 exit bodies and 24 mapped turnout conditions.
-They also examine crossover placement and input rejection.
+The change preserves the previous `rails`, `timbers` and `connector` data.
+The limits for the connected alignments do not change.
+Without this selection, the tool keeps the data in `schema = 1`.
+The selection uses `schema = 2`.
+The tool rejects inputs with unknown source identities.
+
+The [source tests](../../tests/validate_rea_exit_sleepers.py) examine 88 inputs
+and 176 shapes for `E1` and `E2`.
+They also examine `local_points` and `points` in 24 turnout conditions.
+They examine crossover positions and inputs that the tools must reject.
+
 The [FreeCAD test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41406647000)
 at `e39c0ca9565644e75ea252d5fbbd2046cdf21a28` gives PASS.
-Both tests and all 23 counters pass, with no skips or remaining documents.
-The later display correction preserves the calculations and this native evidence.
+The two tests give PASS, and all 23 values in `checks` are correct.
+The result gives `skips = 0` and `documents_remaining = 0`.
+The display correction after this test preserves the calculated data and this FreeCAD evidence.
 
-The [display readiness test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41420670595)
+The [`readiness` display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41420670595)
 and [full display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41422292390)
 give PASS at `dd6c9362457d509dc584ed8690dbb1db66736ac9`.
-The full test completes one test and all 19 counters, with no errors,
-failures or skips. It makes eight geometry results and 13 `PNG` files.
+The full test gives `tests = 1`, `errors = 0`, `failures = 0` and `skips = 0`.
+All 19 values in `checks` are correct.
+The test gives `geometry_builds = 8` and 13 `PNG` files.
 It changes a B8 turnout to C9.25 and back to B8.
-It also creates a B8 crossover with the source record selected.
-The checks include two viewport picks, two rejected inputs, labels, Undo/Redo,
-save/reopen, explicit rebuild and recovery after a rejected edit.
-Independent review examines the original results, all images and process cleanup.
-No test document or owned process remains.
-The crossover image shows the complete alignment. Its small end details
-need the native comparisons and scene checks for detailed evidence.
+It also makes a B8 crossover with the source data selected.
 
-The full display test takes 63.457 seconds.
-The sampled FreeCAD memory peak is 875.18 MiB.
-The memory measurement is a sampled lower bound.
-These results do not give performance acceptance.
-The tests retain the 4 GiB FreeCAD limit, zero swap and 8 GiB host reserve.
-The full display test retains the 900-second FreeCAD limit and the separate
-256 MiB, 1000-second display limits.
-The owner permits these synthetic images on GitHub for 30 days.
-Independent storage preserves the original results and reviews.
-Source archives, private packages, operator documents and geometry exports
-are not part of the public evidence.
+The checks include `actual_viewport_picks = 2`, two rejected inputs, `Label`, `Undo` and `Redo`.
+They also examine persistence, `Rebuild display` and the previous display after a rejected change.
+Independent review examines the initial results, all `PNG` files and process cleanup.
+The result gives `documents_remaining = 0`.
+No test process stays active.
 
-The project preserves the failed runs `41408832010` and `41417125168`.
-The first run has incomplete diagnostics; its original GUI exception stays unknown.
-The reviewed corrections preserve diagnostic output, defer display activation
-to FreeCAD and keep host visibility separate from geometry invalidation.
-Cleanup also handles native ViewProviders without `Proxy`.
-All original GUI assertions and the historical 2/2 record stay unchanged.
+The crossover display shows the full alignment.
+Its ends are small in the display.
+Their small dimensions are a limit on the evidence from the display.
+The FreeCAD tests and checks of the display data supply the other evidence.
 
-This evidence supplies the specified display results absent from the
-[earlier record](#rea-bc-stored-lifecycle). That frozen record does not change.
-All 32 B/C combinations retain `Pending` status for complete qualification.
-Unsupported source regions, chair coverage and corrected TO-001 tests remain open.
-The change preserves C10 and the fixed TO-001/XO-001 evidence.
-Phase 9B stays `Open` at 3/6. LMS work stays stopped.
-No physical-fit, tolerance, rights, production, phase-exit or Phase 10 acceptance
-is given.
+The time for the full display test is 63.457 seconds.
+The maximum FreeCAD memory in the samples is 875.18 MiB.
+The memory between samples can be higher.
+These results give no acceptance for product performance.
+
+The tests keep the 4 GiB FreeCAD memory limit and `memory.swap.max = 0`.
+Before the test process starts, the available memory must be a minimum of 8 GiB.
+The full display test keeps the 900-second FreeCAD limit.
+It also keeps the different 256 MiB and 1000-second limits for the display.
+
+The project owner authorises publication of these `PNG` files from test inputs on GitHub for 30 days.
+Independent preservation keeps the initial results and reviews.
+The evidence on GitHub does not include the owner decision items
+"source archives", "private catalogues", "operator documents" and "geometry exports".
+The evidence also contains no package inputs.
+
+TrackTemplate preserves the FAIL results from `41408832010` and `41417125168`.
+The first test does not have full diagnostics.
+The initial error from its display test stays unknown.
+
+The reviewed corrections preserve diagnostic output.
+The `ViewProvider` does not set `DisplayMode` before FreeCAD supplies its values.
+A change only to `Visibility` on a connected alignment does not remove display data.
+Cleanup also uses `closeDocument` when a `ViewProvider` has no `Proxy`.
+The display test keeps all its initial checks.
+The frozen 2/2 canonical record does not change.
+
+This evidence supplies the specified display results missing from the
+[earlier evidence](#rea-bc-stored-lifecycle).
+That frozen evidence does not change.
+All 32 B/C inputs keep status `Pending` for full validation.
+Validation evidence is also necessary for other source inputs, chairs and the corrected TO-001 tests.
+The change preserves C10 and the previous TO-001/XO-001 evidence.
+
+Phase 9B stays `Open` at 3/6.
+LMS work stays stopped.
+The rights state does not change.
+These results give no acceptance for physical fit, numerical tolerances, production, a phase exit or Phase 10.
