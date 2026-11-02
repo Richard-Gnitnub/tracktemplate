@@ -3652,3 +3652,70 @@ Evidence for chair validation and physical fit is also necessary.
 Phase 9B stays `Open` at 3/6. This change gives no acceptance for production,
 product performance, a phase exit or Phase 10. The rights state does not change.
 LMS work stays stopped.
+
+<a id="rea-bc-exit-display"></a>
+
+## REA B/C source selection and display — 2026-11-02
+
+This Level 2 result advances [D-P9-019](#rea-bc-scope-panel).
+The selected source record adds `E1` and `E2` to each road.
+Its identity is `templot-556b-00-D0GAF-32mm-full-exit`.
+The 32 mm length comes from Templot 556b `gauge_unit.pas`, lines 1197–1207,
+and `math_unit.pas`, line 2079.
+The positions use `plain_track_unit.pas`, lines 602–633, and
+`math_unit.pas`, lines 23009–23045 and 23595–23616.
+The body ends use `math_unit.pas`, lines 31949–32113.
+The existing turnout and crossover tools supply the placement.
+The change preserves existing rails, timbers, connectors and host limits.
+Without this selection, the stored data stays in `schema = 1`.
+The selection uses `schema = 2`; inputs with an unknown source record are rejected.
+
+The [source tests](../../tests/validate_rea_exit_sleepers.py) cover 88 inputs,
+176 exit bodies and 24 mapped turnout conditions.
+They also examine crossover placement and input rejection.
+The [FreeCAD test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41406647000)
+at `e39c0ca9565644e75ea252d5fbbd2046cdf21a28` gives PASS.
+Both tests and all 23 counters pass, with no skips or remaining documents.
+The later display correction preserves the calculations and this native evidence.
+
+The [display readiness test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41420670595)
+and [full display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41422292390)
+give PASS at `dd6c9362457d509dc584ed8690dbb1db66736ac9`.
+The full test completes one test and all 19 counters, with no errors,
+failures or skips. It makes eight geometry results and 13 `PNG` files.
+It changes a B8 turnout to C9.25 and back to B8.
+It also creates a B8 crossover with the source record selected.
+The checks include two viewport picks, two rejected inputs, labels, Undo/Redo,
+save/reopen, explicit rebuild and recovery after a rejected edit.
+Independent review examines the original results, all images and process cleanup.
+No test document or owned process remains.
+The crossover image shows the complete alignment. Its small end details
+need the native comparisons and scene checks for detailed evidence.
+
+The full display test takes 63.457 seconds.
+The sampled FreeCAD memory peak is 875.18 MiB.
+The memory measurement is a sampled lower bound.
+These results do not give performance acceptance.
+The tests retain the 4 GiB FreeCAD limit, zero swap and 8 GiB host reserve.
+The full display test retains the 900-second FreeCAD limit and the separate
+256 MiB, 1000-second display limits.
+The owner permits these synthetic images on GitHub for 30 days.
+Independent storage preserves the original results and reviews.
+Source archives, private packages, operator documents and geometry exports
+are not part of the public evidence.
+
+The project preserves the failed runs `41408832010` and `41417125168`.
+The first run has incomplete diagnostics; its original GUI exception stays unknown.
+The reviewed corrections preserve diagnostic output, defer display activation
+to FreeCAD and keep host visibility separate from geometry invalidation.
+Cleanup also handles native ViewProviders without `Proxy`.
+All original GUI assertions and the historical 2/2 record stay unchanged.
+
+This evidence supplies the specified display results absent from the
+[earlier record](#rea-bc-stored-lifecycle). That frozen record does not change.
+All 32 B/C combinations retain `Pending` status for complete qualification.
+Unsupported source regions, chair coverage and corrected TO-001 tests remain open.
+The change preserves C10 and the fixed TO-001/XO-001 evidence.
+Phase 9B stays `Open` at 3/6. LMS work stays stopped.
+No physical-fit, tolerance, rights, production, phase-exit or Phase 10 acceptance
+is given.
