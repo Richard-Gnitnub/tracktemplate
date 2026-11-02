@@ -3,6 +3,14 @@ name: L1 validation
 on:
   workflow_dispatch:
     inputs:
+      workload:
+        description: Reviewed fixed workload
+        required: true
+        type: choice
+        default: l1
+        options:
+          - l1
+          - to-single
       stage:
         description: Independently admitted stage
         required: true
@@ -29,6 +37,7 @@ jobs:
     timeout-minutes: 140
     env:
       L1_STAGE: ${{ inputs.stage }}
+      TRACKTEMPLATE_NATIVE_WORKLOAD: ${{ inputs.workload || 'l1' }}
     steps:
       - name: Record the bounded job start
         shell: bash
@@ -41,6 +50,7 @@ jobs:
           persist-credentials: false
 
       - name: Check out the separately reviewed candidate
+        if: inputs.workload != 'to-single'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: 155cbb0353ca59a144df697197d8a4a68a91beef

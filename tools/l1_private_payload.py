@@ -95,9 +95,18 @@ def file_identity(path):
     return {"sha256": digest.hexdigest(), "bytes": size}
 
 
-def member_name(group, identity):
+def input_ids(profile="l1"):
+    """Select one fixed input set; never accept a manifest-owned allowlist."""
+    if profile == "l1":
+        return INPUT_IDS
+    if profile == "to-single":
+        return (*INPUT_IDS[:8], "s1_model", "to_base_fixture")
+    raise PayloadError("unknown input profile")
+
+
+def member_name(group, identity, *, profile="l1"):
     """Map a reviewed identity to its one archive member name."""
-    if group == "inputs" and identity in INPUT_IDS:
+    if group == "inputs" and identity in input_ids(profile):
         return "inputs/" + identity
     if group == "controls" and identity in (
             *REQUIRED_CONTROLS, *OPTIONAL_CONTROLS):
@@ -105,7 +114,7 @@ def member_name(group, identity):
     raise PayloadError("unknown payload identity")
 
 
-def validate_manifest(manifest):
+def validate_manifest(manifest, *, profile="l1"):
     """Validate the exact ten-file and bounded control-record allowlist."""
     _require(isinstance(manifest, dict)
              and set(manifest) == {"schema", "inputs", "controls"},
@@ -122,7 +131,7 @@ def validate_manifest(manifest):
                 "id", "member", "path", "sha256", "bytes",
             }, "manifest record fields differ")
             identity = record["id"]
-            _require(record["member"] == member_name(group, identity),
+            _require(record["member"] == member_name(group, identity, profile=profile),
                      "member identity differs")
             _require(isinstance(record["path"], str)
                      and Path(record["path"]).is_absolute(),
@@ -140,7 +149,7 @@ def validate_manifest(manifest):
         _require(len(set(identities)) == len(identities),
                  "duplicate payload identity")
         if group == "inputs":
-            _require(set(identities) == set(INPUT_IDS),
+            _require(set(identities) == set(input_ids(profile)),
                      "input identities differ")
         else:
             _require(set(REQUIRED_CONTROLS) <= set(identities)
@@ -165,9 +174,9 @@ def _add_bytes(archive, name, content):
     archive.addfile(member, io.BytesIO(content))
 
 
-def create_archive(manifest, output):
+def create_archive(manifest, output, *, profile="l1"):
     """Package only hash-bound regular inputs and controls, without overwrite."""
-    records = validate_manifest(manifest)
+    records = validate_manifest(manifest, profile=profile)
     contents = []
     for record in records:
         path = _regular(record["path"])
@@ -209,7 +218,7 @@ def _archive_records(archive_path):
         raise
 
 
-def read_manifest(archive_path):
+def read_manifest(archive_path, *, profile="l1"):
     """Read the bounded manifest from a byte-verified input archive."""
     archive, members = _archive_records(archive_path)
     with archive:
@@ -219,13 +228,13 @@ def read_manifest(archive_path):
         _require(0 < member.size <= MAX_MANIFEST_BYTES, "manifest too large")
         with archive.extractfile(member) as stream:
             manifest = json.loads(stream.read())
-        validate_manifest(manifest)
+        validate_manifest(manifest, profile=profile)
         return manifest
 
 
-def extract_archive(archive_path, manifest, destination_root):
+def extract_archive(archive_path, manifest, destination_root, *, profile="l1"):
     """Verify every member before copying into a fresh mode-0700 root."""
-    records = validate_manifest(manifest)
+    records = validate_manifest(manifest, profile=profile)
     expected = {record["member"]: record for record in records}
     archive, members = _archive_records(archive_path)
     contents = {}
@@ -406,13 +415,19 @@ def empty_public_summary(source_commit, workflow_commit, run_id, run_attempt,
     return validate_public_summary(value)
 
 
-def validate_public_summary(value):
+def validate_public_summary(value, *, profile="l1"):
     """Refuse any unapproved field, string, non-finite number or false PASS."""
-    _require(isinstance(value, dict) and set(value) == {
+    input_ids(profile)
+    fields = {
         "schema", "source_commit", "workflow_commit", "run_id", "run_attempt",
         "stage", "outcome", "counts", "flags", "timings_seconds", "resources",
         "evidence",
-    }, "public summary fields differ")
+    }
+    if profile == "to-single":
+        fields.add("workload")
+        _require(value.get("workload") == profile, "public workload differs")
+    _require(isinstance(value, dict) and set(value) == fields,
+             "public summary fields differ")
     _require(type(value["schema"]) is int and value["schema"] == 1,
              "public summary schema differs")
     for name in ("source_commit", "workflow_commit"):
@@ -450,9 +465,9 @@ def validate_public_summary(value):
     if value["outcome"] == "PASS":
         counts = value["counts"]
         frames, components = ((0, 0) if value["stage"] == "readiness"
-                              else (150, 138))
+                              else (59, 270) if profile == "to-single" else (150, 138))
         successful, rolled_back = ((0, 0) if value["stage"] == "readiness"
-                                   else (690, 230))
+                                   else (270, 270) if profile == "to-single" else (690, 230))
         _require(all(value["flags"].values()) and counts["skips"] == 0
                  and counts["expected_tests"] == counts["observed_tests"] == 1
                  and counts["expected_frames"] == counts["observed_frames"] == frames

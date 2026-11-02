@@ -10,6 +10,7 @@ on:
         default: l1
         options:
           - l1
+          - to-single
           - rea-bc
           - rea-bc-straight
       stage:
@@ -35,7 +36,7 @@ concurrency:
 jobs:
   l1-gui:
     if: >-
-      inputs.workload == 'l1' &&
+      (inputs.workload == 'l1' || inputs.workload == 'to-single') &&
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
       github.event.repository.private == false &&
       github.ref == 'refs/heads/main' && github.run_attempt == 1
@@ -43,6 +44,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 140
     env:
+      TRACKTEMPLATE_GUI_WORKLOAD: ${{ inputs.workload }}
       L1_GUI_STAGE: ${{ inputs.stage }}
       L1_LIFECYCLE_DIAGNOSTIC: ${{ inputs.lifecycle_diagnostic && 'true' || 'false' }}
     steps:
@@ -62,6 +64,7 @@ jobs:
         timeout-minutes: 2
         env:
           L1_GUI_CONTROL: ${{ vars.L1_GUI_CONTROL }}
+          TO_SINGLE_GUI_CONTROL: ${{ vars.TO_SINGLE_GUI_CONTROL }}
         shell: bash
         run: |
           set +x

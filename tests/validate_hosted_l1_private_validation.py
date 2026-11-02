@@ -668,5 +668,854 @@ class L1PrivateControls(unittest.TestCase):
 
 
 
+
+class ToSingleControls(unittest.TestCase):
+    def config(self):
+        return {
+            "schema_version": 1,
+            "scope_id": pilot.TO_SCOPE,
+            "source_commit": "a" * 40,
+            "entry_sha256": pilot.TO_ENTRY_SHA256,
+            "handling_decision": "approved-exact-inputs",
+            "inputs": [
+                {
+                    "id": name,
+                    "path": "/home/richard/" + name,
+                    "sha256": value,
+                    "bytes": pilot.TO_INPUT_BYTES[name],
+                }
+                for name, value in pilot.TO_INPUT_HASHES.items()
+            ],
+        }
+
+    def control(self):
+        config = self.config()
+        return {
+            key: config[key]
+            for key in (
+                "scope_id",
+                "source_commit",
+                "entry_sha256",
+                "handling_decision",
+            )
+        } | {
+            "input_hashes": dict(pilot.TO_INPUT_HASHES),
+            "input_archive": {
+                "asset_id": 42,
+                "bytes": 10240,
+                "sha256": "c" * 64,
+            },
+            "publication_review": {
+                "status": "PASS",
+                "independent_review": "PASS",
+                "input_hashes": dict(pilot.TO_INPUT_HASHES),
+                "handling_decision": config["handling_decision"],
+                "evidence_sha256": "b" * 64,
+                "publication_basis": "Exact reviewed fixture basis",
+            },
+        }
+
+    def receipt(self, stage):
+        result = {
+            "status": "PASS",
+            "stage": stage,
+            "scope_id": pilot.TO_SCOPE,
+            "test_id": pilot.TO_SELECTORS[stage],
+            "source_commit": "a" * 40,
+            "fixture_sha256": pilot.TO_FIXTURE_SHA256,
+            "physical_fit": "NOT_PROVED",
+            "checks": pilot.to_expected_checks(stage),
+            "input_sha256": dict(pilot.TO_INPUT_HASHES),
+            "stage_timings": dict.fromkeys(
+                ("readiness_seconds", "cleanup_seconds", "total_seconds")
+                + (("native_seconds",) if stage == "native" else ()),
+                1.0,
+            ),
+            "input_bindings_unchanged": True,
+            "remaining_documents": 0,
+            "owned_documents_closed": True,
+            "sentinel": pilot.TO_SENTINELS[stage],
+        }
+        if stage == "native":
+            fixture = json.loads(
+                (
+                    ROOT / "tests/fixtures/phase9b-to-single-rail-frames.json"
+                ).read_text()
+            )
+            records = []
+            for family, bodies, fixings in (("L1", 7, 16), ("S1", 5, 12)):
+                names = [f"Part_{i:02d}" for i in range(bodies)]
+                names += ["SourceFixing"] + [
+                    f"SourceFixing{i:03d}" for i in range(1, fixings)
+                ]
+                for name in names:
+                    for row in fixture["positions"]:
+                        if row["family"] == family:
+                            records.append(
+                                dict(
+                                    position_id=row["position_id"],
+                                    component=name,
+                                    counts=[1, 1, 6, 6, 12, 8],
+                                    vertex_residual_mm=0.0,
+                                )
+                            )
+            result.update(
+                component_comparisons=records,
+                preview_disposal_preserves_source_and_foreign=True,
+            )
+        return result
+
+    def test_profile_pins_equal_frozen_entry_and_ten_distinct_inputs(self):
+        entry = runpy.run_path(
+            str(ROOT / "tests/freecad_validate_to_single_rail.py")
+        )
+        self.assertEqual(pilot.TO_INPUT_HASHES, entry["INPUT_HASHES"])
+        self.assertEqual(
+            pilot.TO_ENTRY_SHA256, pilot.digest(ROOT / pilot.TO_ENTRY)
+        )
+        self.assertEqual(sum(pilot.TO_INPUT_BYTES.values()), 2425834)
+        self.assertEqual(
+            set(pilot.payload.input_ids("to-single")),
+            set(pilot.TO_INPUT_HASHES),
+        )
+        self.assertNotIn("reference_document", pilot.TO_INPUT_HASHES)
+        self.assertNotIn("expected_frames", pilot.TO_INPUT_HASHES)
+        for stage in ("readiness", "native"):
+            self.assertEqual(
+                pilot.to_expected_checks(stage),
+                entry["expected_checks"](stage),
+            )
+
+    def test_native_comparison_evidence_requires_all270_exact_identities(self):
+        good = self.receipt("native")
+        pilot.validate_to_receipt("native", good, self.config())
+        for edit in (
+            lambda r: r.pop("component_comparisons"),
+            lambda r: r["component_comparisons"].pop(),
+            lambda r: r["component_comparisons"].__setitem__(
+                -1, r["component_comparisons"][0]
+            ),
+            lambda r: r["component_comparisons"][0].update(
+                component="foreign"
+            ),
+            lambda r: r["component_comparisons"][0].update(
+                vertex_residual_mm=1e-6
+            ),
+            lambda r: r["component_comparisons"][0].update(counts=[True] * 6),
+            lambda r: r.update(
+                preview_disposal_preserves_source_and_foreign=False
+            ),
+        ):
+            bad = copy.deepcopy(good)
+            edit(bad)
+            with self.assertRaises(ValueError):
+                pilot.validate_to_receipt("native", bad, self.config())
+
+    def test_to_environment_passes_identity_without_credentials(self):
+        env = {
+            "GITHUB_SHA": "a" * 40,
+            "GITHUB_RUN_ATTEMPT": "1",
+            "RUNNER_ENVIRONMENT": "github-hosted",
+            "GITHUB_ACTIONS": "true",
+            "GITHUB_RUN_ID": "42",
+            "GITHUB_TOKEN": "secret",
+            "PYTHONPATH": "untrusted",
+        }
+        result = pilot.child_environment(
+            env, Path("/tmp/config"), "b" * 64, workload="to-single"
+        )
+        for key in ("GITHUB_SHA", "GITHUB_RUN_ATTEMPT", "RUNNER_ENVIRONMENT"):
+            self.assertEqual(result[key], env[key])
+        self.assertEqual(
+            result["TRACKTEMPLATE_TO_RUN_CONFIG_SHA256"], "b" * 64
+        )
+        self.assertNotIn("TRACKTEMPLATE_L1_RUN_CONFIG", result)
+        self.assertNotIn("GITHUB_TOKEN", result)
+        self.assertNotIn("PYTHONPATH", result)
+
+    def test_explicit_workload_and_workflow_default_preserve_main_and_pins(
+        self,
+    ):
+        self.assertEqual(pilot.selected_workload({}), "l1")
+        self.assertEqual(
+            pilot.selected_workload(
+                {"TRACKTEMPLATE_NATIVE_WORKLOAD": "to-single"}
+            ),
+            "to-single",
+        )
+        with self.assertRaises(ValueError):
+            pilot.selected_workload(
+                {"TRACKTEMPLATE_NATIVE_WORKLOAD": "arbitrary"}
+            )
+        workflow = (
+            ROOT / ".github/workflows/l1-private-validation.yml"
+        ).read_text()
+        self.assertIn("default: l1", workflow)
+        self.assertIn("          - to-single", workflow)
+        self.assertIn("github.ref == 'refs/heads/main'", workflow)
+        self.assertIn(
+            "ref: 155cbb0353ca59a144df697197d8a4a68a91beef", workflow
+        )
+        self.assertIn("if: inputs.workload != 'to-single'", workflow)
+        self.assertNotIn("inputs.ref", workflow)
+        self.assertIn("TRACKTEMPLATE_NATIVE_WORKLOAD:", workflow)
+
+    def test_exact_to_receipt_counts_types_source_and_failure_fields(self):
+        for stage in ("readiness", "native"):
+            good = self.receipt(stage)
+            pilot.validate_to_receipt(stage, good, self.config())
+            for key in good["checks"]:
+                for value in (good["checks"][key] + 1, True):
+                    bad = copy.deepcopy(good)
+                    bad["checks"][key] = value
+                    with self.subTest(stage=stage, key=key, value=value):
+                        with self.assertRaises(ValueError):
+                            pilot.validate_to_receipt(
+                                stage, bad, self.config()
+                            )
+            for edit in (
+                lambda r: r.update(source_commit="0" * 40),
+                lambda r: r.update(test_id=pilot.SELECTORS[stage]),
+                lambda r: r.update(fixture_sha256="0" * 64),
+                lambda r: r.update(sentinel=pilot.SENTINELS[stage]),
+                lambda r: r.update(remaining_documents=True),
+                lambda r: r.update(traceback="failure"),
+                lambda r: r["stage_timings"].update(
+                    total_seconds=float("nan")
+                ),
+                lambda r: r["stage_timings"].update(total_seconds=10**1000),
+            ):
+                bad = copy.deepcopy(good)
+                edit(bad)
+                with self.assertRaises(ValueError):
+                    pilot.validate_to_receipt(stage, bad, self.config())
+
+    def test_runtime_accepts_only_selected_to_unittest_frame(self):
+        report = json.dumps(
+            {
+                "status": "modular-foundation-ready",
+                "matched_profile_id": original.EXPECTED_PROFILE,
+                "document_mutation": False,
+                "workflow_launched": False,
+            }
+        )
+        selector = pilot.TO_SELECTORS["native"]
+        stdout = (
+            f"{selector.rsplit('.', 1)[1]} ({selector}) ... "
+            "TRACKTEMPLATE_B16_FOUNDATION=" + report
+        )
+        pilot.qualified_runtime(stdout, workload="to-single")
+        with self.assertRaises(ValueError):
+            pilot.qualified_runtime(stdout)
+        with self.assertRaises(ValueError):
+            pilot.qualified_runtime(
+                stdout + "\n" + stdout, workload="to-single"
+            )
+
+    def test_publication_review_refuses_before_download(self):
+        good = self.control()
+        pilot.validate_to_acquisition(good)
+        for edit in (
+            lambda c: c.pop("publication_review"),
+            lambda c: c["publication_review"].update(status="PENDING"),
+            lambda c: c["publication_review"].update(
+                independent_review="PENDING"
+            ),
+            lambda c: c["publication_review"].update(input_hashes={}),
+            lambda c: c["publication_review"].update(
+                handling_decision="other"
+            ),
+            lambda c: c["publication_review"].update(evidence_sha256="0" * 64),
+            lambda c: c["publication_review"].update(publication_basis=""),
+            lambda c: c.update(input_hashes={}),
+            lambda c: c.update(source_commit="bad"),
+        ):
+            bad = copy.deepcopy(good)
+            edit(bad)
+            with tempfile.TemporaryDirectory() as temporary:
+                with patch.object(pilot, "download_asset") as download:
+                    with self.assertRaises(ValueError):
+                        pilot.acquire_to(
+                            "readiness", Path(temporary), control=bad
+                        )
+                    download.assert_not_called()
+
+    def test_input_profile_rejects_changed_bytes_paths_and_duplicate_ids(self):
+        config = self.config()
+        manifest = {"inputs": copy.deepcopy(config["inputs"])}
+        pilot.validate_to_inputs(config, manifest)
+        for edit in (
+            lambda c: c["inputs"][-1].update(bytes=True),
+            lambda c: c["inputs"][-1].update(bytes=1),
+            lambda c: c["inputs"][-1].update(sha256="0" * 64),
+            lambda c: c["inputs"][-1].update(id=c["inputs"][0]["id"]),
+            lambda c: c["inputs"][-1].update(path=c["inputs"][0]["path"]),
+        ):
+            bad = copy.deepcopy(config)
+            edit(bad)
+            with self.assertRaises(ValueError):
+                pilot.validate_to_inputs(bad, manifest)
+
+    def test_to_public_summary_has_explicit_profile_and_exact_counts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / "evidence").mkdir()
+            pilot.write(
+                work / "evidence/assessment.json",
+                {
+                    "status": "PASS",
+                    "completed_native_tests": 1,
+                    "skips": 0,
+                    "native_receipt": self.receipt("native"),
+                },
+            )
+            pilot.write(
+                work / "evidence/finalization.json",
+                {
+                    "cleanup": True,
+                    "working_copies_absent": True,
+                    "staging_inputs_removed": list(pilot.TO_INPUT_HASHES),
+                },
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "GITHUB_SHA": "a" * 40,
+                    "GITHUB_RUN_ID": "42",
+                    "TRACKTEMPLATE_NATIVE_WORKLOAD": "to-single",
+                },
+            ):
+                summary = pilot.public_summary(
+                    "native",
+                    work,
+                    {"sha256": "b" * 64, "bytes": 100, "asset_id": 1},
+                    True,
+                )
+            self.assertEqual(summary["workload"], "to-single")
+            self.assertEqual(summary["source_commit"], "a" * 40)
+            self.assertEqual(summary["outcome"], "PASS")
+            self.assertEqual(summary["counts"]["observed_frames"], 59)
+            self.assertEqual(summary["counts"]["observed_components"], 270)
+            bad = copy.deepcopy(summary)
+            bad["counts"]["observed_components"] = 138
+            with self.assertRaises(ValueError):
+                pilot.payload.validate_public_summary(bad, profile="to-single")
+
+    def test_to_archive_preserves_failed_diagnostics_excludes_profile_and_documents(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            guard_dir = work / "evidence/guard"
+            guard_dir.mkdir(parents=True)
+            _, profile = pilot.guard._private_profile(
+                ["flatpak", pilot.guard.APP_ID], guard_dir
+            )
+            pilot.write(
+                guard_dir / "result.json",
+                {"private_profile": profile, "status": "FAIL"},
+            )
+            (guard_dir / "profile/user.cfg").write_text("private settings")
+            (guard_dir / "wrapper.stdout").write_text(
+                "failed wrapper diagnostic"
+            )
+            (work / "evidence/execution.log").write_text("original failure")
+            (work / "test-data").mkdir()
+            (work / "test-data/TO-001-copy.FCStd").write_bytes(b"not public")
+            with patch.dict(
+                os.environ, {"TRACKTEMPLATE_NATIVE_WORKLOAD": "to-single"}
+            ):
+                pilot.evidence_archive(work, work / "evidence.tar")
+                pilot.evidence_archive(work, work / "publication.tar")
+                with tarfile.open(work / "evidence.tar") as archive:
+                    names = archive.getnames()
+                    self.assertIn("evidence/guard/wrapper.stdout", names)
+                    self.assertIn("evidence/execution.log", names)
+                    self.assertFalse(
+                        any(
+                            "profile/" in n or n.endswith(".FCStd")
+                            for n in names
+                        )
+                    )
+                (work / "evidence/unexpected.FCStd").write_bytes(
+                    b"changed document"
+                )
+                with self.assertRaises(ValueError):
+                    pilot.evidence_archive(work, work / "bad.tar")
+
+    def test_to_cleanup_refuses_unknown_or_linked_working_copies_before_deletion(
+        self,
+    ):
+        for name, linked in (
+            ("unknown.FCStd", False),
+            ("L1-copy.FCStd", True),
+        ):
+            with (
+                self.subTest(name=name),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                work = Path(temporary)
+                (work / "evidence").mkdir()
+                (work / "test-data").mkdir(mode=0o700)
+                pilot.write(
+                    work / "evidence/process-finalization.json",
+                    {"cleanup": True, "errors": [], "seconds": 0},
+                )
+                archive = work / "evidence.tar"
+                archive.write_bytes(b"evidence")
+                target = work / "test-data" / name
+                if linked:
+                    target.symlink_to(archive)
+                else:
+                    target.write_bytes(b"unknown")
+                preserved = {
+                    "asset_id": 1,
+                    "sha256": pilot.digest(archive),
+                    "bytes": archive.stat().st_size,
+                }
+                result = pilot.cleanup_to_staging(work, preserved)
+                self.assertFalse(result["cleanup"])
+                self.assertTrue(target.exists())
+                self.assertEqual(archive.read_bytes(), b"evidence")
+
+    def test_readiness_review_is_separate_exact_source_and_exact_profile(self):
+        config = self.config()
+        control = self.control() | {
+            "workflow_commit": "a" * 40,
+            "control_files_sha256": dict.fromkeys(
+                pilot.TO_CONTROL_FILES, "b" * 64
+            ),
+        }
+        good = dict(
+            status="PASS",
+            independent_review="PASS",
+            source_commit="a" * 40,
+            entry_sha256=pilot.TO_ENTRY_SHA256,
+            scope_id=pilot.TO_SCOPE,
+            workload="to-single",
+            handling_decision=config["handling_decision"],
+            workflow_commit="a" * 40,
+            control_files_sha256=control["control_files_sha256"],
+            run_attempt=1,
+            tests=1,
+            skips=0,
+            failures=0,
+            errors=0,
+            sentinel=pilot.TO_SENTINELS["readiness"],
+            cleanup=True,
+            evidence_verified=True,
+            independent_preservation=True,
+            input_hashes=dict(pilot.TO_INPUT_HASHES),
+            checks=pilot.to_expected_checks("readiness"),
+            run_id=41,
+            evidence_sha256="c" * 64,
+        )
+        pilot.validate_to_readiness(good, config, "42", control)
+        for key, value in (
+            ("source_commit", pilot.CANDIDATE),
+            ("workload", "l1"),
+            ("run_id", 42),
+            ("tests", True),
+            ("independent_preservation", False),
+            ("sentinel", pilot.SENTINELS["readiness"]),
+        ):
+            bad = copy.deepcopy(good)
+            bad[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                pilot.validate_to_readiness(bad, config, "42", control)
+
+    def test_real_acquisition_config_and_exact_cleanup_on_dummy_payload(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            source.mkdir(mode=0o700)
+            deployment = root / "deployed"
+            deployment.mkdir(mode=0o700)
+            work = root / "work"
+            (work / "evidence").mkdir(parents=True, mode=0o700)
+            contents = {name: name.encode() for name in pilot.TO_INPUT_HASHES}
+            hashes = {
+                name: hashlib.sha256(data).hexdigest()
+                for name, data in contents.items()
+            }
+            sizes = {name: len(data) for name, data in contents.items()}
+            with (
+                patch.object(pilot, "TO_INPUT_HASHES", hashes),
+                patch.object(pilot, "TO_INPUT_BYTES", sizes),
+                patch.object(pilot, "DEPLOYMENT_ROOT", deployment),
+            ):
+                config = self.config()
+                for row in config["inputs"]:
+                    row["path"] = str(deployment / row["id"])
+                control = self.control()
+                manifest = {"schema": 1, "inputs": [], "controls": []}
+                for row in config["inputs"]:
+                    target = source / row["id"]
+                    target.write_bytes(contents[row["id"]])
+                    manifest["inputs"].append(
+                        dict(
+                            row,
+                            member=pilot.payload.member_name(
+                                "inputs", row["id"], profile="to-single"
+                            ),
+                        )
+                    )
+                # Manifest destination paths bind deployment, so create the
+                # small source archive directly without touching inputs there.
+                recovery = dict(
+                    status="PASS",
+                    independent_review="PASS",
+                    checkpoint_commit="a" * 40,
+                    input_hashes=hashes,
+                )
+                for name, record in (
+                    ("run-config", config),
+                    ("recovery", recovery),
+                ):
+                    target = source / (name + ".json")
+                    pilot.write(target, record)
+                    manifest["controls"].append(
+                        dict(
+                            id=name,
+                            path=str(target),
+                            member=pilot.payload.member_name("controls", name),
+                            **pilot.payload.file_identity(target),
+                        )
+                    )
+                archive = source / "payload.tar"
+                with tarfile.open(archive, "w") as stream:
+                    pairs = [
+                        (
+                            pilot.payload.MANIFEST_MEMBER,
+                            json.dumps(manifest).encode(),
+                        )
+                    ]
+                    pairs += [
+                        (row["member"], contents[row["id"]])
+                        for row in manifest["inputs"]
+                    ]
+                    pairs += [
+                        (row["member"], Path(row["path"]).read_bytes())
+                        for row in manifest["controls"]
+                    ]
+                    for name, data in pairs:
+                        info = tarfile.TarInfo(name)
+                        info.size = len(data)
+                        stream.addfile(info, io.BytesIO(data))
+                control["input_archive"] = dict(
+                    asset_id=42, **pilot.payload.file_identity(archive)
+                )
+
+                def download(record, target):
+                    self.assertEqual(record, control["input_archive"])
+                    target.write_bytes(archive.read_bytes())
+
+                with (
+                    patch.object(
+                        pilot, "download_asset", side_effect=download
+                    ),
+                    patch.object(pilot, "validate_input_repository"),
+                    patch.object(pilot, "validate_host"),
+                    patch.object(pilot, "command", return_value="a" * 40),
+                    patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}),
+                ):
+                    result = pilot.acquire_to(
+                        "readiness", work, control=control
+                    )
+                self.assertEqual(
+                    set(result),
+                    {
+                        *config,
+                        "stage",
+                        "working_directory",
+                        "evidence_directory",
+                        "recovery",
+                    },
+                )
+                self.assertEqual(
+                    Path(result["working_directory"]), work / "test-data"
+                )
+                self.assertEqual(
+                    Path(result["evidence_directory"]),
+                    work / "evidence/native",
+                )
+                for name in ("working_directory", "evidence_directory"):
+                    self.assertEqual(
+                        Path(result[name]).stat().st_mode & 0o777, 0o700
+                    )
+                for row in result["inputs"]:
+                    self.assertEqual(
+                        Path(row["path"]).read_bytes(), contents[row["id"]]
+                    )
+                    self.assertEqual(
+                        Path(row["path"]).stat().st_mode & 0o777, 0o400
+                    )
+                self.assertEqual(
+                    json.loads(
+                        (work / "evidence/run-config.json").read_text()
+                    ),
+                    result,
+                )
+                for name in pilot.TO_COPY_NAMES:
+                    (work / "test-data" / name).write_bytes(b"working copy")
+                pilot.write(
+                    work / "evidence/process-finalization.json",
+                    dict(cleanup=True, errors=[], seconds=0),
+                )
+                (work / "evidence.tar").write_bytes(b"diagnostics")
+                preserved = dict(
+                    asset_id=42,
+                    **pilot.payload.file_identity(work / "evidence.tar"),
+                )
+                final = pilot.cleanup_to_staging(work, preserved)
+                self.assertTrue(final["cleanup"])
+                self.assertTrue(final["working_copies_absent"])
+                self.assertEqual(len(final["staging_inputs_removed"]), 10)
+                self.assertFalse(list((work / "test-data").iterdir()))
+                self.assertEqual(
+                    archive.read_bytes()[:10],
+                    (source / "payload.tar").read_bytes()[:10],
+                )
+
+    def test_profile_and_unknown_evidence_refuse_without_publication(self):
+        for name in (
+            "unknown.txt",
+            "native/private.FCStd",
+            "guard/unapproved.json",
+        ):
+            with (
+                self.subTest(name=name),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                work = Path(temporary)
+                path = work / "evidence" / name
+                path.parent.mkdir(parents=True)
+                path.write_bytes(b"unapproved")
+                with patch.dict(
+                    os.environ, {"TRACKTEMPLATE_NATIVE_WORKLOAD": "to-single"}
+                ):
+                    with self.assertRaises(ValueError):
+                        pilot.evidence_archive(work, work / "evidence.tar")
+                    self.assertFalse((work / "evidence.tar").exists())
+        for mode in ("linked", "foreign-receipt"):
+            with (
+                self.subTest(mode=mode),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                work = Path(temporary)
+                directory = work / "evidence/guard"
+                directory.mkdir(parents=True)
+                _, profile = pilot.guard._private_profile(
+                    ["flatpak", pilot.guard.APP_ID], directory
+                )
+                if mode == "linked":
+                    (directory / "profile/user-data/link").symlink_to(
+                        directory / "stderr"
+                    )
+                else:
+                    profile["path"] = "/unrelated/profile"
+                pilot.write(
+                    directory / "result.json", {"private_profile": profile}
+                )
+                with self.assertRaises(ValueError):
+                    pilot.to_profile_exclusion(work)
+
+    def test_to_summary_refuses_missing_working_copy_cleanup(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / "evidence").mkdir()
+            pilot.write(
+                work / "evidence/assessment.json",
+                dict(
+                    status="PASS",
+                    completed_native_tests=1,
+                    skips=0,
+                    native_receipt=self.receipt("native"),
+                ),
+            )
+            pilot.write(
+                work / "evidence/finalization.json",
+                dict(
+                    cleanup=True,
+                    staging_inputs_removed=list(pilot.TO_INPUT_HASHES),
+                ),
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "GITHUB_SHA": "a" * 40,
+                    "GITHUB_RUN_ID": "42",
+                    "TRACKTEMPLATE_NATIVE_WORKLOAD": "to-single",
+                },
+            ):
+                summary = pilot.public_summary(
+                    "native",
+                    work,
+                    dict(sha256="b" * 64, bytes=100, asset_id=1),
+                    True,
+                )
+            self.assertEqual(summary["outcome"], "INCOMPLETE")
+
+    def test_guarded_run_uses_to_config_identity_selector_and_result_location(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / "evidence/native").mkdir(parents=True)
+            config = self.config() | dict(stage="readiness")
+            pilot.write(work / "run-config.json", config)
+            pilot.write(work / "control.json", self.control())
+            calls = []
+
+            def guarded(argv, **kwargs):
+                calls.append((argv, kwargs))
+                directory = kwargs["evidence_dir"]
+                directory.mkdir()
+                (directory / "measurements.jsonl").write_text("{}\n")
+                (directory / "stdout").write_text("raw stdout")
+                (directory / "stderr").write_text("raw stderr")
+                pilot.write(
+                    work / "evidence/native/result.json",
+                    self.receipt("readiness"),
+                )
+                return {"cleanup_proved": True}
+
+            def command(*args, **kwargs):
+                if "--show-runtime" in args:
+                    return original.RUNTIME
+                return (
+                    original.RUNTIME_COMMIT
+                    if original.RUNTIME in args
+                    else original.APP_COMMIT
+                )
+
+            environment = dict(
+                TRACKTEMPLATE_NATIVE_WORKLOAD="to-single",
+                GITHUB_SHA="a" * 40,
+                GITHUB_RUN_ID="42",
+                GITHUB_RUN_ATTEMPT="1",
+                GITHUB_ACTIONS="true",
+                RUNNER_ENVIRONMENT="github-hosted",
+            )
+            with (
+                patch.dict(os.environ, environment),
+                patch.object(pilot, "validate_host"),
+                patch.object(pilot, "require_finalization_time"),
+                patch.object(pilot, "command", side_effect=command),
+                patch.object(
+                    pilot.guard, "run_guarded_flatpak", side_effect=guarded
+                ),
+                patch.object(
+                    original, "_deadline_clearance", return_value=True
+                ),
+                patch.object(original, "_clearance", return_value=True),
+                patch.object(
+                    pilot,
+                    "assess",
+                    return_value={
+                        "status": "PASS",
+                        "completed_native_tests": 1,
+                        "skips": 0,
+                    },
+                ) as assess,
+            ):
+                self.assertEqual(pilot.run("readiness", work), 0)
+            self.assertEqual(len(calls), 1)
+            argv, kwargs = calls[0]
+            self.assertEqual(
+                argv[-2:], ["-t", pilot.TO_SELECTORS["readiness"]]
+            )
+            self.assertEqual(argv[-3], str(ROOT / "tests"))
+            self.assertEqual(kwargs["cwd"], ROOT)
+            self.assertTrue(kwargs["isolate_profile"])
+            self.assertEqual(
+                vars(kwargs["limits"]), vars(pilot.limits("readiness"))
+            )
+            for name in (
+                "GITHUB_SHA",
+                "GITHUB_RUN_ATTEMPT",
+                "RUNNER_ENVIRONMENT",
+                "TRACKTEMPLATE_TO_RUN_CONFIG",
+                "TRACKTEMPLATE_TO_RUN_CONFIG_SHA256",
+            ):
+                self.assertIn(
+                    "--env=" + name + "=" + kwargs["env"][name], argv
+                )
+            self.assertEqual(
+                assess.call_args.kwargs, {"workload": "to-single"}
+            )
+            self.assertEqual(
+                json.loads((work / "evidence/assessment.json").read_text())[
+                    "status"
+                ],
+                "PASS",
+            )
+
+    def test_prepare_binds_current_main_source_controls_and_entry(self):
+        control = self.control() | dict(
+            stage="readiness",
+            workload="to-single",
+            workflow_commit="a" * 40,
+            independent_review="PASS",
+            dispatch_nonce="nonce",
+            control_files_sha256={
+                name: pilot.digest(ROOT / name)
+                for name in pilot.TO_CONTROL_FILES
+            },
+            access_review=dict(
+                status="PASS",
+                audited_at_utc="2026-11-02T00:00:00Z",
+                owner="Richard-Gnitnub",
+                environment="l1-private-validation",
+                branches=["main"],
+                tags=[],
+                input_repository=pilot.INPUT_REPOSITORY,
+                repository_public=True,
+            ),
+        )
+        for field, value in (
+            (None, None),
+            ("source_commit", "b" * 40),
+            ("workload", "l1"),
+            ("independent_review", "PENDING"),
+        ):
+            with (
+                self.subTest(field=field),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                work = Path(temporary)
+                (work / "evidence").mkdir()
+                candidate = copy.deepcopy(control)
+                if field:
+                    candidate[field] = value
+
+                def command(*args, **kwargs):
+                    return "" if "status" in args else "a" * 40
+
+                environment = dict(
+                    TRACKTEMPLATE_NATIVE_WORKLOAD="to-single",
+                    GITHUB_SHA="a" * 40,
+                    L1_PRIVATE_CONTROL=json.dumps(candidate),
+                )
+                with (
+                    patch.dict(os.environ, environment),
+                    patch.object(pilot, "command", side_effect=command),
+                    patch.object(
+                        pilot, "validate_host", return_value={"status": "PASS"}
+                    ),
+                    patch.object(pilot.resource, "setrlimit"),
+                ):
+                    if field:
+                        with self.assertRaises(ValueError):
+                            pilot.prepare("readiness", work)
+                        self.assertFalse((work / "control.json").exists())
+                    else:
+                        pilot.prepare("readiness", work)
+                        self.assertEqual(
+                            json.loads((work / "control.json").read_text()),
+                            control,
+                        )
+
+
 if __name__ == '__main__':
     unittest.main()

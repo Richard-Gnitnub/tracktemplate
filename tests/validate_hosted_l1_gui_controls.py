@@ -2104,6 +2104,285 @@ class StraightGuiControls(unittest.TestCase):
         self.assertEqual(text.count('timeout-minutes: 45'), 1)
 
 
+class HostedToSingleGuiControls(unittest.TestCase):
+    def to_authority(self, stage='gui'):
+        source = ast.parse((ROOT / 'tests/freecad_validate_to_single_rail.py')
+                           .read_text())
+        hashes = next(ast.literal_eval(node.value) for node in source.body
+                      if isinstance(node, ast.Assign)
+                      and any(isinstance(target, ast.Name)
+                              and target.id == 'INPUT_HASHES'
+                              for target in node.targets))
+        record = authority()
+        record.pop('product_requalification', None)
+        record.update(
+            stage=stage, workload='to-single', scope_id=gui.TO_SCOPE,
+            source_base_commit=gui.TO_BASE,
+            handling_decision=gui.TO_HANDLING_DECISION,
+            freecad_limits=vars(gui.limits(stage, 'to-single')),
+            display_limits=vars(gui.display_limits(stage, 'to-single')),
+            historical_repair_allowance_consumed=True,
+            automatic_retry=False, input_hashes=hashes,
+            native_entry_sha256=gui.native.TO_ENTRY_SHA256,
+            control_files_sha256={name: 'c' * 64
+                                  for name in gui.to_control_files()},
+        )
+        record['publication_review'] = {
+            'status': 'PASS', 'independent_review': 'PASS',
+            'input_hashes': hashes, 'evidence_sha256': 'e' * 64,
+            'handling_decision': gui.TO_HANDLING_DECISION,
+            'publication_basis': 'synthetic offline test record only',
+        }
+        record['handling_review'] = {
+            'decision_sha256': gui.TO_HANDLING_DECISION.rsplit(':', 1)[1],
+            'independent_review': 'PASS', 'retention_days': 30,
+            'independent_preservation': True, 'readiness_images': 1,
+            'gui_images': 6, 'source_archive_upload': False,
+            'operator_documents': False, 'exact_exports': False,
+            'working_fcstd_upload': False,
+        }
+        record['native_control'] = {
+            'scope_id': 'TO-001-fixed-single-rail-native-v1',
+            'source_commit': record['source_commit'],
+            'entry_sha256': gui.native.TO_ENTRY_SHA256,
+            'handling_decision': record['handling_decision'],
+            'input_hashes': hashes,
+            'input_archive': record['input_archive'],
+            'publication_review': record['publication_review'],
+        }
+        record['prior_native_evidence'].update(
+            run_id=40, source_commit=record['source_commit'],
+            entry_sha256=gui.native.TO_ENTRY_SHA256,
+            scope_id='TO-001-fixed-single-rail-native-v1',
+            input_hashes=hashes, tests=1, skips=0, run_attempt=1,
+            cleanup=True, evidence_verified=True,
+            independent_preservation=True, source_frame_comparisons=59,
+            component_comparisons=270, successful_components=270,
+            rolled_back_components=270,
+        )
+        ready = {key: record[key] for key in (
+            'scope_id', 'workload', 'source_commit', 'gui_entry_sha256',
+            'control_files_sha256', 'input_hashes', 'handling_review',
+            'handling_decision', 'publication_review',
+        )}
+        ready.update(
+            status='PASS', independent_review='PASS', stage='readiness',
+            freecad_limits=vars(gui.limits('readiness', 'to-single')),
+            display_limits=vars(gui.display_limits('readiness', 'to-single')),
+            tests=1, skips=0, run_attempt=1, cleanup=True,
+            evidence_verified=True, independent_preservation=True,
+            sentinel=gui.sentinel('readiness', 'to-single'), run_id=41,
+            evidence_sha256='e' * 64, result_review_sha256='f' * 64,
+            preservation_review_sha256='1' * 64,
+        )
+        record['gui_readiness_review'] = ready
+        return record
+
+    def test_to_authority_requires_publication_native_and_separate_readiness(self):
+        env = dict(environment(), TRACKTEMPLATE_GUI_WORKLOAD='to-single')
+        good = self.to_authority()
+        gui.validate_authority(good, env)
+        for name, value in (
+            ('publication_review', {}), ('handling_review', {}),
+            ('native_control', {}), ('prior_native_evidence', {}),
+            ('gui_readiness_review', {}), ('gui_recovery', {}),
+            ('scope_id', gui.SCOPE), ('handling_decision', gui.HANDLING_DECISION),
+            ('input_hashes', {}), ('automatic_retry', True),
+            ('source_base_commit', 'd' * 40),
+        ):
+            with self.subTest(field=name), self.assertRaises(ValueError):
+                gui.validate_authority(dict(good, **{name: value}), env)
+        for key in ('publication_review', 'prior_native_evidence',
+                    'gui_readiness_review'):
+            changed = copy.deepcopy(good)
+            changed[key]['input_hashes']['s1_model'] = '0' * 64
+            with self.subTest(record=key), self.assertRaises(ValueError):
+                gui.validate_authority(changed, env)
+        changed = copy.deepcopy(good)
+        changed['gui_readiness_review']['run_id'] = 42
+        with self.assertRaises(ValueError):
+            gui.validate_authority(changed, env)
+        ready = self.to_authority('readiness')
+        ready.pop('gui_readiness_review')
+        gui.validate_authority(ready, dict(env, L1_GUI_STAGE='readiness'))
+
+    def test_gui_acquisition_record_passes_actual_native_contract(self):
+        record = self.to_authority()
+        gui.native.validate_to_acquisition(record['native_control'])
+        missing = copy.deepcopy(record['native_control'])
+        missing['publication_review'].pop('publication_basis')
+        with self.assertRaises(ValueError):
+            gui.native.validate_to_acquisition(missing)
+
+    def test_controller_record_matches_real_gui_entry_before_launch(self):
+        with patch.object(sys, 'path', [str(ROOT / 'tests'), *sys.path]):
+            import freecad_validate_to_single_rail_gui as entry
+
+            for stage in ('readiness', 'gui'):
+                record = self.to_authority(stage)
+                env = dict(environment(), L1_GUI_STAGE=stage,
+                           TRACKTEMPLATE_GUI_WORKLOAD='to-single')
+                with patch.dict(os.environ, env, clear=True):
+                    entry.validate_authority(
+                        record, SimpleNamespace(source_commit='a' * 40),
+                        record['gui_entry_sha256'],
+                    )
+                self.assertEqual(gui.to_counts(stage), entry.expected_checks(stage))
+                self.assertEqual(gui.to_images(stage), set(entry.image_names(stage)))
+                self.assertEqual(gui.sentinel(stage, 'to-single'),
+                                 entry.sentinel(stage))
+
+    def test_fixed_to_counts_and_image_sets_reject_other_workloads(self):
+        self.assertEqual(gui.selected_workload({
+            'TRACKTEMPLATE_GUI_WORKLOAD': 'to-single',
+        }), 'to-single')
+        self.assertEqual(gui.selected_workload({}), 'l1')
+        counts = gui.to_counts('gui')
+        self.assertEqual(counts, {
+            'binding_checks': 1, 'catalogue_contracts': 2,
+            'source_frame_inputs': 59, 'source_frame_comparisons': 59,
+            'successful_previews': 1, 'assemblies': 12, 'layers': 42,
+            'successful_components': 270, 'layer_visibility_checks': 42,
+            'viewport_picks': 1, 'late_verifier_failures': 1,
+            'rolled_back_components': 270, 'source_preservation_checks': 4,
+            'preview_disposals': 1, 'screenshots': 6,
+            'readiness_empty_documents': 0,
+        })
+        gui.validate_to_counts(counts, 'gui')
+        for key in counts:
+            for invalid in (True, counts[key] + 1):
+                with self.subTest(key=key, value=invalid):
+                    with self.assertRaises(ValueError):
+                        gui.validate_to_counts(dict(counts, **{key: invalid}),
+                                               'gui')
+        self.assertEqual(gui.to_images('readiness'),
+                         {'to-single-readiness.png'})
+        self.assertEqual(gui.to_images('gui'), {
+            'to-single-overview.png', 'to-corrected-heels.png',
+            'to-retained-placements.png', 'to-selected-chair.png',
+            'to-chair-layer-hidden.png', 'to-rollback-restored.png',
+        })
+        self.assertEqual(gui.limits('gui', 'to-single').memory_max_mib, 4096)
+        self.assertEqual(gui.limits('gui', 'to-single').timeout_seconds, 7200)
+        self.assertEqual(gui.display_limits('gui', 'to-single').tasks_max, 16)
+        self.assertEqual(gui.display_limits('gui', 'to-single').cpu_percent, 25)
+        with self.assertRaises(ValueError):
+            gui.to_images('native')
+
+    def test_single_complete_to_report_and_duplicate_keys(self):
+        prefix = 'TRACKTEMPLATE_TO_SINGLE_GUI='
+        self.assertEqual(gui.to_report(prefix + '{"status":"FAIL"}\n'),
+                         {'status': 'FAIL'})
+        for text in ('', prefix + '{}\n' + prefix + '{}',
+                     prefix + '{"status":"FAIL","status":"PASS"}',
+                     prefix + '{"duration":NaN}', prefix + '[]',
+                     'noise ' + prefix + '{}', prefix + '{broken',
+                     prefix + '{"duration":1e999}',
+                     prefix + '{"duration":-1e999}'):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                gui.to_report(text)
+
+    def test_to_macro_and_child_use_only_reviewed_import_safe_entry(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'gui-run-config.json').write_text('{}')
+            (work / 'evidence/gui-authority.json').write_text('{}')
+            env = dict(environment(), TRACKTEMPLATE_GUI_WORKLOAD='to-single',
+                       HOME=temporary, PATH='/usr/bin')
+            with patch.dict(os.environ, env, clear=True):
+                macro = gui.write_gui_macro(work)
+                clean = gui.child_environment(work)
+                argv = gui.gui_argv(clean, macro)
+            self.assertIn('import freecad_validate_to_single_rail_gui',
+                          macro.read_text())
+            self.assertIn('freecad_validate_to_single_rail_gui.start()',
+                          macro.read_text())
+            for name in ('TRACKTEMPLATE_TO_RUN_CONFIG',
+                         'TRACKTEMPLATE_TO_RUN_CONFIG_SHA256',
+                         'TRACKTEMPLATE_TO_GUI_AUTHORITY',
+                         'TRACKTEMPLATE_TO_GUI_AUTHORITY_SHA256'):
+                self.assertIn(name, clean)
+                self.assertIn('--env=' + name + '=' + clean[name], argv)
+            self.assertNotIn('TRACKTEMPLATE_L1_RUN_CONFIG', clean)
+            self.assertEqual(clean['GITHUB_SHA'], 'a' * 40)
+            self.assertEqual(clean['QT_QPA_PLATFORM'], 'xcb')
+            self.assertEqual(clean['GALLIUM_DRIVER'], 'llvmpipe')
+
+    def test_to_receipt_requires_counts_images_cleanup_and_exact_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            images = work / 'evidence/gui'
+            images.mkdir(parents=True)
+            control = self.to_authority()
+            control['control_files_sha256'] = {}
+            (work / 'control.json').write_text(json.dumps(control))
+            rows = []
+            for name in sorted(gui.to_images('gui')):
+                path = images / name
+                path.write_bytes(b'\x89PNG\r\n\x1a\nsynthetic-offline-fixture')
+                rows.append({'path': name, 'sha256': gui.digest(path),
+                             'bytes': path.stat().st_size})
+            receipt = {
+                'status': 'PASS', 'stage': 'gui', 'scope_id': gui.TO_SCOPE,
+                'test_id': ('freecad_validate_to_single_rail_gui.'
+                            'ToSingleRailGui.test_authorised_gui_stage'),
+                'source_commit': 'a' * 40,
+                'fixture_sha256': (
+                    '407040d01dd0f9c8ac275d7e4d40c928ea32a5da0a05c853bf3a1de4221a8d4b'),
+                'profile': gui.original.EXPECTED_PROFILE, 'gui': True,
+                'visual_review': 'REQUIRED', 'physical_fit': 'NOT_PROVED',
+                'native_evidence_reused': control['prior_native_evidence'],
+                'input_sha256': control['input_hashes'],
+                'input_bindings_unchanged': True,
+                'owned_documents_closed': True, 'remaining_documents': 0,
+                'cleanup_errors': [], 'sentinel': gui.sentinel('gui', 'to-single'),
+                'checks': gui.to_counts('gui'), 'screenshots': rows,
+                'stage_timings': dict.fromkeys((
+                    'readiness_seconds', 'cleanup_seconds', 'total_seconds',
+                    'successful_preview_seconds', 'late_rollback_seconds',
+                    'gui_seconds'), 1.0),
+                'renderer': {'platform': 'xcb', 'gui_up': True,
+                             'widget_valid': True, 'renderer': 'llvmpipe',
+                             'vendor': 'fixture', 'version': 'fixture'},
+            }
+            gui.validate_to_receipt(receipt, work, stage='gui')
+            for field, value in (
+                ('remaining_documents', 1), ('remaining_documents', False),
+                ('owned_documents_closed', False), ('cleanup_errors', ['error']),
+                ('source_commit', 'b' * 40), ('input_sha256', {}),
+                ('screenshots', rows[:-1]), ('screenshots', [rows[0]] * 6),
+                ('stage_timings', {}), ('physical_fit', 'PASS'),
+            ):
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    gui.validate_to_receipt(dict(receipt, **{field: value}),
+                                            work, stage='gui')
+            for bad in (10**400, -(10**400), float('inf'),
+                        float('-inf'), float('nan'), True, -1, 7201):
+                malformed = copy.deepcopy(receipt)
+                malformed['stage_timings']['total_seconds'] = bad
+                with self.subTest(timing=bad), self.assertRaises(ValueError):
+                    gui.validate_to_receipt(malformed, work, stage='gui')
+            unexpected = images / 'unapproved.png'
+            unexpected.write_bytes(b'image')
+            with self.assertRaisesRegex(ValueError, 'Unexpected'):
+                gui.validate_to_receipt(receipt, work, stage='gui')
+            unexpected.unlink()
+            prohibited = work / 'evidence/working.FCStd'
+            prohibited.write_bytes(b'input-copy')
+            with self.assertRaisesRegex(ValueError, 'Unexpected'):
+                gui.validate_to_receipt(receipt, work, stage='gui')
+
+    def test_to_uses_existing_main_job_and_separate_control_record(self):
+        text = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        self.assertIn("inputs.workload == 'to-single'", text)
+        self.assertIn('vars.TO_SINGLE_GUI_CONTROL', text)
+        self.assertEqual(text.count('group: issue230-native-geometry'), 1)
+        self.assertEqual(text.count('timeout-minutes: 140'), 1)
+        self.assertIn('cancel-in-progress: false', text)
+        self.assertIn('retention-days: 30', text)
+
+
 if __name__ == '__main__':
     result = unittest.main(exit=False)
     if not result.result.wasSuccessful():
