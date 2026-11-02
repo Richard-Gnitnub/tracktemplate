@@ -3599,41 +3599,56 @@ The project keeps evidence with FAIL results and the repair evidence.
 
 <a id="rea-bc-stored-lifecycle"></a>
 
-## Stored REA B/C inputs and operator controls — 2026-11-02
+## REA B/C inputs and controls in FreeCAD — 2026-11-02
 
-This Level 2 change advances [D-P9-019](#rea-bc-scope-panel). Explicit B/C
-inputs now supply stored turnout and crossover records through the shared
-calculation path. Each record keeps its identity, source inputs and host
-links. The display is derived from those inputs. The change preserves the
-fixed C10, TO-001 and XO-001 regression cases.
+This Level 2 change supplies evidence for [D-P9-019](#rea-bc-scope-panel).
+FreeCAD now keeps B/C inputs for turnouts and crossovers.
+`ReaTurnoutGeometryAdapter` supplies the data for the two tools.
+Each `ReaTrackworkIntent` keeps its identity, `source_specification` and
+`host_names`. TrackTemplate makes the display from those inputs.
+The change preserves the C10, TO-001 and XO-001 tests.
 
-The [hosted native test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41367654365)
+The [FreeCAD test on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41367654365)
 at `1d710df7f0ea617e17aad32c24edc3d3a8c006fe` gives a PASS result.
-Both tests completed, with no skips. They cover a B8 turnout changed to
-C9.25 and back to B8, and a B8 crossover. They compare 425 source values,
-165 timber records, 70 rail anchors, 23,145 mapped points and 319 display
-lines. The tests also cover canonical reads, invalid inputs, rollback,
-Undo/Redo, reuse without an input change and save/reopen. All test documents
-closed.
-Independent result review confirms the success record, resource measurements
-and process cleanup. The project keeps the previous failed run and the
-reviewed fixture correction. All original assertions and geometry stay unchanged after that repair.
+The two tests completed, with `skips = 0`. They change a B8 turnout to
+C9.25 and back to B8. They also examine a B8 crossover.
 
-The later [operator controls](../../tracktemplate/ui/rea_trackwork_editor.py)
-add explicit create, edit and rebuild actions to the manager.
-All 14 standalone editor tests and 7 composition tests give PASS results.
-Independent review confirms that the existing C10 controls and guarded
-calculation bindings stay unchanged. A separate correction preserves an
-attached display when a new store attempts an edit that fails.
+The tests compare source and product data. The result gives
+`source_scalars = 425`, `timber_records = 165`, `rail_anchors = 70`,
+`mapped_points = 23145` and `scene_lines = 319`.
+The tests also include `canonical_reads`, `negative_controls`, `undo_redo`,
+`no_op` and `save_reopen`. The `negative_controls` include inputs that the
+tool must reject and recovery after a rejected change.
+After the tests, `documents_remaining = 0`.
 
-The operator controls and display still need hosted GUI qualification.
-The native test does not supply that evidence. Specific authority to publish
-B/C GUI screenshots has not been established. The proposed evidence contains
-synthetic rails and timbers, with no operator document or chair package.
+Independent result review gives PASS for the success sentinel, measured data
+and process cleanup. The project preserves the previous FAIL result and the
+reviewed fixture correction. After that repair, all initial `assert` checks
+and geometry do not change.
 
-All 32 menu combinations keep status `Pending`. The previous numerical
-[source evidence](#rea-bc-source-geometry) still applies to its specified
-continuous regions and boundaries. Unsupported source regions, exit-sleeper
-profiles, chair coverage and physical fit remain separate gaps.
-Phase 9B stays Open at 3/6. This change gives no rights, production,
-performance, phase exit or Phase 10 acceptance. LMS development stays paused.
+The [controls in FreeCAD](../../tracktemplate/ui/rea_trackwork_editor.py)
+include `Create`, `Edit selected` and `Rebuild display` in
+`TurnoutManagerDialog`. This change follows the FreeCAD test. All 14 tests in `validate_rea_trackwork_editor.py`
+and 7 tests in `validate_rea_trackwork_composition.py` give PASS results.
+Independent review gives PASS for this scope.
+The C10 controls and the items that
+`ModularTransitionWorkflowSession._validate_binding` checks do not change.
+A correction also preserves an attached display if a new
+`FreeCADReaTrackworkStore` cannot complete an edit.
+
+The controls and display have no validation evidence from `FreeCADGui` on
+GitHub. The FreeCAD test does not supply that evidence.
+The project has no specified authority to publish B/C display output as `PNG`
+files. The proposed output contains `rails` and `timbers` from test inputs.
+The test makes its initial FreeCAD data without an input `FCStd` file or
+chair package.
+
+All 32 B/C inputs from `MENU` keep status `Pending`.
+The previous [source evidence](#rea-bc-source-geometry) does not change.
+It gives results for its specified input ranges and limits.
+The tests supply no evidence for unsupported source inputs or `source_gaps[0]`.
+Evidence for chair validation and physical fit is also necessary.
+
+Phase 9B stays `Open` at 3/6. This change gives no acceptance for production,
+product performance, a phase exit or Phase 10. The rights state does not change.
+LMS work stays stopped.
