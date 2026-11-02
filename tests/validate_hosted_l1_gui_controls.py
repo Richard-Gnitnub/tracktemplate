@@ -3,6 +3,7 @@
 import ast
 import copy
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -1010,6 +1011,865 @@ class GuiProofContracts(unittest.TestCase):
             self.assertNotIn('xvfb-run', guarded)
             self.assertNotIn('FreeCADCmd', guarded)
             self.assertIn('--env=GITHUB_SHA=' + 'a' * 40, argv)
+
+
+class ReaGuiControls(unittest.TestCase):
+    """Additive B/C controls must not inherit L1 input/publication scope."""
+
+    @staticmethod
+    def environment(stage='gui'):
+        return dict(environment(), TRACKTEMPLATE_GUI_WORKLOAD='rea-bc',
+                    GITHUB_REF='refs/heads/codex/rea-bc-exit-profile',
+                    L1_GUI_STAGE=stage, L1_LIFECYCLE_DIAGNOSTIC='false')
+
+    def authority(self, stage='gui'):
+        record = {
+            'schema': 1, 'scope_id': 'REA-BC-LIFECYCLE-GUI-001',
+            'workload': 'rea-bc', 'stage': stage,
+            'source_commit': 'a' * 40,
+            'source_ref': 'refs/heads/codex/rea-bc-exit-profile',
+            'source_tree_sha256': 'b' * 64,
+            'owner': 'Richard-Gnitnub', 'execution_authorized': True,
+            'independent_review': 'PASS', 'run_attempt': 1,
+            'decision_id': 'synthetic-owner-record', 'dispatch_nonce': 'one',
+            'gui_entry_sha256': 'c' * 64,
+            'control_files_sha256': dict.fromkeys(gui.REA_CONTROL_FILES,
+                                                 'd' * 64),
+            'input_hashes': dict.fromkeys(gui.REA_INPUTS, 'e' * 64),
+            'freecad_limits': vars(gui.limits(stage, 'rea-bc')),
+            'display_limits': vars(gui.display_limits(stage, 'rea-bc')),
+            'initial_reserve_mib': 8192, 'software_renderer': 'llvmpipe',
+            'external_inputs': 0, 'private_inputs': 0,
+            'historical_repair_allowance_consumed': True,
+            'automatic_retry': False,
+            'handling_review': {
+                'decision_sha256': 'f' * 64, 'independent_review': 'PASS',
+                'public_research_screenshots': True,
+                'retention_days': 30, 'independent_preservation': True,
+                'readiness_images': 1, 'gui_images': 13,
+                'source_archive_upload': False, 'operator_documents': False,
+                'exact_exports': False, 'fcstd_upload': False,
+            },
+            'gui_recovery': {
+                'status': 'PASS', 'independent_review': 'PASS',
+                'source_commit': 'a' * 40, 'evidence_sha256': '1' * 64,
+            },
+            'prior_native_evidence': {
+                'status': 'PASS', 'independent_review': 'PASS',
+                'run_id': 40, 'evidence_sha256': '2' * 64,
+                'source_compatibility_review_sha256': '3' * 64,
+            },
+        }
+        if stage == 'gui':
+            ready = self.authority('readiness')
+            record['gui_readiness_review'] = {
+                key: copy.deepcopy(ready[key]) for key in (
+                    'scope_id', 'workload', 'stage', 'source_commit',
+                    'source_tree_sha256', 'gui_entry_sha256',
+                    'control_files_sha256', 'input_hashes',
+                    'freecad_limits', 'display_limits', 'handling_review',
+                )
+            }
+            record['gui_readiness_review'].update(
+                status='PASS', independent_review='PASS', run_id=41,
+                tests=1, skips=0, run_attempt=1, cleanup=True,
+                evidence_verified=True, independent_preservation=True,
+                evidence_sha256='4' * 64, result_review_sha256='5' * 64,
+                preservation_review_sha256='6' * 64,
+                sentinel='REA B/C hosted GUI readiness passed',
+            )
+        return record
+
+    def test_workload_is_explicit_and_l1_remains_default(self):
+        self.assertEqual(gui.selected_workload({}), 'l1')
+        self.assertEqual(gui.selected_workload(self.environment()), 'rea-bc')
+        for value in ('', 'REA', 'native', 'l1,rea-bc'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                gui.selected_workload({'TRACKTEMPLATE_GUI_WORKLOAD': value})
+        self.assertEqual(gui.limits('gui').timeout_seconds, 7200)
+        self.assertEqual(gui.display_limits('gui').timeout_seconds, 7300)
+        self.assertEqual(gui.limits('gui', 'rea-bc').timeout_seconds, 900)
+        self.assertEqual(gui.display_limits('gui', 'rea-bc').timeout_seconds,
+                         1000)
+        self.assertEqual(gui.limits('readiness', 'rea-bc').timeout_seconds, 90)
+
+    def test_candidate_host_ref_rerun_debug_and_local_refused(self):
+        memory = ('MemTotal: 16777216 kB\nMemAvailable: 12845056 kB\n'
+                  'SwapTotal: 0 kB\nSwapFree: 0 kB\n')
+        gui.validate_host(self.environment(), memory)
+        for key, value in (('GITHUB_REF', 'refs/heads/main'),
+                           ('GITHUB_REF', 'refs/heads/unreviewed'),
+                           ('GITHUB_RUN_ATTEMPT', '2'),
+                           ('RUNNER_ENVIRONMENT', 'self-hosted'),
+                           ('RUNNER_DEBUG', '1'),
+                           ('L1_LIFECYCLE_DIAGNOSTIC', 'true')):
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                gui.validate_host(dict(self.environment(), **{key: value}), memory)
+        with self.assertRaises(ValueError):
+            gui.validate_host(self.environment(), memory.replace('12845056',
+                                                               '12582912'))
+
+    def test_separate_handling_recovery_and_native_review_required(self):
+        good = self.authority()
+        gui.validate_authority(good, self.environment())
+        changes = {'scope_id': gui.SCOPE, 'workload': 'l1',
+                   'source_ref': 'refs/heads/main', 'source_commit': '0' * 40,
+                   'source_tree_sha256': '', 'execution_authorized': False,
+                   'independent_review': 'PENDING', 'external_inputs': 1,
+                   'private_inputs': 1, 'automatic_retry': True,
+                   'historical_repair_allowance_consumed': False,
+                   'gui_entry_sha256': 'bad', 'control_files_sha256': {},
+                   'input_hashes': {}, 'handling_review': {},
+                   'gui_recovery': {}, 'prior_native_evidence': {},
+                   'gui_readiness_review': {}}
+        for key, value in changes.items():
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                gui.validate_authority(dict(good, **{key: value}),
+                                       self.environment())
+        for key, value in (('fcstd_upload', True), ('retention_days', 90),
+                           ('public_research_screenshots', False),
+                           ('decision_sha256', ''), ('gui_images', 12)):
+            bad = copy.deepcopy(good)
+            bad['handling_review'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                gui.validate_authority(bad, self.environment())
+
+    def test_readiness_is_separate_exact_source_and_complete(self):
+        gui.validate_authority(self.authority('readiness'),
+                               self.environment('readiness'))
+        for key, value in (('run_id', 42), ('tests', 0), ('skips', 1),
+                           ('cleanup', False), ('source_commit', '0' * 40),
+                           ('source_tree_sha256', '0' * 64),
+                           ('input_hashes', {}), ('handling_review', {}),
+                           ('result_review_sha256', ''),
+                           ('preservation_review_sha256', '')):
+            bad = self.authority()
+            bad['gui_readiness_review'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                gui.validate_authority(bad, self.environment())
+
+    def test_zero_external_acquisition_never_downloads_or_deploys(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'control.json').write_text(json.dumps(self.authority()))
+            with patch.dict(os.environ, self.environment(), clear=True), \
+                    patch.object(gui.native, 'acquire', side_effect=AssertionError(
+                        'B/C attempted L1 acquisition')):
+                gui.acquire(work)
+            config = json.loads((work / 'gui-run-config.json').read_text())
+            self.assertEqual(config['inputs'], [])
+            self.assertEqual(config['input_hashes'], self.authority()['input_hashes'])
+            self.assertEqual(config['external_inputs'], 0)
+            self.assertFalse((work / 'inputs.tar').exists())
+
+    def test_900_second_budget_preserves_ten_minute_finalization_reserve(self):
+        env = dict(self.environment(), L1_JOB_START_SECONDS='1000')
+        gui.require_rea_finalization_time('gui', env, 2200)
+        with self.assertRaises(ValueError):
+            gui.require_rea_finalization_time('gui', env, 2201)
+        with self.assertRaises(ValueError):
+            gui.require_rea_finalization_time('gui', env, 999)
+
+    def test_candidate_macro_is_literal_and_env_contains_no_secrets(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'gui-run-config.json').write_text('{}')
+            (work / 'evidence/gui-authority.json').write_text('{}')
+            with patch.dict(os.environ, dict(self.environment(),
+                                            GITHUB_TOKEN='do-not-forward'),
+                            clear=True):
+                macro = gui.write_gui_macro(work)
+                clean = gui.child_environment(work)
+                argv = gui.gui_argv(clean, macro)
+            self.assertIn('hosted_rea_trackwork_gui_suite.start()',
+                          macro.read_text())
+            self.assertNotIn('hosted_l1_gui_suite.start()', macro.read_text())
+            self.assertNotIn('GITHUB_TOKEN', clean)
+            self.assertIn('--env=TRACKTEMPLATE_GUI_WORKLOAD=rea-bc', argv)
+            self.assertEqual(gui.guard._payload_command(argv)[-1], str(macro))
+
+    def test_exact_operation_counts_reject_low_high_bool_and_missing(self):
+        counts = gui.rea_counts('gui')
+        self.assertEqual(counts, {
+            'tests': 1, 'fresh_documents': 2, 'reopens': 1,
+            'source_records_created': 2, 'successful_parameter_updates': 2,
+            'no_op_applies': 1, 'undo_redo_pairs': 1,
+            'host_invalidation_cases': 1, 'explicit_rebuilds': 3,
+            'adopted_view_rollback_cases': 1, 'actual_viewport_picks': 2,
+            'visible_input_refusals': 2, 'operator_label_cases': 1,
+            'profile_selections': 2, 'profile_deselections': 1,
+            'selected_profile_reopens': 1, 'viewport_images': 8,
+            'dialog_images': 5, 'screenshots_total': 13,
+        })
+        for key, value in counts.items():
+            for bad in (value - 1, value + 1, True, None):
+                with self.subTest(key=key, bad=bad), self.assertRaises(ValueError):
+                    gui.validate_rea_counts(dict(counts, **{key: bad}), 'gui')
+        gui.validate_rea_counts(counts, 'gui')
+        with self.assertRaises(ValueError):
+            gui.validate_rea_counts(dict(counts, extra=1), 'gui')
+        ready = gui.rea_counts('readiness')
+        self.assertEqual(ready['fresh_documents'], 1)
+        self.assertEqual(ready['source_records_created'], 0)
+        self.assertEqual(ready['screenshots_total'], 1)
+
+    def test_unique_result_parser_rejects_missing_duplicate_and_malformed(self):
+        record = {'workload': 'rea-bc', 'stage': 'gui', 'status': 'PASS'}
+        text = 'TRACKTEMPLATE_REA_TRACKWORK_GUI=' + json.dumps(record)
+        self.assertEqual(gui.rea_report(text), record)
+        for bad in ('', text + '\n' + text,
+                    'TRACKTEMPLATE_REA_TRACKWORK_GUI={"stage":"gui","stage":"gui"}',
+                    'TRACKTEMPLATE_REA_TRACKWORK_GUI={"value":NaN}',
+                    'TRACKTEMPLATE_REA_TRACKWORK_GUI={"value":1e999}',
+                    'TRACKTEMPLATE_REA_TRACKWORK_GUI={"value":-1e999}',
+                    'TRACKTEMPLATE_REA_TRACKWORK_GUI=[]'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                gui.rea_report(bad)
+
+    def test_candidate_evidence_excludes_unknown_media_and_documents(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence/gui').mkdir(parents=True)
+            (work / 'evidence/gui/result.json').write_text('{}')
+            (work / 'evidence/gui/to-b8.png').write_bytes(b'png')
+            gui.validate_rea_evidence(work, stage='gui')
+            for name in ('private.FCStd', 'private.FCStd1', 'unknown.png',
+                         'archive.zip', 'upstream.pas', 'part.brep', 'part.step'):
+                path = work / 'evidence/gui' / name
+                path.write_bytes(b'not-approved')
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    gui.validate_rea_evidence(work, stage='gui')
+                path.unlink()
+            linked = work / 'evidence/gui/linked.json'
+            linked.symlink_to(work / 'evidence/gui/result.json')
+            with self.assertRaises(ValueError):
+                gui.validate_rea_evidence(work, stage='gui')
+
+    def test_new_entry_import_starts_no_host_or_process(self):
+        path = ROOT / 'tests/hosted_rea_trackwork_gui_suite.py'
+        self.assertTrue(path.is_file(), 'Missing B/C GUI entry')
+        spec = importlib.util.spec_from_file_location('rea_gui_entry', path)
+        suite = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'FreeCAD': None, 'FreeCADGui': None,
+                                     'PySide6': None, 'pivy': None}), \
+                patch.object(subprocess, 'Popen', side_effect=AssertionError(
+                    'Import started a process')):
+            spec.loader.exec_module(suite)
+        self.assertTrue(callable(suite.start))
+        self.assertEqual(suite.SCOPE, 'REA-BC-LIFECYCLE-GUI-001')
+
+    def test_cleanup_finds_observers_among_native_and_python_views(self):
+        suite = self._entry()
+        first = SimpleNamespace(_observer_app=object())
+        second = SimpleNamespace(_observer_app=None)
+        document = SimpleNamespace(Objects=[
+            SimpleNamespace(ViewObject=SimpleNamespace()),
+            SimpleNamespace(ViewObject=None),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=None)),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=first)),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=object())),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=second)),
+        ])
+        self.assertEqual(suite._observer_proxies(document), (first, second))
+
+        class BrokenView:
+            @property
+            def Proxy(self):
+                raise RuntimeError('Unreadable observer ownership')
+
+        document.Objects.append(SimpleNamespace(ViewObject=BrokenView()))
+        with self.assertRaisesRegex(RuntimeError, 'observer ownership'):
+            suite._observer_proxies(document)
+
+    def test_workflow_keeps_l1_and_candidate_mutually_exclusive(self):
+        text = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        self.assertIn('default: l1', text)
+        self.assertIn("inputs.workload == 'rea-bc'", text)
+        self.assertIn("refs/heads/codex/rea-bc-exit-profile", text)
+        self.assertIn("inputs.workload == 'l1'", text)
+        self.assertIn('timeout-minutes: 45', text)
+        self.assertEqual(text.count('environment: l1-private-validation'), 1)
+        self.assertIn('TRACKTEMPLATE_GUI_WORKLOAD: rea-bc', text)
+
+
+    def _receipt_fixture(self, work, stage='gui'):
+        control = self.authority(stage)
+        for group in ('control_files_sha256', 'input_hashes'):
+            control[group] = {name: gui.digest(ROOT / name)
+                              for name in control[group]}
+        control['gui_entry_sha256'] = gui.digest(ROOT / gui.REA_ENTRY)
+        (work / 'control.json').write_text(json.dumps(control))
+        directory = work / 'evidence/gui'
+        directory.mkdir(parents=True)
+        screenshots = []
+        for name in sorted(gui.rea_images(stage)):
+            path = directory / name
+            path.write_bytes(b'\x89PNG\r\n\x1a\n' + name.encode())
+            screenshots.append({'path': name, 'sha256': gui.digest(path),
+                                'bytes': path.stat().st_size})
+        receipt = {
+            'status': 'PASS', 'stage': stage, 'scope_id': gui.REA_SCOPE,
+            'workload': 'rea-bc', 'profile': gui.original.EXPECTED_PROFILE,
+            'source_commit': control['source_commit'],
+            'source_tree_sha256': control['source_tree_sha256'],
+            'input_hashes': control['input_hashes'],
+            'gui_entry_sha256': control['gui_entry_sha256'],
+            'input_bindings_unchanged': True, 'owned_documents_closed': True,
+            'owned_windows_closed': True, 'cleanup_errors': [],
+            'documents_remaining': 0, 'failures': 0, 'errors': 0, 'skips': 0,
+            'geometry_builds': 0 if stage == 'readiness' else 8,
+            'sentinel': gui.sentinel(stage, 'rea-bc'),
+            'checks': gui.rea_counts(stage), 'screenshots': screenshots,
+            'total_seconds': 20.0,
+            'renderer': {'platform': 'xcb', 'gui_up': True,
+                         'widget_valid': True, 'renderer': 'llvmpipe',
+                         'vendor': 'Mesa', 'version': '4.5'},
+        }
+        return control, receipt
+
+    def test_complete_receipt_requires_owned_cleanup_runtime_and_exact_counts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            control, good = self._receipt_fixture(work)
+            with patch.object(gui, 'rea_source_tree', return_value='b' * 64):
+                gui.validate_rea_receipt(good, work, stage='gui')
+                for key, value in (
+                    ('owned_windows_closed', False),
+                    ('owned_documents_closed', False), ('documents_remaining', 1),
+                    ('cleanup_errors', ['incomplete']), ('skips', 1),
+                    ('errors', 1), ('failures', 1), ('geometry_builds', 7),
+                    ('input_bindings_unchanged', False),
+                    ('source_commit', '0' * 40), ('source_tree_sha256', ''),
+                    ('input_hashes', {}), ('gui_entry_sha256', '0' * 64),
+                    ('sentinel', 'other'), ('checks', {}), ('status', 'FAIL'),
+                    ('documents_remaining', False),
+                ):
+                    with self.subTest(key=key), self.assertRaises(ValueError):
+                        gui.validate_rea_receipt(dict(good, **{key: value}),
+                                                work, stage='gui')
+                for key, value in (('platform', 'offscreen'), ('gui_up', False),
+                                   ('widget_valid', False),
+                                   ('renderer', 'hardware'), ('vendor', '')):
+                    bad = copy.deepcopy(good)
+                    bad['renderer'][key] = value
+                    with self.subTest(renderer=key), self.assertRaises(ValueError):
+                        gui.validate_rea_receipt(bad, work, stage='gui')
+            with patch.object(gui, 'rea_source_tree', return_value='0' * 64), \
+                    self.assertRaises(ValueError):
+                gui.validate_rea_receipt(good, work, stage='gui')
+
+    def test_image_omission_duplicate_path_hash_and_unlisted_media_refused(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            _, good = self._receipt_fixture(work)
+            with patch.object(gui, 'rea_source_tree', return_value='b' * 64):
+                bad = copy.deepcopy(good)
+                bad['screenshots'].pop()
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_receipt(bad, work, stage='gui')
+                for key, value in (('path', '../outside.png'),
+                                   ('path', 'unexpected.png'),
+                                   ('sha256', '0' * 64), ('bytes', 0),
+                                   ('bytes', True)):
+                    bad = copy.deepcopy(good)
+                    bad['screenshots'][0][key] = value
+                    with self.subTest(key=key), self.assertRaises(ValueError):
+                        gui.validate_rea_receipt(bad, work, stage='gui')
+                bad = copy.deepcopy(good)
+                bad['screenshots'][0] = bad['screenshots'][1]
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_receipt(bad, work, stage='gui')
+                (work / 'evidence/gui/unlisted.png').write_bytes(b'png')
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_receipt(good, work, stage='gui')
+
+    def test_empty_readiness_proves_no_geometry_and_one_panel_image(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            _, good = self._receipt_fixture(work, 'readiness')
+            with patch.object(gui, 'rea_source_tree', return_value='b' * 64):
+                gui.validate_rea_receipt(good, work, stage='readiness')
+                for key, value in (('geometry_builds', 1), ('stage', 'gui')):
+                    with self.subTest(key=key), self.assertRaises(ValueError):
+                        gui.validate_rea_receipt(dict(good, **{key: value}),
+                                                work, stage='readiness')
+                bad = copy.deepcopy(good)
+                bad['checks']['source_records_created'] = 1
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_receipt(bad, work, stage='readiness')
+
+    def test_temporary_document_cleanup_requires_exact_manifest_and_bytes(self):
+        for changed in (False, True):
+            with self.subTest(changed=changed), tempfile.TemporaryDirectory() as tmp:
+                work = Path(tmp)
+                (work / 'evidence/gui').mkdir(parents=True)
+                (work / 'test-data').mkdir()
+                saved = work / 'test-data/research.FCStd'
+                saved.write_bytes(b'owned fixture')
+                row = {'path': 'test-data/research.FCStd',
+                       'sha256': gui.digest(saved), 'bytes': saved.stat().st_size}
+                (work / 'evidence/gui/result.json').write_text(json.dumps({
+                    'temporary_documents': [row],
+                }))
+                if changed:
+                    saved.write_bytes(b'changed')
+                    with self.assertRaises(ValueError):
+                        gui.cleanup_rea_documents(work)
+                    self.assertTrue(saved.exists())
+                else:
+                    gui.cleanup_rea_documents(work)
+                    self.assertFalse(saved.exists())
+                    receipt = json.loads((work / 'evidence/gui-document-cleanup.json').read_text())
+                    self.assertTrue(receipt['cleanup'])
+                    self.assertEqual(receipt['removed'], [row])
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / 'evidence/gui').mkdir(parents=True)
+            (work / 'test-data').mkdir()
+            saved = work / 'test-data/unknown.FCStd'
+            saved.write_bytes(b'unknown')
+            (work / 'evidence/gui/result.json').write_text('{}')
+            with self.assertRaises(ValueError):
+                gui.cleanup_rea_documents(work)
+            self.assertTrue(saved.exists())
+
+    def test_display_candidate_deadline_and_default_l1_stay_distinct(self):
+        self.assertEqual(gui.display_properties('gui', 'rea-bc')['RuntimeMaxSec'],
+                         '1000')
+        self.assertEqual(gui.display_properties('readiness', 'rea-bc')['RuntimeMaxSec'],
+                         '190')
+        self.assertEqual(gui.display_properties()['RuntimeMaxSec'], '7300')
+        self.assertEqual(gui.display_properties('gui', 'rea-bc')['MemorySwapMax'],
+                         '0')
+
+    def test_source_manifest_binds_bytes_without_child_git_or_host_import(self):
+        path = ROOT / gui.REA_ENTRY
+        spec = importlib.util.spec_from_file_location('rea_gui_manifest', path)
+        suite = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(suite)
+        case = suite.ReaGui('test_authorised_gui_stage')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'tracktemplate').mkdir()
+            (root / 'tracktemplate/example.py').write_text('answer = 42\n')
+            hashes = {'tracktemplate/example.py': gui.digest(
+                root / 'tracktemplate/example.py')}
+            digest = gui.hashlib.sha256(json.dumps(
+                hashes, sort_keys=True, separators=(',', ':'),
+            ).encode()).hexdigest()
+            with patch.object(suite, 'ROOT', root), \
+                    patch.object(subprocess, 'Popen', side_effect=AssertionError(
+                        'Child source check attempted git')):
+                case.assert_source_tree({'product_files_sha256': hashes},
+                                        {'source_tree_sha256': digest})
+                (root / 'tracktemplate/example.py').write_text('changed\n')
+                with self.assertRaises(AssertionError):
+                    case.assert_source_tree({'product_files_sha256': hashes},
+                                            {'source_tree_sha256': digest})
+
+    def test_event_loop_reports_success_only_for_exact_one_unskipped_test(self):
+        path = ROOT / gui.REA_ENTRY
+        spec = importlib.util.spec_from_file_location('rea_gui_start', path)
+        suite = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(suite)
+        for passed, count, skips, exit_code in (
+            (True, 1, [], 0), (False, 1, [], 1), (True, 0, [], 1),
+            (True, 2, [], 1), (True, 1, ['skipped'], 1),
+        ):
+            with self.subTest(passed=passed, count=count, skips=skips):
+                callbacks, exit_qt = [], Mock()
+                pyside = ModuleType('PySide6')
+                pyside.QtCore = SimpleNamespace(
+                    QTimer=SimpleNamespace(singleShot=lambda delay, callback:
+                                           callbacks.append((delay, callback))),
+                    QCoreApplication=SimpleNamespace(exit=exit_qt),
+                )
+                case = suite.ReaGui('test_authorised_gui_stage')
+                case.receipt = {'status': 'PASS', 'sentinel': 'bounded success'}
+                runner = Mock()
+                runner.run.return_value = SimpleNamespace(
+                    wasSuccessful=lambda: passed, testsRun=count, skipped=skips)
+                output = io.StringIO()
+                with patch.dict(sys.modules, {'PySide6': pyside}), \
+                        patch.object(suite, 'ReaGui', return_value=case), \
+                        patch.object(suite.unittest, 'TextTestRunner', return_value=runner), \
+                        patch.object(sys, 'stdout', output):
+                    suite.start()
+                    self.assertEqual(len(callbacks), 1)
+                    exit_qt.assert_not_called()
+                    callbacks[0][1]()
+                exit_qt.assert_called_once_with(exit_code)
+                self.assertEqual(runner.run.call_args.args[0].countTestCases(), 1)
+                self.assertEqual(suite.PREFIX in output.getvalue(), exit_code == 0)
+
+    @staticmethod
+    def _entry():
+        spec = importlib.util.spec_from_file_location(
+            'rea_gui_entry_review', ROOT / gui.REA_ENTRY,
+        )
+        suite = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(suite)
+        return suite
+
+    def test_receipt_elapsed_time_must_be_finite_and_within_stage_limit(self):
+        for stage, limit in (('readiness', 90), ('gui', 900)):
+            with self.subTest(stage=stage), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                _, receipt = self._receipt_fixture(work, stage)
+                with patch.object(gui, 'rea_source_tree', return_value='b' * 64):
+                    for value in (None, True, '20', -1, float('nan'),
+                                  float('inf'), -float('inf'), limit + 0.01,
+                                  10 ** 400):
+                        with self.subTest(value=value), self.assertRaises(ValueError):
+                            gui.validate_rea_receipt(
+                                dict(receipt, total_seconds=value), work,
+                                stage=stage,
+                            )
+                    gui.validate_rea_receipt(
+                        dict(receipt, total_seconds=limit), work, stage=stage,
+                    )
+
+    def test_archive_boundaries_reject_other_stage_image(self):
+        for stage, extra in (('readiness', 'to-b8.png'),
+                             ('gui', 'readiness-panel.png')):
+            with self.subTest(stage=stage), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                _, receipt = self._receipt_fixture(work, stage)
+                (work / 'evidence/gui' / extra).write_bytes(b'other-stage')
+                with patch.dict(os.environ, self.environment(stage), clear=True), \
+                        patch.object(gui, 'rea_source_tree', return_value='b' * 64):
+                    with self.assertRaisesRegex(ValueError, 'Unexpected B/C evidence'):
+                        gui.validate_rea_receipt(receipt, work, stage=stage)
+                    with self.assertRaisesRegex(ValueError, 'Unexpected B/C evidence'):
+                        gui.exclude_gui_copy(work)
+                    # Failed runs must not publish an out-of-stage image either.
+                    with patch.object(gui.native, 'verify_artifact',
+                                      side_effect=ValueError('injected failure')), \
+                            patch.object(gui.native, 'evidence_archive') as archive, \
+                            self.assertRaisesRegex(ValueError, 'Unexpected B/C evidence'):
+                        gui.publish(work)
+                    archive.assert_not_called()
+
+    def test_gui_document_inventory_rejects_hidden_geometry_objects(self):
+        case = self._entry().ReaGui('test_authorised_gui_stage')
+        doc = SimpleNamespace(Objects=[])
+        source = SimpleNamespace(Name='Source', Document=doc,
+                                 TypeId='App::FeaturePython', PropertiesList=[])
+        baseline = [SimpleNamespace(Name=name) for name in
+                    ('Settings', 'HostA', 'HostB')] + [source]
+        doc.Objects = baseline
+        case.assert_document_inventory(source)
+        for bad in (baseline + [SimpleNamespace(Name='Point001')],
+                    baseline + [SimpleNamespace(Name='Rail001')],
+                    baseline[:-1], baseline + [source]):
+            with self.subTest(names=[item.Name for item in bad]), \
+                    self.assertRaises(AssertionError):
+                doc.Objects = bad
+                case.assert_document_inventory(source)
+        doc.Objects = baseline
+        source.TypeId = 'Part::Feature'
+        with self.assertRaises(AssertionError):
+            case.assert_document_inventory(source)
+        source.TypeId = 'App::FeaturePython'
+        source.PropertiesList = ['Shape']
+        with self.assertRaises(AssertionError):
+            case.assert_document_inventory(source)
+
+    def test_nested_manager_releases_polling_timer_before_modal_click(self):
+        for click_error in (False, True):
+            with self.subTest(click_error=click_error):
+                self._nested_manager_case(click_error)
+
+    def _nested_manager_case(self, click_error):
+        suite = self._entry()
+        case = suite.ReaGui('test_authorised_gui_stage')
+        state = {'active': None, 'timers': [], 'queue': [], 'actions': 0}
+
+        class Timer:
+            def __init__(self):
+                self.active = False
+                self.busy = False
+                self.timeout = SimpleNamespace(connect=self.connect)
+                state['timers'].append(self)
+
+            def connect(self, callback):
+                self.callback = callback
+
+            def setInterval(self, value):
+                pass
+
+            def start(self):
+                self.active = True
+
+            def stop(self):
+                self.active = False
+
+            def emit(self):
+                if not self.active or self.busy:
+                    return
+                self.busy = True
+                try:
+                    self.callback()
+                finally:
+                    self.busy = False
+
+            @staticmethod
+            def singleShot(delay, callback):
+                state['queue'].append(callback)
+
+        class Dialog:
+            turnout_manager_button = object()
+
+            def isVisible(self):
+                return state['active'] is self
+
+            def reject(self):
+                if state['active'] is self:
+                    state['active'] = None
+
+        class Curve(Dialog):
+            pass
+
+        class Manager(Dialog):
+            def resize(self, *args):
+                pass
+
+        curve, manager = Curve(), Manager()
+        doc = object()
+        panel = SimpleNamespace(
+            controller=SimpleNamespace(document=doc),
+            widget=SimpleNamespace(isVisible=lambda: True),
+            last_error=None, scroll_area=object(),
+        )
+        manager._tracktemplate_rea_panel = panel
+        manager.mode_tabs = SimpleNamespace(
+            indexOf=lambda widget: 0, setCurrentIndex=lambda index: None,
+        )
+        case.qt = SimpleNamespace(
+            QtCore=SimpleNamespace(QTimer=Timer),
+            QtWidgets=SimpleNamespace(QApplication=SimpleNamespace(
+                activeModalWidget=lambda: state['active'],
+            )), isValid=lambda dialog: True,
+        )
+        case.module = SimpleNamespace(CurveInputDialog=Curve,
+                                      TurnoutManagerDialog=Manager)
+        case.app = SimpleNamespace(ActiveDocument=doc)
+        case.owned_windows = []
+        case.receipt = {}
+        case.session = object()
+        case.qualification = object()
+        case.settle = lambda: None
+
+        def click(button):
+            if click_error:
+                raise RuntimeError('injected modal click failure')
+            self.assertIs(button, curve.turnout_manager_button)
+            state['active'] = manager
+            # Qt refuses reentrant delivery of the currently active timer.
+            state['timers'][0].emit()
+
+        def launch(*args):
+            state['active'] = curve
+            state['timers'][0].emit()
+            while state['queue']:
+                state['queue'].pop(0)()
+
+        def action(actual_panel, dialog):
+            self.assertIs(actual_panel, panel)
+            self.assertIs(dialog, manager)
+            state['actions'] += 1
+
+        case.click = click
+        case.launcher = {'_launch_workflow_with_rea_editor': launch}
+        if click_error:
+            with self.assertRaisesRegex(RuntimeError, 'injected modal'):
+                case.panel(action)
+            self.assertIn('injected modal', case.receipt['modal_failure'])
+        else:
+            case.panel(action)
+            self.assertEqual(state['actions'], 1)
+        self.assertFalse(state['timers'][0].active)
+        self.assertIsNone(state['active'])
+
+    def test_actual_pick_path_uses_qt_click_not_selection_injection(self):
+        tree = ast.parse((ROOT / gui.REA_ENTRY).read_text())
+        case = next(node for node in tree.body
+                    if isinstance(node, ast.ClassDef) and node.name == 'ReaGui')
+        pick = next(node for node in case.body
+                    if isinstance(node, ast.FunctionDef) and node.name == 'pick')
+        calls = [ast.unparse(node.func) for node in ast.walk(pick)
+                 if isinstance(node, ast.Call)]
+        self.assertIn('view.getPointOnScreen', calls)
+        self.assertIn('self.qt.QtTest.QTest.mouseClick', calls)
+        self.assertNotIn('self.gui.Selection.addSelection', calls)
+        self.assertIn('self.gui.Selection.getSelectionEx', calls)
+        method = next(node for node in case.body
+                      if isinstance(node, ast.FunctionDef)
+                      and node.name == 'full_journey')
+        self.assertNotIn('ViewObject.Proxy = None', ast.unparse(method))
+
+
+class ReaGuardEvidenceRegressions(unittest.TestCase):
+    """Use the guard's actual private-profile layout without a host process."""
+
+    def profile(self, work):
+        output = work / 'evidence/guard'
+        output.mkdir(parents=True)
+        _argv, profile = gui.guard._private_profile(
+            ['flatpak', 'run', gui.guard.APP_ID, 'synthetic.FCMacro'], output,
+        )
+        root = Path(profile['path'])
+        (root / 'user.cfg').write_bytes(b'private synthetic configuration')
+        (root / 'temp/owned.FCStd').write_bytes(b'private synthetic document')
+        gui.write(output / 'result.json', {
+            'status': 'failed', 'private_profile': profile,
+        })
+        (output / 'wrapper.stdout').write_text('Synthetic raw failure\n')
+        (output / 'watchdog.json').write_text('{"action":"owned-kill"}\n')
+        (work / 'evidence/execution.log').write_text('Original exception\n')
+        return root
+
+    def test_live_receipt_validation_does_not_move_owned_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            root = self.profile(work)
+            before = (root / 'user.cfg').read_bytes()
+            gui.validate_rea_evidence(work, stage='readiness')
+            self.assertEqual((root / 'user.cfg').read_bytes(), before)
+            self.assertFalse((work / 'retained-guard-profile').exists())
+            self.assertFalse((work / 'evidence/guard-profile-exclusion.json').exists())
+
+    def test_failed_diagnostics_seal_and_publication_exclude_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            source = self.profile(work)
+            original = {str(path.relative_to(source)): path.read_bytes()
+                        for path in source.rglob('*') if path.is_file()}
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                retained = work / 'retained-guard-profile/profile'
+                self.assertFalse(source.exists())
+                self.assertEqual({str(path.relative_to(retained)): path.read_bytes()
+                                  for path in retained.rglob('*') if path.is_file()},
+                                 original)
+                receipt = work / 'evidence/guard-profile-exclusion.json'
+                before = receipt.read_bytes()
+                gui.exclude_gui_copy(work)
+                self.assertEqual(receipt.read_bytes(), before)
+                gui.native.seal(work)
+                with patch.object(gui.native, 'verify_artifact',
+                                  side_effect=ValueError('Synthetic missing readback')):
+                    self.assertEqual(gui.publish(work), 1)
+                self.assertEqual(receipt.read_bytes(), before)
+            for name in ('evidence.tar', 'publication.tar'):
+                with gui.native.tarfile.open(work / name) as archive:
+                    names = archive.getnames()
+                    self.assertIn('evidence/execution.log', names)
+                    self.assertIn('evidence/guard/wrapper.stdout', names)
+                    self.assertIn('evidence/guard/watchdog.json', names)
+                    self.assertIn('evidence/guard-profile-exclusion.json', names)
+                    self.assertFalse(any('/profile/' in member for member in names))
+                    self.assertEqual(archive.extractfile(
+                        'evidence/execution.log').read(), b'Original exception\n')
+            self.assertTrue((retained / 'temp/owned.FCStd').is_file())
+
+    def test_profile_rejects_foreign_receipt_unknown_root_and_owner(self):
+        for problem in ('foreign-path', 'unknown-root', 'owner'):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                if problem == 'foreign-path':
+                    path = work / 'evidence/guard/result.json'
+                    record = json.loads(path.read_text())
+                    record['private_profile']['path'] = str(work / 'foreign')
+                    path.write_text(json.dumps(record))
+                if problem == 'unknown-root':
+                    (root / 'unknown').mkdir()
+                with patch.object(gui.os, 'getuid', return_value=(
+                        os.getuid() + 1 if problem == 'owner' else os.getuid())):
+                    with self.assertRaises(ValueError):
+                        gui.validate_rea_evidence(work, stage='readiness')
+                self.assertTrue(root.exists())
+                self.assertFalse((work / 'retained-guard-profile').exists())
+
+    def test_profile_rejects_links_and_occupied_retention(self):
+        for problem in ('profile', 'nested', 'receipt', 'retention'):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                if problem == 'profile':
+                    moved = work / 'foreign-profile'
+                    root.rename(moved)
+                    root.symlink_to(moved, target_is_directory=True)
+                elif problem == 'nested':
+                    (root / 'temp/linked').symlink_to(root / 'user.cfg')
+                elif problem == 'receipt':
+                    path = work / 'evidence/guard/result.json'
+                    moved = work / 'foreign-result.json'
+                    path.rename(moved)
+                    path.symlink_to(moved)
+                else:
+                    (work / 'retained-guard-profile').mkdir()
+                with patch.dict(os.environ,
+                                ReaGuiControls.environment('readiness'), clear=True):
+                    with self.assertRaises(ValueError):
+                        gui.exclude_gui_copy(work)
+                self.assertTrue(root.exists())
+
+    def test_repeated_exclusion_refuses_retained_tree_changes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            self.profile(work)
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                retained = work / 'retained-guard-profile/profile/user.cfg'
+                retained.write_bytes(b'changed')
+                with self.assertRaises(ValueError):
+                    gui.exclude_gui_copy(work)
+                self.assertFalse((work / 'evidence.tar').exists())
+
+    def test_known_profile_does_not_admit_other_evidence(self):
+        for name in ('guard/unknown.json', 'guard/shutdown-request.json',
+                     'guard/gui-completion.json', 'guard/watchdog2.json',
+                     'gui/to-b8.png', 'gui/private.FCStd'):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                path = work / 'evidence' / name
+                path.parent.mkdir(exist_ok=True)
+                path.write_bytes(b'unapproved')
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_evidence(work, stage='readiness')
+                self.assertTrue(root.exists())
+
+    def test_actual_guard_early_failure_preserves_raw_stdout(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            runtime = work / 'private-runtime'
+            runtime.mkdir(mode=0o700)
+            command = Mock(return_value=subprocess.CompletedProcess(
+                [], 0, gui.guard.APP_ID + ' 999999\n', '',
+            ))
+            process = Mock(side_effect=AssertionError('No host process'))
+            result = gui.guard.run_guarded_flatpak(
+                ['flatpak', 'run', gui.guard.APP_ID, 'synthetic.FCMacro'],
+                limits=gui.limits('readiness', 'rea-bc'),
+                evidence_dir=work / 'evidence/guard', isolate_profile=True,
+                context=gui.guard.GuardContext(run=command, popen=process,
+                                               runtime_dir=runtime),
+            )
+            self.assertEqual(result['failure_reason'], 'foreign-freecad-instance')
+            process.assert_not_called()
+            gui.validate_rea_evidence(work, stage='readiness')
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                gui.native.seal(work)
+            self.assertTrue((work / 'evidence.tar').is_file())
 
 
 if __name__ == '__main__':

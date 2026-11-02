@@ -102,6 +102,372 @@ DIAGNOSTIC_CHANGED_CONTROLS = (
     'tools/hosted_l1_gui_validation.py',
 )
 
+REA_SCOPE = 'REA-BC-LIFECYCLE-GUI-001'
+REA_REF = 'refs/heads/codex/rea-bc-exit-profile'
+REA_ENTRY = 'tests/hosted_rea_trackwork_gui_suite.py'
+REA_INPUTS = (
+    'tests/fixtures/phase9b-rea-bc-source.json',
+    'tests/validate_phase1_turnout.py',
+    'reference/contracts/phase1-compatibility.json',
+    'reference/contracts/phase1-transition-pilot.json',
+    'TrackTemplate.FCMacro',
+    'model_railway_curve_template_multitrack_v10_2a8a7b15_'
+    'chair_performance_and_representation.FCMacro',
+)
+REA_CONTROL_FILES = (
+    '.github/workflows/l1-gui-validation.yml',
+    'tools/hosted_l1_gui_validation.py',
+    'tools/hosted_l1_gui_install.py',
+    'tools/hosted_l1_private_validation.py',
+    'tools/hosted_native_geometry_pilot.py',
+    'tools/freecad_validation_guard.py',
+    'tests/hosted_l1_gui_suite.py',
+    'tests/freecad_validate_rea_trackwork.py',
+    'tests/validate_hosted_l1_gui_controls.py', REA_ENTRY,
+)
+
+
+def selected_workload(environ):
+    """Preserve L1 as the default; admit only the separate reviewed route."""
+    value = environ.get('TRACKTEMPLATE_GUI_WORKLOAD', 'l1')
+    require(value in ('l1', 'rea-bc'), 'Unsupported GUI workload')
+    return value
+
+
+def _hash(value):
+    return isinstance(value, str) and re.fullmatch(r'[0-9a-f]{64}', value)
+
+
+def rea_counts(stage):
+    """Return exact operation counts for the independently reviewed journey."""
+    require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
+    counts = {
+        'tests': 1, 'fresh_documents': 2, 'reopens': 1,
+        'source_records_created': 2, 'successful_parameter_updates': 2,
+        'no_op_applies': 1, 'undo_redo_pairs': 1,
+        'host_invalidation_cases': 1, 'explicit_rebuilds': 3,
+        'adopted_view_rollback_cases': 1, 'actual_viewport_picks': 2,
+        'visible_input_refusals': 2, 'operator_label_cases': 1,
+        'profile_selections': 2, 'profile_deselections': 1,
+        'selected_profile_reopens': 1, 'viewport_images': 8,
+        'dialog_images': 5, 'screenshots_total': 13,
+    }
+    if stage == 'readiness':
+        counts = dict.fromkeys(counts, 0)
+        counts.update(tests=1, fresh_documents=1, dialog_images=1,
+                      screenshots_total=1)
+    return counts
+
+
+def validate_rea_counts(counts, stage):
+    expected = rea_counts(stage)
+    require(type(counts) is dict and set(counts) == set(expected)
+            and all(type(counts[key]) is int and counts[key] == value
+                    for key, value in expected.items()),
+            'B/C GUI operation counts differ')
+
+
+def rea_images(stage):
+    if stage == 'readiness':
+        return {'readiness-panel.png'}
+    require(stage == 'gui', 'Unsupported GUI image stage')
+    return {
+        'to-b8.png', 'to-c925-selected.png', 'to-b8-returned.png',
+        'host-invalidated.png', 'host-rebuilt.png', 'reopened-empty.png',
+        'rollback-retained.png', 'xo-selected.png', 'to-b8-fields.png',
+        'to-c925-selected-fields.png', 'to-b8-returned-fields.png',
+        'rollback-error.png', 'xo-selected-fields.png',
+    }
+
+
+def rea_report(stdout):
+    prefix = 'TRACKTEMPLATE_REA_TRACKWORK_GUI='
+    lines = [line[len(prefix):] for line in stdout.splitlines()
+             if line.startswith(prefix)]
+    require(len(lines) == 1 and stdout.count(prefix) == 1,
+            'Expected one B/C GUI report')
+
+    def reject_constant(value):
+        raise ValueError('Nonfinite GUI report: ' + value)
+
+    def finite_float(value):
+        number = float(value)
+        require(math.isfinite(number), 'Nonfinite GUI report number')
+        return number
+
+    record = json.loads(lines[0], object_pairs_hook=original._unique_object,
+                        parse_constant=reject_constant,
+                        parse_float=finite_float)
+    require(type(record) is dict, 'GUI report must be an object')
+    return record
+
+
+def rea_source_files():
+    """Read the complete tracked product inventory on the hosted controller."""
+    names = native.command('git', 'ls-files', '--', 'tracktemplate').splitlines()
+    require(names and len(names) == len(set(names)),
+            'Tracked product inventory unavailable')
+    hashes = {}
+    for name in names:
+        path = ROOT / name
+        require(path.is_file() and not path.is_symlink(),
+                'Linked or missing product source')
+        hashes[name] = digest(path)
+    return hashes
+
+
+def rea_source_tree():
+    """Bind all tracked modular product bytes, not merely selected fixtures."""
+    return hashlib.sha256(json.dumps(
+        rea_source_files(), sort_keys=True, separators=(',', ':'),
+    ).encode()).hexdigest()
+
+
+def validate_rea_authority(record, environ):
+    """Bind owner handling, recovery and separate readiness to this source."""
+    stage = selected_stage(environ)
+    expected = {
+        'schema': 1, 'scope_id': REA_SCOPE, 'workload': 'rea-bc',
+        'stage': stage, 'source_commit': environ['GITHUB_SHA'],
+        'source_ref': REA_REF, 'owner': 'Richard-Gnitnub',
+        'execution_authorized': True, 'independent_review': 'PASS',
+        'run_attempt': 1, 'initial_reserve_mib': RESERVE_MIB,
+        'software_renderer': 'llvmpipe', 'external_inputs': 0,
+        'private_inputs': 0, 'historical_repair_allowance_consumed': True,
+        'automatic_retry': False,
+        'freecad_limits': vars(limits(stage, 'rea-bc')),
+        'display_limits': vars(display_limits(stage, 'rea-bc')),
+    }
+    require(type(record) is dict and all(
+        type(record.get(key)) is type(value) and record[key] == value
+        for key, value in expected.items()
+    ), 'Separate B/C GUI authority absent or differs')
+    require(environ.get('GITHUB_REF') == REA_REF
+            and not diagnostic_enabled(environ),
+            'B/C candidate or diagnostic selection differs')
+    require(all(isinstance(record.get(key), str) and record[key].strip()
+                for key in ('decision_id', 'dispatch_nonce'))
+            and _hash(record.get('source_tree_sha256'))
+            and _hash(record.get('gui_entry_sha256')),
+            'B/C source or decision identity absent')
+    for key, paths in (('control_files_sha256', REA_CONTROL_FILES),
+                       ('input_hashes', REA_INPUTS)):
+        hashes = record.get(key)
+        require(type(hashes) is dict and set(hashes) == set(paths)
+                and all(_hash(value) for value in hashes.values()),
+                'B/C reviewed source bindings incomplete')
+    handling = record.get('handling_review', {})
+    expected_handling = {
+        'independent_review': 'PASS', 'public_research_screenshots': True,
+        'retention_days': 30, 'independent_preservation': True,
+        'readiness_images': 1, 'gui_images': 13,
+        'source_archive_upload': False, 'operator_documents': False,
+        'exact_exports': False, 'fcstd_upload': False,
+    }
+    require(type(handling) is dict
+            and set(handling) == set(expected_handling) | {'decision_sha256'}
+            and _hash(handling.get('decision_sha256'))
+            and all(type(handling.get(key)) is type(value)
+                    and handling[key] == value
+                    for key, value in expected_handling.items()),
+            'Separate B/C screenshot handling approval absent or differs')
+    recovery = record.get('gui_recovery', {})
+    require(recovery.get('status') == recovery.get('independent_review')
+            == 'PASS' and recovery.get('source_commit') == record['source_commit']
+            and _hash(recovery.get('evidence_sha256')),
+            'B/C source recovery evidence absent')
+    native_review = record.get('prior_native_evidence', {})
+    require(native_review.get('status') == native_review.get('independent_review')
+            == 'PASS' and type(native_review.get('run_id')) is int
+            and native_review['run_id'] > 0
+            and str(native_review['run_id']) != environ['GITHUB_RUN_ID']
+            and _hash(native_review.get('evidence_sha256'))
+            and _hash(native_review.get('source_compatibility_review_sha256')),
+            'B/C independent native evidence or reuse review absent')
+    if stage == 'gui':
+        ready = record.get('gui_readiness_review', {})
+        expected_ready = {
+            key: record[key] for key in (
+                'scope_id', 'workload', 'source_commit', 'source_tree_sha256',
+                'gui_entry_sha256', 'control_files_sha256', 'input_hashes',
+                'handling_review',
+            )
+        }
+        expected_ready.update(
+            status='PASS', independent_review='PASS', stage='readiness',
+            freecad_limits=vars(limits('readiness', 'rea-bc')),
+            display_limits=vars(display_limits('readiness', 'rea-bc')),
+            tests=1, skips=0, run_attempt=1, cleanup=True,
+            evidence_verified=True, independent_preservation=True,
+            sentinel=sentinel('readiness', 'rea-bc'),
+        )
+        require(all(type(ready.get(key)) is type(value)
+                    and ready[key] == value
+                    for key, value in expected_ready.items())
+                and type(ready.get('run_id')) is int and ready['run_id'] > 0
+                and str(ready['run_id']) != environ['GITHUB_RUN_ID']
+                and all(_hash(ready.get(key)) for key in (
+                    'evidence_sha256', 'result_review_sha256',
+                    'preservation_review_sha256')),
+                'Separate exact-source B/C GUI readiness unproved')
+
+
+def require_rea_finalization_time(stage, environ, now):
+    started = int(environ['L1_JOB_START_SECONDS'])
+    require(0 <= now - started
+            <= 45 * 60 - limits(stage, 'rea-bc').timeout_seconds - 600,
+            'Insufficient B/C job time for proof and finalization')
+
+
+def _rea_profile_inventory(profile):
+    """Hash an owned private profile without making its contents public."""
+    directories = {
+        'FREECAD_USER_HOME': 'user-home', 'FREECAD_USER_DATA': 'user-data',
+        'FREECAD_USER_TEMP': 'temp', 'XDG_CACHE_HOME': 'xdg-cache',
+        'XDG_CONFIG_HOME': 'xdg-config', 'XDG_DATA_HOME': 'xdg-data',
+        'PYTHONPYCACHEPREFIX': 'python-cache',
+    }
+    require(not any(path.is_symlink() for path in (profile, *profile.parents))
+            and profile.is_dir(), 'Linked or missing guard profile')
+    require(set(path.name for path in profile.iterdir())
+            <= set(directories.values()) | {'user.cfg', 'system.cfg'}
+            and all((profile / name).is_dir()
+                    for name in directories.values()),
+            'Unexpected guard profile layout')
+    inventory = {}
+    for path in (profile, *sorted(profile.rglob('*'))):
+        require(not path.is_symlink() and path.stat().st_uid == os.getuid(),
+                'Linked or foreign guard profile member')
+        name = path.relative_to(profile).as_posix()
+        if path.is_dir():
+            require(name not in ('user.cfg', 'system.cfg'),
+                    'Guard configuration is not a file')
+            inventory[name] = {'kind': 'directory'}
+        else:
+            require(path.is_file(), 'Nonregular guard profile member')
+            inventory[name] = {'kind': 'file', 'sha256': digest(path),
+                               'bytes': path.stat().st_size}
+    return directories, inventory
+
+
+def _rea_guard_profile(work):
+    """Validate live or retained private state against its guard receipt."""
+    source = work / 'evidence/guard/profile'
+    parent = work / 'retained-guard-profile'
+    retained = parent / 'profile'
+    receipt_path = work / 'evidence/guard-profile-exclusion.json'
+    if not any(path.exists() or path.is_symlink()
+               for path in (source, parent, receipt_path)):
+        return None
+    live = source.exists() or source.is_symlink()
+    require(not live or not (parent.exists() or parent.is_symlink()
+                            or receipt_path.exists()
+                            or receipt_path.is_symlink()),
+            'Guard profile retention target occupied')
+    result_path = work / 'evidence/guard/result.json'
+    require(not any(path.is_symlink()
+                    for path in (result_path, *result_path.parents))
+            and result_path.is_file()
+            and result_path.stat().st_uid == os.getuid(),
+            'Guard profile ownership receipt differs')
+    private = json.loads(result_path.read_text()).get('private_profile', {})
+    profile = source if live else retained
+    directories, inventory = _rea_profile_inventory(profile)
+    environment = {name: str(source / directory)
+                   for name, directory in directories.items()}
+    environment['PYTHONDONTWRITEBYTECODE'] = '1'
+    require(type(private) is dict and private.get('path') == str(source)
+            and private.get('environment') == environment,
+            'Guard profile path or environment differs')
+    files = [row for row in inventory.values() if row['kind'] == 'file']
+    receipt = {
+        'schema': 1, 'source': 'guard/profile',
+        'retained': 'retained-guard-profile/profile',
+        'reason': 'private-runtime-state-not-public-evidence',
+        'guard_result_sha256': digest(result_path),
+        'tree_sha256': hashlib.sha256(json.dumps(
+            inventory, sort_keys=True, separators=(',', ':'),
+        ).encode()).hexdigest(),
+        'files': len(files), 'bytes': sum(row['bytes'] for row in files),
+        'directories': len(inventory) - len(files),
+    }
+    if not live:
+        require(parent.stat().st_uid == os.getuid()
+                and set(path.name for path in parent.iterdir())
+                == {'profile', 'manifest.json'},
+                'Guard profile retention inventory differs')
+        for path, expected in ((parent / 'manifest.json', inventory),
+                               (receipt_path, receipt)):
+            require(not any(item.is_symlink() for item in (path, *path.parents))
+                    and path.is_file() and path.stat().st_uid == os.getuid()
+                    and json.loads(path.read_text()) == expected,
+                    'Retained guard profile identity changed')
+    return profile, inventory, receipt
+
+
+def _retain_rea_guard_profile(work):
+    """Keep the owned profile outside both archives, without deleting it."""
+    state = _rea_guard_profile(work)
+    source = work / 'evidence/guard/profile'
+    if state is None or state[0] != source:
+        return
+    _profile, inventory, receipt = state
+    parent = work / 'retained-guard-profile'
+    parent.mkdir(mode=0o700)
+    write(parent / 'manifest.json', inventory)
+    source.rename(parent / 'profile')
+    write(work / 'evidence/guard-profile-exclusion.json', receipt)
+    _rea_guard_profile(work)
+
+
+def validate_rea_evidence(work, *, stage):
+    """Exclude archives, documents and unknown media before either upload."""
+    evidence = work / 'evidence'
+    profile = _rea_guard_profile(work)
+    roots = {
+        'prepare.log', 'install.log', 'acquisition.log', 'execution.log',
+        'finalizer.log', 'seal.log', 'publication.log', 'xvfb.log',
+        'gui-authority.json', 'admission.json', 'gui-run-config.json',
+        'gui-macro.json', 'display-start-intent.json',
+        'display-ownership.json', 'display-kernel.json',
+        'display-samples.jsonl', 'host.jsonl', 'display-cleanup.json',
+        'assessment.json', 'process-finalization.json',
+        'runtime-finalization.json', 'display-finalization.json',
+        'gui-staging-cleanup.json', 'gui-document-cleanup.json',
+        'publication.json', 'finalization.json',
+        'clearance.json', 'deadline-clearance.json', 'emergency-cleanup.json',
+        'installer-intent.json', 'installer-ownership.json',
+        'installer-result.json', 'installer-output.log',
+        'installer-samples.jsonl', 'installer-cleanup.json',
+        'guard-profile-exclusion.json',
+    }
+    groups = {
+        'gui': {'result.json', *rea_images(stage)},
+        'guard': {'control.json', 'result.json', 'ownership.json',
+                  'measurements.jsonl', 'stdout', 'stderr',
+                  'wrapper.stdout', 'watchdog.json'},
+        'display-preflight': {'clearance.json'},
+        'finalizer-clearance': {'clearance.json', 'deadline-clearance.json'},
+    }
+    require(not evidence.is_symlink() and evidence.is_dir(),
+            'B/C evidence directory differs')
+    for path in evidence.rglob('*'):
+        relative = path.relative_to(evidence)
+        require(not path.is_symlink(), 'Linked B/C evidence refused')
+        if profile is not None and path.is_relative_to(profile[0]):
+            # Receipt validation is read-only while display cleanup is pending.
+            # Seal/publication relocate this verified tree before archiving.
+            continue
+        if path.is_dir():
+            require(str(relative) in groups, 'Unexpected evidence directory')
+        else:
+            allowed = (len(relative.parts) == 1 and relative.name in roots
+                       or len(relative.parts) == 2
+                       and relative.parts[0] in groups
+                       and relative.name in groups[relative.parts[0]])
+            require(path.is_file() and allowed,
+                    'Unexpected B/C evidence member: ' + str(relative))
+
 
 def diagnostic_enabled(environ):
     """Require an explicit boolean dispatch value; default remains off."""
@@ -225,18 +591,26 @@ def selected_stage(environ):
     return stage
 
 
-def limits(stage):
+def limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    return guard.ValidationLimits(4096, 90 if stage == 'readiness' else 7200)
+    require(workload in ('l1', 'rea-bc'), 'Unsupported GUI workload')
+    full = 900 if workload == 'rea-bc' else 7200
+    return guard.ValidationLimits(4096, 90 if stage == 'readiness' else full)
 
 
-def display_limits(stage):
+def display_limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    return guard.ValidationLimits(256, 190 if stage == 'readiness' else 7300,
+    require(workload in ('l1', 'rea-bc'), 'Unsupported GUI workload')
+    full = 1000 if workload == 'rea-bc' else 7300
+    return guard.ValidationLimits(256, 190 if stage == 'readiness' else full,
                                   25, 16)
 
 
-def sentinel(stage):
+def sentinel(stage, workload='l1'):
+    if workload == 'rea-bc':
+        return ('REA B/C hosted GUI readiness passed' if stage == 'readiness'
+                else 'REA B/C hosted GUI validation passed')
+    require(workload == 'l1', 'Unsupported GUI workload')
     return READINESS_SENTINEL if stage == 'readiness' else SENTINEL
 
 
@@ -266,7 +640,18 @@ def validate_readiness(review, control, current_run):
 
 def validate_host(environ, memory):
     """Keep native admission and add the display ceiling to initial reserve."""
-    values = native.validate_host(environ, memory)
+    if selected_workload(environ) == 'rea-bc':
+        require(environ.get('GITHUB_REF') == REA_REF
+                and environ.get('GITHUB_RUN_ID', '').isdigit()
+                and not diagnostic_enabled(environ),
+                'Reviewed B/C candidate required')
+        require(not any(environ.get(name, '').lower() in ('1', 'true')
+                        for name in ('RUNNER_DEBUG', 'ACTIONS_STEP_DEBUG',
+                                     'ACTIONS_RUNNER_DEBUG')),
+                'Debug logging refused')
+        values = original.validate_admission(environ, memory)
+    else:
+        values = native.validate_host(environ, memory)
     require(values['MemAvailable'] >= (
         LIMITS.memory_max_mib + DISPLAY_LIMITS.memory_max_mib + RESERVE_MIB
     ) * 1024**2, 'Insufficient memory for FreeCAD, display and reserve')
@@ -275,6 +660,8 @@ def validate_host(environ, memory):
 
 def validate_authority(record, environ):
     """Require a separate explicit GUI scope; native approval is insufficient."""
+    if selected_workload(environ) == 'rea-bc':
+        return validate_rea_authority(record, environ)
     stage = selected_stage(environ)
     validate_product_requalification(record, environ)
     diagnostic = validate_diagnostic(record, environ)
@@ -343,12 +730,20 @@ def prepare(work):
             'Reviewed checkout differs')
     require(not native.command('git', 'status', '--porcelain',
                                '--untracked-files=no'), 'Dirty source checkout')
-    validate_frozen_source(control)
+    workload = selected_workload(os.environ)
+    if workload == 'rea-bc':
+        require(rea_source_tree() == control['source_tree_sha256'],
+                'Reviewed modular source tree changed')
+        for name, expected in control['input_hashes'].items():
+            require(digest(ROOT / name) == expected, 'Reviewed B/C input changed')
+    else:
+        validate_frozen_source(control)
     for name, expected in control['control_files_sha256'].items():
         require(digest(ROOT / name) == expected, 'Reviewed GUI control changed')
     if diagnostic_enabled(os.environ):
         validate_diagnostic_source(control)
-    require(digest(ROOT / ENTRY) == control['gui_entry_sha256'],
+    entry = REA_ENTRY if workload == 'rea-bc' else ENTRY
+    require(digest(ROOT / entry) == control['gui_entry_sha256'],
             'Reviewed GUI entry changed')
     require(digest(ROOT / 'tools/freecad_validation_guard.py')
             == original.GUARD_SHA256, 'Accepted guard changed')
@@ -358,7 +753,23 @@ def prepare(work):
 
 
 def acquire(work):
-    """Reuse the unchanged ten-input native archive and recovery bindings."""
+    """Reuse L1 acquisition; B/C uses only its exact reviewed public tree."""
+    if selected_workload(os.environ) == 'rea-bc':
+        control = json.loads((work / 'control.json').read_text())
+        config = {
+            'schema': 1, 'workload': 'rea-bc', 'inputs': [],
+            'external_inputs': 0, 'input_hashes': control['input_hashes'],
+            'source_tree_sha256': control['source_tree_sha256'],
+            'product_files_sha256': rea_source_files(),
+            'source_commit': control['source_commit'],
+            'repository_root': str(ROOT),
+            'private_evidence_dir': str(work / 'evidence'),
+            'temporary_document_dir': str(work / 'test-data'),
+        }
+        write(work / 'run-config.json', config)
+        write(work / 'gui-run-config.json', config)
+        write(work / 'evidence/gui-run-config.json', config)
+        return
     native.acquire('readiness', work)
     config = json.loads((work / 'run-config.json').read_text())
     control = json.loads((work / 'control.json').read_text())
@@ -376,14 +787,14 @@ def display_unit(environ):
     return f'tracktemplate-l1-gui-display-{run_id}.service'
 
 
-def display_properties(stage='gui'):
+def display_properties(stage='gui', workload='l1'):
     """Return explicit kernel and deadline properties for the display alone."""
     return {
         'MemoryMax': str(DISPLAY_LIMITS.memory_max_mib * 1024**2),
         'MemoryHigh': str(DISPLAY_LIMITS.memory_max_mib * 1024**2),
         'MemorySwapMax': '0', 'CPUQuota': '25%',
         'CPUQuotaPeriodSec': '100ms', 'TasksMax': '16',
-        'RuntimeMaxSec': str(display_limits(stage).timeout_seconds), 'TimeoutStopSec': '5',
+        'RuntimeMaxSec': str(display_limits(stage, workload).timeout_seconds), 'TimeoutStopSec': '5',
         'KillMode': 'control-group', 'Restart': 'no',
         'Type': 'exec', 'RemainAfterExit': 'yes',
     }
@@ -436,7 +847,8 @@ def start_display(work):
     authority.chmod(0o600)
     argv = ['systemd-run', '--user', '--quiet', '--unit=' + unit]
     stage = selected_stage(os.environ)
-    properties = display_properties(stage)
+    workload = selected_workload(os.environ)
+    properties = display_properties(stage, workload)
     properties.update(StandardOutput='append:' + str(work / 'evidence/xvfb.log'),
                       StandardError='append:' + str(work / 'evidence/xvfb.log'))
     argv += [f'--property={key}={value}' for key, value in properties.items()]
@@ -452,7 +864,8 @@ def start_display(work):
     group = _display_group(owner)
     require(state.get('ActiveState') == 'active'
             and state.get('RuntimeMaxUSec') == (
-                '3min 10s' if stage == 'readiness' else '2h 1min 40s')
+                '3min 10s' if stage == 'readiness' else
+                '16min 40s' if workload == 'rea-bc' else '2h 1min 40s')
             and state.get('TimeoutStopUSec') == '5s'
             and state.get('KillMode') == 'control-group'
             and state.get('Restart') == 'no', 'Display deadline unproved')
@@ -567,6 +980,9 @@ def child_environment(work):
                  DISPLAY=DISPLAY, XAUTHORITY=str(work / 'display/Xauthority'),
                  QT_QPA_PLATFORM='xcb', LIBGL_ALWAYS_SOFTWARE='1',
                  GALLIUM_DRIVER='llvmpipe')
+    if selected_workload(os.environ) == 'rea-bc':
+        clean['TRACKTEMPLATE_GUI_WORKLOAD'] = 'rea-bc'
+        clean['GITHUB_REF'] = os.environ['GITHUB_REF']
     return clean
 
 
@@ -583,13 +999,16 @@ def write_gui_macro(work):
             'from tools import l1_gui_lifecycle_observer as observer\n'
             f'observer.install({str(work / "evidence")!r})\n'
         )
+    suite = ('hosted_rea_trackwork_gui_suite'
+             if selected_workload(os.environ) == 'rea-bc'
+             else 'hosted_l1_gui_suite')
     content = ('import sys\n'
                'import FreeCAD as App\n'
                'import FreeCADGui as Gui\n'
                f'sys.path.insert(0, {str(ROOT / "tests")!r})\n'
-               'import hosted_l1_gui_suite\n'
+               f'import {suite}\n'
                + observer +
-               'hosted_l1_gui_suite.start()\n')
+               f'{suite}.start()\n')
     with macro.open('x', encoding='utf-8') as stream:
         stream.write(content)
     write(work / 'evidence/gui-macro.json', {
@@ -610,6 +1029,8 @@ def gui_argv(clean, macro):
              'DISPLAY', 'XAUTHORITY', 'QT_QPA_PLATFORM',
              'LIBGL_ALWAYS_SOFTWARE', 'GALLIUM_DRIVER',
              'OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS')
+    if clean.get('TRACKTEMPLATE_GUI_WORKLOAD') == 'rea-bc':
+        names += ('TRACKTEMPLATE_GUI_WORKLOAD', 'GITHUB_REF')
     argv = ['flatpak', 'run', '--command=FreeCAD']
     argv += [f'--env={name}={clean[name]}' for name in names]
     return [*argv, guard.APP_ID, str(macro)]
@@ -617,9 +1038,10 @@ def gui_argv(clean, macro):
 
 def qualified_runtime(stdout):
     """Reuse the accepted strict parser with the one actual GUI test frame."""
-    with patch.object(native, 'SELECTORS', {
-        'gui': 'hosted_l1_gui_suite.L1Gui.test_authorised_gui_stage',
-    }):
+    selector = ('hosted_rea_trackwork_gui_suite.ReaGui.test_authorised_gui_stage'
+                if selected_workload(os.environ) == 'rea-bc'
+                else 'hosted_l1_gui_suite.L1Gui.test_authorised_gui_stage')
+    with patch.object(native, 'SELECTORS', {'gui': selector}):
         native.qualified_runtime(stdout)
 
 
@@ -652,10 +1074,14 @@ def run(work):
     """Execute one real GUI unittest with distinct FreeCAD/display accounting."""
     stage = selected_stage(os.environ)
     validate_host(os.environ, Path('/proc/meminfo').read_text())
-    native.require_finalization_time(
-        'readiness' if stage == 'readiness' else 'native',
-        os.environ, time.time(),
-    )
+    workload = selected_workload(os.environ)
+    if workload == 'rea-bc':
+        require_rea_finalization_time(stage, os.environ, time.time())
+    else:
+        native.require_finalization_time(
+            'readiness' if stage == 'readiness' else 'native',
+            os.environ, time.time(),
+        )
     require(native.command('flatpak', 'info', '--system', '--show-commit',
                            guard.APP_ID) == original.APP_COMMIT,
             'FreeCAD build differs')
@@ -703,7 +1129,8 @@ def run(work):
         macro = write_gui_macro(work)
         argv = gui_argv(clean, macro)
         result = guard.run_guarded_flatpak(
-            argv, limits=limits(stage), evidence_dir=work / 'evidence/guard',
+            argv, limits=limits(stage, workload),
+            evidence_dir=work / 'evidence/guard',
             lease=lease,
             context=guard.GuardContext(sleep=sleep), cwd=ROOT, env=clean,
             isolate_profile=True,
@@ -717,8 +1144,8 @@ def run(work):
                    (guard_dir / 'measurements.jsonl').read_text().splitlines()]
         with ExitStack() as stack:
             for name, value in (
-                ('LIMITS', limits(stage)),
-                ('GEOMETRY_SENTINEL', sentinel(stage)),
+                ('LIMITS', limits(stage, workload)),
+                ('GEOMETRY_SENTINEL', sentinel(stage, workload)),
                 ('_qualified_runtime', qualified_runtime),
             ):
                 stack.enter_context(patch.object(original, name, value))
@@ -729,9 +1156,14 @@ def run(work):
             )
         assess_display(display_samples)
         receipt = json.loads((work / 'evidence/gui/result.json').read_text())
-        validate_gui_receipt(receipt, work, stage=stage)
+        if workload == 'rea-bc':
+            require(rea_report((guard_dir / 'stdout').read_text()) == receipt,
+                    'B/C stdout and retained report differ')
+            validate_rea_receipt(receipt, work, stage=stage)
+        else:
+            validate_gui_receipt(receipt, work, stage=stage)
         assessment['gui_receipt'] = receipt
-        assessment['scope'] = SCOPE
+        assessment['scope'] = REA_SCOPE if workload == 'rea-bc' else SCOPE
         if assessment['status'] == 'PASS':
             assessment['classification'] = 'HOSTED_GUI_PASS'
     except (OSError, ValueError, KeyError, TypeError,
@@ -816,6 +1248,114 @@ def validate_gui_receipt(receipt, work, *, stage='gui'):
                 and path.stat().st_size == row['bytes'] > 0,
                 'Screenshot bytes differ')
     require(names == expected_images, 'GUI screenshot witness set differs')
+
+
+def validate_rea_receipt(receipt, work, *, stage):
+    """Require the real B/C journey, source identities and each visible witness."""
+    control = json.loads((work / 'control.json').read_text())
+    expected = {
+        'status': 'PASS', 'stage': stage, 'scope_id': REA_SCOPE,
+        'workload': 'rea-bc', 'profile': original.EXPECTED_PROFILE,
+        'source_commit': control['source_commit'],
+        'source_tree_sha256': control['source_tree_sha256'],
+        'input_hashes': control['input_hashes'],
+        'gui_entry_sha256': control['gui_entry_sha256'],
+        'input_bindings_unchanged': True, 'owned_documents_closed': True,
+        'owned_windows_closed': True, 'cleanup_errors': [],
+        'documents_remaining': 0, 'failures': 0, 'errors': 0, 'skips': 0,
+        'geometry_builds': 0 if stage == 'readiness' else 8,
+        'sentinel': sentinel(stage, 'rea-bc'),
+    }
+    require(all(type(receipt.get(key)) is type(value)
+                and receipt[key] == value for key, value in expected.items()),
+            'B/C GUI receipt incomplete')
+    validate_rea_counts(receipt.get('checks'), stage)
+    elapsed = receipt.get('total_seconds')
+    require(type(elapsed) in (int, float)
+            and 0 <= elapsed <= limits(stage, 'rea-bc').timeout_seconds
+            and math.isfinite(elapsed),
+            'B/C elapsed time missing, nonfinite or outside stage limit')
+    require(rea_source_tree() == control['source_tree_sha256']
+            and all(digest(ROOT / name) == value
+                    for group in ('input_hashes', 'control_files_sha256')
+                    for name, value in control[group].items()),
+            'Reviewed source changed during B/C GUI execution')
+    renderer = receipt.get('renderer', {})
+    require(renderer.get('platform') == 'xcb'
+            and renderer.get('gui_up') is True
+            and renderer.get('widget_valid') is True
+            and all(isinstance(renderer.get(key), str) and renderer[key]
+                    for key in ('renderer', 'vendor', 'version'))
+            and 'llvmpipe' in renderer['renderer'].lower(),
+            'Real B/C software OpenGL context unproved')
+    screenshots = receipt.get('screenshots')
+    expected_images = rea_images(stage)
+    require(type(screenshots) is list
+            and len(screenshots) == len(expected_images),
+            'B/C screenshot count differs')
+    names = set()
+    for row in screenshots:
+        require(type(row) is dict
+                and set(row) == {'path', 'sha256', 'bytes'},
+                'B/C screenshot record differs')
+        name = row['path']
+        require(name in expected_images and name not in names
+                and _hash(row['sha256']) and type(row['bytes']) is int
+                and row['bytes'] > 0, 'B/C screenshot identity differs')
+        names.add(name)
+        path = work / 'evidence/gui' / name
+        require(path.is_file()
+                and not any(item.is_symlink() for item in (path, *path.parents))
+                and digest(path) == row['sha256']
+                and path.stat().st_size == row['bytes']
+                and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'),
+                'B/C screenshot bytes differ')
+    require(names == expected_images, 'B/C screenshot set differs')
+    validate_rea_evidence(work, stage=stage)
+
+
+def cleanup_rea_documents(work):
+    """After verified evidence preservation remove only owned test documents."""
+    directory = work / 'test-data'
+    receipt = work / 'evidence/gui/result.json'
+    rows = (json.loads(receipt.read_text()).get('temporary_documents', [])
+            if receipt.exists() else [])
+    require(type(rows) is list and len(rows) <= 1,
+            'B/C temporary document inventory differs')
+    expected = set()
+    removed = []
+    for row in rows:
+        require(type(row) is dict
+                and set(row) == {'path', 'sha256', 'bytes'}
+                and row['path'] == 'test-data/research.FCStd'
+                and _hash(row['sha256']) and type(row['bytes']) is int
+                and row['bytes'] > 0, 'B/C temporary document identity differs')
+        expected.add(row['path'])
+    require(len(expected) == len(rows), 'Duplicate temporary document')
+    require(not directory.is_symlink(), 'Linked B/C document directory')
+    if directory.exists():
+        actual = {str(path.relative_to(work)) for path in directory.iterdir()}
+        require(directory.is_dir() and actual == expected,
+                'Unknown B/C temporary document')
+    else:
+        require(not rows, 'Recorded B/C temporary document missing')
+    for row in rows:
+        path = work / row['path']
+        require(path.is_file() and path.stat().st_uid == os.getuid()
+                and not any(item.is_symlink() for item in (path, *path.parents))
+                and digest(path) == row['sha256']
+                and path.stat().st_size == row['bytes'],
+                'B/C temporary document bytes or ownership changed')
+        path.unlink()
+        require(not path.exists(), 'B/C temporary document remains')
+        removed.append(row)
+    if directory.exists():
+        require(not tuple(directory.iterdir()), 'B/C temporary data remains')
+        directory.rmdir()
+    write(work / 'evidence/gui-document-cleanup.json', {
+        'cleanup': True, 'removed': removed, 'directory_absent': True,
+        'secure_erasure_claimed': False,
+    })
 
 
 def _installation_was_skipped(work):
@@ -937,6 +1477,10 @@ def _failed_install_cleanup(work, public):
 
 def exclude_gui_copy(work):
     """Retain the one copied document outside the diagnostic archive."""
+    if selected_workload(os.environ) == 'rea-bc':
+        _retain_rea_guard_profile(work)
+        validate_rea_evidence(work, stage=selected_stage(os.environ))
+        return
     source = work / 'evidence/gui/XO-001-copy.FCStd'
     others = [path for path in (work / 'evidence').rglob('*')
               if path.is_file() and path.suffix.lower() == '.fcstd'
@@ -990,19 +1534,26 @@ def publish(work):
             'copied_input_absent': not target.exists(),
             'display_cookie_absent': not cookie.exists(),
         })
+        if selected_workload(os.environ) == 'rea-bc':
+            cleanup_rea_documents(work)
         cleanup = native.cleanup_staging(work, evidence)
         require(cleanup['cleanup'], 'Input staging cleanup incomplete')
     except (OSError, ValueError, KeyError, TypeError):
         publication['errors'].append(traceback.format_exc())
     write(work / 'evidence/publication.json', publication)
     exclude_gui_copy(work)
+    if selected_workload(os.environ) == 'rea-bc':
+        validate_rea_evidence(work, stage=selected_stage(os.environ))
     native.evidence_archive(work, work / 'publication.tar')
     return 0 if not publication['errors'] else 1
 
 
 def complete(work, public):
     """Emit PASS only after both exact artifacts and every cleanup proof."""
-    summary = {'schema': 1, 'scope_id': SCOPE, 'outcome': 'INCOMPLETE',
+    workload = selected_workload(os.environ)
+    summary = {'schema': 1,
+               'scope_id': REA_SCOPE if workload == 'rea-bc' else SCOPE,
+               'outcome': 'INCOMPLETE',
                'source_commit': os.environ['GITHUB_SHA'],
                'stage': selected_stage(os.environ),
                'run_id': int(os.environ['GITHUB_RUN_ID']), 'run_attempt': 1}
@@ -1021,9 +1572,15 @@ def complete(work, public):
         require(os.environ.get('L1_PUBLICATION') == 'success'
                 and publication['primary'] and not publication['errors']
                 and assessment['status'] == 'PASS' and cleanup['cleanup']
-                and len(cleanup['staging_inputs_removed']) == 10
+                and len(cleanup['staging_inputs_removed'])
+                == (0 if workload == 'rea-bc' else 10)
                 and display['cleanup'] and staging['copied_input_absent']
                 and staging['display_cookie_absent'], 'GUI proof incomplete')
+        if workload == 'rea-bc':
+            documents = json.loads((work / 'evidence/gui-document-cleanup.json').read_text())
+            require(documents['cleanup'] is True,
+                    'B/C temporary document cleanup unproved')
+            summary['workload'] = workload
         summary.update(outcome='PASS', tests=1, skips=0, evidence=evidence,
                        independent_preservation_required=True,
                        repair_allowance_remaining=0)

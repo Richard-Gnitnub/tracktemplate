@@ -6,6 +6,9 @@ import inspect
 import json
 
 from tracktemplate.domain.crossover import complete_radius_decision
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_operation,
+)
 
 
 PREFLIGHT_KEY = "complete_radius_preflight"
@@ -40,6 +43,12 @@ class CrossoverPreflightAdapter:
     original_diagnostics: object
     original_trace_text: object
     original_preview_signature: object
+
+    def _admit(self, doc, host_a=None, host_b=None, entity_id=None):
+        names = tuple(getattr(host, "Name", "")
+                      for host in (host_a, host_b)
+                      if getattr(host, "Name", ""))
+        refuse_rea_operation(doc, host_names=names, entity_id=entity_id)
 
     def _host_identity(self, host):
         if host is None:
@@ -142,6 +151,7 @@ class CrossoverPreflightAdapter:
         _host_b_data=None,
     ):
         """Hash all current inputs that can change a placement decision."""
+        self._admit(doc, host_a, host_b)
         payload = {
             "version": 1,
             "document_name": str(getattr(doc, "Name", "")),
@@ -174,6 +184,7 @@ class CrossoverPreflightAdapter:
     def solve(self, *args, **kwargs):
         """Return one signature-bound analytical result or reject before Part."""
         request = _bound_arguments(self.original_solver, args, kwargs)
+        self._admit(request["doc"], request["host_a"], request["host_b"])
         solved = self.original_solver(*args, **kwargs)
         module = self.module
         metrics_a = module.turnout_mapping_metrics(
@@ -225,6 +236,7 @@ class CrossoverPreflightAdapter:
         return solved
 
     def _checked_result(self, request, pre_solved):
+        self._admit(request["doc"], request["host_a"], request["host_b"])
         if pre_solved is None:
             return self.solve(**request)
         if not isinstance(pre_solved, dict):
@@ -263,6 +275,8 @@ class CrossoverPreflightAdapter:
         """Keep derived display until the frozen edit transaction removes it."""
         arguments = _bound_arguments(self.original_editor, args, kwargs)
         identifier = str(arguments["crossover_id"] or "").strip()
+        self._admit(arguments["doc"], arguments["host_a"], arguments["host_b"],
+                    identifier or None)
         if self.module.crossover_config_by_id(
             arguments["doc"], identifier,
         ) is None:

@@ -4,6 +4,10 @@ from dataclasses import dataclass
 import inspect
 import time
 
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_operation,
+)
+
 
 class CrossoverB4RecoveryError(RuntimeError):
     """The B4 command could not prove cleanup of its new object."""
@@ -186,6 +190,7 @@ class CrossoverB4RecoveryAdapter:
         request.apply_defaults()
         doc = request.arguments["doc"]
         identifier = str(request.arguments["crossover_id"] or "").strip()
+        refuse_rea_operation(doc, entity_id=identifier or None)
         writer_name = "_write_crossover_b4_and_timber_analysis_metadata"
         original_writer = getattr(self.module, writer_name, None)
         if original_writer is not self.original_writer:

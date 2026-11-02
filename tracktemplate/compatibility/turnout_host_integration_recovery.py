@@ -6,6 +6,10 @@ crossover adapter until the B15 host meets its legacy-retirement gate.
 
 from dataclasses import dataclass
 
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_entity_operation,
+)
+
 
 class TurnoutHostIntegrationRecoveryError(RuntimeError):
     """The turnout host command could not establish safe recovery."""
@@ -55,6 +59,7 @@ class TurnoutHostIntegrationRecoveryAdapter:
     original_remove: object
 
     def _run(self, document, turnout_id, original, label):
+        refuse_rea_entity_operation(self.module, document, "turnout", turnout_id)
         if int(document.UndoMode) != 1:
             raise TurnoutHostIntegrationRecoveryError(
                 "Enable document Undo before changing turnout host "

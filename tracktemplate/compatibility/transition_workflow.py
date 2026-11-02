@@ -3,6 +3,7 @@
 import copy
 from dataclasses import dataclass
 from functools import partial
+import inspect
 import json
 
 from tracktemplate.application import (
@@ -40,6 +41,10 @@ from tracktemplate.compatibility.b15_workflow_host import (
     load_b15_workflow_host,
 )
 from tracktemplate.domain import turnout
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_entity_operation,
+    refuse_rea_operation,
+)
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
@@ -1005,6 +1010,7 @@ class _ChairAnalysisReuseAdapter:
         )
 
     def __call__(self, doc, entity_kind, entity_id, settings=None):
+        refuse_rea_operation(doc, entity_id=str(entity_id) or None)
         try:
             result = self._reused_result(doc, entity_kind, entity_id, settings)
         except (AttributeError, KeyError, TypeError, ValueError, RuntimeError):
@@ -1013,6 +1019,37 @@ class _ChairAnalysisReuseAdapter:
         if result is not None:
             return result
         return self.original(doc, entity_kind, entity_id, settings)
+
+
+@dataclass(frozen=True)
+class _ReaTurnoutAdmissionAdapter:
+    """Protect source dependencies before either inherited TO mutation."""
+
+    module: object
+    original_builder: object
+    original_editor: object
+
+    def build(self, *args, **kwargs):
+        request = inspect.signature(self.original_builder).bind(*args, **kwargs)
+        request.apply_defaults()
+        values = request.arguments
+        refuse_rea_operation(
+            values["doc"], host_names=(values["host_obj"].Name,),
+            entity_id=values.get("turnout_id") or None,
+        )
+        return self.original_builder(*args, **kwargs)
+
+    def edit(self, *args, **kwargs):
+        request = inspect.signature(self.original_editor).bind(*args, **kwargs)
+        request.apply_defaults()
+        values = request.arguments
+        refuse_rea_entity_operation(
+            self.module, values["doc"], "turnout", values["turnout_id"],
+        )
+        refuse_rea_operation(
+            values["doc"], host_names=(values["host_obj"].Name,),
+        )
+        return self.original_editor(*args, **kwargs)
 
 
 class ModularTransitionWorkflowSession:
@@ -1492,6 +1529,23 @@ class ModularTransitionWorkflowSession:
             )
             self._crossover_dependent_recalculation = dependent
             self._host_functions.update(dependent.bindings)
+        self._rea_turnout_admission = None
+        if all(callable(namespace.get(name)) for name in (
+            "_build_curve_inheriting_c10_turnout",
+            "edit_curve_inheriting_c10_turnout",
+        )):
+            self._rea_turnout_admission = _ReaTurnoutAdmissionAdapter(
+                self.module, namespace["_build_curve_inheriting_c10_turnout"],
+                namespace["edit_curve_inheriting_c10_turnout"],
+            )
+            self._host_functions.update({
+                "_build_curve_inheriting_c10_turnout": (
+                    self._rea_turnout_admission.build
+                ),
+                "edit_curve_inheriting_c10_turnout": (
+                    self._rea_turnout_admission.edit
+                ),
+            })
         self._bind_modular()
 
     def _bind_modular(self):
@@ -1646,12 +1700,39 @@ class ModularTransitionWorkflowSession:
                     )
 
         def inherited_caller(name):
+            admission = self._rea_turnout_admission
+            if admission is not None:
+                for binding, method, original in (
+                    ("_build_curve_inheriting_c10_turnout", "build",
+                     admission.original_builder),
+                    ("edit_curve_inheriting_c10_turnout", "edit",
+                     admission.original_editor),
+                ):
+                    if name != binding:
+                        continue
+                    wrapper = namespace.get(name)
+                    if (type(admission) is not _ReaTurnoutAdmissionAdapter
+                            or admission.module is not self.module
+                            or wrapper is not self._host_functions.get(name)
+                            or getattr(wrapper, "__self__", None) is not admission
+                            or getattr(wrapper, "__func__", None) is not getattr(
+                                _ReaTurnoutAdmissionAdapter, method,
+                            ) or getattr(original, "__globals__", None)
+                            is not namespace):
+                        raise TransitionWorkflowError(
+                            "The REA source admission route is mixed."
+                        )
+                    return original
             if (
                 name == "solve_rea_c10_crossover_geometry"
                 and self._crossover_preflight is not None
             ):
                 return self._crossover_preflight.original_solver
             return namespace.get(name)
+
+        if self._rea_turnout_admission is not None:
+            inherited_caller("_build_curve_inheriting_c10_turnout")
+            inherited_caller("edit_curve_inheriting_c10_turnout")
 
         if (
             (_TURNOUT_DIMENSIONS_BINDING in namespace)
@@ -1818,7 +1899,7 @@ class ModularTransitionWorkflowSession:
                         if isinstance(owner, type) else None
                     )
                 else:
-                    caller = namespace.get(caller_name)
+                    caller = inherited_caller(caller_name)
                 code = getattr(caller, "__code__", None)
                 caller_globals = getattr(caller, "__globals__", None)
                 if (
@@ -2549,6 +2630,15 @@ class ModularTransitionWorkflowSession:
         self._validate_binding()
         return ReaTurnoutGeometryAdapter(self.module).crossover(*args, **kwargs)
 
+    def rea_trackwork_workflow(self, store, scene_factory):
+        """Bind explicit B/C commands to qualified document/display ports."""
+        from tracktemplate.compatibility.rea_trackwork import (
+            ReaTrackworkWorkflow,
+        )
+
+        self._validate_binding()
+        return ReaTrackworkWorkflow(self.module, store, scene_factory)
+
 
 @dataclass(frozen=True)
 class _CoreLayoutExportAdapter:
@@ -2573,6 +2663,7 @@ class _CoreLayoutExportAdapter:
         template_assembly_config,
         exporter_override=None,
     ):
+        refuse_rea_operation(doc, set_id=set_id)
         return self.calculation(
             doc,
             plan,
@@ -2617,6 +2708,7 @@ class _StagedCoreLayoutExportAdapter:
         template_assembly_config,
         exporter_override=None,
     ):
+        refuse_rea_operation(doc, set_id=set_id)
         serializer = (
             self.dispatch_export_task if exporter_override is None
             else exporter_override
@@ -2994,6 +3086,13 @@ class ModularCoreLayoutWorkflowSession:
         self.routing_record()
         return self._calculation_session.prepare_rea_crossover_geometry(
             *args, **kwargs,
+        )
+
+    def rea_trackwork_workflow(self, store, scene_factory):
+        """Expose explicit source commands through the validated session."""
+        self.routing_record()
+        return self._calculation_session.rea_trackwork_workflow(
+            store, scene_factory,
         )
 
     def preview_s1j_reference_chairs(

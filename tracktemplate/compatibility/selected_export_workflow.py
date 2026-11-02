@@ -13,6 +13,9 @@ from tracktemplate.application.selected_export_set import (
 from tracktemplate.compatibility.selected_export_policy import (
     SelectedExportPolicy,
 )
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_operation,
+)
 
 
 HOST_BINDING = "run_selected_production_export"
@@ -63,6 +66,7 @@ class SelectedExportBinding:
         registration_config, template_assembly_config, extra_skipped=None,
         exporter_override=None,
     ):
+        refuse_rea_operation(doc, set_id=set_id or None)
         serializer = (
             self.dispatch_export_task if exporter_override is None
             else exporter_override
