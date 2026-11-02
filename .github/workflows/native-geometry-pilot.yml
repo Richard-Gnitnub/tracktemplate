@@ -12,6 +12,8 @@ on:
           - transition
           - rea-bc-readiness
           - rea-bc-native
+          - rea-bc-exit-readiness
+          - rea-bc-exit-native
 
 permissions:
   contents: read

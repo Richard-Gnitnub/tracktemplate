@@ -44,6 +44,12 @@ REA_TEST_SHA256 = (
     "ac316a5e49794361186f0f78e54db45839ca77f6d0b3905745b350c86c558e3d"
 )
 REA_SENTINEL = "TRACKTEMPLATE_REA_TRACKWORK="
+REA_EXIT_TEST_PATH = "tests/freecad_validate_rea_exit_profile.py"
+# Freeze only after independent review of the new entry.
+REA_EXIT_TEST_SHA256 = (
+    "167dc02c17568fa86688e7816599d03e42dadcc72a396ac0f7251591eee7a83c"
+)
+REA_EXIT_SENTINEL = "TRACKTEMPLATE_REA_EXIT_PROFILE="
 REA_INPUT_PATHS = (
     "tests/fixtures/phase9b-rea-bc-source.json",
     "tests/validate_phase1_turnout.py",
@@ -75,6 +81,14 @@ def _workload(name):
         return {
             "test_path": REA_TEST_PATH, "test_sha256": REA_TEST_SHA256,
             "selector": "freecad_validate_rea_trackwork", "mode": mode,
+            "expected_native_tests": 1 if mode == "readiness" else 2,
+        }
+    if name in ("rea-bc-exit-readiness", "rea-bc-exit-native"):
+        mode = name.removeprefix("rea-bc-exit-")
+        return {
+            "test_path": REA_EXIT_TEST_PATH,
+            "test_sha256": REA_EXIT_TEST_SHA256,
+            "selector": "freecad_validate_rea_exit_profile", "mode": mode,
             "expected_native_tests": 1 if mode == "readiness" else 2,
         }
     raise ValueError("Unknown hosted workload")
@@ -142,6 +156,63 @@ def _rea_report(stdout, mode):
             or any(checks[key] != (count if native else 0)
                    for key, count in expected_checks.items())):
         raise ValueError("REA checks do not prove selected workload")
+    return report
+
+
+def _rea_exit_report(stdout, mode):
+    lines = [line[len(REA_EXIT_SENTINEL):] for line in stdout.splitlines()
+             if line.startswith(REA_EXIT_SENTINEL)]
+    if len(lines) != 1:
+        raise ValueError("Expected one REA exit-profile report")
+    report = json.loads(lines[0], object_pairs_hook=_unique_object)
+    fields = {
+        "mode", "status", "tests", "failures", "errors", "skips",
+        "documents_created", "documents_remaining", "input_sha256",
+        "checks", "elapsed_seconds",
+    }
+    if not isinstance(report, dict) or report.keys() != fields:
+        raise ValueError("Unexpected exit-profile report fields")
+    native = mode == "native"
+    expected = {
+        "tests": 2 if native else 1, "failures": 0, "errors": 0, "skips": 0,
+        "documents_created": 2 if native else 0, "documents_remaining": 0,
+    }
+    if (report["mode"] != mode or report["status"] != "PASS"
+            or any(type(report[key]) is not int or report[key] != count
+                   for key, count in expected.items())):
+        raise ValueError("Exit-profile mode, counts or completion mismatch")
+    elapsed = report["elapsed_seconds"]
+    if (type(elapsed) not in (int, float)
+            or not 0 <= elapsed <= LIMITS.timeout_seconds
+            or not math.isfinite(elapsed)):
+        raise ValueError("Invalid exit-profile elapsed time")
+    hashes = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+              for name in (*REA_INPUT_PATHS, REA_TEST_PATH)}
+    if report["input_sha256"] != hashes:
+        raise ValueError("Exit-profile source input identity mismatch")
+    expected_checks = {
+        "profile_constructors": 1, "profile_constructor_refusals": 1,
+        "schema2_round_trips": 1, "schema2_refusals": 2,
+    }
+    if native:
+        expected_checks = {
+            "source_roads": 3, "baseline_rail_records": 90,
+            "baseline_timber_records": 96, "unchanged_connector_paths": 4,
+            "exit_body_records": 6, "exit_local_corners": 24,
+            "exit_mapped_points": 102, "exit_scene_lines": 6,
+            "initial_selected_scene_lines": 196, "canonical_reads": 12,
+            "schema1_reads": 4, "schema2_reads": 8,
+            "successful_profile_toggles": 4, "default_scene_equalities": 3,
+            "reselect_scene_equalities": 2, "rollback_scene_equalities": 1,
+            "redo_scene_equalities": 1, "reopen_scene_equalities": 2,
+            "no_op": 1, "post_write_rollback": 1,
+            "stale_profile_refusal": 1, "undo_redo": 2, "save_reopen": 2,
+        }
+    checks = report["checks"]
+    if (not isinstance(checks, dict) or checks.keys() != expected_checks.keys()
+            or any(type(checks[key]) is not int or checks[key] != count
+                   for key, count in expected_checks.items())):
+        raise ValueError("Exit-profile checks do not prove selected workload")
     return report
 
 
@@ -298,7 +369,10 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
                 or re.search(r"skipped|FAILED|ERROR:", combined)):
             raise ValueError("Native test count, no-skips or sentinel unproved")
         rea = None
-        if selected["mode"]:
+        exit_profile = selected["test_path"] == REA_EXIT_TEST_PATH
+        if exit_profile:
+            rea = _rea_exit_report(stdout, selected["mode"])
+        elif selected["mode"]:
             rea = _rea_report(stdout, selected["mode"])
         elif stdout.splitlines().count(GEOMETRY_SENTINEL) != 1:
             raise ValueError("Native geometry sentinel unproved")
@@ -316,7 +390,17 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
             ),
             "scope": "One unchanged transition validator; no chair or GUI proof",
         }
-        if rea is not None:
+        if exit_profile:
+            assessment.update(
+                workload=workload,
+                classification="REA_BC_EXIT_" + selected["mode"].upper()
+                               + "_PASS",
+                rea_exit_profile=rea,
+                scope=("REA exit-profile readiness; no documents or geometry"
+                       if selected["mode"] == "readiness" else
+                       "REA exit-profile two native lifecycle tests; no GUI"),
+            )
+        elif rea is not None:
             assessment.update(
                 workload=workload,
                 classification="REA_BC_" + selected["mode"].upper() + "_PASS",
@@ -360,11 +444,16 @@ def _identity(workload="transition"):
              "reference/contracts/phase1-compatibility.json")
     if selected["mode"]:
         paths += REA_INPUT_PATHS
+    if selected["test_path"] == REA_EXIT_TEST_PATH:
+        paths += (REA_TEST_PATH,)
     for name in paths:
         hashes[name] = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     if (hashes[selected["test_path"]] != selected["test_sha256"]
             or hashes["tools/freecad_validation_guard.py"] != GUARD_SHA256):
         raise ValueError("Frozen validator or guard identity changed")
+    if (selected["test_path"] == REA_EXIT_TEST_PATH
+            and hashes[REA_TEST_PATH] != REA_TEST_SHA256):
+        raise ValueError("Frozen inherited native entry identity changed")
     app = _command(
         "flatpak", "info", "--system", "--show-commit", guard.APP_ID,
     )

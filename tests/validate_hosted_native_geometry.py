@@ -824,6 +824,206 @@ class NativeWrapperTests(unittest.TestCase):
         run_path.assert_not_called()
 
 
+def exit_profile_report(mode):
+    record = rea_report(mode)
+    if mode == "readiness":
+        record["checks"] = {
+            "profile_constructors": 1, "profile_constructor_refusals": 1,
+            "schema2_round_trips": 1, "schema2_refusals": 2,
+        }
+    else:
+        record["checks"] = {
+            "source_roads": 3, "baseline_rail_records": 90,
+            "baseline_timber_records": 96, "unchanged_connector_paths": 4,
+            "exit_body_records": 6, "exit_local_corners": 24,
+            "exit_mapped_points": 102, "exit_scene_lines": 6,
+            "initial_selected_scene_lines": 196, "canonical_reads": 12,
+            "schema1_reads": 4, "schema2_reads": 8,
+            "successful_profile_toggles": 4, "default_scene_equalities": 3,
+            "reselect_scene_equalities": 2, "rollback_scene_equalities": 1,
+            "redo_scene_equalities": 1, "reopen_scene_equalities": 2,
+            "no_op": 1, "post_write_rollback": 1,
+            "stale_profile_refusal": 1, "undo_redo": 2, "save_reopen": 2,
+        }
+    name = "tests/freecad_validate_rea_trackwork.py"
+    record["input_sha256"][name] = hashlib.sha256(
+        (ROOT / name).read_bytes(),
+    ).hexdigest()
+    return record
+
+
+class ExitProfileWorkloadTests(unittest.TestCase):
+    def assess(self, mode, *, report=None, stdout=None, stderr=None):
+        record = exit_profile_report(mode) if report is None else report
+        output = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        output += "TRACKTEMPLATE_REA_EXIT_PROFILE=" + json.dumps(record) + "\n"
+        return pilot.assess_result(
+            good_guard(), output if stdout is None else stdout,
+            (f"\nRan {record['tests']} tests in 0.500s\n\nOK\n"
+             if stderr is None else stderr), [live_sample()], True,
+            workload="rea-bc-exit-" + mode,
+        )
+
+    def test_exit_commands_use_only_the_new_explicit_entry(self):
+        for mode in ("readiness", "native"):
+            command = pilot._native_command("rea-bc-" + mode)
+            command[-1] = "freecad_validate_rea_exit_profile"
+            self.assertEqual(
+                pilot._native_command("rea-bc-exit-" + mode), command,
+            )
+        for name in ("rea-bc-exit", "rea-bc-exit-gui", "rea-bc-exit-native;"):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                pilot._native_command(name)
+
+    def test_exit_readiness_and_native_have_distinct_reports(self):
+        for mode in ("readiness", "native"):
+            result = self.assess(mode)
+            self.assertEqual(result["status"], "PASS", result)
+            self.assertEqual(result["classification"],
+                             "REA_BC_EXIT_" + mode.upper() + "_PASS")
+            self.assertEqual(result["rea_exit_profile"],
+                             exit_profile_report(mode))
+            self.assertNotIn("rea_trackwork", result)
+
+    def test_exit_counts_and_seventh_input_are_exact(self):
+        for mode in ("readiness", "native"):
+            original = exit_profile_report(mode)
+            for key, count in original["checks"].items():
+                for bad in (count + 1, count - 1, True, float(count)):
+                    with self.subTest(mode=mode, key=key, bad=bad):
+                        changed = copy.deepcopy(original)
+                        changed["checks"][key] = bad
+                        self.assertEqual(self.assess(mode, report=changed)[
+                            "classification"], "EVIDENCE_INCOMPLETE")
+            for change in ("missing", "wrong", "extra"):
+                changed = copy.deepcopy(original)
+                key = "tests/freecad_validate_rea_trackwork.py"
+                if change == "missing":
+                    del changed["input_sha256"][key]
+                elif change == "wrong":
+                    changed["input_sha256"][key] = "0" * 64
+                else:
+                    changed["input_sha256"]["unapproved"] = "0" * 64
+                self.assertEqual(self.assess(mode, report=changed)[
+                    "classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_exit_report_shape_and_completion_fail_closed(self):
+        for mode in ("readiness", "native"):
+            for updates in (
+                {"mode": "native" if mode == "readiness" else "readiness"},
+                {"tests": True}, {"failures": 1}, {"errors": False},
+                {"status": "FAIL"}, {"skips": 1}, {"documents_created": 1},
+                {"documents_remaining": 1}, {"checks": {}},
+                {"elapsed_seconds": float("nan")}, {"elapsed_seconds": True},
+                {"elapsed_seconds": -1}, {"elapsed_seconds": 901},
+                {"elapsed_seconds": 10**400}, {"geometry": [[1, 2, 3]]},
+            ):
+                with self.subTest(mode=mode, updates=updates):
+                    changed = exit_profile_report(mode)
+                    changed.update(updates)
+                    self.assertEqual(self.assess(mode, report=changed)[
+                        "classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_exit_requires_its_unique_sentinel_runtime_and_test_count(self):
+        runtime = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        line = "TRACKTEMPLATE_REA_EXIT_PROFILE=" + json.dumps(
+            exit_profile_report("native"),
+        ) + "\n"
+        for stdout, stderr in (
+            (runtime, None), (runtime + line * 2, None), (line, None),
+            (runtime * 2 + line, None), (qualified_output(), None),
+            (runtime + line, native_report()),
+            (runtime + line, "Ran 2 tests in 0.1s\nOK (skipped=1)\n"),
+            (runtime + line.replace("REA_EXIT_PROFILE=", "REA_TRACKWORK="),
+             None),
+            (runtime + line.replace('"status": "PASS"',
+                                    '"status": "FAIL", "status": "PASS"'),
+             None),
+        ):
+            with self.subTest(stdout=stdout, stderr=stderr):
+                self.assertEqual(self.assess(
+                    "native", stdout=stdout, stderr=stderr,
+                )["classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_exit_entry_import_and_discovery_never_load_host_or_product(self):
+        script = r'''
+import importlib.abc
+import os
+from pathlib import Path
+import sys
+import unittest
+class RefuseHost(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in (
+            'FreeCAD', 'FreeCADGui', 'Part', 'pivy', 'PySide6', 'tracktemplate',
+        ):
+            raise AssertionError('Import-only host/product load: ' + fullname)
+sys.meta_path.insert(0, RefuseHost())
+sys.path.insert(0, str(Path.cwd() / 'tests'))
+import freecad_validate_rea_exit_profile as entry
+expected = {
+    'readiness': ['Readiness.test_profile_contract_and_entry'],
+    'native': ['Native.test_turnout_selected_toggle_and_reopen',
+               'Native.test_crossover_selected_toggle_and_reopen'],
+}
+for mode, names in expected.items():
+    os.environ['TRACKTEMPLATE_REA_MODE'] = mode
+    suite = entry.load_tests(unittest.defaultTestLoader, None, None)
+    assert suite.countTestCases() == len(names)
+    assert [test.id().split('.', 1)[1] for test in suite] == names
+for mode in ('', 'gui', 'Native'):
+    os.environ['TRACKTEMPLATE_REA_MODE'] = mode
+    try:
+        entry.load_tests(unittest.defaultTestLoader, None, None)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('Unsupported discovery mode admitted')
+print('Exit profile native import/discovery passed')
+'''
+        result = subprocess.run([sys.executable, "-c", script], cwd=ROOT,
+                                capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Exit profile native import/discovery passed",
+                      result.stdout)
+
+    def test_exit_and_inherited_entries_are_frozen_before_runtime_commands(self):
+        read_bytes = Path.read_bytes
+        commit = "1" * 40
+
+        def command(*args):
+            if args == ("git", "rev-parse", "HEAD"):
+                return commit
+            if args == (
+                "git", "status", "--porcelain", "--untracked-files=no",
+            ):
+                return ""
+            self.fail("Unfrozen exit entry reached runtime metadata")
+
+        for target in ("new", "inherited"):
+            def changed_read(path):
+                if (target == "inherited"
+                        and path == ROOT / pilot.REA_TEST_PATH):
+                    return b"changed inherited native helper"
+                if path == ROOT / pilot.REA_EXIT_TEST_PATH:
+                    return b"exit entry"
+                return read_bytes(path)
+
+            frozen = ("0" * 64 if target == "new" else
+                      hashlib.sha256(b"exit entry").hexdigest())
+            for mode in ("readiness", "native"):
+                with (
+                    self.subTest(target=target, mode=mode),
+                    patch.object(pilot, "REA_EXIT_TEST_SHA256", frozen),
+                    patch.object(Path, "read_bytes", changed_read),
+                    patch.object(pilot, "_command", side_effect=command),
+                    patch.object(pilot.os, "getuid", return_value=1000),
+                    patch.dict(pilot.os.environ, {"GITHUB_SHA": commit}),
+                    self.assertRaises(ValueError),
+                ):
+                    pilot._identity("rea-bc-exit-" + mode)
+
+
 class PilotIdentityTests(unittest.TestCase):
     def test_rea_entry_is_frozen_before_runtime_commands(self):
         read_bytes = Path.read_bytes
@@ -930,6 +1130,7 @@ class PilotIdentityTests(unittest.TestCase):
             "description: Bounded native workload", "required: true",
             "type: choice", "default: transition", "options:",
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
+            "- rea-bc-exit-readiness", "- rea-bc-exit-native",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)
