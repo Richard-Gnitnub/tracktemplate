@@ -911,14 +911,19 @@ class ToSingleRailGui(unittest.TestCase):
         # Establish the unrelated witness before testing preview disposal.
         rt.gui.Selection.clearSelection()
         rt.gui.Selection.addSelection(marker)
-        disposal = gui_helpers()._witness_baseline(rt.helpers, rt.gui, marker)
+        gui_helpers()._witness_baseline(rt.helpers, rt.gui, marker)
         name = preview.Name
         rt.app.closeDocument(name)
         assert name not in rt.app.listDocuments()
-        assert rt.helpers.state()["selection"] == disposal["selection"]
-        rt.app.setActiveDocument(source.Name)
-        gui_helpers()._witness_baseline(rt.helpers, rt.gui, marker)
+        # FreeCAD 1.1.4 slotDeleteDocument clears global selection, including
+        # other documents. Check that host effect and the surviving documents
+        # before deliberately restoring the fixture's selection witness.
+        selection = rt.helpers.state()["selection"]
+        assert selection == (), selection
         self._source_preserved(rt, baseline, source, context, receipt)
+        rt.app.setActiveDocument(source.Name)
+        rt.gui.Selection.addSelection(marker)
+        gui_helpers()._witness_baseline(rt.helpers, rt.gui, marker)
         assert rt.helpers.state()["selection"] == baseline["selection"]
         receipt["checks"]["preview_disposals"] = 1
 

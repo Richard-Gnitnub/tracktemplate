@@ -624,7 +624,7 @@ class GuiEntryTests(unittest.TestCase):
         self.assertEqual(selected, [marker])
         self.assertEqual(calls, ["clear", ("add", "Keep")])
 
-    def test_actual_disposal_tail_establishes_then_preserves_witness(self):
+    def test_native_disposal_preserves_documents_and_matches_selection(self):
         tree = ast.parse(Path(entry.__file__).read_text())
         cls = next(
             node
@@ -648,15 +648,20 @@ class GuiEntryTests(unittest.TestCase):
                 for arg in node.value.args
             )
         )
-        # Execute the unchanged actual disposal suffix, after picking and the
-        # separately checked rollback; host close supplies only its boundary.
+        # Execute the actual suffix with the qualified host-close behavior.
+        # FreeCAD 1.1.4 slotDeleteDocument clears global selection, including
+        # an unrelated witness. Product document checks remain real here.
         suffix = compile(
             ast.Module(body=journey.body[index + 1 :], type_ignores=[]),
             entry.__file__,
             "exec",
         )
-        for corrupt_close in (False, True):
-            with self.subTest(corrupt_close=corrupt_close):
+        faults = (
+            None, "retained_selection", "retained_preview", "source_changed",
+            "foreign_changed", "foreign_missing", "context_changed",
+        )
+        for fault in faults:
+            with self.subTest(fault=fault):
                 source = SimpleNamespace(Name="Source")
                 foreign = SimpleNamespace(Name="Foreign")
                 marker = SimpleNamespace(Name="Keep", Document=foreign)
@@ -668,6 +673,8 @@ class GuiEntryTests(unittest.TestCase):
                 }
                 selected = [(preview, "Face5")]
                 events = []
+                values = {name: "unchanged" for name in registry}
+                context = ("TO-001", "unchanged")
 
                 def clear():
                     events.append("clear")
@@ -679,6 +686,10 @@ class GuiEntryTests(unittest.TestCase):
 
                 def state():
                     return dict(
+                        documents=[
+                            {"name": name, "value": values[name]}
+                            for name in registry
+                        ],
                         selection=tuple(
                             (obj.Document.Name, obj.Name, ())
                             for obj, _ in selected
@@ -689,9 +700,22 @@ class GuiEntryTests(unittest.TestCase):
                 def close(name):
                     events.append("close")
                     self.assertEqual(selected, [(marker, "")])
-                    registry.pop(name)
-                    if corrupt_close:
+                    if fault != "retained_preview":
+                        registry.pop(name)
+                    if fault != "retained_selection":
                         selected.clear()
+                    if fault == "source_changed":
+                        values["Source"] = "changed"
+                    if fault == "foreign_changed":
+                        values["Foreign"] = "changed"
+                    if fault == "foreign_missing":
+                        registry.pop("Foreign")
+
+                def source_context(*_):
+                    events.append("context")
+                    if fault == "context_changed":
+                        return ("TO-001", "changed")
+                    return context
 
                 helpers = SimpleNamespace(settle=lambda: None, state=state)
                 gui = SimpleNamespace(
@@ -705,14 +729,25 @@ class GuiEntryTests(unittest.TestCase):
                     app=SimpleNamespace(
                         closeDocument=close,
                         listDocuments=lambda: dict(registry),
-                        setActiveDocument=lambda *_: None,
+                        setActiveDocument=lambda name: events.append(
+                            ("active", name)
+                        ),
                     ),
                     gui=gui,
                     helpers=helpers,
+                    session=SimpleNamespace(module=object()),
                 )
-                case = SimpleNamespace(_source_preserved=Mock())
-                receipt = dict(checks={"preview_disposals": 0})
-                baseline = dict(selection=(("Foreign", "Keep", ()),))
+                case = entry.ToSingleRailGui("test_authorised_gui_stage")
+                receipt = dict(checks={
+                    "preview_disposals": 0, "source_preservation_checks": 0,
+                })
+                baseline = dict(
+                    documents=[
+                        {"name": name, "value": "unchanged"}
+                        for name in ("Source", "Foreign")
+                    ],
+                    selection=(("Foreign", "Keep", ()),),
+                )
                 namespace = dict(
                     entry.__dict__,
                     rt=rt,
@@ -721,18 +756,33 @@ class GuiEntryTests(unittest.TestCase):
                     marker=marker,
                     baseline=baseline,
                     receipt=receipt,
-                    context=object(),
+                    context=context,
                     self=case,
                 )
-                if corrupt_close:
-                    with self.assertRaises(AssertionError):
-                        exec(suffix, namespace)
-                    self.assertEqual(receipt["checks"]["preview_disposals"], 0)
-                else:
+                with patch(
+                    "tracktemplate.compatibility.chair_reference_preview."
+                    "_open_source_context", side_effect=source_context,
+                ):
+                    if fault is not None:
+                        with self.assertRaises(AssertionError):
+                            exec(suffix, namespace)
+                        self.assertEqual(
+                            receipt["checks"]["preview_disposals"], 0,
+                        )
+                        self.assertEqual(
+                            receipt["checks"]["source_preservation_checks"], 0,
+                        )
+                        self.assertEqual(events.count(("add", "Keep")), 1)
+                        continue
                     exec(suffix, namespace)
-                    self.assertEqual(receipt["checks"]["preview_disposals"], 1)
-                    case._source_preserved.assert_called_once()
-                self.assertEqual(events, ["clear", ("add", "Keep"), "close"])
+                self.assertEqual(receipt["checks"]["preview_disposals"], 1)
+                self.assertEqual(
+                    receipt["checks"]["source_preservation_checks"], 1,
+                )
+                self.assertEqual(events, [
+                    "clear", ("add", "Keep"), "close", "context",
+                    ("active", "Source"), ("add", "Keep"),
+                ])
 
     def test_start_refuses_skips_wrong_count_errors_and_cleanup_failure(self):
         exits, scheduled = [], []
