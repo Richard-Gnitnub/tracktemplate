@@ -44,6 +44,16 @@ def _selection(gui):
                  for row in gui.Selection.getSelectionEx("*"))
 
 
+def _observer_proxies(document):
+    """Find owned observer proxies without assuming native views have one."""
+    proxies = []
+    for obj in document.Objects:
+        proxy = getattr(obj.ViewObject, "Proxy", None)
+        if hasattr(proxy, "_observer_app"):
+            proxies.append(proxy)
+    return tuple(proxies)
+
+
 def _scene(proxy):
     if proxy.scene is None:
         return None
@@ -784,12 +794,11 @@ class ReaGui(unittest.TestCase):
                     try:
                         if name in self.app.listDocuments():
                             doc = self.app.listDocuments()[name]
-                            proxies = [obj.ViewObject.Proxy for obj in doc.Objects
-                                       if obj.ViewObject is not None
-                                       and hasattr(obj.ViewObject.Proxy,
-                                                   "_observer_app")]
-                            self.app.closeDocument(name)
-                            self.settle()
+                            try:
+                                proxies = _observer_proxies(doc)
+                            finally:
+                                self.app.closeDocument(name)
+                                self.settle()
                             self.assertTrue(all(proxy._observer_app is None
                                                 for proxy in proxies))
                         self.assertNotIn(name, self.app.listDocuments())

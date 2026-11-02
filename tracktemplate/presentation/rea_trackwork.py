@@ -200,7 +200,8 @@ class ReaTrackworkViewProvider:
             view_object.addDisplayMode(root, REA_TRACKWORK_VIEW_MODE)
         self._view = view_object
         self.selection_root = root
-        view_object.DisplayMode = REA_TRACKWORK_VIEW_MODE
+        # FreeCAD populates DisplayMode after this Python attach callback.
+        # getDefaultDisplayMode supplies the selection at that boundary.
         switch.whichChild.setValue(switch.findChild(root))
 
     def snapshot(self):
@@ -281,6 +282,8 @@ class ReaTrackworkViewProvider:
 
     def slotChangedObject(self, obj, property_name):
         """Invalidate a changed dependency, including changes during Undo."""
+        if property_name == "Visibility":
+            return
         if any(obj is item for item in self._dependencies):
             self.invalidate("Host or settings changed; rebuild the display.")
 

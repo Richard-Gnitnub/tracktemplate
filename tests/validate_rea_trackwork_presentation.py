@@ -105,6 +105,67 @@ class PresentationTests(unittest.TestCase):
             self.obj, scene(), self.signature, coin_module=fake_coin(),
         )
 
+    def test_attach_precedes_native_display_mode_enumeration(self):
+        class EnumeratedView(ViewObject):
+            allowed_modes = ()
+            selected_mode = ""
+
+            @property
+            def DisplayMode(self):
+                return self.selected_mode
+
+            @DisplayMode.setter
+            def DisplayMode(self, value):
+                if value not in self.allowed_modes:
+                    raise ValueError("Mode is not part of the enumeration")
+                self.selected_mode = value
+
+        view_object = EnumeratedView()
+        obj = types.SimpleNamespace(ViewObject=view_object)
+        proxy = ReaTrackworkViewProvider(
+            obj, scene(), self.signature, coin_module=fake_coin(),
+        )
+        self.assertEqual(view_object.allowed_modes, ())
+        self.assertEqual(proxy.scene, scene())
+        view_object.allowed_modes = tuple(proxy.getDisplayModes(view_object))
+        view_object.DisplayMode = proxy.getDefaultDisplayMode()
+        self.assertEqual(view_object.DisplayMode, "REA research")
+        self.assertEqual(view_object.SwitchNode.whichChild.getValue(),
+                         view_object.SwitchNode.findChild(proxy.selection_root))
+        before = proxy.snapshot()
+        proxy.attach(view_object)
+        self.assertEqual(proxy.snapshot(), before)
+        self.assertEqual(len(view_object.modes), 1)
+
+    def test_dependency_visibility_keeps_geometry_but_other_changes_clear(self):
+        document = types.SimpleNamespace()
+        self.obj.Document = document
+        host = types.SimpleNamespace(Document=document, Visibility=True)
+        settings = types.SimpleNamespace(Document=document, Visibility=True)
+        observers = []
+        app = types.SimpleNamespace(
+            addDocumentObserver=observers.append,
+            removeDocumentObserver=observers.remove,
+        )
+        self.view.observe_dependencies(self.obj, (host, settings), app_module=app)
+        before = self.view.snapshot()
+        for dependency in (host, settings):
+            for visible in (False, True):
+                dependency.Visibility = visible
+                observers[0].slotChangedObject(dependency, "Visibility")
+                self.assertEqual(self.view.snapshot(), before)
+                self.assertEqual(self.view.selection_for_element(
+                    REA_TRACKWORK_VIEW_ELEMENT), scene().entity_id)
+        for dependency, property_name in (
+                (host, "Shape"), (host, "Placement"),
+                (settings, "TrackConfigurationJSON"),
+                (settings, "UnrecognisedGeometryProperty")):
+            with self.subTest(property_name=property_name):
+                self.view.replace(scene(), self.signature)
+                observers[0].slotChangedObject(dependency, property_name)
+                self.assertIsNone(self.view.scene)
+                self.assertEqual(self.view.selection_root.getNumChildren(), 0)
+
     def test_batched_points_preserve_exact_world_order(self):
         binding = self.view.snapshot().binding
         self.assertEqual(binding.coordinates.point.value, (
