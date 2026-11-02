@@ -723,7 +723,12 @@ class ToSingleRailGui(unittest.TestCase):
             children = obj.Shape.childShapes()
             child = children[index]
             faces = child.Faces
-            face = max(faces, key=lambda value: value.CenterOfMass.z)
+            # L1 has a coplanar roof: height can select a tiny corner face.
+            # Its largest upward face is the broad, convex plinth top.
+            face = max(
+                (value for value in faces if value.normalAt(0, 0).z > 0),
+                key=lambda value: value.Area,
+            )
             point = face.CenterOfMass
             first = 1 + sum(len(shape.Faces) for shape in children[:index])
             last = first + len(child.Faces) - 1
