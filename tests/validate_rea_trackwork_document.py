@@ -147,14 +147,17 @@ class DocumentTests(unittest.TestCase):
             getDocument=lambda name: self.doc if name == self.doc.Name else None,
             Version=lambda: (1, 1, 4), GuiUp=False,
         )
-        self.store = adapter.FreeCADReaTrackworkStore({
+        self.qualification = {
             "compatibility_evaluation": {
                 "status": "qualified", "matched_profile_id": "test-fake",
             },
             "runtime": {"freecad": {
                 "available": True, "version_info": [1, 1, 4],
             }},
-        }, view_factory=FakeView)
+        }
+        self.store = adapter.FreeCADReaTrackworkStore(
+            self.qualification, view_factory=FakeView,
+        )
         self.signature = "sha256:" + "1" * 64
 
     def tearDown(self):
@@ -215,6 +218,100 @@ class DocumentTests(unittest.TestCase):
         self.assertEqual(getattr(obj, adapter.REA_INTENT_JSON_PROPERTY), before)
         self.assertEqual(view.snapshot(), snapshot)
         self.assertEqual(self.doc.commits, 1)
+
+    def _attached_view_factory(self):
+        class AttachedView(FakeView):
+            def __init__(self, obj, scene, signature):
+                super().__init__(obj, scene, signature)
+                obj.ViewObject.Proxy = self
+
+            def snapshot(self):
+                return super().snapshot(), self.obj.ViewObject.Visibility
+
+            def replace(self, scene, signature):
+                super().replace(scene, signature)
+                self.obj.ViewObject.Visibility = False
+
+            def restore(self, snapshot):
+                previous, visibility = snapshot
+                super().restore(previous)
+                self.obj.ViewObject.Visibility = visibility
+
+        def attach(obj, scene, signature):
+            if obj.ViewObject.Proxy is None:
+                return AttachedView(obj, scene, signature)
+            view = obj.ViewObject.Proxy
+            view.replace(scene, signature)
+            return view
+
+        return attach
+
+    def test_fresh_store_failed_edit_keeps_attached_display(self):
+        self.store._view_factory = self._attached_view_factory()
+        obj = self.create()
+        view = obj.ViewObject.Proxy
+        before = view.snapshot()
+        fresh = adapter.FreeCADReaTrackworkStore(
+            self.qualification, view_factory=self.store._view_factory,
+            view_reader=lambda candidate: candidate.ViewObject.Proxy,
+        )
+        self.doc.fail_commit = True
+        with self.assertRaises(adapter.ReaTrackworkDocumentError):
+            fresh.update(
+                self.doc, obj, replace(intent(), reference_chainage_mm=101.),
+                scene(offset=1), self.signature, hosts=(self.host,),
+                current_signature=lambda: self.signature,
+            )
+        self.assertEqual(adapter.read_rea_trackwork_object(obj), intent())
+        self.assertIs(obj.ViewObject.Proxy, view)
+        self.assertIs(fresh.view_for(obj), view)
+        self.assertEqual(view.snapshot(), before)
+        self.assertFalse(view.disposed)
+        self.assertEqual(self.doc.commits, 1)
+
+    def test_existing_gui_proxy_without_reader_refuses_before_write(self):
+        self.store._view_factory = self._attached_view_factory()
+        obj = self.create()
+        sys.modules["FreeCAD"].GuiUp = True
+        fresh = adapter.FreeCADReaTrackworkStore(
+            self.qualification, view_factory=self.store._view_factory,
+        )
+        before = obj.ViewObject.Proxy.snapshot()
+        with self.assertRaises(adapter.ReaTrackworkDocumentError) as caught:
+            fresh.update(
+                self.doc, obj, replace(intent(), reference_chainage_mm=101.),
+                scene(offset=1), self.signature, hosts=(self.host,),
+                current_signature=lambda: self.signature,
+            )
+        self.assertEqual(caught.exception.code, "view-reader-required")
+        self.assertEqual(adapter.read_rea_trackwork_object(obj), intent())
+        self.assertEqual(obj.ViewObject.Proxy.snapshot(), before)
+        self.assertEqual(self.doc.opens, 1)
+        self.assertEqual(self.doc.commits, 1)
+
+    def test_changed_attached_proxy_cannot_reuse_cached_view(self):
+        self.store._view_factory = self._attached_view_factory()
+        obj = self.create()
+        fresh = adapter.FreeCADReaTrackworkStore(
+            self.qualification, view_factory=self.store._view_factory,
+            view_reader=lambda candidate: candidate.ViewObject.Proxy,
+        )
+        prior = fresh.view_for(obj)
+        foreign = FakeView(obj, scene(offset=7), self.signature)
+        obj.ViewObject.Proxy = foreign
+        before = foreign.snapshot()
+        with self.assertRaises(adapter.ReaTrackworkDocumentError) as caught:
+            fresh.update(
+                self.doc, obj, replace(intent(), reference_chainage_mm=101.),
+                scene(offset=1), self.signature, hosts=(self.host,),
+                current_signature=lambda: self.signature,
+            )
+        self.assertEqual(caught.exception.code, "view-identity-mismatch")
+        self.assertEqual(adapter.read_rea_trackwork_object(obj), intent())
+        self.assertIs(obj.ViewObject.Proxy, foreign)
+        self.assertEqual(foreign.snapshot(), before)
+        self.assertFalse(prior.disposed)
+        self.assertEqual(self.doc.opens, 1)
 
     def test_commit_failure_and_collision_leave_no_object(self):
         for failure in ("fail_commit", "collision"):
