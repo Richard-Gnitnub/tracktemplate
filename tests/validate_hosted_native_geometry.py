@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check hosted-pilot admission and evidence without launching FreeCAD."""
 
+import ast
 import contextlib
 import copy
 import hashlib
@@ -1024,6 +1025,342 @@ print('Exit profile native import/discovery passed')
                     pilot._identity("rea-bc-exit-" + mode)
 
 
+def straight_report(mode):
+    record = exit_profile_report(mode)
+    if mode == "readiness":
+        record["checks"] = {
+            "binding_checks": 1, "canonical_round_trips": 5,
+            "invalid_source_refusals": 5,
+        }
+    else:
+        record["checks"] = {
+            "source_roads": 3, "source_scalars": 27, "rail_records": 90,
+            "rail_anchors": 36,
+            "timber_records": 135, "exit_body_records": 6,
+            "scene_lines": 235, "mapped_points": 1, "line_rail_samples": 1,
+            "boundary_cases": 4, "boundary_line_points": 2,
+            "cap_controls": 1, "unsupported_controls": 3,
+            "canonical_reads": 9, "no_op": 1, "source_changeback": 2,
+            "undo_redo": 2, "save_reopen": 2,
+            "reopen_scene_equalities": 2, "changeback_scene_equalities": 1,
+            "redo_scene_equalities": 1, "boundary_refusal": 1,
+        }
+    name = "tests/validate_rea_straight_closure.py"
+    record["input_sha256"][name] = hashlib.sha256(
+        (ROOT / name).read_bytes(),
+    ).hexdigest()
+    return record
+
+
+class StraightWorkloadTests(unittest.TestCase):
+    @contextlib.contextmanager
+    def _composed_readiness_case(self):
+        """Use both real session layers without a host runtime or document."""
+        import types
+        import freecad_validate_rea_straight as entry
+        from tracktemplate import api
+        from tracktemplate.compatibility import (
+            b15_workflow_host, transition_workflow,
+        )
+        from validate_phase7_concentric_core import _fixture
+        from validate_rea_straight_consumers import (
+            CALLERS, INNER, actual_functions, railway_module,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract = _fixture(root)
+            host = b15_workflow_host.load_b15_workflow_host(root, contract)
+            module = host.module
+            actual_functions(module, (*CALLERS, INNER))
+            railway = railway_module()
+            for name in ("TURNOUT_HAND_LEFT", "TURNOUT_ORIENTATION_FACING"):
+                setattr(module, name, getattr(railway, name))
+            for _, name in (
+                transition_workflow.CORE_LAYOUT_EXPORT_HOST_OPERATIONS
+            ):
+                exec(f"def {name}(*args, **kwargs):\n"
+                     "    raise AssertionError('Unexpected export')\n",
+                     module.__dict__)
+            tree = ast.parse((root / "legacy.FCMacro").read_text())
+            caller = next(node for node in tree.body
+                          if isinstance(node, ast.FunctionDef)
+                          and node.name == "run_macro")
+            caller.body.insert(0, ast.parse("run_production_export()").body[0])
+            exec(compile(ast.Module(body=[caller], type_ignores=[]),
+                         str(root / "legacy.FCMacro"), "exec"),
+                 module.__dict__)
+            functions = {name: getattr(api, name) for name in
+                         transition_workflow.PRODUCT_FUNCTION_NAMES}
+            inner = transition_workflow.ModularTransitionWorkflowSession(
+                host, functions,
+            )
+            outer = transition_workflow.ModularCoreLayoutWorkflowSession(
+                inner, api.run_core_layout_export,
+            )
+            self.assertFalse(hasattr(outer, "_validate_binding"))
+            self.assertEqual(outer.routing_record(), inner.routing_record())
+            case = entry.Readiness("test_line_contract_and_entry")
+            case.session = outer
+            case.module = module
+            case.state = {
+                "app": types.SimpleNamespace(listDocuments=lambda: {}),
+                "documents_created": 0,
+                "checks": dict.fromkeys(
+                    straight_report("readiness")["checks"], 0,
+                ),
+            }
+            yield case
+
+    def test_straight_readiness_runs_through_actual_composed_session(self):
+        with self._composed_readiness_case() as case:
+            case.test_line_contract_and_entry()
+            self.assertEqual(case.state["checks"],
+                             straight_report("readiness")["checks"])
+            self.assertEqual(case.state["documents_created"], 0)
+            self.assertEqual(case.state["app"].listDocuments(), {})
+
+    def test_straight_readiness_refuses_changed_calculation_and_export(self):
+        from tracktemplate.compatibility.transition_workflow import (
+            TransitionWorkflowError,
+        )
+
+        for name in ("build_concentric_core", "run_production_export"):
+            with (
+                self.subTest(binding=name),
+                self._composed_readiness_case() as case,
+            ):
+                setattr(case.module, name, lambda *args, **kwargs: None)
+                with self.assertRaisesRegex(TransitionWorkflowError, "mixed"):
+                    case.test_line_contract_and_entry()
+                self.assertEqual(case.state["checks"], dict.fromkeys(
+                    straight_report("readiness")["checks"], 0,
+                ))
+                self.assertEqual(case.state["documents_created"], 0)
+                self.assertEqual(case.state["app"].listDocuments(), {})
+
+    def assess(self, mode, *, report=None, stdout=None, stderr=None):
+        record = straight_report(mode) if report is None else report
+        output = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        output += "TRACKTEMPLATE_REA_STRAIGHT=" + json.dumps(record) + "\n"
+        return pilot.assess_result(
+            good_guard(), output if stdout is None else stdout,
+            (f"\nRan {record['tests']} tests in 0.500s\n\nOK\n"
+             if stderr is None else stderr), [live_sample()], True,
+            workload="rea-bc-straight-" + mode,
+        )
+
+    def test_straight_commands_use_only_the_new_explicit_entry(self):
+        for mode in ("readiness", "native"):
+            command = pilot._native_command("rea-bc-" + mode)
+            command[-1] = "freecad_validate_rea_straight"
+            self.assertEqual(
+                pilot._native_command("rea-bc-straight-" + mode), command,
+            )
+        for name in ("rea-bc-straight", "rea-bc-straight-gui", "rea-bc-straight-native;"):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                pilot._native_command(name)
+
+    def test_straight_readiness_and_native_have_distinct_reports(self):
+        for mode in ("readiness", "native"):
+            result = self.assess(mode)
+            self.assertEqual(result["status"], "PASS", result)
+            self.assertEqual(result["classification"],
+                             "REA_BC_STRAIGHT_" + mode.upper() + "_PASS")
+            self.assertEqual(result["rea_straight"],
+                             straight_report(mode))
+            self.assertNotIn("rea_trackwork", result)
+
+    def test_straight_counts_and_all_eight_inputs_are_exact(self):
+        for mode in ("readiness", "native"):
+            original = straight_report(mode)
+            for key, count in original["checks"].items():
+                for bad in ((0, -1, True, float(count)) if key in (
+                        "mapped_points", "line_rail_samples") else
+                            (count + 1, count - 1, True, float(count))):
+                    with self.subTest(mode=mode, key=key, bad=bad):
+                        changed = copy.deepcopy(original)
+                        changed["checks"][key] = bad
+                        self.assertEqual(self.assess(mode, report=changed)[
+                            "classification"], "EVIDENCE_INCOMPLETE")
+            for key in original["input_sha256"]:
+                for change in ("missing", "wrong", "extra"):
+                    changed = copy.deepcopy(original)
+                    if change == "missing":
+                        del changed["input_sha256"][key]
+                    elif change == "wrong":
+                        changed["input_sha256"][key] = "0" * 64
+                    else:
+                        changed["input_sha256"]["unapproved"] = "0" * 64
+                    self.assertEqual(self.assess(mode, report=changed)[
+                        "classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_straight_report_shape_and_completion_fail_closed(self):
+        for mode in ("readiness", "native"):
+            for updates in (
+                {"mode": "native" if mode == "readiness" else "readiness"},
+                {"tests": True}, {"failures": 1}, {"errors": False},
+                {"status": "FAIL"}, {"skips": 1}, {"documents_created": 1},
+                {"documents_remaining": 1}, {"checks": {}},
+                {"elapsed_seconds": float("nan")}, {"elapsed_seconds": True},
+                {"elapsed_seconds": -1}, {"elapsed_seconds": 901},
+                {"elapsed_seconds": 10**400}, {"geometry": [[1, 2, 3]]},
+            ):
+                with self.subTest(mode=mode, updates=updates):
+                    changed = straight_report(mode)
+                    changed.update(updates)
+                    self.assertEqual(self.assess(mode, report=changed)[
+                        "classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_straight_requires_its_unique_sentinel_runtime_and_test_count(self):
+        runtime = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        line = "TRACKTEMPLATE_REA_STRAIGHT=" + json.dumps(
+            straight_report("native"),
+        ) + "\n"
+        for stdout, stderr in (
+            (runtime, None), (runtime + line * 2, None), (line, None),
+            (runtime * 2 + line, None), (qualified_output(), None),
+            (runtime + line, native_report()),
+            (runtime + line, "Ran 2 tests in 0.1s\nOK (skipped=1)\n"),
+            (runtime + line.replace("REA_STRAIGHT=", "REA_TRACKWORK="),
+             None),
+            (runtime + line.replace('"status": "PASS"',
+                                    '"status": "FAIL", "status": "PASS"'),
+             None),
+        ):
+            with self.subTest(stdout=stdout, stderr=stderr):
+                self.assertEqual(self.assess(
+                    "native", stdout=stdout, stderr=stderr,
+                )["classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_straight_entry_import_and_discovery_never_load_host_or_product(self):
+        script = r'''
+import importlib.abc
+import os
+from pathlib import Path
+import sys
+import unittest
+class RefuseHost(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in (
+            'FreeCAD', 'FreeCADGui', 'Part', 'pivy', 'PySide6', 'tracktemplate',
+        ):
+            raise AssertionError('Import-only host/product load: ' + fullname)
+sys.meta_path.insert(0, RefuseHost())
+sys.path.insert(0, str(Path.cwd() / 'tests'))
+import freecad_validate_rea_straight as entry
+expected = {
+    'readiness': ['Readiness.test_line_contract_and_entry'],
+    'native': ['Native.test_turnout_line_changeback_and_reopen',
+               'Native.test_crossover_line_and_reopen'],
+}
+for mode, names in expected.items():
+    os.environ['TRACKTEMPLATE_REA_MODE'] = mode
+    suite = entry.load_tests(unittest.defaultTestLoader, None, None)
+    assert suite.countTestCases() == len(names)
+    assert [test.id().split('.', 1)[1] for test in suite] == names
+for mode in ('', 'gui', 'Native'):
+    os.environ['TRACKTEMPLATE_REA_MODE'] = mode
+    try:
+        entry.load_tests(unittest.defaultTestLoader, None, None)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('Unsupported discovery mode admitted')
+print('Straight native import/discovery passed')
+'''
+        result = subprocess.run([sys.executable, "-c", script], cwd=ROOT,
+                                capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Straight native import/discovery passed",
+                      result.stdout)
+
+    def test_straight_and_inherited_entries_are_frozen_before_runtime_commands(self):
+        read_bytes = Path.read_bytes
+        commit = "1" * 40
+
+        def command(*args):
+            if args == ("git", "rev-parse", "HEAD"):
+                return commit
+            if args == (
+                "git", "status", "--porcelain", "--untracked-files=no",
+            ):
+                return ""
+            self.fail("Unfrozen straight entry reached runtime metadata")
+
+        for target in ("new", "inherited", "oracle"):
+            def changed_read(path):
+                if (target == "inherited"
+                        and path == ROOT / pilot.REA_TEST_PATH):
+                    return b"changed inherited native helper"
+                if (target == "oracle"
+                        and path == ROOT / pilot.REA_STRAIGHT_ORACLE_PATH):
+                    return b"changed independent oracle"
+                if path == ROOT / pilot.REA_STRAIGHT_TEST_PATH:
+                    return b"straight entry"
+                return read_bytes(path)
+
+            frozen = ("0" * 64 if target == "new" else
+                      hashlib.sha256(b"straight entry").hexdigest())
+            for mode in ("readiness", "native"):
+                with (
+                    self.subTest(target=target, mode=mode),
+                    patch.object(pilot, "REA_STRAIGHT_TEST_SHA256", frozen),
+                    patch.object(Path, "read_bytes", changed_read),
+                    patch.object(pilot, "_command", side_effect=command),
+                    patch.object(pilot.os, "getuid", return_value=1000),
+                    patch.dict(pilot.os.environ, {"GITHUB_SHA": commit}),
+                    self.assertRaises(ValueError),
+                ):
+                    pilot._identity("rea-bc-straight-" + mode)
+
+
+    def test_straight_witnesses_reach_actual_analytical_roads_without_cad(self):
+        import types
+        import freecad_validate_rea_straight as entry
+        from tracktemplate.compatibility.rea_turnout import (
+            ReaTurnoutGeometryAdapter,
+        )
+        from tracktemplate.domain.rea_turnout import (
+            ReaExitSleeperProfile, ReaTurnoutSpecification,
+        )
+        from validate_rea_straight_consumers import railway_module
+        import validate_phase9b_rea_bc_consumers as fixture
+
+        case = entry.Native("test_crossover_line_and_reopen")
+        case.state = {"checks": dict.fromkeys(
+            straight_report("native")["checks"], 0)}
+        case.module = railway_module()
+        case._boundaries()
+        adapter = ReaTurnoutGeometryAdapter(case.module)
+        doc = types.SimpleNamespace(turnouts=[], crossovers=[])
+        a = fixture.host(case.module)
+        b = fixture.host(case.module, offset=50, name="HostB")
+        spec = ReaTurnoutSpecification("B", entry.HEEL_N)
+        profile = ReaExitSleeperProfile(entry.PROFILE_ID)
+        road = adapter.turnout(
+            doc, a, 1500, case.module.TURNOUT_HAND_LEFT,
+            case.module.TURNOUT_ORIENTATION_FACING, spec,
+            exit_sleeper_profile=profile,
+        )
+        crossing = adapter.crossover(
+            doc, a, b, 1500, spec, minimum_radius=600,
+            exit_sleeper_profile=profile,
+        )
+        for road, offset in ((road, 0), (crossing["turnout_a"], 0),
+                             (crossing["turnout_b"], 50)):
+            case._road(road, offset)
+        for key in ("source_roads", "source_scalars", "rail_records",
+                    "rail_anchors", "timber_records", "exit_body_records",
+                    "boundary_cases", "boundary_line_points", "cap_controls",
+                    "unsupported_controls"):
+            self.assertEqual(case.state["checks"][key],
+                             straight_report("native")["checks"][key], key)
+        for key in ("line_rail_samples", "mapped_points"):
+            self.assertGreater(case.state["checks"][key], 0)
+        self.assertEqual(vars(doc), {"turnouts": [], "crossovers": []})
+
+
 class PilotIdentityTests(unittest.TestCase):
     def test_rea_entry_is_frozen_before_runtime_commands(self):
         read_bytes = Path.read_bytes
@@ -1131,6 +1468,7 @@ class PilotIdentityTests(unittest.TestCase):
             "type: choice", "default: transition", "options:",
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
+            "- rea-bc-straight-readiness", "- rea-bc-straight-native",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)

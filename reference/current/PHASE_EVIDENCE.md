@@ -3743,3 +3743,102 @@ Phase 9B stays `Open` at 3/6.
 LMS work stays stopped.
 The rights state does not change.
 These results give no acceptance for physical fit, numerical tolerances, production, a phase exit or Phase 10.
+
+<a id="rea-b-source-line"></a>
+
+## REA B with `source_closure_kind = "line"` — 2026-11-02
+
+This Level 2 result supplies evidence for [D-P9-019](#rea-bc-scope-panel).
+The turnout and crossover tools use the same source data when
+`abs(k2 - k3) < 1e-12` gives `True`.
+The source sets `tl = (th - h) * N`.
+For `source_closure_kind = "line"`, the tools calculate `y = h + (x - heelx) * tan(k3)`.
+The source is Templot 556b `math_unit.pas`, lines 3357–3435 and 9046–9061.
+The change keeps the source condition and the previous limits used to compare values.
+
+The [source checks](../../tests/validate_rea_straight_closure.py) examine `source_closure_kind = "line"`
+and the source conditions on each side.
+The [turnout and crossover checks](../../tests/validate_rea_straight_consumers.py) examine `Left`, `Right`, `Facing` and `Trailing`.
+They also examine positive, zero and negative `curvature` inputs.
+The tests independently compare 140 values, 180 items in `timbers` and 20 points from these source data.
+The change preserves C10 and the previous TO-001/XO-001 evidence.
+
+The [FreeCAD test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41441106280)
+at `61dd31cf85ef1d2eac60c8b6dc2b8992d3000c18` gives PASS.
+The two tests give PASS with `skips = 0`.
+All 20 specified values in `checks` are correct.
+The actual results give `mapped_points = 19026` and `line_rail_samples = 5115`.
+
+The test examines four adjacent values at the source conditions.
+It examines one turnout and the two turnouts in the crossover.
+It changes the source data to B8 and back.
+It also examines `Undo`, `Redo`, `save_reopen` and rejected changes.
+C10 keeps its previous separate evidence.
+This FreeCAD test does not operate on C10.
+
+The [`readiness` display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41443140794)
+and [full display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41445331398)
+give PASS at the same commit.
+The full test gives `tests = 1`, `errors = 0`, `failures = 0` and `skips = 0`.
+All 21 values in `checks` are correct.
+The result gives `geometry_builds = 8` and seven `PNG` files.
+
+The test examines two changes inside the source limits and one rejected change outside them.
+It also examines changes to the connected alignments, persistence, `Rebuild display`, `Label` and two actual selections in the display.
+It changes the turnout to B8 and makes a separate crossover with `source_closure_kind = "line"`.
+It does not change the B8 turnout back in this display test.
+
+The previous [display evidence](#rea-bc-exit-display) supplies the applicable checks for `Undo` and `Redo`.
+It also examines the previous display after a rejected change.
+The new test does not do those checks again or remove the source selection.
+
+Independent review examines the initial test results, all seven `PNG` files and process cleanup.
+The crossover ends are small in these files.
+The tests independently compare the end positions and supply separate evidence.
+The FreeCAD and display results give `documents_remaining = 0`.
+No test process stays active.
+
+The time for the FreeCAD tests without the display is 19.999 seconds.
+The time for the full display test is 27.504 seconds.
+The maximum FreeCAD memory in the samples is 263.93 MiB for tests without the display and 775.57 MiB for the display test.
+Memory between samples can be higher.
+
+The time for the separate installation is 85.628 seconds.
+The maximum memory in its samples is 5970112512 bytes.
+Its `PSI` result is 22323 microseconds.
+FreeCAD and the display give zero.
+Installation has separate controls.
+The FreeCAD memory limit does not apply to installation.
+
+These measured results give no acceptance for product performance.
+
+The tests keep the 4 GiB FreeCAD memory limit and `memory.swap.max = 0`.
+Before each test process starts, the available memory must be a minimum of 8 GiB.
+The full tests keep the 900-second FreeCAD limit.
+The full display test also keeps the separate 256 MiB and 1000-second display limits.
+
+The project owner authorises publication of one `readiness` `PNG` file and seven `PNG` files from the full test on GitHub for 30 days.
+Independent preservation on USB keeps the initial results and reviews.
+The evidence on GitHub does not include the owner decision items
+"source archives", "private catalogues", "operator documents" and "geometry exports".
+The evidence also contains no temporary `FCStd` documents.
+
+TrackTemplate preserves the [failed test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41434703312).
+Its fixture uses `_validate_binding` on an object without that method.
+The [Testing Policy](../TESTING_POLICY.md) classifies this result as `fixture-or-harness-defect`.
+
+The correction uses `routing_record`, the method for callers, and preserves all initial checks.
+Two added tests examine `ModularCoreLayoutWorkflowSession` with `ModularTransitionWorkflowSession`.
+They reject changes to `build_concentric_core` and `run_production_export`.
+The [initial test after correction](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41440316921) gives PASS.
+The frozen 2/2 evidence does not change.
+
+These results supply evidence for specified inputs, not all continuous input ranges.
+All 32 B/C inputs from `MENU` keep status `Pending` for full validation.
+Other source inputs that the tools cannot use stay `Pending`.
+Evidence is necessary for the corrected TO-001 tests and remaining chair positions.
+
+Phase 9B stays `Open` at 3/6.
+LMS work stays stopped.
+The rights state does not change.
+These results give no acceptance for physical fit, numerical tolerances, production, a phase exit or Phase 10.

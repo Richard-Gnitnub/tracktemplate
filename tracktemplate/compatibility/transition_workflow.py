@@ -45,6 +45,12 @@ from tracktemplate.compatibility.rea_trackwork_admission import (
     refuse_rea_entity_operation,
     refuse_rea_operation,
 )
+from tracktemplate.compatibility.rea_turnout_rails import (
+    REA_INNER_GAUGE_BINDING,
+    REA_INNER_GAUGE_CALLERS,
+    _ReaInnerGaugeAdapter,
+    validate_rea_inner_gauge_binding,
+)
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
@@ -1280,6 +1286,19 @@ class ModularTransitionWorkflowSession:
                 )
             )
         namespace = self.module.__dict__
+        self._rea_inner_gauge_adapter = None
+        if any(name in namespace for name in (
+            REA_INNER_GAUGE_BINDING, *REA_INNER_GAUGE_CALLERS,
+        )):
+            original = namespace.get(REA_INNER_GAUGE_BINDING)
+            if getattr(original, "__globals__", None) is not namespace:
+                raise TransitionWorkflowError(
+                    "The original source inner-gauge binding is unavailable."
+                )
+            self._rea_inner_gauge_adapter = _ReaInnerGaugeAdapter(original)
+            self._host_functions[REA_INNER_GAUGE_BINDING] = (
+                self._rea_inner_gauge_adapter
+            )
         self._chair_signature_adapter = None
         self._chair_reuse_adapter = None
         if any(name in namespace for name in _CHAIR_SIGNATURE_SURFACE):
@@ -1550,6 +1569,13 @@ class ModularTransitionWorkflowSession:
 
     def _bind_modular(self):
         namespace = self.module.__dict__
+        adapter = self._rea_inner_gauge_adapter
+        if (adapter is not None
+                and namespace.get(REA_INNER_GAUGE_BINDING) is not adapter
+                and namespace.get(REA_INNER_GAUGE_BINDING) is not adapter.original):
+            raise TransitionWorkflowError(
+                "The source inner-gauge binding was replaced."
+            )
         missing = object()
         previous = {
             name: namespace.get(name, missing)
@@ -1594,6 +1620,25 @@ class ModularTransitionWorkflowSession:
     def _validate_binding(self):
         """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
+        adapter = self._rea_inner_gauge_adapter
+        present = any(name in namespace for name in (
+            REA_INNER_GAUGE_BINDING, *REA_INNER_GAUGE_CALLERS,
+        ))
+        if present != (adapter is not None):
+            raise TransitionWorkflowError(
+                "The source inner-gauge binding is mixed."
+            )
+        if adapter is not None:
+            if (namespace.get(REA_INNER_GAUGE_BINDING) is not adapter
+                    or self._host_functions.get(REA_INNER_GAUGE_BINDING)
+                    is not adapter):
+                raise TransitionWorkflowError(
+                    "The source inner-gauge binding identity changed."
+                )
+            try:
+                validate_rea_inner_gauge_binding(self.module)
+            except ValueError as error:
+                raise TransitionWorkflowError(str(error)) from error
         dependent = self._crossover_dependent_recalculation
         if ("remove_all_generated_outputs" in namespace) != (
             dependent is not None

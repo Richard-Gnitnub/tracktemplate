@@ -104,6 +104,8 @@ DIAGNOSTIC_CHANGED_CONTROLS = (
 
 REA_SCOPE = 'REA-BC-LIFECYCLE-GUI-001'
 REA_REF = 'refs/heads/codex/rea-bc-exit-profile'
+REA_STRAIGHT_SCOPE = 'REA-BC-STRAIGHT-GUI-001'
+REA_STRAIGHT_REF = 'refs/heads/codex/rea-bc-straight-closure'
 REA_ENTRY = 'tests/hosted_rea_trackwork_gui_suite.py'
 REA_INPUTS = (
     'tests/fixtures/phase9b-rea-bc-source.json',
@@ -130,7 +132,8 @@ REA_CONTROL_FILES = (
 def selected_workload(environ):
     """Preserve L1 as the default; admit only the separate reviewed route."""
     value = environ.get('TRACKTEMPLATE_GUI_WORKLOAD', 'l1')
-    require(value in ('l1', 'rea-bc'), 'Unsupported GUI workload')
+    require(value in ('l1', 'rea-bc', 'rea-bc-straight'),
+        'Unsupported GUI workload')
     return value
 
 
@@ -138,9 +141,21 @@ def _hash(value):
     return isinstance(value, str) and re.fullmatch(r'[0-9a-f]{64}', value)
 
 
-def rea_counts(stage):
+def rea_scope(workload='rea-bc'):
+    require(workload in ('rea-bc', 'rea-bc-straight'),
+            'Unsupported B/C GUI workload')
+    return REA_STRAIGHT_SCOPE if workload == 'rea-bc-straight' else REA_SCOPE
+
+
+def rea_ref(workload='rea-bc'):
+    rea_scope(workload)
+    return REA_STRAIGHT_REF if workload == 'rea-bc-straight' else REA_REF
+
+
+def rea_counts(stage, workload='rea-bc'):
     """Return exact operation counts for the independently reviewed journey."""
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
+    rea_scope(workload)
     counts = {
         'tests': 1, 'fresh_documents': 2, 'reopens': 1,
         'source_records_created': 2, 'successful_parameter_updates': 2,
@@ -152,6 +167,14 @@ def rea_counts(stage):
         'selected_profile_reopens': 1, 'viewport_images': 8,
         'dialog_images': 5, 'screenshots_total': 13,
     }
+    if workload == 'rea-bc-straight':
+        counts.update(
+            successful_parameter_updates=4, undo_redo_pairs=0,
+            explicit_rebuilds=2, adopted_view_rollback_cases=0,
+            visible_input_refusals=1, profile_deselections=0,
+            viewport_images=5, dialog_images=2, screenshots_total=7,
+            straight_boundary_edits=2, initial_straight_source_roads=3,
+        )
     if stage == 'readiness':
         counts = dict.fromkeys(counts, 0)
         counts.update(tests=1, fresh_documents=1, dialog_images=1,
@@ -159,15 +182,26 @@ def rea_counts(stage):
     return counts
 
 
-def validate_rea_counts(counts, stage):
-    expected = rea_counts(stage)
+def validate_rea_counts(counts, stage, workload='rea-bc'):
+    expected = rea_counts(stage, workload)
     require(type(counts) is dict and set(counts) == set(expected)
             and all(type(counts[key]) is int and counts[key] == value
                     for key, value in expected.items()),
             'B/C GUI operation counts differ')
 
 
-def rea_images(stage):
+def rea_images(stage, workload='rea-bc'):
+    rea_scope(workload)
+    require(stage in ('readiness', 'gui'), 'Unsupported GUI image stage')
+    if workload == 'rea-bc-straight':
+        if stage == 'readiness':
+            return {'straight-readiness-panel.png'}
+        return {
+            'to-straight.png', 'to-straight-fields.png',
+            'upper-out-refused.png', 'straight-reopened-empty.png',
+            'straight-rebuilt-picked.png', 'to-b8-returned.png',
+            'xo-straight.png',
+        }
     if stage == 'readiness':
         return {'readiness-panel.png'}
     require(stage == 'gui', 'Unsupported GUI image stage')
@@ -226,23 +260,25 @@ def rea_source_tree():
 def validate_rea_authority(record, environ):
     """Bind owner handling, recovery and separate readiness to this source."""
     stage = selected_stage(environ)
+    workload = selected_workload(environ)
+    scope = rea_scope(workload)
     expected = {
-        'schema': 1, 'scope_id': REA_SCOPE, 'workload': 'rea-bc',
+        'schema': 1, 'scope_id': scope, 'workload': workload,
         'stage': stage, 'source_commit': environ['GITHUB_SHA'],
-        'source_ref': REA_REF, 'owner': 'Richard-Gnitnub',
+        'source_ref': rea_ref(workload), 'owner': 'Richard-Gnitnub',
         'execution_authorized': True, 'independent_review': 'PASS',
         'run_attempt': 1, 'initial_reserve_mib': RESERVE_MIB,
         'software_renderer': 'llvmpipe', 'external_inputs': 0,
         'private_inputs': 0, 'historical_repair_allowance_consumed': True,
         'automatic_retry': False,
-        'freecad_limits': vars(limits(stage, 'rea-bc')),
-        'display_limits': vars(display_limits(stage, 'rea-bc')),
+        'freecad_limits': vars(limits(stage, workload)),
+        'display_limits': vars(display_limits(stage, workload)),
     }
     require(type(record) is dict and all(
         type(record.get(key)) is type(value) and record[key] == value
         for key, value in expected.items()
     ), 'Separate B/C GUI authority absent or differs')
-    require(environ.get('GITHUB_REF') == REA_REF
+    require(environ.get('GITHUB_REF') == rea_ref(workload)
             and not diagnostic_enabled(environ),
             'B/C candidate or diagnostic selection differs')
     require(all(isinstance(record.get(key), str) and record[key].strip()
@@ -260,7 +296,8 @@ def validate_rea_authority(record, environ):
     expected_handling = {
         'independent_review': 'PASS', 'public_research_screenshots': True,
         'retention_days': 30, 'independent_preservation': True,
-        'readiness_images': 1, 'gui_images': 13,
+        'readiness_images': 1,
+        'gui_images': 7 if workload == 'rea-bc-straight' else 13,
         'source_archive_upload': False, 'operator_documents': False,
         'exact_exports': False, 'fcstd_upload': False,
     }
@@ -295,11 +332,11 @@ def validate_rea_authority(record, environ):
         }
         expected_ready.update(
             status='PASS', independent_review='PASS', stage='readiness',
-            freecad_limits=vars(limits('readiness', 'rea-bc')),
-            display_limits=vars(display_limits('readiness', 'rea-bc')),
+            freecad_limits=vars(limits('readiness', workload)),
+            display_limits=vars(display_limits('readiness', workload)),
             tests=1, skips=0, run_attempt=1, cleanup=True,
             evidence_verified=True, independent_preservation=True,
-            sentinel=sentinel('readiness', 'rea-bc'),
+            sentinel=sentinel('readiness', workload),
         )
         require(all(type(ready.get(key)) is type(value)
                     and ready[key] == value
@@ -420,7 +457,7 @@ def _retain_rea_guard_profile(work):
     _rea_guard_profile(work)
 
 
-def validate_rea_evidence(work, *, stage):
+def validate_rea_evidence(work, *, stage, workload='rea-bc'):
     """Exclude archives, documents and unknown media before either upload."""
     evidence = work / 'evidence'
     profile = _rea_guard_profile(work)
@@ -442,7 +479,7 @@ def validate_rea_evidence(work, *, stage):
         'guard-profile-exclusion.json',
     }
     groups = {
-        'gui': {'result.json', *rea_images(stage)},
+        'gui': {'result.json', *rea_images(stage, workload)},
         'guard': {'control.json', 'result.json', 'ownership.json',
                   'measurements.jsonl', 'stdout', 'stderr',
                   'wrapper.stdout', 'watchdog.json'},
@@ -593,21 +630,27 @@ def selected_stage(environ):
 
 def limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    require(workload in ('l1', 'rea-bc'), 'Unsupported GUI workload')
-    full = 900 if workload == 'rea-bc' else 7200
+    require(workload in ('l1', 'rea-bc', 'rea-bc-straight'),
+        'Unsupported GUI workload')
+    full = 900 if workload in ('rea-bc', 'rea-bc-straight') else 7200
     return guard.ValidationLimits(4096, 90 if stage == 'readiness' else full)
 
 
 def display_limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    require(workload in ('l1', 'rea-bc'), 'Unsupported GUI workload')
-    full = 1000 if workload == 'rea-bc' else 7300
+    require(workload in ('l1', 'rea-bc', 'rea-bc-straight'),
+        'Unsupported GUI workload')
+    full = 1000 if workload in ('rea-bc', 'rea-bc-straight') else 7300
     return guard.ValidationLimits(256, 190 if stage == 'readiness' else full,
                                   25, 16)
 
 
 def sentinel(stage, workload='l1'):
-    if workload == 'rea-bc':
+    if workload == 'rea-bc-straight':
+        return ('REA B straight hosted GUI readiness passed'
+                if stage == 'readiness'
+                else 'REA B straight hosted GUI validation passed')
+    if workload in ('rea-bc', 'rea-bc-straight'):
         return ('REA B/C hosted GUI readiness passed' if stage == 'readiness'
                 else 'REA B/C hosted GUI validation passed')
     require(workload == 'l1', 'Unsupported GUI workload')
@@ -640,8 +683,8 @@ def validate_readiness(review, control, current_run):
 
 def validate_host(environ, memory):
     """Keep native admission and add the display ceiling to initial reserve."""
-    if selected_workload(environ) == 'rea-bc':
-        require(environ.get('GITHUB_REF') == REA_REF
+    if selected_workload(environ) in ('rea-bc', 'rea-bc-straight'):
+        require(environ.get('GITHUB_REF') == rea_ref(selected_workload(environ))
                 and environ.get('GITHUB_RUN_ID', '').isdigit()
                 and not diagnostic_enabled(environ),
                 'Reviewed B/C candidate required')
@@ -660,7 +703,7 @@ def validate_host(environ, memory):
 
 def validate_authority(record, environ):
     """Require a separate explicit GUI scope; native approval is insufficient."""
-    if selected_workload(environ) == 'rea-bc':
+    if selected_workload(environ) in ('rea-bc', 'rea-bc-straight'):
         return validate_rea_authority(record, environ)
     stage = selected_stage(environ)
     validate_product_requalification(record, environ)
@@ -731,18 +774,20 @@ def prepare(work):
     require(not native.command('git', 'status', '--porcelain',
                                '--untracked-files=no'), 'Dirty source checkout')
     workload = selected_workload(os.environ)
-    if workload == 'rea-bc':
+    if workload in ('rea-bc', 'rea-bc-straight'):
         require(rea_source_tree() == control['source_tree_sha256'],
                 'Reviewed modular source tree changed')
         for name, expected in control['input_hashes'].items():
-            require(digest(ROOT / name) == expected, 'Reviewed B/C input changed')
+            require(digest(ROOT / name) == expected,
+                'Reviewed B/C input changed')
     else:
         validate_frozen_source(control)
     for name, expected in control['control_files_sha256'].items():
-        require(digest(ROOT / name) == expected, 'Reviewed GUI control changed')
+        require(digest(ROOT / name) == expected,
+            'Reviewed GUI control changed')
     if diagnostic_enabled(os.environ):
         validate_diagnostic_source(control)
-    entry = REA_ENTRY if workload == 'rea-bc' else ENTRY
+    entry = REA_ENTRY if workload in ('rea-bc', 'rea-bc-straight') else ENTRY
     require(digest(ROOT / entry) == control['gui_entry_sha256'],
             'Reviewed GUI entry changed')
     require(digest(ROOT / 'tools/freecad_validation_guard.py')
@@ -754,10 +799,11 @@ def prepare(work):
 
 def acquire(work):
     """Reuse L1 acquisition; B/C uses only its exact reviewed public tree."""
-    if selected_workload(os.environ) == 'rea-bc':
+    if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
         control = json.loads((work / 'control.json').read_text())
         config = {
-            'schema': 1, 'workload': 'rea-bc', 'inputs': [],
+            'schema': 1, 'workload': selected_workload(os.environ),
+            'inputs': [],
             'external_inputs': 0, 'input_hashes': control['input_hashes'],
             'source_tree_sha256': control['source_tree_sha256'],
             'product_files_sha256': rea_source_files(),
@@ -865,7 +911,8 @@ def start_display(work):
     require(state.get('ActiveState') == 'active'
             and state.get('RuntimeMaxUSec') == (
                 '3min 10s' if stage == 'readiness' else
-                '16min 40s' if workload == 'rea-bc' else '2h 1min 40s')
+                '16min 40s' if workload in ('rea-bc', 'rea-bc-straight')
+                else '2h 1min 40s')
             and state.get('TimeoutStopUSec') == '5s'
             and state.get('KillMode') == 'control-group'
             and state.get('Restart') == 'no', 'Display deadline unproved')
@@ -980,8 +1027,8 @@ def child_environment(work):
                  DISPLAY=DISPLAY, XAUTHORITY=str(work / 'display/Xauthority'),
                  QT_QPA_PLATFORM='xcb', LIBGL_ALWAYS_SOFTWARE='1',
                  GALLIUM_DRIVER='llvmpipe')
-    if selected_workload(os.environ) == 'rea-bc':
-        clean['TRACKTEMPLATE_GUI_WORKLOAD'] = 'rea-bc'
+    if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
+        clean['TRACKTEMPLATE_GUI_WORKLOAD'] = selected_workload(os.environ)
         clean['GITHUB_REF'] = os.environ['GITHUB_REF']
     return clean
 
@@ -1000,7 +1047,7 @@ def write_gui_macro(work):
             f'observer.install({str(work / "evidence")!r})\n'
         )
     suite = ('hosted_rea_trackwork_gui_suite'
-             if selected_workload(os.environ) == 'rea-bc'
+             if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight')
              else 'hosted_l1_gui_suite')
     content = ('import sys\n'
                'import FreeCAD as App\n'
@@ -1029,7 +1076,9 @@ def gui_argv(clean, macro):
              'DISPLAY', 'XAUTHORITY', 'QT_QPA_PLATFORM',
              'LIBGL_ALWAYS_SOFTWARE', 'GALLIUM_DRIVER',
              'OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS')
-    if clean.get('TRACKTEMPLATE_GUI_WORKLOAD') == 'rea-bc':
+    if clean.get('TRACKTEMPLATE_GUI_WORKLOAD') in (
+        'rea-bc', 'rea-bc-straight',
+    ):
         names += ('TRACKTEMPLATE_GUI_WORKLOAD', 'GITHUB_REF')
     argv = ['flatpak', 'run', '--command=FreeCAD']
     argv += [f'--env={name}={clean[name]}' for name in names]
@@ -1039,7 +1088,9 @@ def gui_argv(clean, macro):
 def qualified_runtime(stdout):
     """Reuse the accepted strict parser with the one actual GUI test frame."""
     selector = ('hosted_rea_trackwork_gui_suite.ReaGui.test_authorised_gui_stage'
-                if selected_workload(os.environ) == 'rea-bc'
+                if selected_workload(os.environ) in (
+                    'rea-bc', 'rea-bc-straight',
+                )
                 else 'hosted_l1_gui_suite.L1Gui.test_authorised_gui_stage')
     with patch.object(native, 'SELECTORS', {'gui': selector}):
         native.qualified_runtime(stdout)
@@ -1075,7 +1126,7 @@ def run(work):
     stage = selected_stage(os.environ)
     validate_host(os.environ, Path('/proc/meminfo').read_text())
     workload = selected_workload(os.environ)
-    if workload == 'rea-bc':
+    if workload in ('rea-bc', 'rea-bc-straight'):
         require_rea_finalization_time(stage, os.environ, time.time())
     else:
         native.require_finalization_time(
@@ -1156,14 +1207,16 @@ def run(work):
             )
         assess_display(display_samples)
         receipt = json.loads((work / 'evidence/gui/result.json').read_text())
-        if workload == 'rea-bc':
+        if workload in ('rea-bc', 'rea-bc-straight'):
             require(rea_report((guard_dir / 'stdout').read_text()) == receipt,
                     'B/C stdout and retained report differ')
-            validate_rea_receipt(receipt, work, stage=stage)
+            validate_rea_receipt(receipt, work, stage=stage, workload=workload)
         else:
             validate_gui_receipt(receipt, work, stage=stage)
         assessment['gui_receipt'] = receipt
-        assessment['scope'] = REA_SCOPE if workload == 'rea-bc' else SCOPE
+        assessment['scope'] = (rea_scope(workload)
+                               if workload in ('rea-bc', 'rea-bc-straight')
+                               else SCOPE)
         if assessment['status'] == 'PASS':
             assessment['classification'] = 'HOSTED_GUI_PASS'
     except (OSError, ValueError, KeyError, TypeError,
@@ -1250,12 +1303,12 @@ def validate_gui_receipt(receipt, work, *, stage='gui'):
     require(names == expected_images, 'GUI screenshot witness set differs')
 
 
-def validate_rea_receipt(receipt, work, *, stage):
+def validate_rea_receipt(receipt, work, *, stage, workload='rea-bc'):
     """Require the real B/C journey, source identities and each visible witness."""
     control = json.loads((work / 'control.json').read_text())
     expected = {
-        'status': 'PASS', 'stage': stage, 'scope_id': REA_SCOPE,
-        'workload': 'rea-bc', 'profile': original.EXPECTED_PROFILE,
+        'status': 'PASS', 'stage': stage, 'scope_id': rea_scope(workload),
+        'workload': workload, 'profile': original.EXPECTED_PROFILE,
         'source_commit': control['source_commit'],
         'source_tree_sha256': control['source_tree_sha256'],
         'input_hashes': control['input_hashes'],
@@ -1264,15 +1317,15 @@ def validate_rea_receipt(receipt, work, *, stage):
         'owned_windows_closed': True, 'cleanup_errors': [],
         'documents_remaining': 0, 'failures': 0, 'errors': 0, 'skips': 0,
         'geometry_builds': 0 if stage == 'readiness' else 8,
-        'sentinel': sentinel(stage, 'rea-bc'),
+        'sentinel': sentinel(stage, workload),
     }
     require(all(type(receipt.get(key)) is type(value)
                 and receipt[key] == value for key, value in expected.items()),
             'B/C GUI receipt incomplete')
-    validate_rea_counts(receipt.get('checks'), stage)
+    validate_rea_counts(receipt.get('checks'), stage, workload)
     elapsed = receipt.get('total_seconds')
     require(type(elapsed) in (int, float)
-            and 0 <= elapsed <= limits(stage, 'rea-bc').timeout_seconds
+            and 0 <= elapsed <= limits(stage, workload).timeout_seconds
             and math.isfinite(elapsed),
             'B/C elapsed time missing, nonfinite or outside stage limit')
     require(rea_source_tree() == control['source_tree_sha256']
@@ -1289,7 +1342,7 @@ def validate_rea_receipt(receipt, work, *, stage):
             and 'llvmpipe' in renderer['renderer'].lower(),
             'Real B/C software OpenGL context unproved')
     screenshots = receipt.get('screenshots')
-    expected_images = rea_images(stage)
+    expected_images = rea_images(stage, workload)
     require(type(screenshots) is list
             and len(screenshots) == len(expected_images),
             'B/C screenshot count differs')
@@ -1311,7 +1364,7 @@ def validate_rea_receipt(receipt, work, *, stage):
                 and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'),
                 'B/C screenshot bytes differ')
     require(names == expected_images, 'B/C screenshot set differs')
-    validate_rea_evidence(work, stage=stage)
+    validate_rea_evidence(work, stage=stage, workload=workload)
 
 
 def cleanup_rea_documents(work):
@@ -1477,9 +1530,10 @@ def _failed_install_cleanup(work, public):
 
 def exclude_gui_copy(work):
     """Retain the one copied document outside the diagnostic archive."""
-    if selected_workload(os.environ) == 'rea-bc':
+    if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
         _retain_rea_guard_profile(work)
-        validate_rea_evidence(work, stage=selected_stage(os.environ))
+        validate_rea_evidence(work, stage=selected_stage(os.environ),
+                              workload=selected_workload(os.environ))
         return
     source = work / 'evidence/gui/XO-001-copy.FCStd'
     others = [path for path in (work / 'evidence').rglob('*')
@@ -1493,7 +1547,8 @@ def exclude_gui_copy(work):
         target_dir = work / 'retained-gui-inputs'
         target_dir.mkdir(mode=0o700)
         target = target_dir / source.name
-        require(not target.exists(), 'Copied document retention target occupied')
+        require(not target.exists(),
+            'Copied document retention target occupied')
         identity = {'member': 'gui/' + source.name, 'sha256': digest(source),
                     'bytes': source.stat().st_size,
                     'reason': 'copied-input-not-diagnostic-evidence'}
@@ -1534,7 +1589,7 @@ def publish(work):
             'copied_input_absent': not target.exists(),
             'display_cookie_absent': not cookie.exists(),
         })
-        if selected_workload(os.environ) == 'rea-bc':
+        if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
             cleanup_rea_documents(work)
         cleanup = native.cleanup_staging(work, evidence)
         require(cleanup['cleanup'], 'Input staging cleanup incomplete')
@@ -1542,8 +1597,9 @@ def publish(work):
         publication['errors'].append(traceback.format_exc())
     write(work / 'evidence/publication.json', publication)
     exclude_gui_copy(work)
-    if selected_workload(os.environ) == 'rea-bc':
-        validate_rea_evidence(work, stage=selected_stage(os.environ))
+    if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
+        validate_rea_evidence(work, stage=selected_stage(os.environ),
+                              workload=selected_workload(os.environ))
     native.evidence_archive(work, work / 'publication.tar')
     return 0 if not publication['errors'] else 1
 
@@ -1552,7 +1608,9 @@ def complete(work, public):
     """Emit PASS only after both exact artifacts and every cleanup proof."""
     workload = selected_workload(os.environ)
     summary = {'schema': 1,
-               'scope_id': REA_SCOPE if workload == 'rea-bc' else SCOPE,
+               'scope_id': (rea_scope(workload)
+                            if workload in ('rea-bc', 'rea-bc-straight')
+                            else SCOPE),
                'outcome': 'INCOMPLETE',
                'source_commit': os.environ['GITHUB_SHA'],
                'stage': selected_stage(os.environ),
@@ -1573,10 +1631,10 @@ def complete(work, public):
                 and publication['primary'] and not publication['errors']
                 and assessment['status'] == 'PASS' and cleanup['cleanup']
                 and len(cleanup['staging_inputs_removed'])
-                == (0 if workload == 'rea-bc' else 10)
+                == (0 if workload in ('rea-bc', 'rea-bc-straight') else 10)
                 and display['cleanup'] and staging['copied_input_absent']
                 and staging['display_cookie_absent'], 'GUI proof incomplete')
-        if workload == 'rea-bc':
+        if workload in ('rea-bc', 'rea-bc-straight'):
             documents = json.loads((work / 'evidence/gui-document-cleanup.json').read_text())
             require(documents['cleanup'] is True,
                     'B/C temporary document cleanup unproved')

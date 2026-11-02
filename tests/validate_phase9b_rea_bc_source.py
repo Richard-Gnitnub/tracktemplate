@@ -144,16 +144,28 @@ class ReaSourceTests(unittest.TestCase):
                         self.specification("C", 10, **values)
                     )
 
-    def test_straight_sentinel_and_irregular_source_regions_reject(self):
+    def test_source_straight_branch_and_irregular_regions(self):
+        from validate_rea_straight_closure import independent_line
+
         heels = {"B": 18.417941404842995, "C": 22.70237204880366}
         for size, heel in heels.items():
-            for n in (heel - 1.0e-10, math.nextafter(heel, 0), heel,
-                      math.nextafter(heel, math.inf), heel + 0.01):
+            near = (heel - 1.0e-10, math.nextafter(heel, 0), heel,
+                    math.nextafter(heel, math.inf))
+            for n in (*near, heel + 0.01):
                 with self.subTest(size=size, n=n):
-                    with self.assertRaises(ValueError):
-                        self.subject.rea_turnout_dimensions(
+                    if size == "B" and n in near:
+                        result = self.subject.rea_turnout_dimensions(
                             self.specification(size, n)
                         )
+                        self.assertEqual(result["source_closure_kind"], "line")
+                        self.assertFalse(result["auto_fit_cap"])
+                        for key, expected in independent_line(n).items():
+                            baseline._close(result[key], expected)
+                    else:
+                        with self.assertRaises(ValueError):
+                            self.subject.rea_turnout_dimensions(
+                                self.specification(size, n)
+                            )
 
     def test_denominator_sentinel_still_reaches_source_auto_fit(self):
         # Distinct source predicates: math3357 versus3373-3375. A nonstraight

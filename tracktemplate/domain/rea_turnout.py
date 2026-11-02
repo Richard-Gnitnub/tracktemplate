@@ -217,11 +217,17 @@ def _crossing_counts(ratio):
     return 5, 8
 
 
+def _source_straight_closure(k2, k3):
+    """Keep the source angle predicate distinct from the radius sentinel."""
+    return abs(k2 - k3) < _SOURCE_MINFP
+
+
 def rea_turnout_dimensions(spec):
     """Return transient square-on REA B/C dimensions in model millimetres.
 
     This explicit source path does not replace legacy C10 arithmetic.
-    It admits positive, nonstraight, nonimprovised regular crossings only.
+    It admits positive, nonimprovised regular crossings, including the
+    source-defined B straight closure.
     The inherited module extension is a product envelope, not source exit
     sleeper qualification. No physical-fit or production claim is made.
     """
@@ -267,11 +273,7 @@ def rea_turnout_dimensions(spec):
     entry_straight = 2.0 * flange * k3n
     offset_at_curve_end = gauge - (entry_straight / k3n)
     denominator = math.cos(k2) - math.cos(k3)
-    if abs(k2 - k3) < _SOURCE_MINFP:
-        raise ReaTurnoutError(
-            "unsupported-straight-closure",
-            "The source straight closure needs a separate path.",
-        )
+    straight_closure = _source_straight_closure(k2, k3)
     # The denominator sentinel is distinct from the straight-angle flag.
     # Source math_unit.pas:3373-3412 can cap it to the switch radius.
     if abs(denominator) < _SOURCE_MINFP:
@@ -283,7 +285,8 @@ def rea_turnout_dimensions(spec):
             "unsupported-negative-closure",
             "The source negative closure is not construction-qualified.",
         )
-    auto_fit_cap = turnout_radius > switch_radius + _SOURCE_MINFP
+    auto_fit_cap = (not straight_closure
+                    and turnout_radius > switch_radius + _SOURCE_MINFP)
     if auto_fit_cap:
         turnout_radius = switch_radius
         offset_at_curve_end = heel_offset + turnout_radius * denominator
@@ -293,7 +296,13 @@ def rea_turnout_dimensions(spec):
                 "invalid-auto-fit-entry",
                 "The source auto-fit entry is shorter than its minimum.",
             )
-    turnout_curve_length = turnout_radius * (math.sin(k3) - math.sin(k2))
+    if straight_closure:
+        # math_unit:3365-3371. The radius is an invalid source placeholder;
+        # an explicit line, not this large circle, supplies every ordinate.
+        turnout_radius = _SOURCE_MAX_RADIUS + 0.5 * gauge
+        turnout_curve_length = (offset_at_curve_end - heel_offset) * k3n
+    else:
+        turnout_curve_length = turnout_radius * (math.sin(k3) - math.sin(k2))
     if turnout_curve_length <= 0.0:
         raise ReaTurnoutError(
             "unsupported-negative-closure",
@@ -421,10 +430,10 @@ def rea_turnout_dimensions(spec):
         - flare_length
     )
     angled_entry_length = entry_straight / max(math.cos(k3), 1.0e-12)
-    curved_stock_radius = turnout_radius - gauge
+    curved_stock_radius = 0.0 if straight_closure else turnout_radius - gauge
     check_turnout_radius = curved_stock_radius + flange
     check_turnout_flare_radius = curved_stock_radius + flare_end_gap
-    if check_turnout_length_before_fp < angled_entry_length:
+    if straight_closure or check_turnout_length_before_fp < angled_entry_length:
         check_turnout_working_mode = "straight crossing leg"
         check_flare_in_angle = k3
         check_start_angle = k3
@@ -496,10 +505,12 @@ def rea_turnout_dimensions(spec):
 
     switch_origin_x = heel_lead - switch_radius * math.sin(k2)
     switch_origin_y = heel_offset + switch_radius * math.cos(k2)
-    turnout_origin_x = heel_lead - turnout_radius * math.sin(k2)
-    turnout_origin_y = heel_offset + turnout_radius * math.cos(k2)
+    turnout_origin_x = (0.0 if straight_closure
+                        else heel_lead - turnout_radius * math.sin(k2))
+    turnout_origin_y = (0.0 if straight_closure
+                        else heel_offset + turnout_radius * math.cos(k2))
 
-    return {
+    result = {
         "size": "REA {}{:g} regular".format(spec.switch_size, k3n),
         "gauge": gauge,
         "flangeway": flange,
@@ -609,6 +620,62 @@ def rea_turnout_dimensions(spec):
             "for this explicit source specification.",
         ],
     }
+    if straight_closure:
+        result["source_closure_kind"] = "line"
+    return result
+
+
+def rea_turnout_straight_point(dimensions, x_value):
+    """Return a validated source line point/heading in main-gauge mm.
+
+    The marker is derived only. Recheck its specification and defining
+    values before allowing any inherited consumer to use the line.
+    """
+    try:
+        record = dimensions["source_specification"]
+        spec = ReaTurnoutSpecification(
+            record["switch_size"], record["crossing_ratio"],
+            record["schema_version"], record["source_context"],
+        )
+        switch = _switch_data("B")
+        inch = 25.4 / 76.2
+        k1 = math.atan(1.0 / switch["planing_ratio"])
+        planing = switch["planing"] * inch * math.cos(k1)
+        heel = switch["heel"] * inch
+        radius = switch["radius"] * inch
+        k2 = math.asin((heel - planing) / radius + math.sin(k1))
+        k3 = math.atan(1.0 / float(spec.crossing_ratio))
+        offset = (planing / switch["planing_ratio"]
+                  + radius * math.cos(k1) - radius * math.cos(k2))
+        defining = {
+            "source_closure_kind": "line",
+            "source_status": "transient-unqualified",
+            "source_context_flags": _source_context_flags(),
+            "gauge": 16.5, "flangeway": 1.0, "model_scale": 76.2,
+            "heel_lead": heel, "heel_offset": offset, "k2": k2, "k3": k3,
+            "turnout_radius": _SOURCE_MAX_RADIUS + 8.25,
+            "turnout_origin_x": 0.0, "turnout_origin_y": 0.0,
+        }
+        valid = (spec.switch_size == "B" and record == spec.to_record()
+                 and _source_straight_closure(k2, k3)
+                 and all(dimensions.get(key) == value
+                         for key, value in defining.items()))
+    except (KeyError, TypeError, ValueError, OverflowError) as error:
+        raise ReaTurnoutError(
+            "invalid-source-line", "The source line context is invalid.",
+        ) from error
+    if not valid:
+        raise ReaTurnoutError(
+            "invalid-source-line", "The source line context is inconsistent.",
+        )
+    try:
+        x = float(x_value)
+        finite = type(x_value) in (int, float) and math.isfinite(x)
+    except (ValueError, TypeError, OverflowError):
+        finite = False
+    if not finite:
+        raise ReaTurnoutError("invalid-source-station", "x must be finite.")
+    return x, offset + (x - heel) * math.tan(k3), k3
 
 
 def rea_turnout_timber_stations(spec):
@@ -710,15 +777,18 @@ def rea_turnout_source_rail_point(
         end = dimensions[end_key]
         fraction = (x - start) / (end - start) if x >= start else 0.0
         # aq2offset on the admitted regular crossing leg, source 9198.
-        if x < dimensions["switch_curve_end_x"]:
+        if "source_closure_kind" in dimensions:
+            _, running_y, heading = rea_turnout_straight_point(dimensions, x)
+        elif x < dimensions["switch_curve_end_x"]:
             raise ReaTurnoutError(
                 "unsupported-wing-running-branch",
                 "The wing path precedes the qualified crossing leg.",
             )
-        running_y = dimensions["curve_end_offset"] + (
-            x - dimensions["switch_curve_end_x"]
-        ) * math.tan(k3)
-        heading = k3
+        else:
+            running_y = dimensions["curve_end_offset"] + (
+                x - dimensions["switch_curve_end_x"]
+            ) * math.tan(k3)
+            heading = k3
         side = 1.0
     else:
         prefix = "check_turnout_" + flare_prefix
@@ -741,7 +811,10 @@ def rea_turnout_source_rail_point(
             )
         # aq3offset: the actual-x stock face, not a check-radius circle.
         curve_end_x = dimensions["switch_curve_end_x"] - gauge * math.sin(k3)
-        if x < curve_end_x:
+        if "source_closure_kind" in dimensions:
+            _, running_y, heading = rea_turnout_straight_point(dimensions, x)
+            running_y += gauge / math.cos(heading)
+        elif x < curve_end_x:
             heel_x = dimensions["heel_lead"] - gauge * math.sin(
                 dimensions["k2"]
             )

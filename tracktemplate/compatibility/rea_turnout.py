@@ -12,6 +12,7 @@ from tracktemplate.domain import rea_turnout
 from tracktemplate.domain.crossover import complete_radius_decision
 from tracktemplate.compatibility.rea_turnout_rails import (
     rea_turnout_rail_polylines,
+    validate_rea_inner_gauge_binding,
 )
 
 
@@ -54,6 +55,8 @@ class ReaTurnoutGeometryAdapter:
     def _turnout(self, doc, host, toe, handing, orientation, spec, dimensions,
                  *, exit_sleeper_profile=None):
         module = self.module
+        if "source_closure_kind" in dimensions:
+            validate_rea_inner_gauge_binding(module)
         data, set_id = self._host(host)
         toe = self._placement(data, dimensions, toe, handing, orientation)
         conflict, overlap = module._turnout_find_overlap(
@@ -146,6 +149,8 @@ class ReaTurnoutGeometryAdapter:
         """Resolve one source specification through both roads and connector."""
         module = self.module
         dimensions = rea_turnout.rea_turnout_dimensions(specification)
+        if "source_closure_kind" in dimensions:
+            validate_rea_inner_gauge_binding(module)
         data_a, set_a = self._host(host_a)
         data_b, set_b = self._host(host_b)
         if host_a.Name == host_b.Name:
