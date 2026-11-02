@@ -3596,3 +3596,44 @@ Phase 9B stays `Open` at 3/6. This result gives no acceptance for physical
 fit, production, product performance, release or a phase exit. The rights
 state does not change. LMS work stays stopped until after Phase 11.
 The project keeps evidence with FAIL results and the repair evidence.
+
+<a id="rea-bc-stored-lifecycle"></a>
+
+## Stored REA B/C inputs and operator controls — 2026-11-02
+
+This Level 2 change advances [D-P9-019](#rea-bc-scope-panel). Explicit B/C
+inputs now supply stored turnout and crossover records through the shared
+calculation path. Each record keeps its identity, source inputs and host
+links. The display is derived from those inputs. The change preserves the
+fixed C10, TO-001 and XO-001 regression cases.
+
+The [hosted native test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41367654365)
+at `1d710df7f0ea617e17aad32c24edc3d3a8c006fe` gives a PASS result.
+Both tests completed, with no skips. They cover a B8 turnout changed to
+C9.25 and back to B8, and a B8 crossover. They compare 425 source values,
+165 timber records, 70 rail anchors, 23,145 mapped points and 319 display
+lines. The tests also cover canonical reads, invalid inputs, rollback,
+Undo/Redo, reuse without an input change and save/reopen. All test documents
+closed.
+Independent result review confirms the success record, resource measurements
+and process cleanup. The project keeps the previous failed run and the
+reviewed fixture correction. All original assertions and geometry stay unchanged after that repair.
+
+The later [operator controls](../../tracktemplate/ui/rea_trackwork_editor.py)
+add explicit create, edit and rebuild actions to the manager.
+All 14 standalone editor tests and 7 composition tests give PASS results.
+Independent review confirms that the existing C10 controls and guarded
+calculation bindings stay unchanged. A separate correction preserves an
+attached display when a new store attempts an edit that fails.
+
+The operator controls and display still need hosted GUI qualification.
+The native test does not supply that evidence. Specific authority to publish
+B/C GUI screenshots has not been established. The proposed evidence contains
+synthetic rails and timbers, with no operator document or chair package.
+
+All 32 menu combinations keep status `Pending`. The previous numerical
+[source evidence](#rea-bc-source-geometry) still applies to its specified
+continuous regions and boundaries. Unsupported source regions, exit-sleeper
+profiles, chair coverage and physical fit remain separate gaps.
+Phase 9B stays Open at 3/6. This change gives no rights, production,
+performance, phase exit or Phase 10 acceptance. LMS development stays paused.
