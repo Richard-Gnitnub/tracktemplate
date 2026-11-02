@@ -9,6 +9,7 @@ a new operator command.
 from contextlib import ExitStack
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -200,7 +201,6 @@ def validate_authority(authority, config, entry_sha256):
         dict(
             status="PASS",
             independent_review="PASS",
-            source_commit=config.source_commit,
             entry_sha256=NATIVE_SHA256,
             input_hashes=expected["input_hashes"],
             scope_id=native().SCOPE,
@@ -219,6 +219,22 @@ def validate_authority(authority, config, entry_sha256):
     assert type(proof.get("run_id")) is int and proof["run_id"] > 0
     assert str(proof["run_id"]) != os.environ["GITHUB_RUN_ID"]
     assert _hash(proof.get("evidence_sha256"))
+    source = proof.get("source_commit")
+    assert type(source) is str and re.fullmatch("[0-9a-f]{40}", source)
+    reuse = authority.get("native_source_reuse")
+    if source == config.source_commit:
+        assert reuse is None
+    else:
+        # The controller also proves the complete tracked-file difference
+        # before acquisition. Keep the original proof identity unchanged.
+        _matches(reuse, dict(
+            schema=1, scope_id="TO-001-GUI-PICK-DIAGNOSTIC-001",
+            status="PASS", independent_review="PASS",
+            from_commit=source, to_commit=config.source_commit,
+            native_run_id=proof["run_id"],
+            native_evidence_sha256=proof["evidence_sha256"],
+        ))
+        assert _hash(reuse.get("review_sha256"))
     if stage == "gui":
         ready = authority.get("gui_readiness_review")
         _matches(
@@ -380,13 +396,90 @@ def compare_frames(placements, fixture):
     return count
 
 
-def check_pick(rows, document, obj, first_face, last_face):
-    assert len(rows) == 1
+def _pick_diagnostic(rows, document, obj, first_face, last_face, target):
+    """Bound synthetic selection data; never stringify arbitrary objects."""
+    valid = True
+
+    def invalid():
+        nonlocal valid
+        valid = False
+        return "<invalid>"
+
+    def text(value):
+        if (type(value) is str
+                and re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", value)):
+            return value
+        return invalid()
+
+    def number(value, *, integer=False, positive=False):
+        # This is a logging bound, not a geometry or physical-fit tolerance.
+        types = (int,) if integer else (int, float)
+        if (type(value) in types and abs(value) <= 10**9
+                and math.isfinite(value) and (not positive or value > 0)):
+            return value
+        return invalid()
+
+    def vector(value, size, **options):
+        if type(value) not in (list, tuple) or len(value) != size:
+            return invalid()
+        return [number(item, **options) for item in value]
+
+    observed = []
+    count = len(rows) if type(rows) in (list, tuple) else invalid()
+    for row in rows[:2] if type(rows) in (list, tuple) else ():
+        names = getattr(row, "SubElementNames", None)
+        observed.append(dict(
+            document=text(getattr(row, "DocumentName", None)),
+            object=text(getattr(row, "ObjectName", None)),
+            subelement_count=(len(names) if type(names) in (list, tuple)
+                              else invalid()),
+            subelements=([text(name) for name in names[:2]]
+                         if type(names) in (list, tuple) else invalid()),
+        ))
+    if target is not None:
+        keys = {"position_id", "child_index", "target_face_index", "point_mm",
+                "screen_point", "device_pixel_ratio", "click_pixel",
+                "viewport_size"}
+        if type(target) is not dict or set(target) != keys:
+            target = invalid()
+        else:
+            child_index = number(target["child_index"], integer=True)
+            if type(child_index) is int and child_index < 0:
+                child_index = invalid()
+            target = dict(
+                position_id=text(target["position_id"]),
+                child_index=child_index,
+                target_face_index=number(target["target_face_index"],
+                                         integer=True, positive=True),
+                point_mm=vector(target["point_mm"], 3),
+                screen_point=vector(target["screen_point"], 2),
+                device_pixel_ratio=number(target["device_pixel_ratio"],
+                                          positive=True),
+                click_pixel=vector(target["click_pixel"], 2, integer=True),
+                viewport_size=vector(target["viewport_size"], 2,
+                                     integer=True, positive=True),
+            )
+    record = dict(
+        expected=dict(document=text(document), object=text(obj), face_range=[
+            number(first_face, integer=True, positive=True),
+            number(last_face, integer=True, positive=True),
+        ]),
+        observed=dict(row_count=count, rows=observed), target=target,
+    )
+    return "TO_PICK_DIAGNOSTIC=" + json.dumps(record, allow_nan=False), valid
+
+
+def check_pick(rows, document, obj, first_face, last_face, *, diagnostic=None):
+    message, valid = _pick_diagnostic(
+        rows, document, obj, first_face, last_face, diagnostic
+    )
+    assert valid, message
+    assert len(rows) == 1, message
     row = rows[0]
-    assert (row.DocumentName, row.ObjectName) == (document, obj)
-    assert len(row.SubElementNames) == 1
+    assert (row.DocumentName, row.ObjectName) == (document, obj), message
+    assert len(row.SubElementNames) == 1, message
     match = re.fullmatch(r"Face([1-9][0-9]*)", row.SubElementNames[0])
-    assert match and first_face <= int(match.group(1)) <= last_face
+    assert match and first_face <= int(match.group(1)) <= last_face, message
 
 
 def finish(rt, config, owned, receipt):
@@ -629,7 +722,8 @@ class ToSingleRailGui(unittest.TestCase):
             rt.helpers.settle()
             children = obj.Shape.childShapes()
             child = children[index]
-            face = max(child.Faces, key=lambda value: value.CenterOfMass.z)
+            faces = child.Faces
+            face = max(faces, key=lambda value: value.CenterOfMass.z)
             point = face.CenterOfMass
             first = 1 + sum(len(shape.Faces) for shape in children[:index])
             last = first + len(child.Faces) - 1
@@ -666,6 +760,18 @@ class ToSingleRailGui(unittest.TestCase):
                 obj.Name,
                 first,
                 last,
+                diagnostic=dict(
+                    position_id=rows[index]["position_id"],
+                    child_index=index,
+                    target_face_index=next(
+                        i + 1 for i, candidate in enumerate(faces)
+                        if candidate is face
+                    ),
+                    point_mm=(point.x, point.y, point.z),
+                    screen_point=(x, y), device_pixel_ratio=ratio,
+                    click_pixel=(target.x(), target.y()),
+                    viewport_size=(widget.width(), widget.height()),
+                ),
             )
         finally:
             for layer, visible in visibility:

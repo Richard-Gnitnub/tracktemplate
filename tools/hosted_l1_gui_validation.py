@@ -135,6 +135,13 @@ TO_HANDLING_DECISION = (
     'to001-handling-owner-decision.json@sha256:'
     '6a63891440b9c5ae6e5b814a4795485e50b9ccb321837891cded533c46c09398'
 )
+TO_NATIVE_REUSE_SCOPE = 'TO-001-GUI-PICK-DIAGNOSTIC-001'
+TO_NATIVE_REUSE_PATHS = frozenset({
+    TO_ENTRY, 'tools/hosted_l1_gui_validation.py',
+    'tests/validate_to_single_rail_gui_entry.py',
+    'tests/validate_hosted_l1_gui_controls.py',
+    'reference/current/PHASE_EVIDENCE.md', 'reference/ste-review-state.json',
+})
 
 
 def to_counts(stage):
@@ -214,6 +221,62 @@ def to_control_files():
         'tests/validate_to_single_rail_gui_entry.py',
         'tests/validate_hosted_l1_gui_controls.py',
         'tests/validate_hosted_l1_gui_install.py')))
+
+
+def validate_to_native_reuse(record):
+    """Bind unchanged native evidence to one reviewed GUI diagnostic delta."""
+    proof = record.get('prior_native_evidence', {})
+    source = proof.get('source_commit')
+    require(type(source) is str and re.fullmatch(r'[0-9a-f]{40}', source),
+            'TO native source identity absent')
+    reuse = record.get('native_source_reuse')
+    if source == record['source_commit']:
+        require(reuse is None, 'Unexpected TO native source reuse record')
+        return
+    expected = {
+        'schema': 1, 'scope_id': TO_NATIVE_REUSE_SCOPE,
+        'status': 'PASS', 'independent_review': 'PASS',
+        'from_commit': source, 'to_commit': record['source_commit'],
+        'native_run_id': proof.get('run_id'),
+        'native_evidence_sha256': proof.get('evidence_sha256'),
+    }
+    require(type(reuse) is dict
+            and set(reuse) == {*expected, 'review_sha256', 'changed_paths'}
+            and all(type(reuse[key]) is type(value) and reuse[key] == value
+                    for key, value in expected.items())
+            and _hash(reuse['review_sha256']),
+            'TO native source reuse review absent or differs')
+    paths = reuse['changed_paths']
+    require(type(paths) is list and paths
+            and all(type(path) is str for path in paths)
+            and paths == sorted(set(paths))
+            and set(paths) <= TO_NATIVE_REUSE_PATHS,
+            'TO native source reuse paths differ')
+
+
+def validate_to_native_source(record):
+    """Reject every unreviewed tracked delta before input acquisition."""
+    validate_to_native_reuse(record)
+    reuse = record.get('native_source_reuse')
+    if reuse is None:
+        return
+    source, target = reuse['from_commit'], reuse['to_commit']
+    for revision in (source, target):
+        require(native.command('git', 'rev-parse', '--verify',
+                               revision + '^{commit}') == revision,
+                'TO native source commit unavailable')
+    require(native.command('git', 'rev-parse', 'HEAD') == target,
+            'TO native source target differs from checkout')
+    native.command('git', 'merge-base', '--is-ancestor', source, target)
+    names = native.command('git', 'diff', '--no-renames', '--name-status',
+                           '-z', source, target, '--')
+    fields = names.rstrip('\0').split('\0') if names else []
+    require(len(fields) % 2 == 0
+            and all(status == 'M' for status in fields[::2]),
+            'TO native source reuse requires modified files only')
+    paths = sorted(fields[1::2])
+    require(paths == reuse['changed_paths'],
+            'TO native source dependencies or reviewed paths changed')
 
 
 def validate_to_authority(record, environ):
@@ -299,7 +362,6 @@ def validate_to_authority(record, environ):
     proof = record.get('prior_native_evidence', {})
     expected_native = {
         'status': 'PASS', 'independent_review': 'PASS',
-        'source_commit': record['source_commit'],
         'entry_sha256': native.TO_ENTRY_SHA256, 'scope_id': native.TO_SCOPE,
         'input_hashes': native.TO_INPUT_HASHES,
         'tests': 1, 'skips': 0, 'run_attempt': 1, 'cleanup': True,
@@ -313,6 +375,7 @@ def validate_to_authority(record, environ):
             and str(proof['run_id']) != environ['GITHUB_RUN_ID']
             and _hash(proof.get('evidence_sha256')),
             'TO independent native proof absent or differs')
+    validate_to_native_reuse(record)
     if stage == 'gui':
         ready = record.get('gui_readiness_review', {})
         expected_ready = {key: record[key] for key in (
@@ -1019,6 +1082,7 @@ def prepare(work):
             require(digest(ROOT / name) == expected,
                 'Reviewed B/C input changed')
     elif workload == 'to-single':
+        validate_to_native_source(control)
         require(not native.command('git', 'diff', '--name-only', TO_BASE,
                                    '--', 'tracktemplate',
                                    'TrackTemplate.FCMacro',
