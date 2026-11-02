@@ -9671,6 +9671,74 @@ def validate_hosted_policy_acceptance_mutations() -> None:
         )
 
 
+def validate_to_research_publication_mutations() -> None:
+    """Keep the exact research approval separate from production clearance."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    progress._validate_phase9b_decisions(document)
+    record = document["decisions"][14]
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    progress._validate_dp9_020_publication(evidence, record)
+    plan = read("reference/PROJECT_PLAN.md")
+    row = next(line for line in plan.splitlines()
+               if line.startswith("| D-P9-020 |"))
+    for name, changed_plan in (
+        ("wider-dashboard", plan.replace(row, row + " All production accepted.")),
+        ("duplicate-dashboard", plan.replace(row, row + "\n" + row)),
+    ):
+        expect_rejected(
+            "to-research-publication/" + name,
+            lambda item=changed_plan: progress._validate_plan_shape(item),
+            "authorised added dashboard row drifted: D-P9-020",
+        )
+    for name, field, value in (
+        ("unaccepted", "status", "Proposed"),
+        ("missing-panel", "panel_required_under_current_policy", False),
+        ("wrong-date", "decided_on", "2026-11-01"),
+        ("wider-authority", "authority", "Publish all chair packages."),
+        ("changed-source", "decision", record["decision"].replace(
+            "934827", "934828",
+        )),
+        ("production-clearance", "exclusions", "All production is accepted."),
+    ):
+        changed = copy.deepcopy(document)
+        changed["decisions"][14][field] = value
+        expect_rejected(
+            "to-research-publication/" + name,
+            lambda item=changed: progress._validate_phase9b_decisions(item),
+            "D-P9-020",
+        )
+    for name, changed in (
+        ("missing-decision", document["decisions"][:-1]),
+        ("duplicate-decision", [*document["decisions"], record]),
+    ):
+        altered = copy.deepcopy(document)
+        altered["decisions"] = changed
+        expect_rejected(
+            "to-research-publication/" + name,
+            lambda item=altered: progress._validate_phase9b_decisions(item),
+            "decision chain incomplete or widened",
+        )
+    altered = copy.deepcopy(document)
+    altered["decisions"][13]["decision"] = "All B/C inputs are qualified."
+    expect_rejected(
+        "to-research-publication/prior-bc-authority",
+        lambda: progress._validate_phase9b_decisions(altered),
+        "D-P9-019",
+    )
+    changed_evidence = evidence.replace(
+        "Its `MANIFEST.json` SHA-256 is `3686206f",
+        "Its `MANIFEST.json` SHA-256 is `4686206f", 1,
+    )
+    assert changed_evidence != evidence
+    expect_rejected(
+        "to-research-publication/changed-panel-source",
+        lambda: progress._validate_dp9_020_publication(
+            changed_evidence, record,
+        ),
+        "D-P9-020",
+    )
+
+
 def main() -> None:
     """Run every durable in-memory adversarial mutation."""
     validate_product_vision_mutations()
@@ -9710,6 +9778,7 @@ def main() -> None:
     validate_chief_mutations()
     validate_ontology_mutation()
     validate_hosted_policy_acceptance_mutations()
+    validate_to_research_publication_mutations()
     summary = {
         "escaped": 0,
         "independent_protections": len(PROTECTIONS),
