@@ -319,9 +319,111 @@ def require_rea_finalization_time(stage, environ, now):
             'Insufficient B/C job time for proof and finalization')
 
 
+def _rea_profile_inventory(profile):
+    """Hash an owned private profile without making its contents public."""
+    directories = {
+        'FREECAD_USER_HOME': 'user-home', 'FREECAD_USER_DATA': 'user-data',
+        'FREECAD_USER_TEMP': 'temp', 'XDG_CACHE_HOME': 'xdg-cache',
+        'XDG_CONFIG_HOME': 'xdg-config', 'XDG_DATA_HOME': 'xdg-data',
+        'PYTHONPYCACHEPREFIX': 'python-cache',
+    }
+    require(not any(path.is_symlink() for path in (profile, *profile.parents))
+            and profile.is_dir(), 'Linked or missing guard profile')
+    require(set(path.name for path in profile.iterdir())
+            <= set(directories.values()) | {'user.cfg', 'system.cfg'}
+            and all((profile / name).is_dir()
+                    for name in directories.values()),
+            'Unexpected guard profile layout')
+    inventory = {}
+    for path in (profile, *sorted(profile.rglob('*'))):
+        require(not path.is_symlink() and path.stat().st_uid == os.getuid(),
+                'Linked or foreign guard profile member')
+        name = path.relative_to(profile).as_posix()
+        if path.is_dir():
+            require(name not in ('user.cfg', 'system.cfg'),
+                    'Guard configuration is not a file')
+            inventory[name] = {'kind': 'directory'}
+        else:
+            require(path.is_file(), 'Nonregular guard profile member')
+            inventory[name] = {'kind': 'file', 'sha256': digest(path),
+                               'bytes': path.stat().st_size}
+    return directories, inventory
+
+
+def _rea_guard_profile(work):
+    """Validate live or retained private state against its guard receipt."""
+    source = work / 'evidence/guard/profile'
+    parent = work / 'retained-guard-profile'
+    retained = parent / 'profile'
+    receipt_path = work / 'evidence/guard-profile-exclusion.json'
+    if not any(path.exists() or path.is_symlink()
+               for path in (source, parent, receipt_path)):
+        return None
+    live = source.exists() or source.is_symlink()
+    require(not live or not (parent.exists() or parent.is_symlink()
+                            or receipt_path.exists()
+                            or receipt_path.is_symlink()),
+            'Guard profile retention target occupied')
+    result_path = work / 'evidence/guard/result.json'
+    require(not any(path.is_symlink()
+                    for path in (result_path, *result_path.parents))
+            and result_path.is_file()
+            and result_path.stat().st_uid == os.getuid(),
+            'Guard profile ownership receipt differs')
+    private = json.loads(result_path.read_text()).get('private_profile', {})
+    profile = source if live else retained
+    directories, inventory = _rea_profile_inventory(profile)
+    environment = {name: str(source / directory)
+                   for name, directory in directories.items()}
+    environment['PYTHONDONTWRITEBYTECODE'] = '1'
+    require(type(private) is dict and private.get('path') == str(source)
+            and private.get('environment') == environment,
+            'Guard profile path or environment differs')
+    files = [row for row in inventory.values() if row['kind'] == 'file']
+    receipt = {
+        'schema': 1, 'source': 'guard/profile',
+        'retained': 'retained-guard-profile/profile',
+        'reason': 'private-runtime-state-not-public-evidence',
+        'guard_result_sha256': digest(result_path),
+        'tree_sha256': hashlib.sha256(json.dumps(
+            inventory, sort_keys=True, separators=(',', ':'),
+        ).encode()).hexdigest(),
+        'files': len(files), 'bytes': sum(row['bytes'] for row in files),
+        'directories': len(inventory) - len(files),
+    }
+    if not live:
+        require(parent.stat().st_uid == os.getuid()
+                and set(path.name for path in parent.iterdir())
+                == {'profile', 'manifest.json'},
+                'Guard profile retention inventory differs')
+        for path, expected in ((parent / 'manifest.json', inventory),
+                               (receipt_path, receipt)):
+            require(not any(item.is_symlink() for item in (path, *path.parents))
+                    and path.is_file() and path.stat().st_uid == os.getuid()
+                    and json.loads(path.read_text()) == expected,
+                    'Retained guard profile identity changed')
+    return profile, inventory, receipt
+
+
+def _retain_rea_guard_profile(work):
+    """Keep the owned profile outside both archives, without deleting it."""
+    state = _rea_guard_profile(work)
+    source = work / 'evidence/guard/profile'
+    if state is None or state[0] != source:
+        return
+    _profile, inventory, receipt = state
+    parent = work / 'retained-guard-profile'
+    parent.mkdir(mode=0o700)
+    write(parent / 'manifest.json', inventory)
+    source.rename(parent / 'profile')
+    write(work / 'evidence/guard-profile-exclusion.json', receipt)
+    _rea_guard_profile(work)
+
+
 def validate_rea_evidence(work, *, stage):
     """Exclude archives, documents and unknown media before either upload."""
     evidence = work / 'evidence'
+    profile = _rea_guard_profile(work)
     roots = {
         'prepare.log', 'install.log', 'acquisition.log', 'execution.log',
         'finalizer.log', 'seal.log', 'publication.log', 'xvfb.log',
@@ -337,11 +439,13 @@ def validate_rea_evidence(work, *, stage):
         'installer-intent.json', 'installer-ownership.json',
         'installer-result.json', 'installer-output.log',
         'installer-samples.jsonl', 'installer-cleanup.json',
+        'guard-profile-exclusion.json',
     }
     groups = {
         'gui': {'result.json', *rea_images(stage)},
         'guard': {'control.json', 'result.json', 'ownership.json',
-                  'measurements.jsonl', 'stdout', 'stderr'},
+                  'measurements.jsonl', 'stdout', 'stderr',
+                  'wrapper.stdout', 'watchdog.json'},
         'display-preflight': {'clearance.json'},
         'finalizer-clearance': {'clearance.json', 'deadline-clearance.json'},
     }
@@ -350,6 +454,10 @@ def validate_rea_evidence(work, *, stage):
     for path in evidence.rglob('*'):
         relative = path.relative_to(evidence)
         require(not path.is_symlink(), 'Linked B/C evidence refused')
+        if profile is not None and path.is_relative_to(profile[0]):
+            # Receipt validation is read-only while display cleanup is pending.
+            # Seal/publication relocate this verified tree before archiving.
+            continue
         if path.is_dir():
             require(str(relative) in groups, 'Unexpected evidence directory')
         else:
@@ -1370,6 +1478,7 @@ def _failed_install_cleanup(work, public):
 def exclude_gui_copy(work):
     """Retain the one copied document outside the diagnostic archive."""
     if selected_workload(os.environ) == 'rea-bc':
+        _retain_rea_guard_profile(work)
         validate_rea_evidence(work, stage=selected_stage(os.environ))
         return
     source = work / 'evidence/gui/XO-001-copy.FCStd'

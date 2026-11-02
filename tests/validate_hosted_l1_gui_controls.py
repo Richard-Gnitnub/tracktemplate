@@ -1688,6 +1688,167 @@ class ReaGuiControls(unittest.TestCase):
         self.assertNotIn('ViewObject.Proxy = None', ast.unparse(method))
 
 
+class ReaGuardEvidenceRegressions(unittest.TestCase):
+    """Use the guard's actual private-profile layout without a host process."""
+
+    def profile(self, work):
+        output = work / 'evidence/guard'
+        output.mkdir(parents=True)
+        _argv, profile = gui.guard._private_profile(
+            ['flatpak', 'run', gui.guard.APP_ID, 'synthetic.FCMacro'], output,
+        )
+        root = Path(profile['path'])
+        (root / 'user.cfg').write_bytes(b'private synthetic configuration')
+        (root / 'temp/owned.FCStd').write_bytes(b'private synthetic document')
+        gui.write(output / 'result.json', {
+            'status': 'failed', 'private_profile': profile,
+        })
+        (output / 'wrapper.stdout').write_text('Synthetic raw failure\n')
+        (output / 'watchdog.json').write_text('{"action":"owned-kill"}\n')
+        (work / 'evidence/execution.log').write_text('Original exception\n')
+        return root
+
+    def test_live_receipt_validation_does_not_move_owned_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            root = self.profile(work)
+            before = (root / 'user.cfg').read_bytes()
+            gui.validate_rea_evidence(work, stage='readiness')
+            self.assertEqual((root / 'user.cfg').read_bytes(), before)
+            self.assertFalse((work / 'retained-guard-profile').exists())
+            self.assertFalse((work / 'evidence/guard-profile-exclusion.json').exists())
+
+    def test_failed_diagnostics_seal_and_publication_exclude_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            source = self.profile(work)
+            original = {str(path.relative_to(source)): path.read_bytes()
+                        for path in source.rglob('*') if path.is_file()}
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                retained = work / 'retained-guard-profile/profile'
+                self.assertFalse(source.exists())
+                self.assertEqual({str(path.relative_to(retained)): path.read_bytes()
+                                  for path in retained.rglob('*') if path.is_file()},
+                                 original)
+                receipt = work / 'evidence/guard-profile-exclusion.json'
+                before = receipt.read_bytes()
+                gui.exclude_gui_copy(work)
+                self.assertEqual(receipt.read_bytes(), before)
+                gui.native.seal(work)
+                with patch.object(gui.native, 'verify_artifact',
+                                  side_effect=ValueError('Synthetic missing readback')):
+                    self.assertEqual(gui.publish(work), 1)
+                self.assertEqual(receipt.read_bytes(), before)
+            for name in ('evidence.tar', 'publication.tar'):
+                with gui.native.tarfile.open(work / name) as archive:
+                    names = archive.getnames()
+                    self.assertIn('evidence/execution.log', names)
+                    self.assertIn('evidence/guard/wrapper.stdout', names)
+                    self.assertIn('evidence/guard/watchdog.json', names)
+                    self.assertIn('evidence/guard-profile-exclusion.json', names)
+                    self.assertFalse(any('/profile/' in member for member in names))
+                    self.assertEqual(archive.extractfile(
+                        'evidence/execution.log').read(), b'Original exception\n')
+            self.assertTrue((retained / 'temp/owned.FCStd').is_file())
+
+    def test_profile_rejects_foreign_receipt_unknown_root_and_owner(self):
+        for problem in ('foreign-path', 'unknown-root', 'owner'):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                if problem == 'foreign-path':
+                    path = work / 'evidence/guard/result.json'
+                    record = json.loads(path.read_text())
+                    record['private_profile']['path'] = str(work / 'foreign')
+                    path.write_text(json.dumps(record))
+                if problem == 'unknown-root':
+                    (root / 'unknown').mkdir()
+                with patch.object(gui.os, 'getuid', return_value=(
+                        os.getuid() + 1 if problem == 'owner' else os.getuid())):
+                    with self.assertRaises(ValueError):
+                        gui.validate_rea_evidence(work, stage='readiness')
+                self.assertTrue(root.exists())
+                self.assertFalse((work / 'retained-guard-profile').exists())
+
+    def test_profile_rejects_links_and_occupied_retention(self):
+        for problem in ('profile', 'nested', 'receipt', 'retention'):
+            with self.subTest(problem=problem), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                if problem == 'profile':
+                    moved = work / 'foreign-profile'
+                    root.rename(moved)
+                    root.symlink_to(moved, target_is_directory=True)
+                elif problem == 'nested':
+                    (root / 'temp/linked').symlink_to(root / 'user.cfg')
+                elif problem == 'receipt':
+                    path = work / 'evidence/guard/result.json'
+                    moved = work / 'foreign-result.json'
+                    path.rename(moved)
+                    path.symlink_to(moved)
+                else:
+                    (work / 'retained-guard-profile').mkdir()
+                with patch.dict(os.environ,
+                                ReaGuiControls.environment('readiness'), clear=True):
+                    with self.assertRaises(ValueError):
+                        gui.exclude_gui_copy(work)
+                self.assertTrue(root.exists())
+
+    def test_repeated_exclusion_refuses_retained_tree_changes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            self.profile(work)
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                retained = work / 'retained-guard-profile/profile/user.cfg'
+                retained.write_bytes(b'changed')
+                with self.assertRaises(ValueError):
+                    gui.exclude_gui_copy(work)
+                self.assertFalse((work / 'evidence.tar').exists())
+
+    def test_known_profile_does_not_admit_other_evidence(self):
+        for name in ('guard/unknown.json', 'guard/shutdown-request.json',
+                     'guard/gui-completion.json', 'guard/watchdog2.json',
+                     'gui/to-b8.png', 'gui/private.FCStd'):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                root = self.profile(work)
+                path = work / 'evidence' / name
+                path.parent.mkdir(exist_ok=True)
+                path.write_bytes(b'unapproved')
+                with self.assertRaises(ValueError):
+                    gui.validate_rea_evidence(work, stage='readiness')
+                self.assertTrue(root.exists())
+
+    def test_actual_guard_early_failure_preserves_raw_stdout(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            runtime = work / 'private-runtime'
+            runtime.mkdir(mode=0o700)
+            command = Mock(return_value=subprocess.CompletedProcess(
+                [], 0, gui.guard.APP_ID + ' 999999\n', '',
+            ))
+            process = Mock(side_effect=AssertionError('No host process'))
+            result = gui.guard.run_guarded_flatpak(
+                ['flatpak', 'run', gui.guard.APP_ID, 'synthetic.FCMacro'],
+                limits=gui.limits('readiness', 'rea-bc'),
+                evidence_dir=work / 'evidence/guard', isolate_profile=True,
+                context=gui.guard.GuardContext(run=command, popen=process,
+                                               runtime_dir=runtime),
+            )
+            self.assertEqual(result['failure_reason'], 'foreign-freecad-instance')
+            process.assert_not_called()
+            gui.validate_rea_evidence(work, stage='readiness')
+            with patch.dict(os.environ,
+                            ReaGuiControls.environment('readiness'), clear=True):
+                gui.exclude_gui_copy(work)
+                gui.native.seal(work)
+            self.assertTrue((work / 'evidence.tar').is_file())
+
+
 if __name__ == '__main__':
     result = unittest.main(exit=False)
     if not result.result.wasSuccessful():
