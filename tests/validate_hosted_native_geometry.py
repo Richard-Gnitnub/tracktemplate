@@ -120,6 +120,160 @@ def native_report():
     return "\nRan 1 test in 0.500s\n\nOK\n"
 
 
+def rea_report(mode):
+    paths = (
+        "tests/fixtures/phase9b-rea-bc-source.json",
+        "tests/validate_phase1_turnout.py",
+        "reference/contracts/phase1-compatibility.json",
+        "reference/contracts/phase1-transition-pilot.json",
+        "TrackTemplate.FCMacro",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_"
+        "chair_performance_and_representation.FCMacro",
+    )
+    native = mode == "native"
+    checks = {
+        "source_scalars": 425, "timber_records": 165, "rail_anchors": 70,
+        "mapped_points": 1, "scene_lines": 319, "canonical_reads": 13,
+        "negative_controls": 7, "undo_redo": 2, "save_reopen": 2, "no_op": 1,
+    }
+    if not native:
+        checks = dict.fromkeys(checks, 0)
+    return {
+        "mode": mode, "status": "PASS", "tests": 2 if native else 1,
+        "failures": 0, "errors": 0, "skips": 0,
+        "documents_created": 2 if native else 0, "documents_remaining": 0,
+        "input_sha256": {
+            path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+            for path in paths
+        },
+        "checks": checks, "elapsed_seconds": 0.5,
+    }
+
+
+class ReaWorkloadTests(unittest.TestCase):
+    def assess(self, mode, *, report=None, stdout=None, stderr=None):
+        record = rea_report(mode) if report is None else report
+        output = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        output += "TRACKTEMPLATE_REA_TRACKWORK=" + json.dumps(record) + "\n"
+        return pilot.assess_result(
+            good_guard(), output if stdout is None else stdout,
+            (f"\nRan {record['tests']} tests in 0.500s\n\nOK\n"
+             if stderr is None else stderr), [live_sample()], True,
+            workload="rea-bc-" + mode,
+        )
+
+    def test_workload_commands_are_fixed_and_default_is_unchanged(self):
+        transition = [
+            "flatpak", "run", "--command=FreeCADCmd",
+            "--env=OMP_NUM_THREADS=1", "--env=OPENBLAS_NUM_THREADS=1",
+            pilot.guard.APP_ID, "-P", str(ROOT / "tests"), "-t",
+            "hosted_transition_geometry_suite.TestTransitionGeometry."
+            "test_transition",
+        ]
+        self.assertEqual(pilot._native_command(), transition)
+        for mode in ("readiness", "native"):
+            with self.subTest(mode=mode):
+                expected = transition[:5] + [
+                    "--env=TRACKTEMPLATE_REA_MODE=" + mode,
+                    *transition[5:-1], "freecad_validate_rea_trackwork",
+                ]
+                self.assertEqual(pilot._native_command("rea-bc-" + mode),
+                                 expected)
+        for name in ("", "REA-BC-native", "native", "x; echo unsafe"):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                pilot._native_command(name)
+
+    def test_readiness_and_lifecycle_have_distinct_pass_classifications(self):
+        for mode, count, classification in (
+            ("readiness", 1, "REA_BC_READINESS_PASS"),
+            ("native", 2, "REA_BC_NATIVE_PASS"),
+        ):
+            with self.subTest(mode=mode):
+                result = self.assess(mode)
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(result["classification"], classification)
+                self.assertEqual(result["workload"], "rea-bc-" + mode)
+                self.assertEqual(result["completed_native_tests"], count)
+                self.assertEqual(result["rea_trackwork"], rea_report(mode))
+
+    def test_incomplete_or_geometry_bearing_reports_fail_closed(self):
+        for mode in ("readiness", "native"):
+            variants = [
+                {"mode": "native" if mode == "readiness" else "readiness"},
+                {"status": "FAIL"}, {"tests": True}, {"failures": 1},
+                {"errors": False}, {"skips": 1}, {"documents_remaining": 1},
+                {"documents_created": 1}, {"elapsed_seconds": float("nan")},
+                {"elapsed_seconds": -1.0}, {"elapsed_seconds": True},
+                {"elapsed_seconds": 901.0}, {"elapsed_seconds": 10**400},
+                {"unexpected_geometry": [1, 2, 3]}, {"input_sha256": {}},
+                {"checks": {}},
+            ]
+            for updates in variants:
+                with self.subTest(mode=mode, updates=updates):
+                    record = rea_report(mode)
+                    record.update(updates)
+                    result = self.assess(mode, report=record)
+                    self.assertEqual(result["classification"],
+                                     "EVIDENCE_INCOMPLETE", result)
+                    self.assertEqual(result["expected_native_tests"],
+                                     1 if mode == "readiness" else 2)
+
+    def test_hashes_and_check_counters_must_match_the_selected_mode(self):
+        for mode in ("readiness", "native"):
+            record = rea_report(mode)
+            for group, key, value in (
+                ("input_sha256", next(iter(record["input_sha256"])), "0" * 64),
+                ("input_sha256", "extra-file", "0" * 64),
+                ("checks", "source_scalars", -1),
+                ("checks", "source_scalars", True),
+                ("checks", "source_scalars", 0 if mode == "native" else 1),
+                ("checks", "save_reopen", 1),
+                ("checks", "geometry", [1, 2, 3]),
+            ):
+                with self.subTest(mode=mode, group=group, key=key, value=value):
+                    changed = copy.deepcopy(record)
+                    changed[group][key] = value
+                    self.assertEqual(self.assess(mode, report=changed)[
+                        "classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_count_runtime_report_and_no_skips_remain_mandatory(self):
+        runtime = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")
+        sentinel = "TRACKTEMPLATE_REA_TRACKWORK="
+        report = sentinel + json.dumps(rea_report("native")) + "\n"
+        for stdout, stderr in (
+            (runtime, None), (runtime + report * 2, None),
+            (report, None), (runtime * 2 + report, None),
+            (qualified_output(), None),
+            (runtime + report, native_report()),
+            (runtime + report, "Ran 2 tests in 0.1s\nOK (skipped=1)\n"),
+            (runtime + report.replace('"status": "PASS"',
+                                      '"status": "FAIL", "status": "PASS"'),
+             None),
+        ):
+            with self.subTest(stdout=stdout, stderr=stderr):
+                self.assertEqual(self.assess(
+                    "native", stdout=stdout, stderr=stderr,
+                )["classification"], "EVIDENCE_INCOMPLETE")
+
+    def test_native_requires_every_deterministic_check_total(self):
+        record = rea_report("native")
+        for key, count in record["checks"].items():
+            if key == "mapped_points":
+                continue
+            for value in (count - 1, count + 1):
+                with self.subTest(key=key, value=value):
+                    changed = copy.deepcopy(record)
+                    changed["checks"][key] = value
+                    self.assertEqual(self.assess("native", report=changed)[
+                        "classification"], "EVIDENCE_INCOMPLETE")
+        for value in (0, -1, True):
+            with self.subTest(mapped_points=value):
+                changed = copy.deepcopy(record)
+                changed["checks"]["mapped_points"] = value
+                self.assertEqual(self.assess("native", report=changed)[
+                    "classification"], "EVIDENCE_INCOMPLETE")
+
+
 class HostedAdmissionTests(unittest.TestCase):
     def test_exact_host_and_minimum_headroom_are_admitted(self):
         result = pilot.validate_admission(hosted_environment(), meminfo())
@@ -184,7 +338,10 @@ class HostedResultTests(unittest.TestCase):
             self.assertEqual(result["classification"], classification)
 
     def test_complete_single_native_test_passes(self):
-        self.assertEqual(self.assess()["status"], "PASS")
+        result = self.assess()
+        self.assertEqual(result["status"], "PASS")
+        # The L1 controller also reuses the default resource assessor.
+        self.assertNotIn("workload", result)
 
     def test_prelaunch_refusal_is_setup_failure(self):
         guard = good_guard()
@@ -668,8 +825,44 @@ class NativeWrapperTests(unittest.TestCase):
 
 
 class PilotIdentityTests(unittest.TestCase):
+    def test_rea_entry_is_frozen_before_runtime_commands(self):
+        read_bytes = Path.read_bytes
+        entry = b"reviewed REA entry fixture"
+        digest = hashlib.sha256(entry).hexdigest()
+        commit = "1" * 40
+
+        def changed_read(path):
+            return entry if path == ROOT / pilot.REA_TEST_PATH else read_bytes(
+                path,
+            )
+
+        def command(*args):
+            if args == ("git", "rev-parse", "HEAD"):
+                return commit
+            if args == (
+                "git", "status", "--porcelain", "--untracked-files=no",
+            ):
+                return ""
+            self.fail("Unfrozen entry reached runtime metadata: " + repr(args))
+
+        for mode in ("readiness", "native"):
+            for frozen in (None, "", "0" * 64, digest + "\n"):
+                with (
+                    self.subTest(mode=mode, frozen=frozen),
+                    patch.object(pilot, "REA_TEST_SHA256", frozen),
+                    patch.object(Path, "read_bytes", changed_read),
+                    patch.object(pilot, "_command", side_effect=command),
+                    patch.object(pilot.os, "getuid", return_value=1000),
+                    patch.dict(pilot.os.environ, {"GITHUB_SHA": commit}),
+                    self.assertRaises(ValueError),
+                ):
+                    pilot._identity("rea-bc-" + mode)
+
     def test_validator_and_guard_match_retained_hashes(self):
         expected = {
+            "tests/freecad_validate_rea_trackwork.py": (
+                "ac316a5e49794361186f0f78e54db45839ca77f6d0b3905745b350c86c558e3d"
+            ),
             "tests/freecad_validate_phase6_transition_exact_geometry.py": (
                 "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"
             ),
@@ -678,6 +871,7 @@ class PilotIdentityTests(unittest.TestCase):
             ),
         }
         self.assertEqual(pilot.TEST_SHA256, expected[pilot.TEST_PATH])
+        self.assertEqual(pilot.REA_TEST_SHA256, expected[pilot.REA_TEST_PATH])
         self.assertEqual(
             pilot.GUARD_SHA256, expected["tools/freecad_validation_guard.py"],
         )
@@ -731,7 +925,22 @@ class PilotIdentityTests(unittest.TestCase):
                 line.strip() for line in match[1].splitlines() if line.strip()
             ]
 
-        self.assertEqual(top_block("on"), ["workflow_dispatch:"])
+        self.assertEqual(top_block("on"), [
+            "workflow_dispatch:", "inputs:", "workload:",
+            "description: Bounded native workload", "required: true",
+            "type: choice", "default: transition", "options:",
+            "- transition", "- rea-bc-readiness", "- rea-bc-native",
+        ])
+        self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
+                      workflow)
+        self.assertIn("'workload': os.environ['PILOT_WORKLOAD']", workflow)
+        self.assertIn("PILOT_WORKLOAD: ${{ inputs.workload }}", workflow)
+        uploaded_paths = re.findall(
+            r"^            (benchmark-output/[^\n]+)$", workflow, re.MULTILINE,
+        )
+        self.assertEqual(len(uploaded_paths), 14)
+        self.assertFalse(any("*" in path or "FCStd" in path
+                             for path in uploaded_paths))
         self.assertEqual(top_block("permissions"), ["contents: read"])
         self.assertEqual(len(re.findall(r"^\s*permissions:", workflow,
                                        re.MULTILINE)), 1)
@@ -942,6 +1151,66 @@ class HostedSetupTests(unittest.TestCase):
 
 
 class HostObservationTests(unittest.TestCase):
+    def test_rea_main_passes_only_the_selected_workload_to_guard(self):
+        read_text = Path.read_text
+
+        def host_read(path, *args, **kwargs):
+            if path == Path("/proc/meminfo"):
+                return meminfo()
+            if path == Path("/proc/pressure/memory"):
+                return live_sample()["memory.pressure"]
+            return read_text(path, *args, **kwargs)
+
+        for mode in ("readiness", "native"):
+            with self.subTest(mode=mode):
+                record = rea_report(mode)
+
+                def guarded_run(argv, *, evidence_dir, limits, **_kwargs):
+                    self.assertEqual(argv, pilot._native_command(
+                        "rea-bc-" + mode,
+                    ))
+                    self.assertEqual(vars(limits), good_guard()["limits"])
+                    evidence_dir.mkdir()
+                    (evidence_dir / "stdout").write_text(
+                        qualified_output().replace(GEOMETRY_SENTINEL, "")
+                        + "TRACKTEMPLATE_REA_TRACKWORK=" + json.dumps(record)
+                        + "\n",
+                    )
+                    (evidence_dir / "stderr").write_text(
+                        f"Ran {record['tests']} tests in 0.5s\nOK\n",
+                    )
+                    (evidence_dir / "measurements.jsonl").write_text(
+                        json.dumps(live_sample()) + "\n",
+                    )
+                    return good_guard()
+
+                with tempfile.TemporaryDirectory() as temporary:
+                    output = Path(temporary) / "evidence"
+                    with (
+                        patch.object(pilot, "OUTPUT", output),
+                        patch.object(pilot, "_identity", return_value={
+                            "source_commit": "1" * 40,
+                        }) as identity,
+                        patch.dict(pilot.os.environ, {
+                            **hosted_environment(),
+                            "TRACKTEMPLATE_HOSTED_WORKLOAD": "rea-bc-" + mode,
+                        }),
+                        patch.object(Path, "read_text", host_read),
+                        patch.object(pilot.guard, "run_guarded_flatpak",
+                                     side_effect=guarded_run) as guarded,
+                        patch.object(pilot, "_clearance", return_value=True),
+                        patch.object(pilot, "_deadline_clearance",
+                                     return_value=True),
+                        contextlib.redirect_stdout(io.StringIO()),
+                    ):
+                        self.assertEqual(pilot.main(), 0)
+                    identity.assert_called_once_with("rea-bc-" + mode)
+                    guarded.assert_called_once()
+                    summary = json.loads((output / "summary.json").read_text())
+                    self.assertEqual(summary["workload"], "rea-bc-" + mode)
+                    self.assertEqual(summary["expected_native_tests"],
+                                     record["tests"])
+
     def test_main_requires_fresh_deadline_clearance_for_every_exit(self):
         read_text = Path.read_text
 

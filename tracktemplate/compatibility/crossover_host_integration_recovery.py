@@ -2,6 +2,10 @@
 
 from dataclasses import dataclass
 
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_entity_operation,
+)
+
 
 class CrossoverHostIntegrationRecoveryError(RuntimeError):
     """The host integration command could not establish safe recovery."""
@@ -51,6 +55,9 @@ class CrossoverHostIntegrationRecoveryAdapter:
     original_remove: object
 
     def _run(self, document, crossover_id, original, label):
+        refuse_rea_entity_operation(
+            self.module, document, "crossover", crossover_id,
+        )
         if int(document.UndoMode) != 1:
             raise CrossoverHostIntegrationRecoveryError(
                 "Enable document Undo before changing crossover host "

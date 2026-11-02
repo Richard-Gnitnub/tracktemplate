@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -38,6 +39,20 @@ GEOMETRY_SENTINEL = (
     "Phase 6 transition transient exact geometry validation passed"
 )
 RUNTIME_SENTINEL = "TRACKTEMPLATE_HOSTED_RUNTIME="
+REA_TEST_PATH = "tests/freecad_validate_rea_trackwork.py"
+REA_TEST_SHA256 = (
+    "ac316a5e49794361186f0f78e54db45839ca77f6d0b3905745b350c86c558e3d"
+)
+REA_SENTINEL = "TRACKTEMPLATE_REA_TRACKWORK="
+REA_INPUT_PATHS = (
+    "tests/fixtures/phase9b-rea-bc-source.json",
+    "tests/validate_phase1_turnout.py",
+    "reference/contracts/phase1-compatibility.json",
+    "reference/contracts/phase1-transition-pilot.json",
+    "TrackTemplate.FCMacro",
+    "model_railway_curve_template_multitrack_v10_2a8a7b15_"
+    "chair_performance_and_representation.FCMacro",
+)
 OUTPUT = ROOT / "benchmark-output/hosted-native-geometry"
 LIMITS = guard.ValidationLimits(memory_max_mib=4096, timeout_seconds=900)
 SAMPLE_FIELDS = (
@@ -45,6 +60,89 @@ SAMPLE_FIELDS = (
     "memory.pressure", "cpu.stat", "pids.current", "cgroup.events",
     "cgroup.procs",
 )
+
+
+def _workload(name):
+    if name == "transition":
+        return {
+            "test_path": TEST_PATH, "test_sha256": TEST_SHA256,
+            "selector": "hosted_transition_geometry_suite."
+                        "TestTransitionGeometry.test_transition",
+            "mode": None, "expected_native_tests": 1,
+        }
+    if name in ("rea-bc-readiness", "rea-bc-native"):
+        mode = name.removeprefix("rea-bc-")
+        return {
+            "test_path": REA_TEST_PATH, "test_sha256": REA_TEST_SHA256,
+            "selector": "freecad_validate_rea_trackwork", "mode": mode,
+            "expected_native_tests": 1 if mode == "readiness" else 2,
+        }
+    raise ValueError("Unknown hosted workload")
+
+
+def _native_command(workload="transition"):
+    selected = _workload(workload)
+    command = ["flatpak", "run", "--command=FreeCADCmd",
+               "--env=OMP_NUM_THREADS=1", "--env=OPENBLAS_NUM_THREADS=1"]
+    if selected["mode"]:
+        command.append("--env=TRACKTEMPLATE_REA_MODE=" + selected["mode"])
+    return command + [guard.APP_ID, "-P", str(ROOT / "tests"), "-t",
+                      selected["selector"]]
+
+
+def _unique_object(pairs):
+    record = dict(pairs)
+    if len(record) != len(pairs):
+        raise ValueError("Duplicate report field")
+    return record
+
+
+def _rea_report(stdout, mode):
+    lines = [line[len(REA_SENTINEL):] for line in stdout.splitlines()
+             if line.startswith(REA_SENTINEL)]
+    if len(lines) != 1:
+        raise ValueError("Expected one REA trackwork report")
+    report = json.loads(lines[0], object_pairs_hook=_unique_object)
+    expected_keys = {
+        "mode", "status", "tests", "failures", "errors", "skips",
+        "documents_created", "documents_remaining", "input_sha256",
+        "checks", "elapsed_seconds",
+    }
+    if not isinstance(report, dict) or report.keys() != expected_keys:
+        raise ValueError("Unexpected REA report fields")
+    native = mode == "native"
+    expected = {
+        "tests": 2 if native else 1, "failures": 0, "errors": 0, "skips": 0,
+        "documents_created": 2 if native else 0, "documents_remaining": 0,
+    }
+    if (report["mode"] != mode or report["status"] != "PASS"
+            or any(type(report[key]) is not int or report[key] != value
+                   for key, value in expected.items())):
+        raise ValueError("REA mode, counts or completion mismatch")
+    elapsed = report["elapsed_seconds"]
+    if (type(elapsed) not in (int, float)
+            or not 0 <= elapsed <= LIMITS.timeout_seconds
+            or not math.isfinite(elapsed)):
+        raise ValueError("Invalid REA elapsed time")
+    hashes = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+              for name in REA_INPUT_PATHS}
+    if report["input_sha256"] != hashes:
+        raise ValueError("REA source input identity mismatch")
+    checks = report["checks"]
+    expected_checks = {
+        "source_scalars": 425, "timber_records": 165, "rail_anchors": 70,
+        "scene_lines": 319, "canonical_reads": 13, "negative_controls": 7,
+        "undo_redo": 2, "save_reopen": 2, "no_op": 1,
+    }
+    if (not isinstance(checks, dict)
+            or checks.keys() != expected_checks.keys() | {"mapped_points"}):
+        raise ValueError("Unexpected REA check counters")
+    if (any(type(value) is not int or (value <= 0 if native else value != 0)
+            for value in checks.values())
+            or any(checks[key] != (count if native else 0)
+                   for key, count in expected_checks.items())):
+        raise ValueError("REA checks do not prove selected workload")
+    return report
 
 
 def _memory(text):
@@ -99,36 +197,46 @@ def _qualified_runtime(stdout):
 
 
 def assess_result(result, stdout, stderr, samples, clearance, *,
-                  deadline_clearance=False):
+                  deadline_clearance=False, workload="transition"):
     """Require native assertions, contained execution and complete evidence."""
+    selected = _workload(workload)
+    expected_tests = selected["expected_native_tests"]
+
+    def failed(classification, detail):
+        failure = _failure(classification, detail)
+        if selected["mode"]:
+            failure.update(workload=workload,
+                           expected_native_tests=expected_tests)
+        return failure
+
     reason = result.get("failure_reason") or result.get(
         "execution_failure_reason"
     )
     if result.get("status") == "refused":
-        return _failure("SETUP_FAILURE", reason)
+        return failed("SETUP_FAILURE", reason)
     if not result.get("cleanup_proved") or not clearance:
-        return _failure("CLEANUP_FAILURE", "Owned cleanup or clearance unproved")
+        return failed("CLEANUP_FAILURE", "Owned cleanup or clearance unproved")
     if reason and reason not in (
         "deadline-exceeded", "interrupted", "memory-limit", "payload-nonzero",
     ):
-        return _failure("SETUP_FAILURE", reason)
+        return failed("SETUP_FAILURE", reason)
     if reason in ("deadline-exceeded", "interrupted"):
-        return _failure("TIMEOUT", reason)
+        return failed("TIMEOUT", reason)
     if reason == "memory-limit":
-        return _failure("MEMORY_LIMIT", reason)
+        return failed("MEMORY_LIMIT", reason)
     if result.get("process_exit") != 0 or reason == "payload-nonzero":
         try:
             _qualified_runtime(stdout)
         except (KeyError, TypeError, ValueError) as error:
-            return _failure("SETUP_FAILURE", str(error))
-        return _failure("GEOMETRY_FAILURE", reason or "Nonzero native exit")
+            return failed("SETUP_FAILURE", str(error))
+        return failed("GEOMETRY_FAILURE", reason or "Nonzero native exit")
     if result.get("status") != "completed" or reason:
-        return _failure("SETUP_FAILURE", reason or "Guard did not complete")
+        return failed("SETUP_FAILURE", reason or "Guard did not complete")
     cancellation = result.get("deadline_cancellation_exit")
     if cancellation != 0 and not (
         cancellation == 5 and deadline_clearance is True
     ):
-        return _failure("CLEANUP_FAILURE", "Deadline cancellation unproved")
+        return failed("CLEANUP_FAILURE", "Deadline cancellation unproved")
     expected_kernel = {
         "memory.max": str(4096 * 1024**2),
         "memory.high": str(4096 * 1024**2), "memory.swap.max": "0",
@@ -136,7 +244,7 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
     }
     if (result.get("kernel_limits") != expected_kernel
             or result.get("limits") != vars(LIMITS)):
-        return _failure("SETUP_FAILURE", "Unexpected kernel limits")
+        return failed("SETUP_FAILURE", "Unexpected kernel limits")
     try:
         live = []
         removed = False
@@ -165,7 +273,7 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
                     "high", "max", "oom", "oom_kill", "oom_group_kill"))
                     or numbers["memory.swap.current"]
                     or numbers["memory.peak"] > 4096 * 1024**2):
-                return _failure("MEMORY_LIMIT", "Memory event, swap or ceiling")
+                return failed("MEMORY_LIMIT", "Memory event, swap or ceiling")
             if numbers["pids.current"] > 128:
                 raise ValueError("Task ceiling exceeded")
             cpu = dict(line.split() for line in sample["cpu.stat"].splitlines())
@@ -185,14 +293,19 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
         combined = stdout + "\n" + stderr
         counts = re.findall(r"^Ran (\d+) tests? in ([0-9.]+)s$",
                             combined, re.MULTILINE)
-        if (len(counts) != 1 or counts[0][0] != "1"
+        if (len(counts) != 1 or counts[0][0] != str(expected_tests)
                 or len(re.findall(r"^OK$", combined, re.MULTILINE)) != 1
-                or re.search(r"skipped|FAILED|ERROR:", combined)
-                or stdout.splitlines().count(GEOMETRY_SENTINEL) != 1):
+                or re.search(r"skipped|FAILED|ERROR:", combined)):
             raise ValueError("Native test count, no-skips or sentinel unproved")
-        return {
+        rea = None
+        if selected["mode"]:
+            rea = _rea_report(stdout, selected["mode"])
+        elif stdout.splitlines().count(GEOMETRY_SENTINEL) != 1:
+            raise ValueError("Native geometry sentinel unproved")
+        assessment = {
             "status": "PASS", "classification": "NATIVE_GEOMETRY_PASS",
-            "expected_native_tests": 1, "completed_native_tests": 1,
+            "expected_native_tests": expected_tests,
+            "completed_native_tests": expected_tests,
             "skips": 0, "native_test_seconds": float(counts[0][1]),
             "peak_cgroup_memory_bytes": max(x["memory.peak"] for x in live),
             "peak_tasks_observed": max(x["pids.current"] for x in live),
@@ -203,8 +316,18 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
             ),
             "scope": "One unchanged transition validator; no chair or GUI proof",
         }
-    except (KeyError, TypeError, ValueError) as error:
-        return _failure("EVIDENCE_INCOMPLETE", str(error))
+        if rea is not None:
+            assessment.update(
+                workload=workload,
+                classification="REA_BC_" + selected["mode"].upper() + "_PASS",
+                rea_trackwork=rea,
+                scope=("REA B/C readiness only; no documents or geometry"
+                       if selected["mode"] == "readiness" else
+                       "REA B/C two native lifecycle tests; no GUI proof"),
+            )
+        return assessment
+    except (KeyError, OSError, TypeError, ValueError) as error:
+        return failed("EVIDENCE_INCOMPLETE", str(error))
 
 
 def _write(path, value):
@@ -216,7 +339,8 @@ def _command(*args):
                           capture_output=True, timeout=15).stdout.strip()
 
 
-def _identity():
+def _identity(workload="transition"):
+    selected = _workload(workload)
     if os.getuid() == 0 or sys.flags.optimize:
         raise ValueError("Non-root execution with assertions is required")
     sha = _command("git", "rev-parse", "HEAD")
@@ -224,14 +348,21 @@ def _identity():
         raise ValueError("Checkout differs from dispatched commit")
     if _command("git", "status", "--porcelain", "--untracked-files=no"):
         raise ValueError("Tracked checkout has changed")
+    if not isinstance(selected["test_sha256"], str) or not re.fullmatch(
+        r"[0-9a-f]{64}", selected["test_sha256"],
+    ):
+        raise ValueError("Native entry identity is not frozen")
     hashes = {}
-    for name in (TEST_PATH, "tools/freecad_validation_guard.py",
-                 "tests/hosted_transition_geometry_suite.py",
-                 "tools/hosted_native_geometry_pilot.py",
-                 ".github/workflows/native-geometry-pilot.yml",
-                 "reference/contracts/phase1-compatibility.json"):
+    paths = (selected["test_path"], "tools/freecad_validation_guard.py",
+             "tests/hosted_transition_geometry_suite.py",
+             "tools/hosted_native_geometry_pilot.py",
+             ".github/workflows/native-geometry-pilot.yml",
+             "reference/contracts/phase1-compatibility.json")
+    if selected["mode"]:
+        paths += REA_INPUT_PATHS
+    for name in paths:
         hashes[name] = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-    if (hashes[TEST_PATH] != TEST_SHA256
+    if (hashes[selected["test_path"]] != selected["test_sha256"]
             or hashes["tools/freecad_validation_guard.py"] != GUARD_SHA256):
         raise ValueError("Frozen validator or guard identity changed")
     app = _command(
@@ -248,6 +379,7 @@ def _identity():
     _command("systemctl", "--user", "show-environment")
     return {
         "source_commit": sha, "files_sha256": hashes,
+        "workload": workload, "native_entry": selected,
         "app_commit": app, "runtime": runtime,
         "runtime_commit": runtime_commit, "limits": vars(LIMITS),
         "runner": {key: os.environ.get(key) for key in (
@@ -332,6 +464,7 @@ def main():
     if (OUTPUT / "summary.json").exists() or (OUTPUT / "guard").exists():
         raise ValueError("Evidence already exists; no automatic retry")
     summary = _failure("SETUP_FAILURE", "Preparation did not complete")
+    workload = os.environ.get("TRACKTEMPLATE_HOSTED_WORKLOAD", "transition")
     started = time.monotonic()
     host_observations = []
 
@@ -358,7 +491,9 @@ def main():
         time.sleep(seconds)
 
     try:
-        identity = _identity()
+        selected = _workload(workload)
+        summary["expected_native_tests"] = selected["expected_native_tests"]
+        identity = _identity(workload)
         identity["host_admission"] = validate_admission(
             os.environ, Path("/proc/meminfo").read_text(),
         )
@@ -369,10 +504,7 @@ def main():
         guard_started = time.monotonic()
         children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         result = guard.run_guarded_flatpak(
-            ["flatpak", "run", "--command=FreeCADCmd",
-             "--env=OMP_NUM_THREADS=1", "--env=OPENBLAS_NUM_THREADS=1",
-             guard.APP_ID, "-P", str(ROOT / "tests"), "-t",
-             "hosted_transition_geometry_suite.TestTransitionGeometry.test_transition"],
+            _native_command(workload),
             limits=LIMITS, evidence_dir=OUTPUT / "guard",
             context=guard.GuardContext(sleep=observed_sleep),
             cwd=ROOT, isolate_profile=True,
@@ -391,13 +523,14 @@ def main():
             result, (OUTPUT / "guard/stdout").read_text(),
             (OUTPUT / "guard/stderr").read_text(), samples,
             clearance and deadline_clearance,
-            deadline_clearance=deadline_clearance,
+            deadline_clearance=deadline_clearance, workload=workload,
         )
         summary["deadline_cleanup_proved"] = deadline_clearance
         if any("error" in row for row in host_observations):
             summary = _failure(
                 "EVIDENCE_INCOMPLETE", "Host telemetry unavailable",
             )
+            summary["expected_native_tests"] = selected["expected_native_tests"]
             summary["host_telemetry_errors"] = [
                 row["error"] for row in host_observations if "error" in row
             ]
@@ -427,6 +560,7 @@ def main():
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         summary["detail"] = repr(error)
     finally:
+        summary["workload"] = workload
         summary["pilot_elapsed_seconds"] = time.monotonic() - started
         summary["local_pressure_guard_qualification"] = False
         _write(OUTPUT / "summary.json", summary)

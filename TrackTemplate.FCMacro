@@ -107,6 +107,83 @@ def _load_modular_transition_workflow(
     return session, session.routing_record()
 
 
+
+def _launch_workflow_with_rea_editor(session, qualification):
+    """Compose the source editor during one inherited modal launch.
+
+    This temporary bridge belongs to the B16 composition root. Remove it
+    when the modular manager owns the qualified operator workflow.
+    """
+    module = session.module
+    original = module.dialog_exec
+    if getattr(original, "_tracktemplate_rea_editor_launch", False):
+        raise RuntimeError("The REA operator launch is already active.")
+    curve_class = module.CurveInputDialog
+    manager_class = module.TurnoutManagerDialog
+    document_adapter = importlib.import_module(
+        "tracktemplate.adapters.freecad.rea_turnout_state"
+    )
+    presentation = importlib.import_module(
+        "tracktemplate.presentation.rea_trackwork"
+    )
+    editor = importlib.import_module("tracktemplate.ui.rea_trackwork_editor")
+    from uuid import uuid4
+
+    store = document_adapter.FreeCADReaTrackworkStore(
+        qualification,
+        view_factory=presentation.attach_rea_trackwork_view,
+        view_reader=presentation.read_rea_trackwork_view,
+    )
+
+    def scene_factory(entity_id, lines):
+        return presentation.ReaTrackworkScene(entity_id, tuple(
+            presentation.ReaTrackworkLine(*line) for line in lines
+        ))
+
+    workflow = session.rea_trackwork_workflow(store, scene_factory)
+
+    def read_hosts(document):
+        return tuple(editor.ReaHostChoice(
+            obj, str(obj.Name),
+            module.object_string_property(obj, "TemplateSetID", ""),
+            module.turnout_host_label(obj),
+        ) for obj in module.turnout_host_objects(document))
+
+    def dialog_exec(dialog):
+        if type(dialog) is curve_class:
+            dialog.turnout_manager_button.setText(
+                "Turnouts and Crossovers (C10 / REA B/C)..."
+            )
+            dialog.turnout_manager_button.setToolTip(
+                "Open the existing C10 tools or the source REA B/C "
+                "research editor. Production qualification remains pending."
+            )
+        elif type(dialog) is manager_class:
+            if getattr(dialog, "_tracktemplate_rea_panel", None) is None:
+                controller = editor.ReaTrackworkEditorController(
+                    dialog.doc, workflow,
+                    read_records=document_adapter.read_rea_trackwork_objects,
+                    read_hosts=read_hosts,
+                    active_document=lambda: module.App.ActiveDocument,
+                    new_entity_id=lambda: "REA-" + uuid4().hex,
+                )
+                editor.attach_rea_trackwork_panel(
+                    dialog, controller, module.QtWidgets,
+                    minimum_radius_mm=module.CROSSOVER_DEFAULT_MINIMUM_RADIUS,
+                )
+        return original(dialog)
+
+    dialog_exec._tracktemplate_rea_editor_launch = True
+    module.dialog_exec = dialog_exec
+    try:
+        return session.launch_workflow()
+    finally:
+        binding_changed = module.dialog_exec is not dialog_exec
+        module.dialog_exec = original
+        if binding_changed:
+            raise RuntimeError("The REA dialog execution binding changed.")
+
+
 def run_macro(launch_workflow=False):
     """Qualify the modular foundation and optionally load its inherited GUI."""
     repository_root = _launcher_root()
@@ -161,7 +238,7 @@ def run_macro(launch_workflow=False):
         raise RuntimeError(str(error)) from error
 
     if launch_workflow:
-        session.launch_workflow()
+        _launch_workflow_with_rea_editor(session, qualification)
 
     result = {
         "schema_version": 1,

@@ -17,6 +17,9 @@ from tracktemplate.domain.chair_placement import (
     prepare_s1j_placements,
     recover_reference_frame,
 )
+from tracktemplate.compatibility.rea_trackwork_admission import (
+    refuse_rea_operation,
+)
 
 
 def _canonical_json(record):
@@ -32,6 +35,7 @@ def _source_context(
     """Read current decisions without using the rounded solid-plan cache."""
     if entity_kind not in ("turnout", "crossover"):
         raise ValueError("Unsupported reference preview source kind.")
+    refuse_rea_operation(document, entity_id=entity_id)
     kind, config, analysis, settings, rails, timbers = (
         module._chair_generation_context(document, entity_kind, entity_id)
     )
