@@ -861,7 +861,7 @@ class PilotIdentityTests(unittest.TestCase):
     def test_validator_and_guard_match_retained_hashes(self):
         expected = {
             "tests/freecad_validate_rea_trackwork.py": (
-                "32a3dffdbb6cbe3d378a14de80c20a1a961d5d77935c627c606ae2ad7b909a7e"
+                "ac316a5e49794361186f0f78e54db45839ca77f6d0b3905745b350c86c558e3d"
             ),
             "tests/freecad_validate_phase6_transition_exact_geometry.py": (
                 "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"

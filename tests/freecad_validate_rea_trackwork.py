@@ -409,6 +409,24 @@ class Native(_QualifiedCase):
         self._read(obj, initial)
         self.assertEqual(_history(self.doc), history)
         self.count("negative_controls")
+        # FreeCAD clears pending redo when a new transaction starts.
+        # Exercise rollback before the occupancy control leaves a redo.
+        self.assertEqual(int(self.doc.RedoCount), 0)
+        def reject_after_write(candidate, scene, signature):
+            self._read(candidate, changed)
+            raise RuntimeError("REA native deliberate post-write failure")
+
+        failing = self._workflow(view_factory=reject_after_write)
+        with self.assertRaises(ReaTrackworkDocumentError) as caught:
+            failing.update(self.doc, obj, changed)
+        self.assertEqual(caught.exception.code, "transaction-failed")
+        self.assertTrue(caught.exception.recoverable)
+        self._read(obj, initial)
+        self.assertEqual(_history(self.doc), history)
+        self.assertEqual(tuple(sorted(item.Name for item in self.doc.Objects)),
+                         baseline_names)
+        self.count("negative_controls")
+
         prepared = self.workflow.prepare(self.doc, changed, existing=obj)
         other = replace(initial, entity_id="Other", reference_chainage_mm=3000.0)
         self._workflow().create(self.doc, other)
@@ -433,20 +451,6 @@ class Native(_QualifiedCase):
                          baseline_names)
         self.count("negative_controls")
 
-        def reject_after_write(candidate, scene, signature):
-            self._read(candidate, changed)
-            raise RuntimeError("REA native deliberate post-write failure")
-
-        failing = self._workflow(view_factory=reject_after_write)
-        with self.assertRaises(ReaTrackworkDocumentError) as caught:
-            failing.update(self.doc, obj, changed)
-        self.assertEqual(caught.exception.code, "transaction-failed")
-        self.assertTrue(caught.exception.recoverable)
-        self._read(obj, initial)
-        self.assertEqual(_history(self.doc), history)
-        self.assertEqual(tuple(sorted(item.Name for item in self.doc.Objects)),
-                         baseline_names)
-        self.count("negative_controls")
 
     def test_turnout_create_edit_return_and_reopen(self):
         from tracktemplate.domain.rea_turnout import ReaTurnoutSpecification
