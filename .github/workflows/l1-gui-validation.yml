@@ -3,6 +3,14 @@ name: L1 GUI validation
 on:
   workflow_dispatch:
     inputs:
+      workload:
+        description: Separately reviewed GUI workload
+        required: true
+        type: choice
+        default: l1
+        options:
+          - l1
+          - rea-bc
       stage:
         description: Separately admitted GUI stage
         required: true
@@ -26,6 +34,7 @@ concurrency:
 jobs:
   l1-gui:
     if: >-
+      inputs.workload == 'l1' &&
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
       github.event.repository.private == false &&
       github.ref == 'refs/heads/main' && github.run_attempt == 1
@@ -213,6 +222,212 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: l1-public-summary-gui-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-gui-publish-${{ github.run_id }}/summary.json
+
+      - name: Require complete proof and publication
+        timeout-minutes: 1
+        if: always()
+        env:
+          L1_SUMMARY_UPLOAD: ${{ steps.summary_artifact.outcome }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          timeout 10s python3 tools/hosted_l1_gui_validation.py finish >/dev/null 2>&1
+
+  rea-bc-gui:
+    if: >-
+      inputs.workload == 'rea-bc' && inputs.lifecycle_diagnostic == false &&
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/rea-bc-exit-profile' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TRACKTEMPLATE_GUI_WORKLOAD: rea-bc
+      L1_GUI_STAGE: ${{ inputs.stage }}
+      L1_LIFECYCLE_DIAGNOSTIC: 'false'
+    steps:
+      - name: Record the bounded job start
+        shell: bash
+        run: echo "L1_JOB_START_SECONDS=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Check out the reviewed B/C candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify reviewed scope before input acquisition
+        id: prepare
+        timeout-minutes: 2
+        env:
+          L1_GUI_CONTROL: ${{ vars.REA_BC_GUI_CONTROL }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          l1_work="$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID"
+          mkdir -m 700 "$l1_work"
+          mkdir -m 700 "$l1_work/evidence"
+          exec >> "$l1_work/evidence/prepare.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py prepare
+
+      - name: Install the unchanged qualified runtime
+        id: install
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/install.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py install
+
+      - name: Bind the public checkout without external inputs
+        id: acquire
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/acquisition.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py acquire
+
+      - name: Execute the separately authorised GUI unittest
+        id: gui
+        timeout-minutes: 17
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/execution.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py run
+
+      - name: Preserve diagnostics and verify cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 2
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: ${{ steps.gui.outcome }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          mkdir -p -m 700 "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence"
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/finalizer.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py finalize
+
+      - name: Seal the primary diagnostic archive
+        id: seal
+        if: always()
+        timeout-minutes: 1
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/seal.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py seal
+
+      - name: Preserve primary evidence
+        id: primary_artifact
+        if: always() && steps.seal.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rea-bc-primary-${{ inputs.stage }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-gui-${{ github.run_id }}/evidence.tar
+
+      - name: Read back the exact primary artifact
+        id: primary_readback
+        if: always() && steps.primary_artifact.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.primary_artifact.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/l1-gui-${{ github.run_id }}/readback-primary
+
+      - name: Verify preservation and finish staging cleanup
+        id: publication
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_artifact.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_readback.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_artifact.outputs.artifact-id }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          ulimit -c 0
+          exec >> "$RUNNER_TEMP/l1-gui-$GITHUB_RUN_ID/evidence/publication.log" 2>&1
+          python3 tools/hosted_l1_gui_validation.py publish
+
+      - name: Preserve final diagnostics and cleanup evidence
+        id: final_artifact
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rea-bc-evidence-${{ inputs.stage }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/l1-gui-${{ github.run_id }}/publication.tar
+
+      - name: Read back the exact final artifact
+        id: final_readback
+        if: always() && steps.final_artifact.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_artifact.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/l1-gui-${{ github.run_id }}/readback-final
+
+      - name: Verify final preservation and prepare summary
+        id: complete
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PUBLICATION: ${{ steps.publication.outcome }}
+          L1_FINAL_UPLOAD: ${{ steps.final_artifact.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_readback.outcome }}
+          L1_FINAL_ID: ${{ steps.final_artifact.outputs.artifact-id }}
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          umask 077
+          timeout 10s python3 tools/hosted_l1_gui_validation.py complete >/dev/null 2>&1
+
+      - name: Preserve the allowlisted public summary
+        id: summary_artifact
+        timeout-minutes: 1
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rea-bc-summary-${{ inputs.stage }}-${{ github.run_id }}
           retention-days: 30
           if-no-files-found: error
           path: ${{ runner.temp }}/l1-gui-publish-${{ github.run_id }}/summary.json
