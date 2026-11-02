@@ -253,6 +253,159 @@ class GuiEntryTests(unittest.TestCase):
             with self.subTest(rows=rows), self.assertRaises(AssertionError):
                 entry.check_pick(rows, "Preview", "L1_Part_00", 4, 9)
 
+    def test_pick_failure_identifies_observed_name_and_expected_range(self):
+        for name in ("Edge7", "Face99"):
+            row = SimpleNamespace(
+                DocumentName="Preview", ObjectName="L1_Part_00",
+                SubElementNames=(name,),
+            )
+            with (self.subTest(name=name),
+                  self.assertRaises(AssertionError) as cm):
+                entry.check_pick([row], "Preview", "L1_Part_00", 4, 9)
+            message = str(cm.exception)
+            self.assertTrue(message.startswith("TO_PICK_DIAGNOSTIC="))
+            record = json.loads(message.split("=", 1)[1])
+            self.assertEqual(record["expected"]["face_range"], [4, 9])
+            self.assertEqual(record["observed"]["rows"][0]["subelements"],
+                             [name])
+        row.SubElementNames = ("Face7",)
+        entry.check_pick([row], "Preview", "L1_Part_00", 4, 9)
+
+    def test_pick_diagnostics_reject_malformed_or_unbounded_fields(self):
+        context = dict(
+            position_id="TO-001:S13-A:rail1", child_index=1,
+            target_face_index=2, point_mm=(10.0, 20.0, 3.0),
+            screen_point=(120.0, 70.0), device_pixel_ratio=2.0,
+            click_pixel=(60, 64), viewport_size=(200, 100),
+        )
+        row = SimpleNamespace(
+            DocumentName="Preview", ObjectName="L1_Part_00",
+            SubElementNames=("Face7",),
+        )
+        entry.check_pick(
+            [row], "Preview", "L1_Part_00", 4, 9, diagnostic=context
+        )
+        for key, value in (
+            ("position_id", "x" * 10000), ("child_index", 10**400),
+            ("child_index", -1),
+            ("target_face_index", True), ("point_mm", (float("nan"), 0, 0)),
+            ("screen_point", (float("inf"), 0)),
+            ("device_pixel_ratio", float("nan")),
+            ("click_pixel", (True, 0)), ("viewport_size", (0, 100)),
+            ("unknown", "must-not-be-logged"),
+        ):
+            with (self.subTest(key=key),
+                  self.assertRaises(AssertionError) as cm):
+                entry.check_pick(
+                    [row], "Preview", "L1_Part_00", 4, 9,
+                    diagnostic=dict(context, **{key: value}),
+                )
+            self.assertLess(len(str(cm.exception)), 4096)
+            self.assertNotIn("must-not-be-logged", str(cm.exception))
+        cases = [
+            [], [row, row],
+            [SimpleNamespace()],
+            [SimpleNamespace(DocumentName="Source", ObjectName="L1_Part_00",
+                             SubElementNames=("Face7",))],
+            [SimpleNamespace(DocumentName="Preview", ObjectName="Other",
+                             SubElementNames=("Face7",))],
+            [SimpleNamespace(DocumentName="Preview", ObjectName="L1_Part_00",
+                             SubElementNames=())],
+            [SimpleNamespace(DocumentName="Preview", ObjectName="L1_Part_00",
+                             SubElementNames=("Face7", "Face8"))],
+            [SimpleNamespace(DocumentName="x" * 10000,
+                             ObjectName="L1_Part_00",
+                             SubElementNames=("Face" + "9" * 10000,))],
+        ]
+        for rows in cases:
+            with (self.subTest(rows=len(rows)),
+                  self.assertRaises(AssertionError) as cm):
+                entry.check_pick(
+                    rows, "Preview", "L1_Part_00", 4, 9,
+                    diagnostic=context,
+                )
+            self.assertTrue(
+                str(cm.exception).startswith("TO_PICK_DIAGNOSTIC=")
+            )
+            self.assertLess(len(str(cm.exception)), 4096)
+
+    def test_actual_pick_failure_keeps_click_and_restores_visibility(self):
+        def face(z):
+            return SimpleNamespace(
+                CenterOfMass=SimpleNamespace(x=10.0, y=20.0, z=z)
+            )
+        children = [SimpleNamespace(Faces=[face(0)] * 3),
+                    SimpleNamespace(
+                        Faces=[face(1), face(3), face(2), face(0)])]
+        obj = SimpleNamespace(
+            Name="L1_Part_00",
+            Shape=SimpleNamespace(childShapes=lambda: children),
+            ViewObject=SimpleNamespace(Visibility=True),
+        )
+        others = [SimpleNamespace(ViewObject=SimpleNamespace(Visibility=v))
+                  for v in (False, True)]
+        preview = SimpleNamespace(
+            Name="Preview", Objects=[obj, *others], getObject=lambda _: obj,
+        )
+        widget = SimpleNamespace(
+            isVisible=lambda: True, isValid=lambda: True,
+            devicePixelRatioF=lambda: 2.0, height=lambda: 100,
+            width=lambda: 200,
+            rect=lambda: SimpleNamespace(contains=lambda _: True),
+            setFocus=Mock(),
+        )
+        area = SimpleNamespace(activeSubWindow=lambda: SimpleNamespace(
+            findChildren=lambda _: [widget]))
+        view = SimpleNamespace(getPointOnScreen=lambda _: (120.0, 70.0))
+        gui = SimpleNamespace(
+            activeDocument=lambda: SimpleNamespace(activeView=lambda: view),
+            getMainWindow=lambda: SimpleNamespace(findChild=lambda _: area),
+            Selection=SimpleNamespace(clearSelection=Mock()),
+        )
+        qtcore = SimpleNamespace(
+            QPoint=lambda x, y: SimpleNamespace(x=lambda: x, y=lambda: y),
+            Qt=SimpleNamespace(LeftButton=1, NoModifier=0),
+        )
+        rt = SimpleNamespace(
+            gui=gui, qtcore=qtcore, qtwidgets=SimpleNamespace(QMdiArea=object),
+            qttest=SimpleNamespace(QTest=SimpleNamespace(
+                mouseMove=Mock(), mouseClick=Mock())),
+            helpers=SimpleNamespace(settle=lambda: None),
+        )
+        fixture = dict(positions=[
+            dict(family="L1", timber_id="TO-001:timber:S12",
+                 source_rail_code=1, position_id="TO-001:S12-A:rail1"),
+            dict(family="L1", timber_id="TO-001:timber:S13",
+                 source_rail_code=1, position_id="TO-001:S13-A:rail1"),
+        ])
+        qt = SimpleNamespace(QOpenGLWidget=object)
+        case = SimpleNamespace(_focus=Mock())
+        for subelement in ("Edge7", "Face99"):
+            gui.Selection.getSelectionEx = lambda _: [SimpleNamespace(
+                DocumentName="Preview", ObjectName="L1_Part_00",
+                SubElementNames=(subelement,))]
+            with patch.dict(sys.modules, {"PySide6.QtOpenGLWidgets": qt}):
+                with self.assertRaises(AssertionError) as cm:
+                    entry.ToSingleRailGui._pick(case, rt, preview, fixture)
+            self.assertEqual(
+                [x.ViewObject.Visibility for x in preview.Objects],
+                [True, False, True],
+            )
+            args = rt.qttest.QTest.mouseClick.call_args.args
+            self.assertIs(args[0], widget)
+            self.assertEqual((args[1], args[2]), (1, 0))
+            self.assertEqual((args[3].x(), args[3].y()), (60, 64))
+            record = json.loads(str(cm.exception).split("=", 1)[1])
+            self.assertEqual(record["expected"]["face_range"], [4, 7])
+            self.assertEqual(record["observed"]["rows"][0]["subelements"],
+                             [subelement])
+            self.assertEqual(record["target"], dict(
+                position_id="TO-001:S13-A:rail1", child_index=1,
+                target_face_index=2, point_mm=[10.0, 20.0, 3],
+                screen_point=[120.0, 70.0], device_pixel_ratio=2.0,
+                click_pixel=[60, 64], viewport_size=[200, 100],
+            ))
+
     def test_readiness_uses_real_public_composition_without_geometry(self):
         from validate_to_single_rail_native_entry import composed_session
         from tracktemplate.compatibility.transition_workflow import (
@@ -632,7 +785,7 @@ if __name__ == "__main__":
     )
     if (
         outcome.wasSuccessful()
-        and outcome.testsRun == 12
+        and outcome.testsRun == 15
         and not outcome.skipped
     ):
         print(SENTINEL)

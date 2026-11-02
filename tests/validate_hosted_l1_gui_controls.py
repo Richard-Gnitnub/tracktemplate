@@ -2105,6 +2105,129 @@ class StraightGuiControls(unittest.TestCase):
 
 
 class HostedToSingleGuiControls(unittest.TestCase):
+    def reuse_authority(self, stage='readiness'):
+        record = self.to_authority(stage)
+        proof = record['prior_native_evidence']
+        proof['source_commit'] = 'b' * 40
+        record['native_source_reuse'] = {
+            'schema': 1, 'scope_id': 'TO-001-GUI-PICK-DIAGNOSTIC-001',
+            'status': 'PASS', 'independent_review': 'PASS',
+            'from_commit': proof['source_commit'],
+            'to_commit': record['source_commit'],
+            'native_run_id': proof['run_id'],
+            'native_evidence_sha256': proof['evidence_sha256'],
+            'review_sha256': 'd' * 64,
+            'changed_paths': ['tests/freecad_validate_to_single_rail_gui.py'],
+        }
+        return record
+
+    def test_to_native_reuse_requires_exact_independent_binding(self):
+        env = dict(environment(), L1_GUI_STAGE='readiness',
+                   TRACKTEMPLATE_GUI_WORKLOAD='to-single')
+        good = self.reuse_authority()
+        original = copy.deepcopy(good['prior_native_evidence'])
+        gui.validate_authority(good, env)
+        self.assertEqual(good['prior_native_evidence'], original)
+        for key, value in (
+            ('schema', True), ('scope_id', 'other'), ('status', 'FAIL'),
+            ('independent_review', 'Pending'), ('review_sha256', ''),
+            ('from_commit', 'c' * 40), ('to_commit', 'c' * 40),
+            ('native_run_id', 99), ('native_evidence_sha256', 'e' * 64),
+            ('changed_paths', ['tracktemplate/unreviewed.py']),
+            ('changed_paths', ['tests/freecad_validate_to_single_rail_gui.py']
+             * 2), ('changed_paths', []),
+        ):
+            changed = copy.deepcopy(good)
+            changed['native_source_reuse'][key] = value
+            with self.subTest(field=key, value=value):
+                with self.assertRaises(ValueError):
+                    gui.validate_authority(changed, env)
+        for value in (None, {}, []):
+            changed = dict(good, native_source_reuse=value)
+            with self.subTest(reuse=value), self.assertRaises(ValueError):
+                gui.validate_authority(changed, env)
+        changed = copy.deepcopy(good)
+        changed['prior_native_evidence']['source_commit'] = 'not-a-sha'
+        changed['native_source_reuse']['from_commit'] = 'not-a-sha'
+        with self.assertRaises(ValueError):
+            gui.validate_authority(changed, env)
+        same = self.to_authority('readiness')
+        gui.validate_authority(same, env)
+        same['native_source_reuse'] = good['native_source_reuse']
+        with self.assertRaises(ValueError):
+            gui.validate_authority(same, env)
+
+    def test_to_native_reuse_compares_actual_tracked_dependencies(self):
+        allowed = 'tests/freecad_validate_to_single_rail_gui.py'
+        protected = (
+            'tracktemplate/geometry.py', 'AdvancedTurnout.FCMacro',
+            'model_railway_curve_template_multitrack_v10_2a8a7b15_'
+            'chair_performance_and_representation.FCMacro',
+            'tests/freecad_validate_to_single_rail.py',
+            'tests/fixtures/phase9b-to-single-rail-frames.json',
+            'tools/freecad_bridge/chair_recipe.py',
+            'tests/helpers/comparator.py', 'tools/freecad_validation_guard.py',
+            'reference/contracts/phase1-compatibility.json', 'unknown.txt',
+            ' tests/freecad_validate_to_single_rail_gui.py',
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            command = gui.native.command
+
+            def git(*args):
+                return command('git', *args, cwd=root)
+
+            def commit(message):
+                git('add', '.')
+                git('-c', 'user.name=Regression Fixture', '-c',
+                    'user.email=fixture@example.invalid', 'commit', '-m',
+                    message)
+                return git('rev-parse', 'HEAD')
+
+            git('init', '-q')
+            for name in (allowed, *protected):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('baseline\n')
+            baseline = commit('Original native dependencies')
+            (root / allowed).write_text('diagnostic\n')
+            head = commit('GUI diagnostics only')
+            record = self.reuse_authority()
+            record['source_commit'] = head
+            record['prior_native_evidence']['source_commit'] = baseline
+            record['native_source_reuse'].update(
+                from_commit=baseline, to_commit=head,
+            )
+            with patch.object(gui.native, 'command', side_effect=lambda *args:
+                              command(*args, cwd=root)):
+                gui.validate_to_native_source(record)
+                for source in ('f' * 40, head):
+                    bad = copy.deepcopy(record)
+                    bad['prior_native_evidence']['source_commit'] = source
+                    bad['native_source_reuse']['from_commit'] = source
+                    with self.subTest(source=source), self.assertRaises(
+                            (ValueError, subprocess.CalledProcessError)):
+                        gui.validate_to_native_source(bad)
+                for name in protected:
+                    (root / name).write_text('changed dependency\n')
+                    bad_head = commit('Changed protected dependency')
+                    bad = copy.deepcopy(record)
+                    bad['source_commit'] = bad_head
+                    bad['native_source_reuse']['to_commit'] = bad_head
+                    with self.subTest(path=name), self.assertRaisesRegex(
+                            ValueError, 'native source'):
+                        gui.validate_to_native_source(bad)
+                    (root / name).write_text('baseline\n')
+                    commit('Restore fixture dependency')
+                (root / allowed).write_text('baseline\n')
+                (root / (' ' + allowed)).write_text('unknown input\n')
+                bad_head = commit('Only a leading-space path changed')
+                bad = copy.deepcopy(record)
+                bad['source_commit'] = bad_head
+                bad['native_source_reuse']['to_commit'] = bad_head
+                with self.assertRaisesRegex(ValueError, 'native source'):
+                    gui.validate_to_native_source(bad)
+
     def to_authority(self, stage='gui'):
         source = ast.parse((ROOT / 'tests/freecad_validate_to_single_rail.py')
                            .read_text())
@@ -2213,6 +2336,38 @@ class HostedToSingleGuiControls(unittest.TestCase):
         missing['publication_review'].pop('publication_basis')
         with self.assertRaises(ValueError):
             gui.native.validate_to_acquisition(missing)
+
+    def test_reused_native_proof_requires_actual_entry_binding(self):
+        with patch.object(sys, 'path', [str(ROOT / 'tests'), *sys.path]):
+            import freecad_validate_to_single_rail_gui as entry
+
+        for stage in ('readiness', 'gui'):
+            record = self.reuse_authority(stage)
+            original = copy.deepcopy(record['prior_native_evidence'])
+            env = dict(environment(), L1_GUI_STAGE=stage,
+                       TRACKTEMPLATE_GUI_WORKLOAD='to-single')
+            config = SimpleNamespace(source_commit=record['source_commit'])
+            with patch.dict(os.environ, env, clear=True):
+                entry.validate_authority(record, config,
+                                         record['gui_entry_sha256'])
+                self.assertEqual(record['prior_native_evidence'], original)
+                for key, value in (
+                    ('from_commit', 'c' * 40), ('to_commit', 'c' * 40),
+                    ('native_run_id', 99), ('independent_review', 'Pending'),
+                    ('review_sha256', ''), ('native_evidence_sha256', ''),
+                ):
+                    changed = copy.deepcopy(record)
+                    changed['native_source_reuse'][key] = value
+                    with self.subTest(stage=stage, field=key):
+                        with self.assertRaises(AssertionError):
+                            entry.validate_authority(
+                                changed, config, record['gui_entry_sha256'],
+                            )
+                changed = copy.deepcopy(record)
+                changed.pop('native_source_reuse')
+                with self.assertRaises(AssertionError):
+                    entry.validate_authority(changed, config,
+                                             record['gui_entry_sha256'])
 
     def test_controller_record_matches_real_gui_entry_before_launch(self):
         with patch.object(sys, 'path', [str(ROOT / 'tests'), *sys.path]):
