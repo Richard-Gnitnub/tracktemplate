@@ -1424,7 +1424,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-P9-019',
          'a3d647f355adae6cb527c66b40c45daa48fa72ec9b62d26ff1b2e3b8b9d55255'),
         ('D-P9-020',
-         'f843167e9f2f0500c053c2414646f51d364b59120c048d60193ecda15faf214a'),
+         '0cd43275768d3c42afe0c6a33e69d6099fd09b7f17c95391f2de7fe6d97e09d9'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -7977,8 +7977,8 @@ def _validate_dp9_020_decision(record, fields):
     )
     for field, expected in (
         ("authority", "0847addd4d978fd52e403f086fd97fad8f10dccd560263ca0f38ab1af348d1ce"),
-        ("decision", "dfaf35c0bb6514c0aed2a0e54cdf124557226f7b2eaaf3ce346a31f7547f96ab"),
-        ("exclusions", "e375a6accdee89e546c428e6c368bf0e526a7047c3c784e19eb39d6b31ca847f"),
+        ("decision", "fb8688987b81fa12f5020e556e7c8570720d8b478a43320f01cd03de2d8d7978"),
+        ("exclusions", "35850fc4c168aee6934de08876d6fde3bcf8a270c15a452acf292494aab359fc"),
     ):
         value = record[field]
         _require(
@@ -7995,7 +7995,7 @@ def _validate_dp9_020_publication(evidence: str, record: dict) -> None:
         record["id"] == "D-P9-020"
         and evidence.count('<a id="to-single-research-publication-panel"></a>') == 1
         and hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
-        == "556b47ace44736778141f04205902a400336f057d19832c0c35d1e6f3daf53ea",
+        == "2f9583aecf3d656a3c4e71c4484b73df48d915ae1d4349ae5a3b883b530b6b43",
         "D-P9-020 publication panel or boundaries drifted",
     )
 
