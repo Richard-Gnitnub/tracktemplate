@@ -1260,6 +1260,29 @@ class ReaGuiControls(unittest.TestCase):
         self.assertTrue(callable(suite.start))
         self.assertEqual(suite.SCOPE, 'REA-BC-LIFECYCLE-GUI-001')
 
+    def test_cleanup_finds_observers_among_native_and_python_views(self):
+        suite = self._entry()
+        first = SimpleNamespace(_observer_app=object())
+        second = SimpleNamespace(_observer_app=None)
+        document = SimpleNamespace(Objects=[
+            SimpleNamespace(ViewObject=SimpleNamespace()),
+            SimpleNamespace(ViewObject=None),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=None)),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=first)),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=object())),
+            SimpleNamespace(ViewObject=SimpleNamespace(Proxy=second)),
+        ])
+        self.assertEqual(suite._observer_proxies(document), (first, second))
+
+        class BrokenView:
+            @property
+            def Proxy(self):
+                raise RuntimeError('Unreadable observer ownership')
+
+        document.Objects.append(SimpleNamespace(ViewObject=BrokenView()))
+        with self.assertRaisesRegex(RuntimeError, 'observer ownership'):
+            suite._observer_proxies(document)
+
     def test_workflow_keeps_l1_and_candidate_mutually_exclusive(self):
         text = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
         self.assertIn('default: l1', text)
