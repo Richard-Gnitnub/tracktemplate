@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 
+from tracktemplate.domain.rea_turnout import ReaExitSleeperProfile
 from tracktemplate.domain.rea_turnout import ReaTurnoutError
 from tracktemplate.domain.rea_turnout import ReaTurnoutSpecification
 
@@ -122,6 +123,42 @@ def _source_from_record(value):
     return specification
 
 
+
+def _exact_profile_value(observed, expected, path):
+    if type(observed) is not type(expected):
+        raise ReaTrackworkStateError(
+            "unsupported-exit-profile", path,
+            "The exact source profile value and type are required.",
+        )
+    if type(expected) is dict:
+        _object(observed, expected, path)
+        for field, value in expected.items():
+            _exact_profile_value(observed[field], value, path + "." + field)
+    elif observed != expected:
+        raise ReaTrackworkStateError(
+            "unsupported-exit-profile", path,
+            "The exact source profile value is required.",
+        )
+
+
+def _exit_profile_from_record(value):
+    path = "$.intent.exit_sleeper_profile"
+    if type(value) is not dict:
+        raise ReaTrackworkStateError(
+            "invalid-exit-profile", path, "A complete profile is required.",
+        )
+    try:
+        profile = ReaExitSleeperProfile(
+            value.get("profile_id"), value.get("schema_version"),
+        )
+    except ReaTurnoutError as error:
+        raise ReaTrackworkStateError(
+            "unsupported-exit-profile", path, str(error),
+        ) from error
+    _exact_profile_value(value, profile.to_record(), path)
+    return profile
+
+
 @dataclass(frozen=True)
 class ReaTrackworkIntent:
     """One logical TO/XO request; host names are ordered object locators.
@@ -141,6 +178,7 @@ class ReaTrackworkIntent:
     orientation: str | None = None
     arrangement: str | None = None
     minimum_radius_mm: float | None = None
+    exit_sleeper_profile: ReaExitSleeperProfile | None = None
 
     def __post_init__(self):
         for field in ("entity_id", "template_set_id"):
@@ -173,6 +211,20 @@ class ReaTrackworkIntent:
                 "An explicit source specification is required.",
             )
         _source_from_record(source.to_record())
+        profile = self.exit_sleeper_profile
+        if profile is not None:
+            if type(profile) is not ReaExitSleeperProfile:
+                raise ReaTrackworkStateError(
+                    "invalid-exit-profile", "$.intent.exit_sleeper_profile",
+                    "An explicit immutable source profile is required.",
+                )
+            try:
+                _exit_profile_from_record(profile.to_record())
+            except ReaTurnoutError as error:
+                raise ReaTrackworkStateError(
+                    "invalid-exit-profile", "$.intent.exit_sleeper_profile",
+                    str(error),
+                ) from error
         chainage = _number(
             self.reference_chainage_mm, "$.intent.reference_chainage_mm",
         )
@@ -224,7 +276,7 @@ def _require_intent(intent):
 
 def _record(intent):
     _require_intent(intent)
-    return {
+    record = {
         "schema": REA_TRACKWORK_SCHEMA_ID,
         "schema_version": REA_TRACKWORK_SCHEMA_VERSION,
         "intent": {
@@ -240,6 +292,12 @@ def _record(intent):
             "minimum_radius_mm": intent.minimum_radius_mm,
         },
     }
+    if intent.exit_sleeper_profile is not None:
+        record["schema_version"] = 2
+        record["intent"]["exit_sleeper_profile"] = (
+            intent.exit_sleeper_profile.to_record()
+        )
+    return record
 
 
 def _canonical_json(value):
@@ -291,22 +349,29 @@ def rea_trackwork_intent_from_json(text):
             "The explicit REA trackwork intent schema is required.",
         )
     if (type(record["schema_version"]) is not int
-            or record["schema_version"] != REA_TRACKWORK_SCHEMA_VERSION):
+            or record["schema_version"] not in (1, 2)):
         raise ReaTrackworkStateError(
             "unsupported-schema-version", "$.schema_version",
-            "Only source intent version 1 is supported.",
+            "Only source intent versions 1 and 2 are supported.",
         )
-    intent = _object(record["intent"], (
+    fields = (
         "entity_id", "entity_kind", "template_set_id", "host_names",
         "source_specification", "reference_chainage_mm", "handing",
         "orientation", "arrangement", "minimum_radius_mm",
-    ), "$.intent")
+    )
+    if record["schema_version"] == 2:
+        fields += ("exit_sleeper_profile",)
+    intent = _object(record["intent"], fields, "$.intent")
     if type(intent["host_names"]) is not list:
         raise ReaTrackworkStateError(
             "invalid-hosts", "$.intent.host_names",
             "Ordered host references must be a JSON array.",
         )
     values = dict(intent)
+    if record["schema_version"] == 2:
+        values["exit_sleeper_profile"] = _exit_profile_from_record(
+            intent["exit_sleeper_profile"],
+        )
     values["host_names"] = tuple(intent["host_names"])
     values["source_specification"] = _source_from_record(
         intent["source_specification"],

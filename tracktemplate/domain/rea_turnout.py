@@ -115,6 +115,77 @@ class ReaTurnoutSpecification:
         }
 
 
+
+@dataclass(frozen=True)
+class ReaExitSleeperProfile:
+    """Explicit source length/correction choice, not a complete gauge preset."""
+
+    profile_id: str
+    schema_version: int = 1
+
+    def __post_init__(self):
+        if (type(self.profile_id) is not str
+                or self.profile_id != "templot-556b-00-D0GAF-32mm-full-exit"
+                or type(self.schema_version) is not int
+                or self.schema_version != 1):
+            raise ReaTurnoutError(
+                "unsupported-exit-sleeper-profile",
+                "Select the explicit 556b full-length 32 mm source profile.",
+            )
+
+    def to_record(self):
+        """Return fresh fixed provenance and source conditions."""
+        self.__post_init__()
+        return {
+            "schema_version": 1, "profile_id": self.profile_id,
+            "source_archive_sha256": _SOURCE_ARCHIVE_SHA256,
+            "calculation_revision": 1,
+            # gauge_unit:1197-1207; math_unit:2079. Length provenance only.
+            "source_gauge_identity": "t_00DGF_i",
+            "source_gauge_name": "00-D0GAF",
+            "nominal_sleeper_length_mm": 32.0,
+            "source_flags": {
+                "exittb_i": 2, "fdm_timber_correction_enabled": False,
+                "frackeq": 0, "full_length": True, "gaunt": False,
+                "half_diamond": False, "include_xing_timbers": True,
+                "jt_slwide_inches": 10, "mv_joint_offset_inches": 0,
+                "mvj_sp_inches": 12.5, "plain_track": False, "pt_i": 3,
+                "randangle": 0, "randend": 0, "retpar_i": 0,
+                "shoves_omissions_or_inserts": "none", "slwide_inches": 10,
+                "tb_end_offset_inches": 0, "tb_roll_percent": 0,
+                "tv_joint_offset_inches": 0, "veetimb_spacing_inches": 30,
+                "wingtimb_spacing_inches": 30,
+            },
+        }
+
+
+def rea_turnout_exit_sleepers(spec, profile):
+    """Return E1/E2 source bodies in the local mid-gauge frame, in mm.
+
+    The explicit full-length, square-on, zero-correction context does not
+    qualify any reduced exit, return sleeper or production chair placement.
+    """
+    if type(profile) is not ReaExitSleeperProfile:
+        raise ReaTurnoutError(
+            "invalid-exit-sleeper-profile", "An explicit profile is required.",
+        )
+    profile.__post_init__()
+    dimensions = rea_turnout_dimensions(spec)
+    # Require the same positive closure/timbering region as the other rows.
+    rea_turnout_timber_stations(spec)
+    inch = dimensions["inch"]
+    joint = dimensions["vee_joint_x"]
+    # plain_track_unit:602-633; math_unit:23009-23045,23595-23616.
+    # size=1 ends from math_unit:31949-32113, shifted by -gauge/2.
+    return [{
+        "identifier": "E" + str(index + 1), "section": "exit",
+        "x": joint + offset * inch, "width": 10.0 * inch,
+        "angle_radians": 0.0, "crossing_suffix": "",
+        "length": 32.0, "near_y": -16.0, "far_y": 16.0,
+        "joint_sleeper": index - 1, "key_towards": -1,
+    } for index, offset in enumerate((12.0, 38.5))]
+
+
 def _require_specification(spec):
     if type(spec) is not ReaTurnoutSpecification:
         raise ReaTurnoutError(

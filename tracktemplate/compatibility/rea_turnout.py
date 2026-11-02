@@ -51,7 +51,8 @@ class ReaTurnoutGeometryAdapter:
             raise ValueError("Switch-toe chainage is outside the host interval.")
         return toe
 
-    def _turnout(self, doc, host, toe, handing, orientation, spec, dimensions):
+    def _turnout(self, doc, host, toe, handing, orientation, spec, dimensions,
+                 *, exit_sleeper_profile=None):
         module = self.module
         data, set_id = self._host(host)
         toe = self._placement(data, dimensions, toe, handing, orientation)
@@ -75,11 +76,20 @@ class ReaTurnoutGeometryAdapter:
             rails.append({"name": name, "local_points": local, "points": points})
         width, _thickness = module.turnout_host_template_dimensions(doc, host)
         timbers = []
-        for station in rea_turnout.rea_turnout_timber_stations(spec):
+        stations = rea_turnout.rea_turnout_timber_stations(spec)
+        if exit_sleeper_profile is not None:
+            exits = rea_turnout.rea_turnout_exit_sleepers(
+                spec, exit_sleeper_profile,
+            )
+            for index, record in enumerate(exits, len(stations) + 1):
+                record["sequence"] = index
+            stations += exits
+        for station in stations:
             timber = dict(station)
-            timber.update(module._turnout_timber_end_data(
-                dimensions, timber["x"], width,
-            ))
+            if timber["section"] != "exit":
+                timber.update(module._turnout_timber_end_data(
+                    dimensions, timber["x"], width,
+                ))
             local = module._turnout_timber_outline_local_points(timber)
             points = module._turnout_map_polyline(
                 data, toe, orientation, handing, local,
@@ -89,7 +99,7 @@ class ReaTurnoutGeometryAdapter:
             )
             timber.update(local_points=local, points=points)
             timbers.append(timber)
-        return {
+        result = {
             "status": "transient-only",
             "source_specification": asdict(spec),
             "host_identity": {"object_name": str(host.Name),
@@ -108,17 +118,30 @@ class ReaTurnoutGeometryAdapter:
                 "source production lengths remain unqualified.",
             ),
         }
+        if exit_sleeper_profile is not None:
+            result["exit_sleeper_profile"] = exit_sleeper_profile.to_record()
+            gaps = list(result["qualification_gaps"])
+            gaps[0] = "The rail-length profile and free-end extent remain unqualified."
+            gaps[-1] = (
+                "J/S/T/X timber lengths use the inherited template envelope; "
+                "source production lengths remain unqualified."
+            )
+            result["qualification_gaps"] = tuple(gaps)
+        return result
 
-    def turnout(self, doc, host, toe, handing, orientation, specification):
+    def turnout(self, doc, host, toe, handing, orientation, specification,
+                *, exit_sleeper_profile=None):
         """Return actual mapped source rails and timbers without mutation."""
         dimensions = rea_turnout.rea_turnout_dimensions(specification)
         return self._turnout(
             doc, host, toe, handing, orientation, specification, dimensions,
+            exit_sleeper_profile=exit_sleeper_profile,
         )
 
     def crossover(
         self, doc, host_a, host_b, reference_chainage, specification, *,
         arrangement=None, handing=None, minimum_radius=None,
+        exit_sleeper_profile=None,
     ):
         """Resolve one source specification through both roads and connector."""
         module = self.module
@@ -171,10 +194,14 @@ class ReaTurnoutGeometryAdapter:
             data_a, data_b, toe_a, orientation_a, orientation_b, handing,
             dimensions, minimum_radius,
         )
-        road_a = self._turnout(doc, host_a, toe_a, handing, orientation_a,
-                               specification, dimensions)
-        road_b = self._turnout(doc, host_b, solved["toe_b"], handing,
-                               orientation_b, specification, dimensions)
+        road_a = self._turnout(
+            doc, host_a, toe_a, handing, orientation_a, specification, dimensions,
+            exit_sleeper_profile=exit_sleeper_profile,
+        )
+        road_b = self._turnout(
+            doc, host_b, solved["toe_b"], handing, orientation_b,
+            specification, dimensions, exit_sleeper_profile=exit_sleeper_profile,
+        )
         for host, road in ((host_a, road_a), (host_b, road_b)):
             conflict, _overlap = module._crossover_find_existing_conflict(
                 doc, host, road["host_station_interval"], None,
@@ -190,10 +217,13 @@ class ReaTurnoutGeometryAdapter:
             raise ValueError(decision["diagnostic"])
         # Deliberately not a legacy pre_solved payload: that path cannot
         # create new source geometry with fixed C10 dimensions or timbering.
-        return {
+        result = {
             "status": "transient-only",
             "source_specification": asdict(specification),
             "turnout_a": road_a, "turnout_b": road_b,
             "connector": solved["connector"], "radius_assessment": decision,
             "qualification_gaps": road_a["qualification_gaps"],
         }
+        if exit_sleeper_profile is not None:
+            result["exit_sleeper_profile"] = exit_sleeper_profile.to_record()
+        return result

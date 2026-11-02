@@ -7,7 +7,10 @@ from tracktemplate.application.rea_turnout_state import (
     REA_INTENT_JSON_PROPERTY,
     ReaTrackworkIntent,
 )
-from tracktemplate.domain.rea_turnout import ReaTurnoutSpecification
+from tracktemplate.domain.rea_turnout import (
+    ReaExitSleeperProfile,
+    ReaTurnoutSpecification,
+)
 
 
 @dataclass(frozen=True)
@@ -107,7 +110,8 @@ class ReaTrackworkEditorController:
 
     def create(self, *, entity_kind, host_names, switch_size, crossing_ratio,
                reference_chainage_mm, handing, orientation=None,
-               arrangement=None, minimum_radius_mm=None):
+               arrangement=None, minimum_radius_mm=None,
+               exit_sleeper_profile=None):
         """Create from explicit source choices through the existing command."""
         self._active()
         hosts = self._selected_hosts(host_names)
@@ -120,6 +124,7 @@ class ReaTrackworkEditorController:
             reference_chainage_mm=reference_chainage_mm, handing=handing,
             orientation=orientation, arrangement=arrangement,
             minimum_radius_mm=minimum_radius_mm,
+            exit_sleeper_profile=exit_sleeper_profile,
         )
         obj = self.workflow.create(self.document, intent)
         self.refresh()
@@ -127,7 +132,8 @@ class ReaTrackworkEditorController:
 
     def apply_changes(self, *, host_names, switch_size, crossing_ratio,
                       reference_chainage_mm, handing, orientation=None,
-                      arrangement=None, minimum_radius_mm=None):
+                      arrangement=None, minimum_radius_mm=None,
+                      exit_sleeper_profile=None):
         """Refuse stale forms before preparing a replacement intent."""
         previous = self.editing_intent
         if previous is None:
@@ -149,6 +155,7 @@ class ReaTrackworkEditorController:
             reference_chainage_mm=reference_chainage_mm, handing=handing,
             orientation=orientation, arrangement=arrangement,
             minimum_radius_mm=minimum_radius_mm,
+            exit_sleeper_profile=exit_sleeper_profile,
         )
         result = self.workflow.update(self.document, obj, replacement)
         self.refresh()
@@ -205,6 +212,14 @@ class ReaTrackworkEditorPanel:
         self.direction_combo = qt_widgets.QComboBox()
         self.minimum_radius_edit = qt_widgets.QLineEdit()
         self.minimum_radius_edit.setText(repr(float(minimum_radius_mm)))
+        self.exit_profile_combo = qt_widgets.QComboBox()
+        self.exit_profile_combo.addItem(
+            "Not selected; exit sleepers pending", None,
+        )
+        self.exit_profile_combo.addItem(
+            "00-D0GAF — full-length 32 mm source profile",
+            "templot-556b-00-D0GAF-32mm-full-exit",
+        )
 
         self._field(layout, qt_widgets, "Trackwork", self.kind_combo)
         self._field(layout, qt_widgets, "Switch size", self.size_combo)
@@ -225,6 +240,8 @@ class ReaTrackworkEditorPanel:
             layout, qt_widgets, "Minimum radius (mm)",
             self.minimum_radius_edit,
         )
+        self._field(layout, qt_widgets, "Exit sleepers",
+                    self.exit_profile_combo)
         self.status_label = qt_widgets.QLabel("")
         self.status_label.setWordWrap(True)
         self.status_label.setObjectName("TrackTemplateReaStatus")
@@ -251,6 +268,7 @@ class ReaTrackworkEditorPanel:
             ("Handing", self.handing_combo),
             ("Direction", self.direction_combo),
             ("MinimumRadius", self.minimum_radius_edit),
+            ("ExitProfile", self.exit_profile_combo),
         ):
             widget.setObjectName("TrackTemplateRea" + name)
         self.kind_combo.currentIndexChanged.connect(self._mode_changed)
@@ -335,6 +353,7 @@ class ReaTrackworkEditorPanel:
             self._set_editing(False)
             self.identity_label.setText("New REA B/C research record")
             self._loaded_numbers = {}
+            self.exit_profile_combo.setCurrentIndex(0)
             self.last_error = None
             self.status_label.setText("Research: ready for an explicit action.")
         except (TypeError, ValueError, RuntimeError) as error:
@@ -359,6 +378,7 @@ class ReaTrackworkEditorPanel:
         hosts = (self.host_a_combo.currentData(),)
         if crossover:
             hosts += (self.host_b_combo.currentData(),)
+        profile_id = self.exit_profile_combo.currentData()
         return dict(
             host_names=hosts, switch_size=self.size_combo.currentData(),
             crossing_ratio=self._number("crossing ratio", self.ratio_edit),
@@ -373,6 +393,8 @@ class ReaTrackworkEditorPanel:
             minimum_radius_mm=(self._number(
                 "minimum radius (mm)", self.minimum_radius_edit,
             ) if crossover else None),
+            exit_sleeper_profile=(ReaExitSleeperProfile(profile_id)
+                                  if profile_id is not None else None),
         )
 
     def _load_form(self, intent):
@@ -382,6 +404,12 @@ class ReaTrackworkEditorPanel:
         self.size_combo.setCurrentIndex(self.size_combo.findData(
             intent.source_specification.switch_size,
         ))
+        profile = intent.exit_sleeper_profile
+        self.exit_profile_combo.setCurrentIndex(
+            self.exit_profile_combo.findData(
+                profile.profile_id if profile is not None else None,
+            ),
+        )
         self.host_a_combo.setCurrentIndex(self.host_a_combo.findData(
             intent.host_names[0],
         ))
@@ -453,6 +481,7 @@ class ReaTrackworkEditorPanel:
         self.controller.cancel_edit()
         self._set_editing(False)
         self.size_combo.setCurrentIndex(0)
+        self.exit_profile_combo.setCurrentIndex(0)
         self.ratio_edit.setText("")
         self.chainage_edit.setText("")
         self._loaded_numbers = {}

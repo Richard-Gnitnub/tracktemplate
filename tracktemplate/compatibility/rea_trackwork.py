@@ -316,11 +316,13 @@ class ReaTrackworkWorkflow:
             return self._geometry.turnout(
                 document, hosts[0], intent.reference_chainage_mm,
                 intent.handing, intent.orientation, intent.source_specification,
+                exit_sleeper_profile=intent.exit_sleeper_profile,
             )
         return self._geometry.crossover(
             document, *hosts, intent.reference_chainage_mm,
             intent.source_specification, arrangement=intent.arrangement,
             handing=intent.handing, minimum_radius=intent.minimum_radius_mm,
+            exit_sleeper_profile=intent.exit_sleeper_profile,
         )
 
     @staticmethod
