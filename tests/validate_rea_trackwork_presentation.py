@@ -148,6 +148,41 @@ class PresentationTests(unittest.TestCase):
         self.assertTrue(restored.diagnostic)
         self.assertIsNone(restored.dumps())
 
+    def test_existing_view_reader_preserves_live_binding(self):
+        from tracktemplate.presentation.rea_trackwork import (
+            read_rea_trackwork_view,
+        )
+        before = self.view.snapshot()
+        self.assertIs(read_rea_trackwork_view(self.obj), self.view)
+        self.assertEqual(self.view.snapshot(), before)
+        foreign = types.SimpleNamespace(ViewObject=ViewObject())
+        foreign.ViewObject.Proxy = self.view
+        with self.assertRaisesRegex(ValueError, "different"):
+            read_rea_trackwork_view(foreign)
+        self.assertEqual(self.view.snapshot(), before)
+
+    def test_existing_view_reader_restores_empty_and_rejects_foreign(self):
+        from tracktemplate.presentation.rea_trackwork import (
+            read_rea_trackwork_view,
+        )
+        restored = object.__new__(ReaTrackworkViewProvider)
+        restored.loads(None)
+        self.obj.ViewObject.Proxy = restored
+        with patch.dict(sys.modules, {
+            "pivy": types.SimpleNamespace(coin=fake_coin()),
+        }):
+            self.assertIs(read_rea_trackwork_view(self.obj), restored)
+        self.assertIsNone(restored.scene)
+        self.assertEqual(restored.selection_root.getNumChildren(), 0)
+        self.obj.ViewObject.Proxy = object()
+        with self.assertRaisesRegex(ValueError, "foreign"):
+            read_rea_trackwork_view(self.obj)
+        self.obj.ViewObject.Proxy = None
+        self.assertIsNone(read_rea_trackwork_view(self.obj))
+        self.assertIsNone(read_rea_trackwork_view(
+            types.SimpleNamespace(ViewObject=None),
+        ))
+
     def test_pick_rejects_foreign_path_and_preserves_entity(self):
         pick = types.SimpleNamespace(getPath=lambda: types.SimpleNamespace(
             findNode=lambda node: 0 if node is self.view.selection_root else -1,

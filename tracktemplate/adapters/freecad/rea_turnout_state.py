@@ -191,15 +191,44 @@ def _qualified(qualification):
 class FreeCADReaTrackworkStore:
     """Write intent and its disposable display as one research operation."""
 
-    def __init__(self, qualification, *, view_factory=None):
+    def __init__(self, qualification, *, view_factory=None, view_reader=None):
         self.qualified_profile_id = _qualified(qualification)
         self._view_factory = view_factory
+        self._view_reader = view_reader
         self._views = {}
 
     def view_for(self, obj):
-        """Return this store's currently attached disposable view, if any."""
+        """Resolve the owned attached view before capturing rollback state."""
         entry = self._views.get(id(obj))
-        return entry[1] if entry is not None and entry[0] is obj else None
+        cached = entry[1] if entry is not None and entry[0] is obj else None
+        if self._view_reader is not None:
+            try:
+                attached = self._view_reader(obj)
+            except Exception as error:
+                raise ReaTrackworkDocumentError(
+                    "invalid-attached-view", str(error),
+                ) from error
+            if cached is not None and attached is not cached:
+                raise ReaTrackworkDocumentError(
+                    "view-identity-mismatch",
+                    "The attached view changed outside this store.",
+                )
+            if attached is not None:
+                self._views[id(obj)] = (obj, attached)
+            return attached
+        if _app().GuiUp:
+            proxy = getattr(getattr(obj, "ViewObject", None), "Proxy", None)
+            if cached is not None and proxy is not cached:
+                raise ReaTrackworkDocumentError(
+                    "view-identity-mismatch",
+                    "The attached view changed outside this store.",
+                )
+            if cached is None and proxy is not None and type(proxy) is not int:
+                raise ReaTrackworkDocumentError(
+                    "view-reader-required",
+                    "The GUI composition must identify the existing view.",
+                )
+        return cached
 
     def _attach(self, obj, scene, signature):
         if self._view_factory is not None:

@@ -108,6 +108,21 @@ def _binding(scene, coin):
     return _Binding(root, coordinates, lines)
 
 
+def read_rea_trackwork_view(obj):
+    """Resolve an owned view without replacing an existing visible scene."""
+    view = getattr(obj, "ViewObject", None)
+    if view is None or view.Proxy is None or type(view.Proxy) is int:
+        return None
+    proxy = view.Proxy
+    if not isinstance(proxy, ReaTrackworkViewProvider):
+        raise ValueError("A foreign ViewProvider cannot be adopted.")
+    if proxy._view is not None and proxy._view is not view:
+        raise ValueError("The ViewProvider belongs to a different object.")
+    if proxy._view is None:
+        proxy.attach(view)
+    return proxy
+
+
 def attach_rea_trackwork_view(obj, scene, signature):
     """Create or rebuild the injected GUI view; headless objects have none."""
     view = obj.ViewObject
