@@ -105,7 +105,7 @@ class Readiness(baseline.Readiness):
 
         super().test_imports_runtime_and_entry()
         validate_rea_inner_gauge_binding(self.module)
-        self.session._validate_binding()
+        self.session.routing_record()
         self.count("binding_checks")
         for ratio in (HEEL_N, *(float.fromhex(x) for x in BOUNDARIES)):
             intent = replace(baseline.Native._intent(self),

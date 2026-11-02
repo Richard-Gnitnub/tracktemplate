@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check hosted-pilot admission and evidence without launching FreeCAD."""
 
+import ast
 import contextlib
 import copy
 import hashlib
@@ -1052,6 +1053,92 @@ def straight_report(mode):
 
 
 class StraightWorkloadTests(unittest.TestCase):
+    @contextlib.contextmanager
+    def _composed_readiness_case(self):
+        """Use both real session layers without a host runtime or document."""
+        import types
+        import freecad_validate_rea_straight as entry
+        from tracktemplate import api
+        from tracktemplate.compatibility import (
+            b15_workflow_host, transition_workflow,
+        )
+        from validate_phase7_concentric_core import _fixture
+        from validate_rea_straight_consumers import (
+            CALLERS, INNER, actual_functions, railway_module,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            contract = _fixture(root)
+            host = b15_workflow_host.load_b15_workflow_host(root, contract)
+            module = host.module
+            actual_functions(module, (*CALLERS, INNER))
+            railway = railway_module()
+            for name in ("TURNOUT_HAND_LEFT", "TURNOUT_ORIENTATION_FACING"):
+                setattr(module, name, getattr(railway, name))
+            for _, name in (
+                transition_workflow.CORE_LAYOUT_EXPORT_HOST_OPERATIONS
+            ):
+                exec(f"def {name}(*args, **kwargs):\n"
+                     "    raise AssertionError('Unexpected export')\n",
+                     module.__dict__)
+            tree = ast.parse((root / "legacy.FCMacro").read_text())
+            caller = next(node for node in tree.body
+                          if isinstance(node, ast.FunctionDef)
+                          and node.name == "run_macro")
+            caller.body.insert(0, ast.parse("run_production_export()").body[0])
+            exec(compile(ast.Module(body=[caller], type_ignores=[]),
+                         str(root / "legacy.FCMacro"), "exec"),
+                 module.__dict__)
+            functions = {name: getattr(api, name) for name in
+                         transition_workflow.PRODUCT_FUNCTION_NAMES}
+            inner = transition_workflow.ModularTransitionWorkflowSession(
+                host, functions,
+            )
+            outer = transition_workflow.ModularCoreLayoutWorkflowSession(
+                inner, api.run_core_layout_export,
+            )
+            self.assertFalse(hasattr(outer, "_validate_binding"))
+            self.assertEqual(outer.routing_record(), inner.routing_record())
+            case = entry.Readiness("test_line_contract_and_entry")
+            case.session = outer
+            case.module = module
+            case.state = {
+                "app": types.SimpleNamespace(listDocuments=lambda: {}),
+                "documents_created": 0,
+                "checks": dict.fromkeys(
+                    straight_report("readiness")["checks"], 0,
+                ),
+            }
+            yield case
+
+    def test_straight_readiness_runs_through_actual_composed_session(self):
+        with self._composed_readiness_case() as case:
+            case.test_line_contract_and_entry()
+            self.assertEqual(case.state["checks"],
+                             straight_report("readiness")["checks"])
+            self.assertEqual(case.state["documents_created"], 0)
+            self.assertEqual(case.state["app"].listDocuments(), {})
+
+    def test_straight_readiness_refuses_changed_calculation_and_export(self):
+        from tracktemplate.compatibility.transition_workflow import (
+            TransitionWorkflowError,
+        )
+
+        for name in ("build_concentric_core", "run_production_export"):
+            with (
+                self.subTest(binding=name),
+                self._composed_readiness_case() as case,
+            ):
+                setattr(case.module, name, lambda *args, **kwargs: None)
+                with self.assertRaisesRegex(TransitionWorkflowError, "mixed"):
+                    case.test_line_contract_and_entry()
+                self.assertEqual(case.state["checks"], dict.fromkeys(
+                    straight_report("readiness")["checks"], 0,
+                ))
+                self.assertEqual(case.state["documents_created"], 0)
+                self.assertEqual(case.state["app"].listDocuments(), {})
+
     def assess(self, mode, *, report=None, stdout=None, stderr=None):
         record = straight_report(mode) if report is None else report
         output = qualified_output().replace(GEOMETRY_SENTINEL + "\n", "")

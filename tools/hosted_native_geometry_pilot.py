@@ -53,7 +53,7 @@ REA_EXIT_SENTINEL = "TRACKTEMPLATE_REA_EXIT_PROFILE="
 REA_STRAIGHT_TEST_PATH = "tests/freecad_validate_rea_straight.py"
 # Freeze only after independent preparation review.
 REA_STRAIGHT_TEST_SHA256 = (
-    "89771e19c8dcf6b26b6761f155a822aad977a75593f8554672502a23b5dfe969"
+    "fa71e8dde835940b8dfc6d1394efc1d58c31c6ec415bab0a12dcff0367ed8d32"
 )
 REA_STRAIGHT_SENTINEL = "TRACKTEMPLATE_REA_STRAIGHT="
 REA_STRAIGHT_ORACLE_PATH = "tests/validate_rea_straight_closure.py"
