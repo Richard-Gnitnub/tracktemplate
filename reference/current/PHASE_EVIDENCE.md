@@ -3973,39 +3973,45 @@ The previous 2/2 record and documentation limits do not change.
 The initial [decision record](#to-single-qualification-preparation-panel) keeps SHA-256 `6a63891440b9c5ae6e5b814a4795485e50b9ccb321837891cded533c46c09398`.
 The new decision adds publication authority. The initial decision keeps the same identity in the test controls.
 
+## TO-001 test results and selection diagnostic
+
 <a id="to-single-native-and-gui-result-panel"></a>
 
-### Fixed TO-001 native result and GUI selection diagnostic
+**Status:** The FreeCAD test without the display gives `PASS`.
+The test with the display gives `FAIL` at the selection check.
+Exit 9B-3 stays `Pending`. Phase 9B stays `Open` at 3/6.
 
-**Status:** The native test gives `PASS`. The GUI test gives `FAIL` at the selection check.
-Exit 9B-3 stays `Pending`. Phase 9B stays Open at 3/6.
-
-The [native run](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41506601704) checks 12 assemblies: 11 L1 and one S1.
-It completes 59 source-frame comparisons and 270 component comparisons.
-Wrong-frame rejection, rollback, Undo/Redo and cleanup checks pass.
-The run uses commit `1436dcd2bbe100249745d90d759fadedfa88a31e`.
+The [FreeCAD test without the display](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41506601704) checks 12 assemblies: 11 L1 and one S1.
+It completes 59 checks for `source_frame_comparisons` and 270 checks for `component_comparisons`.
+The `wrong_frame_rejections`, `rolled_back_components`, `preview_undo_redo` and cleanup checks give `PASS`.
+The test uses commit `1436dcd2bbe100249745d90d759fadedfa88a31e`.
 Its independent review and preservation checks give `PASS`.
 
-The [GUI run](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41514166991) makes the 12 assemblies and 42 layers.
-It completes 270 component placements, 59 source-frame comparisons and 42 layer-visibility checks.
-It saves three of the six required images, then stops at the viewport selection assertion.
-The failure record does not identify the selected subelement or the expected face range.
-The cause of the selection failure stays unresolved.
-The remaining GUI checks have no result.
-Cleanup passes. The failed run, images and independent reviews stay preserved.
+The [FreeCAD test with the display](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41514166991) makes the 12 assemblies and 42 objects for display.
+It puts 270 components in their positions, with 59 `source_frame_comparisons` checks and 42 `layer_visibility_checks` checks.
+It makes three of the six necessary images, then stops at the selection check.
 
-The Level 2 change adds bounded failure data to the GUI test.
-It keeps the mouse operation and selection assertions.
-It also permits use of the existing native result after an independent source comparison.
-The native result keeps its original commit and run identity.
-Only the specified GUI diagnostics, their controls and tests, and this evidence record can differ.
-All other tracked files must be unchanged.
-The new GUI test must pass hosted readiness before the full GUI test starts.
+The result record does not identify the selected `SubElementNames` value or the specified `Face` range.
+The cause of the `FAIL` selection result stays unknown.
+The remaining checks in the test with the display have no result.
+Cleanup gives `PASS`. The project preserves the `FAIL` result, its images and independent reviews.
 
-This work adds no chair positions or physical-fit evidence.
-The retained TO-001 count stays 86 of 168 source positions across the existing placement routes.
-The remaining 82 positions comprise 24 raw empty-string labels and 58 other labels.
-The empty-string values do not establish a shared-support classification.
-Product geometry, the ten input files and execution limits stay unchanged.
-The previous 2/2 record stays consumed. LMS work stays stopped.
-No production, package, rights or phase-exit acceptance follows.
+The Level 2 change adds specified diagnostic data to the test with the display.
+It keeps the mouse operation and the conditions in `check_pick`.
+After independent review checks the source, the test can use the previous result from FreeCAD without the display.
+That result keeps its initial commit and test identity.
+
+Only the specified diagnostics, their controls and tests, this evidence record and its review-state register can be different.
+All other tracked files must stay the same.
+Before the complete test with the display starts, the new `readiness` test on GitHub must give `PASS`.
+
+This work adds no chair positions or evidence for physical fit.
+The TO-001 routes continue to include 86 of 168 source positions.
+The source records for the remaining 82 positions contain 24 `chair_code_label=""` values and 58 other values.
+The empty values do not show that positions use the same support.
+They also do not show that it is correct to keep these positions without a chair.
+
+The product, the ten input files and execution limits stay the same.
+The previous record shows `2/2` used repairs. That record gives no remaining repairs.
+LMS work stays stopped.
+This result gives no acceptance for production, a package, a rights state or a phase exit.
