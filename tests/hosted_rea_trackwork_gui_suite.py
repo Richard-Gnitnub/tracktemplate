@@ -183,7 +183,8 @@ class ReaGui(unittest.TestCase):
         if state["error"] is not None:
             self.receipt["modal_failure"] = state["traceback"]
             raise state["error"]
-        self.assertTrue(state["done"], "Normal manager journey did not execute")
+        self.assertTrue(state["done"],
+            "Normal manager journey did not execute")
         self.assertIsNone(self.qt.QtWidgets.QApplication.activeModalWidget())
 
     def _gl_widget(self):
@@ -201,7 +202,7 @@ class ReaGui(unittest.TestCase):
     def image(self, name, *, dialog=None):
         from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
-        self.assertIn(name, self.control.rea_images(self.stage))
+        self.assertIn(name, self.control.rea_images(self.stage, self.workload))
         self.assertFalse((self.directory / name).exists())
         self.settle()
         if dialog is None:
@@ -416,7 +417,7 @@ class ReaGui(unittest.TestCase):
         self.assertIsNone(panel.last_error)
         self.assertEqual(panel.controller.editing_intent, self.read(obj))
 
-    def create(self, panel, *, crossover=False, selected=False):
+    def create(self, panel, *, crossover=False, selected=False, ratio=8.0):
         self.combo(panel.kind_combo, "crossover" if crossover else "turnout")
         self.combo(panel.size_combo, "B")
         self.combo(panel.host_a_combo, "HostA")
@@ -426,7 +427,7 @@ class ReaGui(unittest.TestCase):
             self.assertEqual(float(panel.minimum_radius_edit.text()), 600.0)
         else:
             self.combo(panel.handing_combo, "Left-hand", text=True)
-        self.edit(panel.ratio_edit, "8.0")
+        self.edit(panel.ratio_edit, repr(ratio))
         self.edit(panel.chainage_edit, "1500.0")
         self.combo(panel.exit_profile_combo, PROFILE_ID if selected else None)
         self.click(panel.create_button)
@@ -437,7 +438,7 @@ class ReaGui(unittest.TestCase):
         self.receipt["geometry_builds"] += 1
         if selected:
             self.count("profile_selections")
-        self.assert_record(obj, "B", 8.0, selected=selected,
+        self.assert_record(obj, "B", ratio, selected=selected,
                            crossover=crossover)
         return obj
 
@@ -512,12 +513,14 @@ class ReaGui(unittest.TestCase):
                          PROFILE_ID)
         self.assertEqual(obj.Label, "Operator-owned B/C label")
         self.assertIsNone(obj.ViewObject.Proxy.scene)
-        self.assertEqual(obj.ViewObject.Proxy.selection_root.getNumChildren(), 0)
+        self.assertEqual(obj.ViewObject.Proxy.selection_root.getNumChildren(),
+            0)
         self.count("selected_profile_reopens")
         self.image("reopened-empty.png")
         def check_loaded(panel, _dialog):
             self.select_record(panel, obj)
-            self.assertEqual(panel.exit_profile_combo.currentData(), PROFILE_ID)
+            self.assertEqual(panel.exit_profile_combo.currentData(),
+                PROFILE_ID)
             self.assertEqual(panel.size_combo.currentData(), "C")
             self.assertEqual(float(panel.ratio_edit.text()), 9.25)
         self.panel(check_loaded)
@@ -611,7 +614,8 @@ class ReaGui(unittest.TestCase):
         ])
         self.settle()
         self.assertIsNone(obj.ViewObject.Proxy.scene)
-        self.assertEqual(obj.ViewObject.Proxy.selection_root.getNumChildren(), 0)
+        self.assertEqual(obj.ViewObject.Proxy.selection_root.getNumChildren(),
+            0)
         self.assertEqual(obj.TrackTemplateReaIntentJSON, baseline)
         self.image("host-invalidated.png")
         host.Shape = shape
@@ -649,7 +653,8 @@ class ReaGui(unittest.TestCase):
                 self.assertIn("Could not complete:", panel.status_label.text())
                 self.assertEqual(xo.TrackTemplateReaIntentJSON, payload)
                 self.assertEqual(_history(doc), history)
-                self.assertEqual(tuple(item.Name for item in doc.Objects), inventory)
+                self.assertEqual(tuple(item.Name for item in doc.Objects),
+                    inventory)
                 self.assertEqual(_scene(xo.ViewObject.Proxy), scene)
                 self.assertIs(xo.ViewObject.Proxy._binding, binding)
                 self.receipt["refusals"].append({
@@ -657,6 +662,211 @@ class ReaGui(unittest.TestCase):
                 })
                 self.count("visible_input_refusals")
         self.panel(invalid)
+
+    def assert_straight_record(self, obj, ratio, *, crossover=False):
+        """Check the line display; native evidence owns coordinates."""
+        from tracktemplate.domain.rea_turnout import rea_turnout_dimensions
+
+        intent = self.assert_record(obj, "B", ratio, selected=True,
+                                    crossover=crossover)
+        dimensions = rea_turnout_dimensions(intent.source_specification)
+        self.assertEqual(dimensions.get("source_closure_kind"), "line")
+        self.assertEqual(intent.source_specification.crossing_ratio.hex(),
+                         ratio.hex())
+        scene = obj.ViewObject.Proxy.scene
+        self.assertEqual(len(scene.lines), 158 if crossover else 77)
+        self.assertEqual(sum(line.layer_id == "rails" for line in scene.lines),
+                         64 if crossover else 30)
+        self.assertEqual(sum(line.layer_id == "timbers" for line in scene.lines),
+                         94 if crossover else 47)
+        return intent
+
+    def straight_journey(self):
+        """Render one line TO and two XO roads through the normal editor."""
+        central = 18.417941404842995
+        doc = self.new_document("ReaStraightGuiTO")
+        created = []
+
+        def initial(panel, dialog):
+            self.assertIsNone(panel.exit_profile_combo.currentData())
+            obj = self.create(panel, selected=True, ratio=central)
+            created.append(obj)
+            self.assert_straight_record(obj, central)
+            self.count("initial_straight_source_roads")
+            obj.Label = "Operator-owned straight B label"
+            self.settle()
+            self.count("operator_label_cases")
+            payload, history = obj.TrackTemplateReaIntentJSON, _history(doc)
+            binding = obj.ViewObject.Proxy._binding
+            self.select_record(panel, obj)
+            self.assertEqual(float(panel.ratio_edit.text()).hex(),
+                central.hex())
+            self.click(panel.apply_button)
+            self.assertIsNone(panel.last_error)
+            self.assertEqual(obj.TrackTemplateReaIntentJSON, payload)
+            self.assertEqual(_history(doc), history)
+            self.assertIs(obj.ViewObject.Proxy._binding, binding)
+            self.count("no_op_applies")
+            self.image("to-straight-fields.png", dialog=dialog)
+
+        self.panel(initial)
+        obj, = created
+        self.view(obj)
+        self.image("to-straight.png")
+        payload = obj.TrackTemplateReaIntentJSON
+        identity, name = self.read(obj).entity_id, obj.Name
+        initial_scene = _scene(obj.ViewObject.Proxy)
+
+        def exact_boundary_edits(panel, _dialog):
+            self.select_record(panel, obj)
+            for hex_ratio in ("0x1.26afe3537fbd7p+4",
+                              "0x1.26afe353ae7fdp+4"):
+                ratio = float.fromhex(hex_ratio)
+                self.edit(panel.ratio_edit, repr(ratio))
+                self.assertEqual(float(panel.ratio_edit.text()).hex(),
+                    hex_ratio)
+                self.click(panel.apply_button)
+                self.assertIsNone(panel.last_error)
+                self.assertIs(panel.last_result, obj)
+                self.assert_straight_record(obj, ratio)
+                self.assertEqual(self.read(obj).entity_id, identity)
+                self.count("straight_boundary_edits")
+                self.count("successful_parameter_updates")
+                self.receipt["geometry_builds"] += 1
+            self.edit(panel.ratio_edit, repr(central))
+            self.click(panel.apply_button)
+            self.assertIsNone(panel.last_error)
+            self.assert_straight_record(obj, central)
+            self.assertEqual(obj.TrackTemplateReaIntentJSON, payload)
+            self.assertEqual(_scene(obj.ViewObject.Proxy), initial_scene)
+            self.count("successful_parameter_updates")
+            self.receipt["geometry_builds"] += 1
+
+        self.panel(exact_boundary_edits)
+        proxy = obj.ViewObject.Proxy
+        snapshot, history = proxy.snapshot(), _history(doc)
+        selection = _selection(self.gui)
+        inventory = tuple(item.Name for item in doc.Objects)
+
+        def refused_boundary(panel, dialog):
+            from tracktemplate.domain.rea_turnout import ReaTurnoutError
+
+            self.select_record(panel, obj)
+            ratio = float.fromhex("0x1.26afe353ae7fep+4")
+            self.edit(panel.ratio_edit, repr(ratio))
+            self.click(panel.apply_button)
+            self.assertIsNotNone(panel.last_error)
+            self.assertIsInstance(panel.last_error, ReaTurnoutError)
+            self.assertEqual(panel.last_error.code,
+                             "unsupported-negative-closure")
+            self.assertIn("Could not complete:", panel.status_label.text())
+            self.assertEqual(
+                panel.status_label.text(),
+                "Could not complete: {}".format(panel.last_error),
+            )
+            self.assertEqual(obj.TrackTemplateReaIntentJSON, payload)
+            self.assertEqual(_history(doc), history)
+            self.assertEqual(_selection(self.gui), selection)
+            self.assertEqual(tuple(item.Name for item in doc.Objects),
+                inventory)
+            self.assertIs(obj.ViewObject.Proxy, proxy)
+            self.assertEqual(proxy.snapshot(), snapshot)
+            self.assertEqual(self.read(obj).entity_id, identity)
+            self.receipt["refusals"].append({
+                "input_hex": ratio.hex(),
+                "visible_text": panel.status_label.text(),
+            })
+            self.count("visible_input_refusals")
+            self.image("upper-out-refused.png", dialog=dialog)
+
+        self.panel(refused_boundary)
+        import Part
+
+        host = doc.getObject("HostA")
+        shape = host.Shape.copy()
+        host.Shape = Part.makePolygon([
+            self.app.Vector(0, 1, 0), self.app.Vector(5000, 1, 0),
+        ])
+        self.settle()
+        self.assertIsNone(proxy.scene)
+        self.assertEqual(proxy.selection_root.getNumChildren(), 0)
+        self.assertEqual(obj.TrackTemplateReaIntentJSON, payload)
+        host.Shape = shape
+        self.settle()
+        self.assertIsNone(proxy.scene)
+        self.count("host_invalidation_cases")
+        self.rebuild(obj)
+        self.assertEqual(_scene(proxy), initial_scene)
+
+        doc.saveAs(str(self.saved))
+        attached = obj.ViewObject.Proxy
+        self.app.closeDocument(doc.Name)
+        self.settle()
+        self.assertIsNone(attached._observer_app)
+        doc = self.app.openDocument(str(self.saved))
+        doc.UndoMode = 1
+        self.owned_documents.append(doc.Name)
+        self.count("reopens")
+        obj = doc.getObject(name)
+        self.assertIsNotNone(obj)
+        self.assertEqual(obj.TrackTemplateReaIntentJSON, payload)
+        self.assertEqual(self.read(obj).entity_id, identity)
+        self.assertEqual(self.read(obj).source_specification.crossing_ratio.hex(),
+                         central.hex())
+        self.assertEqual(self.read(obj).exit_sleeper_profile.profile_id,
+            PROFILE_ID)
+        self.assertEqual(obj.Label, "Operator-owned straight B label")
+        self.assertIsNone(obj.ViewObject.Proxy.scene)
+        self.assertEqual(obj.ViewObject.Proxy.selection_root.getNumChildren(),
+            0)
+        self.count("selected_profile_reopens")
+        self.image("straight-reopened-empty.png")
+        self.rebuild(obj)
+        self.assertEqual(_scene(obj.ViewObject.Proxy), initial_scene)
+        self.assert_straight_record(obj, central)
+        self.pick(obj)
+        self.image("straight-rebuilt-picked.png")
+
+        def return_b8(panel, _dialog):
+            from tracktemplate.domain.rea_turnout import rea_turnout_dimensions
+
+            self.select_record(panel, obj)
+            self.assertEqual(panel.exit_profile_combo.currentData(),
+                PROFILE_ID)
+            self.edit(panel.ratio_edit, "8.0")
+            self.click(panel.apply_button)
+            self.assertIsNone(panel.last_error)
+            intent = self.assert_record(obj, "B", 8.0, selected=True)
+            self.assertEqual(intent.entity_id, identity)
+            self.assertNotIn("source_closure_kind",
+                             rea_turnout_dimensions(intent.source_specification))
+            self.assertNotEqual(_scene(obj.ViewObject.Proxy), initial_scene)
+            self.assertEqual(obj.Label, "Operator-owned straight B label")
+            self.count("successful_parameter_updates")
+            self.receipt["geometry_builds"] += 1
+
+        self.panel(return_b8)
+        self.view(obj)
+        self.image("to-b8-returned.png")
+        self.app.closeDocument(doc.Name)
+        self.settle()
+        doc = self.new_document("ReaStraightGuiXO")
+        created.clear()
+
+        def crossover(panel, _dialog):
+            xo = self.create(
+                panel, crossover=True, selected=True, ratio=central,
+            )
+            self.assertEqual(self.read(xo).minimum_radius_mm, 600.0)
+            self.assert_straight_record(xo, central, crossover=True)
+            self.count("initial_straight_source_roads", 2)
+            created.append(xo)
+
+        self.panel(crossover)
+        xo, = created
+        self.view(xo)
+        self.pick(xo)
+        self.image("xo-straight.png")
 
     def assert_source_tree(self, config, authority):
         # The host provides the tracked manifest. The sandbox verifies its
@@ -685,6 +895,7 @@ class ReaGui(unittest.TestCase):
 
         self.control = control
         self.stage = os.environ["L1_GUI_STAGE"]
+        self.workload = control.selected_workload(os.environ)
         config_path = _regular(os.environ["TRACKTEMPLATE_L1_RUN_CONFIG"])
         self.assertEqual(_digest(config_path), os.environ[
             "TRACKTEMPLATE_L1_RUN_CONFIG_SHA256"])
@@ -710,13 +921,17 @@ class ReaGui(unittest.TestCase):
         self.owned_documents, self.owned_windows = [], []
         self.app = None
         self.receipt = {
-            "status": "RUNNING", "stage": self.stage, "scope_id": SCOPE,
-            "workload": "rea-bc", "profile": control.original.EXPECTED_PROFILE,
+            "status": "RUNNING", "stage": self.stage,
+            "scope_id": control.rea_scope(self.workload),
+            "workload": self.workload,
+            "profile": control.original.EXPECTED_PROFILE,
             "source_commit": authority["source_commit"],
             "source_tree_sha256": authority["source_tree_sha256"],
             "input_hashes": authority["input_hashes"],
             "gui_entry_sha256": authority["gui_entry_sha256"],
-            "checks": dict.fromkeys(control.rea_counts(self.stage), 0),
+            "checks": dict.fromkeys(
+                control.rea_counts(self.stage, self.workload), 0,
+            ),
             "geometry_builds": 0, "screenshots": [], "states": [],
             "picks": [], "refusals": [], "temporary_documents": [],
             "visual_review": "REQUIRED", "physical_fit": "NOT_PROVED",
@@ -761,17 +976,23 @@ class ReaGui(unittest.TestCase):
                     self.assertIsNone(panel.exit_profile_combo.currentData())
                     self.assertTrue(panel.create_button.isVisible())
                     self.assertEqual(doc.Objects, [])
-                    self.image("readiness-panel.png", dialog=dialog)
+                    self.image("straight-readiness-panel.png"
+                               if self.workload == "rea-bc-straight"
+                               else "readiness-panel.png", dialog=dialog)
                 self.panel(readiness)
                 self.assertEqual(doc.Objects, [])
             else:
                 temporary.mkdir(mode=0o700)
-                self.full_journey()
+                if self.workload == "rea-bc-straight":
+                    self.straight_journey()
+                else:
+                    self.full_journey()
             self.receipt["renderer"] = images._gl_record(
                 app, gui, QtGui, QtWidgets,
             )
             self.count("tests")
-            control.validate_rea_counts(self.receipt["checks"], self.stage)
+            control.validate_rea_counts(self.receipt["checks"], self.stage,
+                                        self.workload)
             self.assertEqual(self.receipt["geometry_builds"],
                              0 if self.stage == "readiness" else 8)
         except BaseException as error:
@@ -833,7 +1054,9 @@ class ReaGui(unittest.TestCase):
                 failure = AssertionError("B/C GUI cleanup unproved")
             self.receipt["status"] = "PASS" if failure is None else "FAIL"
             if failure is None:
-                self.receipt["sentinel"] = control.sentinel(self.stage, "rea-bc")
+                self.receipt["sentinel"] = control.sentinel(
+                    self.stage, self.workload,
+                )
             else:
                 self.receipt["errors"] = 1
             _write(self.directory / "result.json", self.receipt)

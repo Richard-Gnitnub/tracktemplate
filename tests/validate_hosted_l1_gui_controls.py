@@ -1291,7 +1291,7 @@ class ReaGuiControls(unittest.TestCase):
         self.assertIn("inputs.workload == 'l1'", text)
         self.assertIn('timeout-minutes: 45', text)
         self.assertEqual(text.count('environment: l1-private-validation'), 1)
-        self.assertIn('TRACKTEMPLATE_GUI_WORKLOAD: rea-bc', text)
+        self.assertIn('TRACKTEMPLATE_GUI_WORKLOAD: ${{ inputs.workload }}', text)
 
 
     def _receipt_fixture(self, work, stage='gui'):
@@ -1870,6 +1870,238 @@ class ReaGuardEvidenceRegressions(unittest.TestCase):
                 gui.exclude_gui_copy(work)
                 gui.native.seal(work)
             self.assertTrue((work / 'evidence.tar').is_file())
+
+
+
+
+class StraightGuiControls(unittest.TestCase):
+    """The straight journey has its own exact source and image authority."""
+
+    @staticmethod
+    def environment(stage='gui'):
+        return dict(ReaGuiControls.environment(stage),
+                    TRACKTEMPLATE_GUI_WORKLOAD='rea-bc-straight',
+                    GITHUB_REF='refs/heads/codex/rea-bc-straight-closure')
+
+    def authority(self, stage='gui'):
+        record = ReaGuiControls().authority(stage)
+        record.update(scope_id='REA-BC-STRAIGHT-GUI-001',
+                      workload='rea-bc-straight',
+                      source_ref=self.environment(stage)['GITHUB_REF'])
+        record['handling_review']['gui_images'] = 7
+        if stage == 'gui':
+            ready = record['gui_readiness_review']
+            ready.update(scope_id=record['scope_id'], workload=record['workload'],
+                         handling_review=copy.deepcopy(record['handling_review']),
+                         sentinel='REA B straight hosted GUI readiness passed')
+        return record
+
+    def test_only_named_straight_scope_and_ref_are_admitted(self):
+        self.assertEqual(gui.selected_workload(self.environment()),
+                         'rea-bc-straight')
+        self.assertEqual(gui.rea_scope('rea-bc-straight'),
+                         'REA-BC-STRAIGHT-GUI-001')
+        self.assertEqual(gui.rea_ref('rea-bc-straight'),
+                         self.environment()['GITHUB_REF'])
+        self.assertEqual(gui.rea_scope(), 'REA-BC-LIFECYCLE-GUI-001')
+        for value in ('straight', 'rea-bc-straight-gui', '', 'l1,rea-bc'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                gui.selected_workload({'TRACKTEMPLATE_GUI_WORKLOAD': value})
+        for stage in ('gui', 'readiness'):
+            self.assertEqual(vars(gui.limits(stage, 'rea-bc-straight')),
+                             vars(gui.limits(stage, 'rea-bc')))
+            self.assertEqual(vars(gui.display_limits(stage, 'rea-bc-straight')),
+                             vars(gui.display_limits(stage, 'rea-bc')))
+
+    def test_exact_twenty_one_counters_and_seven_full_images(self):
+        counts = gui.rea_counts('gui', 'rea-bc-straight')
+        self.assertEqual(counts, {
+            'tests': 1, 'fresh_documents': 2, 'reopens': 1,
+            'source_records_created': 2, 'successful_parameter_updates': 4,
+            'no_op_applies': 1, 'undo_redo_pairs': 0,
+            'host_invalidation_cases': 1, 'explicit_rebuilds': 2,
+            'adopted_view_rollback_cases': 0, 'actual_viewport_picks': 2,
+            'visible_input_refusals': 1, 'operator_label_cases': 1,
+            'profile_selections': 2, 'profile_deselections': 0,
+            'selected_profile_reopens': 1, 'viewport_images': 5,
+            'dialog_images': 2, 'screenshots_total': 7,
+            'straight_boundary_edits': 2, 'initial_straight_source_roads': 3,
+        })
+        self.assertEqual(gui.rea_images('gui', 'rea-bc-straight'), {
+            'to-straight.png', 'to-straight-fields.png',
+            'upper-out-refused.png', 'straight-reopened-empty.png',
+            'straight-rebuilt-picked.png', 'to-b8-returned.png',
+            'xo-straight.png',
+        })
+        for key, expected in counts.items():
+            for bad in (expected + 1, True, float(expected)):
+                with self.subTest(key=key, bad=bad), self.assertRaises(ValueError):
+                    gui.validate_rea_counts(dict(counts, **{key: bad}), 'gui',
+                                            'rea-bc-straight')
+        ready = gui.rea_counts('readiness', 'rea-bc-straight')
+        self.assertEqual({k: v for k, v in ready.items() if v}, {
+            'tests': 1, 'fresh_documents': 1, 'dialog_images': 1,
+            'screenshots_total': 1,
+        })
+        self.assertEqual(gui.rea_images('readiness', 'rea-bc-straight'),
+                         {'straight-readiness-panel.png'})
+        self.assertEqual(len(gui.rea_images('gui')), 13)
+
+    def test_prior_image_scope_and_wrong_ref_cannot_authorise_straight(self):
+        for stage in ('readiness', 'gui'):
+            good = self.authority(stage)
+            env = self.environment(stage)
+            gui.validate_rea_authority(good, env)
+            for key, value in (
+                ('scope_id', 'REA-BC-LIFECYCLE-GUI-001'),
+                ('workload', 'rea-bc'),
+                ('source_ref', 'refs/heads/codex/rea-bc-exit-profile'),
+                ('automatic_retry', True), ('execution_authorized', False),
+            ):
+                with self.subTest(stage=stage, key=key), self.assertRaises(ValueError):
+                    gui.validate_rea_authority(dict(good, **{key: value}), env)
+            for key, value in (('gui_images', 13), ('readiness_images', 0),
+                               ('fcstd_upload', True), ('decision_sha256', '')):
+                bad = copy.deepcopy(good)
+                bad['handling_review'][key] = value
+                with self.subTest(stage=stage, key=key), self.assertRaises(ValueError):
+                    gui.validate_rea_authority(bad, env)
+            with self.assertRaises(ValueError):
+                gui.validate_rea_authority(good, dict(
+                    env, GITHUB_REF='refs/heads/codex/rea-bc-exit-profile'))
+
+    def test_native_recovery_and_exact_readiness_remain_required(self):
+        good, env = self.authority(), self.environment()
+        for group in ('gui_recovery', 'prior_native_evidence',
+                      'gui_readiness_review'):
+            bad = copy.deepcopy(good)
+            bad[group] = {}
+            with self.subTest(group=group), self.assertRaises(ValueError):
+                gui.validate_rea_authority(bad, env)
+        for key, value in (('workload', 'rea-bc'), ('skips', 1),
+                           ('source_commit', 'b' * 40), ('cleanup', False),
+                           ('sentinel', 'REA B/C hosted GUI readiness passed')):
+            bad = copy.deepcopy(good)
+            bad['gui_readiness_review'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                gui.validate_rea_authority(bad, env)
+
+    def test_image_stage_unknown_and_symlink_stay_fail_closed(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            directory = work / 'evidence/gui'
+            directory.mkdir(parents=True)
+            (directory / 'result.json').write_text('{}')
+            selected = directory / 'straight-readiness-panel.png'
+            selected.write_bytes(b'\x89PNG\r\n\x1a\n')
+            gui.validate_rea_evidence(work, stage='readiness',
+                                      workload='rea-bc-straight')
+            for name in ('to-straight.png', 'readiness-panel.png', 'unknown.png'):
+                path = directory / name
+                path.write_bytes(b'\x89PNG\r\n\x1a\n')
+                try:
+                    with self.subTest(name=name), self.assertRaises(ValueError):
+                        gui.validate_rea_evidence(
+                            work, stage='readiness', workload='rea-bc-straight')
+                finally:
+                    path.unlink()
+            selected.unlink()
+            selected.symlink_to(directory / 'result.json')
+            with self.assertRaises(ValueError):
+                gui.validate_rea_evidence(work, stage='readiness',
+                                          workload='rea-bc-straight')
+
+    def test_straight_entry_stays_one_named_gui_test(self):
+        tree = ast.parse((ROOT / gui.REA_ENTRY).read_text())
+        cls = next(node for node in tree.body
+                   if isinstance(node, ast.ClassDef) and node.name == 'ReaGui')
+        methods = {node.name: node for node in cls.body
+                   if isinstance(node, ast.FunctionDef)}
+        self.assertIn('straight_journey', methods)
+        self.assertEqual([name for name in methods if name.startswith('test_')],
+                         ['test_authorised_gui_stage'])
+        text = ast.get_source_segment((ROOT / gui.REA_ENTRY).read_text(),
+                                      methods['straight_journey'])
+        for token in ('0x1.26afe3537fbd7p+4', '0x1.26afe353ae7fdp+4',
+                      '0x1.26afe353ae7fep+4', 'float.fromhex',
+                      'straight_boundary_edits', 'openDocument', 'self.pick'):
+            self.assertIn(token, text)
+
+    def test_upper_out_refusal_requires_specific_source_error_and_visibility(self):
+        from tracktemplate.domain.rea_turnout import ReaTurnoutError
+
+        tree = ast.parse((ROOT / gui.REA_ENTRY).read_text())
+        action = next(node for node in ast.walk(tree)
+                      if isinstance(node, ast.FunctionDef)
+                      and node.name == 'refused_boundary')
+
+        def exercise(error, visible):
+            case = unittest.TestCase()
+            case.gui = None
+            case.receipt = {'refusals': []}
+            counts = []
+            case.count = counts.append
+            case.select_record = lambda *args: None
+            case.edit = lambda *args: None
+            case.click = lambda *args: None
+            case.image = lambda *args, **kwargs: None
+            case.read = lambda obj: SimpleNamespace(entity_id='source-id')
+            proxy = SimpleNamespace(snapshot=lambda: ('unchanged-view',))
+            obj = SimpleNamespace(
+                Name='Source', TrackTemplateReaIntentJSON='canonical',
+                ViewObject=SimpleNamespace(Proxy=proxy),
+            )
+            doc = SimpleNamespace(Objects=[obj])
+            panel = SimpleNamespace(
+                last_error=error, ratio_edit=object(), apply_button=object(),
+                status_label=SimpleNamespace(text=lambda: visible),
+            )
+            namespace = {
+                'self': case, 'obj': obj, 'doc': doc, 'proxy': proxy,
+                'payload': 'canonical', 'history': ('unchanged-history',),
+                'selection': ('unchanged-selection',), 'inventory': ('Source',),
+                'snapshot': ('unchanged-view',), 'identity': 'source-id',
+                '_history': lambda doc: ('unchanged-history',),
+                '_selection': lambda gui: ('unchanged-selection',),
+            }
+            exec(compile(ast.Module(body=[action], type_ignores=[]),
+                         str(ROOT / gui.REA_ENTRY), 'exec'), namespace)
+            namespace['refused_boundary'](panel, object())
+            return counts, case.receipt
+
+        correct = ReaTurnoutError(
+            'unsupported-negative-closure',
+            'A nonpositive source closure span is not construction-qualified.',
+        )
+        visible = 'Could not complete: {}'.format(correct)
+        counts, receipt = exercise(correct, visible)
+        self.assertEqual(counts, ['visible_input_refusals'])
+        self.assertEqual(receipt['refusals'][0]['input_hex'],
+                         '0x1.26afe353ae7fep+4')
+        self.assertEqual(receipt['refusals'][0]['visible_text'], visible)
+        cases = (
+            (RuntimeError('unrelated failure'),
+             'Could not complete: unrelated failure'),
+            (RuntimeError(str(correct)), visible),
+            (ReaTurnoutError('invalid-auto-fit-entry', 'Different source error'),
+             'Could not complete: invalid-auto-fit-entry: Different source error'),
+            (correct, 'Could not complete: unrelated failure'),
+            (correct, 'Could not complete:'),
+            (correct, ''),
+        )
+        for error, label in cases:
+            with self.subTest(error=repr(error), visible=label):
+                with self.assertRaises(AssertionError):
+                    exercise(error, label)
+
+    def test_workflow_ref_pairs_cannot_cross_route(self):
+        text = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        self.assertIn("inputs.workload == 'rea-bc-straight'", text)
+        self.assertIn("refs/heads/codex/rea-bc-straight-closure", text)
+        self.assertIn('TRACKTEMPLATE_GUI_WORKLOAD: ${{ inputs.workload }}', text)
+        self.assertIn('default: l1', text)
+        self.assertEqual(text.count('rea-bc-gui:'), 1)
+        self.assertEqual(text.count('timeout-minutes: 45'), 1)
 
 
 if __name__ == '__main__':

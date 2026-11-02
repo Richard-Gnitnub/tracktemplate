@@ -11,6 +11,7 @@ on:
         options:
           - l1
           - rea-bc
+          - rea-bc-straight
       stage:
         description: Separately admitted GUI stage
         required: true
@@ -240,14 +241,18 @@ jobs:
 
   rea-bc-gui:
     if: >-
-      inputs.workload == 'rea-bc' && inputs.lifecycle_diagnostic == false &&
+      ((inputs.workload == 'rea-bc' &&
+        github.ref == 'refs/heads/codex/rea-bc-exit-profile') ||
+       (inputs.workload == 'rea-bc-straight' &&
+        github.ref == 'refs/heads/codex/rea-bc-straight-closure')) &&
+      inputs.lifecycle_diagnostic == false &&
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
       github.event.repository.private == false &&
-      github.ref == 'refs/heads/codex/rea-bc-exit-profile' && github.run_attempt == 1
+      github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
-      TRACKTEMPLATE_GUI_WORKLOAD: rea-bc
+      TRACKTEMPLATE_GUI_WORKLOAD: ${{ inputs.workload }}
       L1_GUI_STAGE: ${{ inputs.stage }}
       L1_LIFECYCLE_DIAGNOSTIC: 'false'
     steps:
