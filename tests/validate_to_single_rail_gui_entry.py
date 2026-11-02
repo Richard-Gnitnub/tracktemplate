@@ -247,6 +247,7 @@ class GuiEntryTests(unittest.TestCase):
             [picked(obj="ReferenceRails")],
             [picked(sub=("Face3",))],
             [picked(sub=("Edge5",))],
+            [picked(sub=("Vertex81",))],
             [picked(sub=())],
             [picked(sub=("Face5", "Face6"))],
         ):
@@ -254,7 +255,7 @@ class GuiEntryTests(unittest.TestCase):
                 entry.check_pick(rows, "Preview", "L1_Part_00", 4, 9)
 
     def test_pick_failure_identifies_observed_name_and_expected_range(self):
-        for name in ("Edge7", "Face99"):
+        for name in ("Edge7", "Vertex81", "Face99"):
             row = SimpleNamespace(
                 DocumentName="Preview", ObjectName="L1_Part_00",
                 SubElementNames=(name,),
@@ -330,13 +331,20 @@ class GuiEntryTests(unittest.TestCase):
             self.assertLess(len(str(cm.exception)), 4096)
 
     def test_actual_pick_failure_keeps_click_and_restores_visibility(self):
-        def face(z):
+        def face(z, area=1.0, normal_z=1.0):
             return SimpleNamespace(
-                CenterOfMass=SimpleNamespace(x=10.0, y=20.0, z=z)
+                CenterOfMass=SimpleNamespace(x=10.0, y=20.0, z=z),
+                Area=area,
+                normalAt=lambda _u, _v: SimpleNamespace(z=normal_z),
             )
+        # The retained L1 roof triangle and plinth have equal source height.
+        # Kernel rounding must not favour the 0.0172 mm2 corner triangle
+        # over the 8.505 mm2 plinth; larger sides and underside cannot win.
         children = [SimpleNamespace(Faces=[face(0)] * 3),
                     SimpleNamespace(
-                        Faces=[face(1), face(3), face(2), face(0)])]
+                        Faces=[face(3.0000000000000004, 0.0172),
+                               face(3, 8.505), face(2, 20, 0),
+                               face(0, 30, -1)])]
         obj = SimpleNamespace(
             Name="L1_Part_00",
             Shape=SimpleNamespace(childShapes=lambda: children),
@@ -380,7 +388,7 @@ class GuiEntryTests(unittest.TestCase):
         ])
         qt = SimpleNamespace(QOpenGLWidget=object)
         case = SimpleNamespace(_focus=Mock())
-        for subelement in ("Edge7", "Face99"):
+        for subelement in ("Edge7", "Vertex81", "Face99"):
             gui.Selection.getSelectionEx = lambda _: [SimpleNamespace(
                 DocumentName="Preview", ObjectName="L1_Part_00",
                 SubElementNames=(subelement,))]
