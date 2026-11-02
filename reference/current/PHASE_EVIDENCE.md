@@ -3845,47 +3845,52 @@ These results give no acceptance for physical fit, numerical tolerances, product
 
 <a id="to-single-qualification-preparation-panel"></a>
 
-## TO-001 qualification preparation — 2026-11-02
+## TO-001 tests — 2026-11-02
 
-The project owner approves remote processing and public publication of two exact inputs from `7fa2a5a`.
-They are the retained S1 model and the synthetic base fixture.
-The approval also covers one `readiness` image, six TO GUI images and specified diagnostic evidence.
-Actions keeps this evidence for 30 days.
+The project owner gives approval for "remote processing and public publication" of two exact inputs from `7fa2a5a`.
+They are `s1_model` and `to_base_fixture`, the S1 model and the "synthetic base fixture".
+The approval also includes one `readiness` image, six TO display images and specified diagnostic evidence.
+GitHub keeps this evidence for 30 days.
 Independent preservation keeps the initial results and reviews.
 The decision record is `to001-handling-owner-decision.json`, SHA-256 `6a63891440b9c5ae6e5b814a4795485e50b9ccb321837891cded533c46c09398`.
 
-Before transfer, independent review must establish the publication basis for these exact inputs.
-The review supports publication of the synthetic base with its source notices.
-The S1 publication basis stays unresolved.
-The S1 model and its rendered evidence stay local.
-The source and data for its five body components and twelve fixing components need a compatible disposition for publication.
-The review finds no specific third-party prohibition.
-Existing source licences and owner handling approval do not resolve the remaining data rights.
+Before GitHub receives these exact inputs, independent review must give evidence for the necessary rights state.
+The review gives evidence for publication of `to_base_fixture` with its "source notices".
+The S1 review result stays `UNKNOWN_PUBLICATION_BASIS / TRANSFER_HOLD`.
+The S1 model and its display evidence stay in local evidence.
+
+For publication, a compatible disposition is necessary for the source and data of all 17 S1 chair components.
+These are the five `Part_*` components and twelve `SourceFixing*` components.
+This review finds no "third-party ban".
+The source licences and owner approval for "handling" do not resolve the remaining rights state.
 The review record is `input-publication-basis-independent-review.json`, SHA-256 `e231247aec491dde85af9915d664cdde9ec6f00f07e8a87dfd256ce30e766d2f`.
 The separate correction record preserves the initial review and verdict.
 
-The prepared native and GUI tests use the existing GitHub workflows and resource controls.
-Their fixed TO-001 scope contains twelve chair assemblies: eleven L1 and one S1.
-The tests use 59 source frames and 270 component placements.
-The native test compares the components and checks rollback.
-The GUI test examines 42 layers, viewport selection, rollback and preview disposal.
-The original native test, source fixture and product geometry do not change.
-Offline tests examine the input contracts, launch sequence, result checks and cleanup.
-They give no native or GUI execution evidence.
+The prepared FreeCAD tests use the previous GitHub workflows and their controls.
+Their specified TO-001 scope contains twelve chair assemblies: eleven L1 and one S1.
+They use 59 sets of `origin_mm`, `x_axis` and `y_axis` values from the source.
+They examine 270 chair components at their specified positions.
+The test without the display compares the components and checks the previous state after a rejected change.
 
-Independent review finds two fixture defects before hosted execution.
-Malformed numeric reports need rejection without an uncaught exception.
-The GUI fixture must set its intended selection before it checks selection preservation.
-The corrections keep the original assertions and failed evidence.
-The existing rights gate stops input transfer and hosted qualification until the S1 publication basis is established.
+The display test examines `layer_count = 42`, selection in the display and the previous state after a rejected change.
+It also closes the `preview` and checks the previous source state.
+The initial FreeCAD test without the display, source fixture and product geometry do not change.
+Tests that do not start FreeCAD examine input contracts, the sequence that starts the test, result checks and cleanup.
+Their results give no evidence from FreeCAD with or without the display.
+
+Independent review finds two fixture defects before the tests start on GitHub.
+The tools must reject incorrect numbers in reports without `OverflowError`.
+The display fixture must set the selection before it checks whether that selection stays the same.
+The corrections keep the initial `assert` statements and results with `FAIL`.
+The controls stop input movement to GitHub and these FreeCAD tests until independent review gives evidence for the necessary rights state.
 
 The full FreeCAD test keeps its 4 GiB memory limit and 7200-second time limit.
 The separate display keeps its 256 MiB memory limit and 7300-second time limit.
-The initial host reserve stays 8 GiB.
-CPU, task, swap, cleanup and independent review controls do not change.
-The shorter limits for `readiness` stay unchanged.
+Before each test starts, the available memory must be a minimum of 8 GiB.
+The `cpu_percent`, `tasks_max`, `memory.swap.max`, cleanup and independent review controls do not change.
+The shorter limits for `readiness` do not change.
 
 Phase 9B stays `Open` at 3/6.
 LMS work stays stopped.
-The historical 2/2 record and documentation limits stay unchanged.
-This preparation gives no acceptance for physical fit, rights, production, a phase exit or Phase 10.
+The previous 2/2 record and documentation limits do not change.
+The prepared tests give no acceptance for physical fit, the rights state, production, a phase exit or Phase 10.
