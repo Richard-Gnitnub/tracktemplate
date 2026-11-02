@@ -228,6 +228,15 @@ class SourceConsumerTests(unittest.TestCase):
 
         source_a = host(self.module)
         source_b = host(self.module, offset=50.0, name="HostB")
+        self.document.Objects = (source_a, source_b)
+        source_a.Document = self.document
+        source_b.Document = self.document
+        preflight = CrossoverPreflightAdapter(
+            self.module, None, None, None, None, None, None,
+        )
+        request = {
+            "doc": self.document, "host_a": source_a, "host_b": source_b,
+        }
         for size, ratio in (("B", 8.0), ("C", 9.25)):
             spec = self.spec_type(size, ratio)
             result = self.adapter.crossover(
@@ -243,7 +252,7 @@ class SourceConsumerTests(unittest.TestCase):
             # The actual retained commit preflight rejects this payload
             # before using any cached geometry or changing a document.
             with self.assertRaisesRegex(ValueError, "preflight is invalid"):
-                CrossoverPreflightAdapter._checked_result(None, {}, result)
+                preflight._checked_result(request, result)
         with self.assertRaisesRegex(ValueError, "different centrelines"):
             self.adapter.crossover(self.document, source_a, source_a, 2000.0,
                                    self.spec_type("C", 10))
