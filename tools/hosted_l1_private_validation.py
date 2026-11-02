@@ -57,6 +57,615 @@ CONTROL_FILES = (
 )
 
 
+TO_INPUT_HASHES = {
+    "catalogue": "f1016a97f35cc87cca9e0b9f09e70ea1cec4620c43d9451430dfb299eed6b885",
+    "inventory": "df8c942b3cf74508e45b8ab220c17db53912da7857109f656cda3d5f81236e93",
+    "context_recipes": "e484b241fb8edc435b12a162f5eec99ba6c3a3f36100d47fb624fd07956e90a9",
+    "supplemental_recipes": "fad0ddaa24eb582f9c669cc5dce9f7b68e0df66719466a3f5c1208f74132335f",
+    "l1_model": "a0289c046b6ae8cb1e2df88a8f6a1f3f0dc79f7a0ae1870d0b3b13154e0eb042",
+    "validation_receipt": "a91d7e9bc8f74e07a5ce8afdbe3f96c018504a40b7e6f13fa259c5c366ac24ad",
+    "execution_receipt": "77967d8ee640c8aab3a2ec47d2664cf075e1d87328dff0fc1f858ab1c1ed5661",
+    "build_receipt": "b3a5d11827ade1c961219efd50488aaf46fa14ca449059fd22f371e1e71b9a65",
+    "s1_model": "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb",
+    "to_base_fixture": "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+}
+TO_INPUT_BYTES = {
+    "catalogue": 189151,
+    "inventory": 6820,
+    "context_recipes": 776816,
+    "supplemental_recipes": 305266,
+    "l1_model": 166364,
+    "validation_receipt": 26770,
+    "execution_receipt": 1854,
+    "build_receipt": 165460,
+    "s1_model": 150989,
+    "to_base_fixture": 636344,
+}
+
+TO_SCOPE = "TO-001-fixed-single-rail-native-v1"
+TO_ENTRY = "tests/freecad_validate_to_single_rail.py"
+TO_ENTRY_SHA256 = (
+    "6288286b9b7c45ec26df4cf3d2b891ae59548bab4cc5b3ab92a103fa54d627c0"
+)
+TO_FIXTURE_SHA256 = (
+    "407040d01dd0f9c8ac275d7e4d40c928ea32a5da0a05c853bf3a1de4221a8d4b"
+)
+TO_CONTROL_FILES = (
+    *CONTROL_FILES,
+    TO_ENTRY,
+    "tests/fixtures/phase9b-to-single-rail-frames.json",
+    "tests/validate_to_single_rail_native_entry.py",
+    "tests/validate_hosted_l1_private_validation.py",
+    "tests/validate_l1_private_payload.py",
+)
+TO_SENTINELS = {
+    "readiness": "Fixed TO single-rail hosted readiness passed",
+    "native": "Fixed TO single-rail hosted native validation passed",
+}
+TO_SELECTORS = {
+    "readiness": "freecad_validate_to_single_rail.ToSingleRail.test_readiness",
+    "native": "freecad_validate_to_single_rail.ToSingleRail.test_fixed_twelve",
+}
+TO_COPY_NAMES = ("L1-copy.FCStd", "S1-copy.FCStd", "TO-001-copy.FCStd")
+
+
+def selected_workload(environ=None):
+    """Select the fixed TO workload or the unchanged default L1 proof."""
+    environ = os.environ if environ is None else environ
+    value = environ.get("TRACKTEMPLATE_NATIVE_WORKLOAD", "l1")
+    require(value in ("l1", "to-single"), "Unsupported native workload")
+    return value
+
+
+def to_expected_checks(stage):
+    """Return the frozen entry's independently reviewed exact counters."""
+    require(stage in TO_SELECTORS, "Unsupported TO stage")
+    values = dict(
+        binding_checks=1,
+        catalogue_contracts=2,
+        source_frame_inputs=59,
+        comparator_negative_controls=8,
+        source_frame_comparisons=0,
+        component_comparisons=0,
+        successful_components=0,
+        rolled_back_components=0,
+        wrong_frame_rejections=0,
+        preview_undo_redo=0,
+    )
+    if stage == "native":
+        values.update(
+            source_frame_comparisons=59,
+            component_comparisons=270,
+            successful_components=270,
+            rolled_back_components=270,
+            wrong_frame_rejections=2,
+            preview_undo_redo=1,
+        )
+    return values
+
+
+def validate_to_acquisition(control):
+    """Require the exact source/input/publication review before transfer."""
+    require(
+        control.get("scope_id") == TO_SCOPE
+        and control.get("entry_sha256") == TO_ENTRY_SHA256
+        and isinstance(control.get("source_commit"), str)
+        and re.fullmatch(r"[0-9a-f]{40}", control["source_commit"])
+        and control.get("input_hashes") == TO_INPUT_HASHES
+        and isinstance(control.get("handling_decision"), str)
+        and control["handling_decision"].strip(),
+        "TO acquisition differs",
+    )
+    review = control.get("publication_review", {})
+    require(
+        isinstance(review, dict)
+        and review.get("status") == review.get("independent_review") == "PASS"
+        and review.get("input_hashes") == TO_INPUT_HASHES
+        and review.get("handling_decision") == control["handling_decision"]
+        and isinstance(review.get("evidence_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", review["evidence_sha256"])
+        and review["evidence_sha256"] != "0" * 64
+        and isinstance(review.get("publication_basis"), str)
+        and review["publication_basis"].strip(),
+        "Exact TO input publication review absent",
+    )
+
+
+def validate_to_inputs(config, manifest):
+    """Bind all ten input bytes and destinations before deployment."""
+    rows = config.get("inputs")
+    require(
+        type(rows) is list
+        and len(rows) == 10
+        and all(
+            type(row) is dict
+            and set(row)
+            == {
+                "id",
+                "path",
+                "sha256",
+                "bytes",
+            }
+            for row in rows
+        ),
+        "TO input records differ",
+    )
+    require(
+        {row["id"]: row["sha256"] for row in rows} == TO_INPUT_HASHES
+        and len({row["path"] for row in rows}) == 10
+        and all(
+            type(row["bytes"]) is int
+            and row["bytes"] == TO_INPUT_BYTES[row["id"]]
+            for row in rows
+        ),
+        "TO input profile differs",
+    )
+    validate_input_map(config, manifest)
+    for row in rows:
+        destination = Path(row["path"])
+        require(
+            destination.is_absolute()
+            and destination.is_relative_to(DEPLOYMENT_ROOT)
+            and ".." not in destination.parts,
+            "TO input destination differs",
+        )
+
+
+def prepare_to(stage, work):
+    """Bind the current main checkout and reviewed TO control record."""
+    require(os.getuid() != 0 and not sys.flags.optimize, "Unsafe interpreter")
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    admission = validate_host(os.environ, Path("/proc/meminfo").read_text())
+    control = json.loads(os.environ["L1_PRIVATE_CONTROL"])
+    validate_to_acquisition(control)
+    require(
+        control.get("stage") == stage
+        and control.get("workload") == "to-single"
+        and control.get("workflow_commit")
+        == control["source_commit"]
+        == os.environ["GITHUB_SHA"]
+        == command("git", "rev-parse", "HEAD")
+        and control.get("independent_review") == "PASS"
+        and control.get("dispatch_nonce"),
+        "Reviewed TO source differs",
+    )
+    access = control.get("access_review", {})
+    require(
+        access.get("status") == "PASS"
+        and access.get("audited_at_utc")
+        and access.get("owner") == "Richard-Gnitnub"
+        and access.get("environment") == "l1-private-validation"
+        and access.get("branches") == ["main"]
+        and access.get("tags") == []
+        and access.get("input_repository") == INPUT_REPOSITORY
+        and access.get("repository_public") is True,
+        "TO access review absent",
+    )
+    require(
+        set(control["control_files_sha256"]) == set(TO_CONTROL_FILES),
+        "TO control bindings incomplete",
+    )
+    for relative, expected in control["control_files_sha256"].items():
+        require(
+            digest(ROOT / relative) == expected, "TO control source changed"
+        )
+    require(
+        digest(ROOT / TO_ENTRY) == TO_ENTRY_SHA256
+        and digest(ROOT / "tools/freecad_validation_guard.py")
+        == original.GUARD_SHA256
+        and not command(
+            "git", "status", "--porcelain", "--untracked-files=no"
+        ),
+        "Dirty or changed TO source",
+    )
+    write(work / "control.json", control)
+    write(work / "evidence/admission.json", admission)
+
+
+def acquire_to(stage, work, *, source_root=ROOT, control=None):
+    """Acquire one reviewed TO profile for the native or GUI coordinator.
+
+    The caller supplies a native acquisition record after its own scope
+    checks. Runtime working documents remain outside public evidence.
+    """
+    require(stage in TO_SELECTORS, "Unsupported TO stage")
+    if control is None:
+        control = json.loads((work / "control.json").read_text())
+    validate_to_acquisition(control)
+    validate_host(os.environ, Path("/proc/meminfo").read_text())
+    require(
+        control["source_commit"]
+        == os.environ.get("GITHUB_SHA")
+        == command("git", "rev-parse", "HEAD", cwd=source_root)
+        and digest(source_root / TO_ENTRY) == TO_ENTRY_SHA256,
+        "TO acquisition source changed",
+    )
+    validate_input_repository()
+    download_asset(control["input_archive"], work / "inputs.tar")
+    manifest = payload.read_manifest(work / "inputs.tar", profile="to-single")
+    extracted = payload.extract_archive(
+        work / "inputs.tar", manifest, work / "unpacked", profile="to-single"
+    )
+    config = json.loads(extracted["run-config"].read_text())
+    require(
+        type(config) is dict
+        and set(config)
+        == {
+            "schema_version",
+            "scope_id",
+            "source_commit",
+            "entry_sha256",
+            "handling_decision",
+            "inputs",
+        }
+        and type(config["schema_version"]) is int
+        and config["schema_version"] == 1
+        and all(
+            config[key] == control[key]
+            for key in (
+                "scope_id",
+                "source_commit",
+                "entry_sha256",
+                "handling_decision",
+            )
+        ),
+        "TO archive configuration differs",
+    )
+    validate_to_inputs(config, manifest)
+    recovery = extracted["recovery"]
+    record = json.loads(recovery.read_text())
+    require(
+        record.get("status") == record.get("independent_review") == "PASS"
+        and record.get("checkpoint_commit") == config["source_commit"]
+        and record.get("input_hashes") == TO_INPUT_HASHES,
+        "TO recovery readiness absent",
+    )
+    # Check all targets before the first deployed byte; never rewrite paths.
+    require(
+        DEPLOYMENT_ROOT.is_dir()
+        and DEPLOYMENT_ROOT.resolve() == DEPLOYMENT_ROOT
+        and DEPLOYMENT_ROOT.stat().st_uid == os.getuid(),
+        "TO deployment root unavailable",
+    )
+    targets = [Path(row["path"]) for row in config["inputs"]]
+    for target in targets:
+        require(
+            not target.exists()
+            and not any(p.is_symlink() for p in (target, *target.parents)),
+            "Unsafe or occupied TO destination",
+        )
+    working = work / "test-data"
+    evidence = work / "evidence/native"
+    require(
+        not any(p.exists() or p.is_symlink() for p in (working, evidence)),
+        "TO runtime directory already exists",
+    )
+    for directory in (working, evidence):
+        require(
+            not any(p.is_symlink() for p in directory.parents),
+            "Linked TO runtime directory",
+        )
+        directory.mkdir(mode=0o700)
+    for index, row in enumerate(config["inputs"], 1):
+        destination = Path(row["path"])
+        destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        with (
+            extracted[row["id"]].open("rb") as source,
+            destination.open("xb") as target,
+        ):
+            shutil.copyfileobj(source, target)
+        destination.chmod(0o400)
+        write(
+            work / f"evidence/deployed-{index:02d}.json",
+            {"path": str(destination), "sha256": row["sha256"]},
+        )
+    config.update(
+        stage=stage,
+        working_directory=str(working),
+        evidence_directory=str(evidence),
+        recovery={
+            "path": str(recovery),
+            "sha256": digest(recovery),
+            "bytes": recovery.stat().st_size,
+        },
+    )
+    write(work / "run-config.json", config)
+    write(work / "evidence/run-config.json", config)
+    write(work / "evidence/private-control.json", control)
+    write(work / "evidence/input-manifest.json", manifest)
+    shutil.copyfile(recovery, work / "evidence/recovery.json")
+    if "readiness-review" in extracted:
+        shutil.copyfile(
+            extracted["readiness-review"],
+            work / "evidence/readiness-review.json",
+        )
+    return config
+
+
+def validate_to_receipt(stage, receipt, config):
+    """Validate the whole success shape, including each exact counter."""
+    expected = {
+        "status": "PASS",
+        "stage": stage,
+        "scope_id": TO_SCOPE,
+        "test_id": TO_SELECTORS[stage],
+        "source_commit": config["source_commit"],
+        "fixture_sha256": TO_FIXTURE_SHA256,
+        "physical_fit": "NOT_PROVED",
+        "input_sha256": TO_INPUT_HASHES,
+        "input_bindings_unchanged": True,
+        "remaining_documents": 0,
+        "owned_documents_closed": True,
+        "sentinel": TO_SENTINELS[stage],
+    }
+    fields = {*expected, "checks", "stage_timings"}
+    if stage == "native":
+        fields.update(
+            (
+                "preview_disposal_preserves_source_and_foreign",
+                "component_comparisons",
+            )
+        )
+        require(
+            receipt.get("preview_disposal_preserves_source_and_foreign")
+            is True,
+            "TO preview disposal unproved",
+        )
+        validate_to_comparisons(receipt.get("component_comparisons"))
+    require(
+        type(receipt) is dict
+        and set(receipt) == fields
+        and all(
+            type(receipt[key]) is type(value) and receipt[key] == value
+            for key, value in expected.items()
+        ),
+        "TO receipt differs",
+    )
+    checks = receipt["checks"]
+    require(
+        type(checks) is dict
+        and checks == to_expected_checks(stage)
+        and all(type(value) is int for value in checks.values()),
+        "TO exact counters differ",
+    )
+    times = receipt["stage_timings"]
+    names = {"readiness_seconds", "cleanup_seconds", "total_seconds"}
+    if stage == "native":
+        names.add("native_seconds")
+    require(
+        type(times) is dict
+        and set(times) == names
+        and all(
+            type(value) in (int, float)
+            and 0 <= value <= limits(stage).timeout_seconds
+            for value in times.values()
+        ),
+        "TO timing differs",
+    )
+
+
+def validate_to_comparisons(records):
+    """Require every frozen assembly/component pair and comparator result."""
+    fixture_path = ROOT / "tests/fixtures/phase9b-to-single-rail-frames.json"
+    require(
+        digest(fixture_path) == TO_FIXTURE_SHA256, "TO frame fixture changed"
+    )
+    positions = json.loads(fixture_path.read_text())["positions"]
+    expected = []
+    for family, bodies, fixings in (("L1", 7, 16), ("S1", 5, 12)):
+        names = [f"Part_{index:02d}" for index in range(bodies)]
+        names += ["SourceFixing"] + [
+            f"SourceFixing{index:03d}" for index in range(1, fixings)
+        ]
+        expected.extend(
+            (row["position_id"], name)
+            for name in names
+            for row in positions
+            if row["family"] == family
+        )
+    require(
+        type(records) is list and len(records) == len(expected) == 270,
+        "TO component evidence incomplete",
+    )
+    for record, identity in zip(records, expected):
+        require(
+            type(record) is dict
+            and set(record)
+            == {
+                "position_id",
+                "component",
+                "counts",
+                "vertex_residual_mm",
+            }
+            and (record["position_id"], record["component"]) == identity,
+            "TO component evidence identity differs",
+        )
+        counts, residual = record["counts"], record["vertex_residual_mm"]
+        # Same EPSILON_MM as the unchanged source-bound native comparator.
+        require(
+            type(counts) is list
+            and len(counts) == 6
+            and all(type(value) is int and value >= 0 for value in counts)
+            and type(residual) in (int, float)
+            and 0 <= residual <= 1.0e-7,
+            "TO component comparison differs",
+        )
+
+
+def validate_to_readiness(review, config, current_run, control):
+    """Require a separately preserved, exact-source TO readiness PASS."""
+    require(
+        set(control["control_files_sha256"]) == set(TO_CONTROL_FILES),
+        "TO readiness control bindings incomplete",
+    )
+    expected = {
+        "status": "PASS",
+        "independent_review": "PASS",
+        "source_commit": config["source_commit"],
+        "entry_sha256": TO_ENTRY_SHA256,
+        "scope_id": TO_SCOPE,
+        "workload": "to-single",
+        "handling_decision": config["handling_decision"],
+        "workflow_commit": control["workflow_commit"],
+        "control_files_sha256": control["control_files_sha256"],
+        "run_attempt": 1,
+        "tests": 1,
+        "skips": 0,
+        "failures": 0,
+        "errors": 0,
+        "sentinel": TO_SENTINELS["readiness"],
+        "cleanup": True,
+        "evidence_verified": True,
+        "independent_preservation": True,
+        "input_hashes": TO_INPUT_HASHES,
+        "checks": to_expected_checks("readiness"),
+    }
+    require(
+        all(
+            type(review.get(key)) is type(value) and review[key] == value
+            for key, value in expected.items()
+        )
+        and all(type(value) is int for value in review["checks"].values()),
+        "TO readiness review differs",
+    )
+    require(
+        type(review.get("run_id")) is int
+        and review["run_id"] > 0
+        and str(review["run_id"]) != current_run
+        and isinstance(review.get("evidence_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", review["evidence_sha256"])
+        and review["evidence_sha256"] != "0" * 64,
+        "Separate TO readiness evidence absent",
+    )
+
+
+def to_profile_exclusion(work):
+    """Keep the guard-owned private profile out of every public archive."""
+    root = work / "evidence/guard/profile"
+    if not root.exists() and not root.is_symlink():
+        return None
+    require(
+        not any(p.is_symlink() for p in (root, *root.parents))
+        and root.is_dir(),
+        "Linked TO profile refused",
+    )
+    record_path = root.parent / "result.json"
+    require(
+        not record_path.is_symlink() and record_path.is_file(),
+        "TO profile ownership receipt absent",
+    )
+    profile = json.loads(record_path.read_text()).get("private_profile", {})
+    directories = {
+        "FREECAD_USER_HOME": "user-home",
+        "FREECAD_USER_DATA": "user-data",
+        "FREECAD_USER_TEMP": "temp",
+        "XDG_CACHE_HOME": "xdg-cache",
+        "XDG_CONFIG_HOME": "xdg-config",
+        "XDG_DATA_HOME": "xdg-data",
+        "PYTHONPYCACHEPREFIX": "python-cache",
+    }
+    environment = {
+        key: str(root / value) for key, value in directories.items()
+    }
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    require(
+        profile.get("path") == str(root)
+        and profile.get("environment") == environment
+        and set(p.name for p in root.iterdir())
+        <= {*directories.values(), "user.cfg", "system.cfg"}
+        and all((root / name).is_dir() for name in directories.values()),
+        "TO guard profile differs",
+    )
+    inventory, total = {}, 0
+    for path in (root, *sorted(root.rglob("*"))):
+        require(
+            not path.is_symlink()
+            and path.stat().st_uid == os.getuid()
+            and (path.is_dir() or path.is_file()),
+            "Foreign or linked TO profile member",
+        )
+        name = path.relative_to(root).as_posix()
+        require(
+            name not in ("user.cfg", "system.cfg") or path.is_file(),
+            "TO profile configuration is not a file",
+        )
+        inventory[name] = (
+            {"sha256": digest(path), "bytes": path.stat().st_size}
+            if path.is_file()
+            else {"directory": True}
+        )
+        if path.is_file():
+            total += path.stat().st_size
+    return {
+        "member": "guard/profile",
+        "bytes": total,
+        "sha256": hashlib.sha256(
+            json.dumps(
+                inventory,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest(),
+        "reason": "private-runtime-state",
+    }
+
+
+def validate_to_evidence_name(name):
+    """Admit only existing native diagnostic producers, never input media."""
+    roots = {
+        "prepare.log",
+        "install.log",
+        "acquisition.log",
+        "execution.log",
+        "finalizer.log",
+        "seal.log",
+        "publication.log",
+        "admission.json",
+        "run-config.json",
+        "private-control.json",
+        "input-manifest.json",
+        "recovery.json",
+        "readiness-review.json",
+        "host.jsonl",
+        "assessment.json",
+        "clearance.json",
+        "deadline-clearance.json",
+        "emergency-cleanup.json",
+        "process-finalization.json",
+        "finalization.json",
+        "publication.json",
+    }
+    roots.update(f"deployed-{index:02d}.json" for index in range(1, 11))
+    groups = {
+        "native": {"result.json"},
+        "guard": {
+            "control.json",
+            "result.json",
+            "ownership.json",
+            "measurements.jsonl",
+            "stdout",
+            "stderr",
+            "wrapper.stdout",
+            "watchdog.json",
+            "shutdown-request.json",
+        },
+        "finalizer-clearance": {"clearance.json", "deadline-clearance.json"},
+    }
+    parts = Path(name).parts
+    require(
+        name in roots
+        or len(parts) == 2
+        and parts[0] in groups
+        and parts[1] in groups[parts[0]],
+        "Unknown TO evidence file refused",
+    )
+
+
+def cleanup_to_staging(work, preserved):
+    """Remove only owned TO staging after verified primary readback."""
+    return cleanup_staging(work, preserved, profile="to-single")
+
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
@@ -94,7 +703,7 @@ def validate_host(environ, memory):
     return original.validate_admission(environ, memory)
 
 
-def child_environment(environ, config, sha256):
+def child_environment(environ, config, sha256, *, workload="l1"):
     """Construct an allowlist; no tokens, secrets or caller import paths."""
     result = {key: environ[key] for key in (
         'HOME', 'PATH', 'LANG', 'LC_ALL', 'USER', 'LOGNAME',
@@ -104,6 +713,15 @@ def child_environment(environ, config, sha256):
     result.update(TRACKTEMPLATE_L1_RUN_CONFIG=str(config),
                   TRACKTEMPLATE_L1_RUN_CONFIG_SHA256=sha256,
                   OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
+    if workload == 'to-single':
+        result.pop('TRACKTEMPLATE_L1_RUN_CONFIG')
+        result.pop('TRACKTEMPLATE_L1_RUN_CONFIG_SHA256')
+        result.update(TRACKTEMPLATE_TO_RUN_CONFIG=str(config),
+                      TRACKTEMPLATE_TO_RUN_CONFIG_SHA256=sha256)
+        for key in ('GITHUB_SHA', 'GITHUB_RUN_ATTEMPT', 'RUNNER_ENVIRONMENT'):
+            result[key] = environ[key]
+    else:
+        require(workload == 'l1', 'Unsupported native workload')
     return result
 
 
@@ -132,10 +750,11 @@ def validate_readiness(review, config, current_run, control):
             'Reviewed evidence identity absent')
 
 
-def qualified_runtime(stdout):
+def qualified_runtime(stdout, *, workload="l1"):
+    selectors = TO_SELECTORS if workload == 'to-single' else SELECTORS
     prefix = 'TRACKTEMPLATE_B16_FOUNDATION='
     frames = [prefix, *(f'{selector.rsplit(".", 1)[1]} ({selector}) ... {prefix}'
-                        for selector in SELECTORS.values())]
+                        for selector in selectors.values())]
     lines = [line[len(frame):] for line in stdout.splitlines()
              for frame in frames if line.startswith(frame)]
     require(stdout.count(prefix) == 1 and len(lines) == 1,
@@ -149,16 +768,17 @@ def qualified_runtime(stdout):
             'Qualified native foundation unproved')
 
 
-def assess(stage, result, stdout, stderr, samples, clearance):
+def assess(stage, result, stdout, stderr, samples, clearance, *, workload="l1"):
     """Reuse the pilot's unchanged resource/count/cleanup assessment.
 
     Only the authorised entry's runtime record, sentinel and fixed deadline
     differ. Raw evidence and resource assertions are not rewritten.
     """
+    sentinels = TO_SENTINELS if workload == 'to-single' else SENTINELS
     with ExitStack() as stack:
         for name, value in (
-            ('LIMITS', limits(stage)), ('GEOMETRY_SENTINEL', SENTINELS[stage]),
-            ('_qualified_runtime', qualified_runtime),
+            ('LIMITS', limits(stage)), ('GEOMETRY_SENTINEL', sentinels[stage]),
+            ('_qualified_runtime', lambda text: qualified_runtime(text, workload=workload)),
         ):
             stack.enter_context(patch.object(original, name, value))
         return original.assess_result(
@@ -200,6 +820,8 @@ def command(*args, cwd=ROOT):
 
 def prepare(stage, work):
     """Validate reviewed code and public-input scope before acquisition."""
+    if selected_workload() == 'to-single':
+        return prepare_to(stage, work)
     require(os.getuid() != 0 and not sys.flags.optimize, 'Unsafe interpreter')
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     admission = validate_host(os.environ, Path('/proc/meminfo').read_text())
@@ -365,6 +987,8 @@ def emergency_cleanup(work, owner, context=None):
 
 
 def acquire(stage, work):
+    if selected_workload() == 'to-single':
+        return acquire_to(stage, work)
     control = json.loads((work / 'control.json').read_text())
     validate_host(os.environ, Path('/proc/meminfo').read_text())
     validate_input_repository()
@@ -425,6 +1049,9 @@ def acquire(stage, work):
 
 
 def run(stage, work):
+    workload = selected_workload()
+    source_root = ROOT if workload == 'to-single' else ROOT / 'candidate'
+    selectors = TO_SELECTORS if workload == 'to-single' else SELECTORS
     control = json.loads((work / 'control.json').read_text())
     validate_host(os.environ, Path('/proc/meminfo').read_text())
     require_finalization_time(stage, os.environ, time.time())
@@ -437,8 +1064,9 @@ def run(stage, work):
     configuration = work / 'run-config.json'
     config = json.loads(configuration.read_text())
     if stage == 'native':
-        validate_readiness(json.loads((work / 'unpacked/control/readiness-review.json').read_text()),
-                           config, os.environ['GITHUB_RUN_ID'], control)
+        validator = validate_to_readiness if workload == 'to-single' else validate_readiness
+        validator(json.loads((work / 'unpacked/control/readiness-review.json').read_text()),
+                  config, os.environ['GITHUB_RUN_ID'], control)
     samples = []
 
     def observe():
@@ -462,16 +1090,20 @@ def run(stage, work):
 
     observe()
     started = time.monotonic()
-    clean = child_environment(os.environ, configuration, digest(configuration))
+    clean = child_environment(os.environ, configuration, digest(configuration),
+                              workload=workload)
     argv = ['flatpak', 'run', '--command=FreeCADCmd',
             '--env=OMP_NUM_THREADS=1', '--env=OPENBLAS_NUM_THREADS=1']
-    for name in ('TRACKTEMPLATE_L1_RUN_CONFIG', 'TRACKTEMPLATE_L1_RUN_CONFIG_SHA256',
-                 'GITHUB_ACTIONS', 'GITHUB_RUN_ID'):
+    names = (('TRACKTEMPLATE_TO_RUN_CONFIG', 'TRACKTEMPLATE_TO_RUN_CONFIG_SHA256',
+              'GITHUB_SHA', 'GITHUB_RUN_ATTEMPT', 'RUNNER_ENVIRONMENT')
+             if workload == 'to-single' else
+             ('TRACKTEMPLATE_L1_RUN_CONFIG', 'TRACKTEMPLATE_L1_RUN_CONFIG_SHA256'))
+    for name in (*names, 'GITHUB_ACTIONS', 'GITHUB_RUN_ID'):
         argv.append(f'--env={name}={clean[name]}')
-    argv += [guard.APP_ID, '-P', str(ROOT / 'candidate/tests'), '-t', SELECTORS[stage]]
+    argv += [guard.APP_ID, '-P', str(source_root / 'tests'), '-t', selectors[stage]]
     result = guard.run_guarded_flatpak(
         argv, limits=limits(stage), evidence_dir=work / 'evidence/guard',
-        context=guard.GuardContext(sleep=sleep), cwd=ROOT / 'candidate',
+        context=guard.GuardContext(sleep=sleep), cwd=source_root,
         env=clean, isolate_profile=True,
     )
     observe()
@@ -482,14 +1114,19 @@ def run(stage, work):
     owned = [json.loads(line) for line in (guard_dir / 'measurements.jsonl').read_text().splitlines()]
     assessment = assess(stage, result, (guard_dir / 'stdout').read_text(),
                         (guard_dir / 'stderr').read_text(), owned,
-                        deadline_clear and flatpak_clear)
+                        deadline_clear and flatpak_clear, workload=workload)
     assessment['elapsed_seconds'] = time.monotonic() - started
     assessment['initial_mem_available_bytes'] = samples[0].get('MemAvailable', 0)
     if any('error' in row for row in samples):
         assessment.update(status='FAIL', classification='EVIDENCE_INCOMPLETE')
-    receipt = json.loads((work / f'evidence/native/{stage}/result.json').read_text())
+    receipt_path = (work / 'evidence/native/result.json' if workload == 'to-single'
+                    else work / f'evidence/native/{stage}/result.json')
+    receipt = json.loads(receipt_path.read_text())
     try:
-        validate_native_receipt(stage, receipt)
+        if workload == 'to-single':
+            validate_to_receipt(stage, receipt, config)
+        else:
+            validate_native_receipt(stage, receipt)
     except (KeyError, TypeError, ValueError):
         assessment.update(status='FAIL', classification='EVIDENCE_INCOMPLETE')
     assessment['native_receipt'] = receipt
@@ -507,14 +1144,23 @@ def evidence_archive(work, destination, *, late=False):
     config = json.loads(config_path.read_text()) if config_path.exists() else {}
     input_hashes = {row['sha256'] for row in config.get('inputs', [])}
     records, excluded = {}, []
+    to_profile = selected_workload() == 'to-single'
+    if to_profile:
+        exclusion = to_profile_exclusion(work)
+        if exclusion is not None:
+            excluded.append(exclusion)
     selected = ([work / 'evidence/publication.json', work / 'evidence/publication.log',
                  work / 'evidence/finalization.json']
                 if late else sorted((work / 'evidence').rglob('*')))
     with tarfile.open(partial, 'x') as archive:
         for path in selected:
             require(not path.is_symlink(), 'Linked evidence refused')
+            if to_profile and path.is_relative_to(work / 'evidence/guard/profile'):
+                continue
             if path.is_file():
                 name = path.relative_to(work / 'evidence').as_posix()
+                if to_profile:
+                    validate_to_evidence_name(name)
                 identity = {'sha256': digest(path), 'bytes': path.stat().st_size}
                 if name in ('native/native/L1-copy.FCStd',
                             'native/native/XO-001-copy.FCStd') or identity['sha256'] in input_hashes:
@@ -572,7 +1218,7 @@ def finalize(stage, work, public):
     return 0 if not errors else 1
 
 
-def cleanup_staging(work, preserved):
+def cleanup_staging(work, preserved, *, profile="l1"):
     """Remove exact owned plaintext staging only after primary readback.
 
     This proves file absence, not secure erasure. Controls and diagnostic
@@ -589,11 +1235,26 @@ def cleanup_staging(work, preserved):
     result['errors'] = list(process.get('errors', []))
     targets = [(work / 'inputs.tar', None, False)]
     targets.extend((work / 'unpacked/inputs' / name, None, False)
-                   for name in payload.INPUT_IDS)
-    targets.extend((work / 'evidence/native/native' / name, None, False)
-                   for name in ('L1-copy.FCStd', 'XO-001-copy.FCStd'))
+                   for name in payload.input_ids(profile))
+    if profile == 'to-single':
+        targets.extend((work / 'test-data' / name, None, False)
+                       for name in TO_COPY_NAMES)
+    else:
+        targets.extend((work / 'evidence/native/native' / name, None, False)
+                       for name in ('L1-copy.FCStd', 'XO-001-copy.FCStd'))
     try:
         require(process.get('cleanup') is True, 'Process cleanup not proved')
+        if profile == 'to-single':
+            directory = work / 'test-data'
+            require(not any(p.is_symlink() for p in (directory, *directory.parents)),
+                    'Linked TO working directory')
+            if directory.exists():
+                require(directory.is_dir() and directory.stat().st_uid == os.getuid()
+                        and set(p.name for p in directory.iterdir()) <= set(TO_COPY_NAMES)
+                        and all(p.is_file() and not p.is_symlink()
+                                and p.stat().st_uid == os.getuid()
+                                for p in directory.iterdir()),
+                        'Unknown or linked TO working copy')
         for index in range(1, 11):
             receipt_path = work / f'evidence/deployed-{index:02d}.json'
             if not receipt_path.exists():
@@ -628,6 +1289,12 @@ def cleanup_staging(work, preserved):
                 result['staging_absence_verified'].append(str(path))
             except (OSError, ValueError, KeyError):
                 result['errors'].append(traceback.format_exc())
+    if profile == 'to-single':
+        result['working_copies_absent'] = not any(
+            p.exists() or p.is_symlink()
+            for p in (work / 'test-data' / name for name in TO_COPY_NAMES))
+        if result['errors']:
+            result['working_copies_absent'] = False
     result['cleanup'] = process.get('cleanup') is True and not result['errors']
     write(work / 'evidence/finalization.json', result)
     return result
@@ -685,6 +1352,8 @@ def public_summary(stage, work, evidence, publication_complete):
     passed = (assessment.get('status') == 'PASS' and cleanup
               and len(final.get('staging_inputs_removed', [])) == 10
               and publication_complete)
+    if selected_workload() == 'to-single':
+        passed = passed and final.get('working_copies_absent') is True
     summary = {
         'schema': 1, 'source_commit': CANDIDATE,
         'workflow_commit': os.environ['GITHUB_SHA'],
@@ -711,7 +1380,18 @@ def public_summary(stage, work, evidence, publication_complete):
                       'tasks_peak': assessment.get('peak_tasks_observed', 0)},
         'evidence': evidence,
     }
-    return payload.validate_public_summary(summary)
+    if selected_workload() == 'to-single':
+        summary.update(workload='to-single', source_commit=os.environ['GITHUB_SHA'])
+        checks = receipt.get('checks', {})
+        summary['counts'].update(
+            expected_frames=59 if stage == 'native' else 0,
+            observed_frames=checks.get('source_frame_comparisons', 0),
+            expected_components=270 if stage == 'native' else 0,
+            observed_components=checks.get('component_comparisons', 0),
+            successful_components=checks.get('successful_components', 0),
+            rolled_back_components=checks.get('rolled_back_components', 0))
+        summary['flags']['sentinel'] = receipt.get('sentinel') == TO_SENTINELS[stage]
+    return payload.validate_public_summary(summary, profile=selected_workload())
 
 
 def seal(work):
@@ -736,7 +1416,7 @@ def publish(stage, work, public):
             os.environ.get('L1_PRIMARY_ID', ''),
         )
         publication['primary'] = evidence
-        cleanup = cleanup_staging(work, evidence)
+        cleanup = cleanup_staging(work, evidence, profile=selected_workload())
         require(cleanup['cleanup'], 'Plaintext staging cleanup incomplete')
     except (OSError, ValueError, KeyError, TypeError):
         publication['errors'].append(traceback.format_exc())
@@ -793,7 +1473,7 @@ def main():
     elif operation == 'finish':
         try:
             summary = json.loads((public / 'summary.json').read_text())
-            payload.validate_public_summary(summary)
+            payload.validate_public_summary(summary, profile=selected_workload())
             return 0 if summary['outcome'] == 'PASS' and os.environ.get('L1_SUMMARY_UPLOAD') == 'success' else 1
         except (OSError, ValueError, KeyError):
             return 1

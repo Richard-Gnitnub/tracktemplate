@@ -392,5 +392,69 @@ class SymmetricHomeCleanupTests(unittest.TestCase):
             read_stat.assert_called_once()
 
 
+
+
+class ToPayloadTests(unittest.TestCase):
+    def test_explicit_profile_is_exact_not_union_or_manifest_selected(self):
+        self.assertEqual(payload.input_ids(), payload.INPUT_IDS)
+        self.assertEqual(
+            payload.input_ids("to-single"),
+            (*payload.INPUT_IDS[:8], "s1_model", "to_base_fixture"),
+        )
+        with self.assertRaises(payload.PayloadError):
+            payload.input_ids("arbitrary")
+        with self.assertRaises(payload.PayloadError):
+            payload.member_name("inputs", "s1_model")
+        with self.assertRaises(payload.PayloadError):
+            payload.member_name(
+                "inputs", "reference_document", profile="to-single"
+            )
+
+    def test_to_profile_roundtrip_and_cross_profile_refusal(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = {"schema": 1, "inputs": [], "controls": []}
+            for group, names in (
+                ("inputs", payload.input_ids("to-single")),
+                ("controls", payload.REQUIRED_CONTROLS),
+            ):
+                for name in names:
+                    path = root / name
+                    path.write_text(name)
+                    manifest[group].append(
+                        {
+                            "id": name,
+                            "member": payload.member_name(
+                                group, name, profile="to-single"
+                            ),
+                            "path": str(path),
+                            **payload.file_identity(path),
+                        }
+                    )
+            archive = root / "inputs.tar"
+            payload.create_archive(manifest, archive, profile="to-single")
+            self.assertEqual(
+                payload.read_manifest(archive, profile="to-single"), manifest
+            )
+            files = payload.extract_archive(
+                archive, manifest, root / "unpacked", profile="to-single"
+            )
+            self.assertEqual(files["s1_model"].read_text(), "s1_model")
+            with self.assertRaises(payload.PayloadError):
+                payload.read_manifest(archive)
+            altered = copy.deepcopy(manifest)
+            altered["inputs"][-1]["id"] = "reference_document"
+            with self.assertRaises(payload.PayloadError):
+                payload.validate_manifest(altered, profile="to-single")
+            altered = copy.deepcopy(manifest)
+            altered["inputs"].append(altered["inputs"][0])
+            with self.assertRaises(payload.PayloadError):
+                payload.validate_manifest(altered, profile="to-single")
+            with self.assertRaises(payload.PayloadError):
+                payload.extract_archive(
+                    archive, manifest, root / "unpacked", profile="to-single"
+                )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

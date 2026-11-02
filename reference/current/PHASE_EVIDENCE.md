@@ -3842,3 +3842,50 @@ Phase 9B stays `Open` at 3/6.
 LMS work stays stopped.
 The rights state does not change.
 These results give no acceptance for physical fit, numerical tolerances, production, a phase exit or Phase 10.
+
+<a id="to-single-qualification-preparation-panel"></a>
+
+## TO-001 qualification preparation — 2026-11-02
+
+The project owner approves remote processing and public publication of two exact inputs from `7fa2a5a`.
+They are the retained S1 model and the synthetic base fixture.
+The approval also covers one `readiness` image, six TO GUI images and specified diagnostic evidence.
+Actions keeps this evidence for 30 days.
+Independent preservation keeps the initial results and reviews.
+The decision record is `to001-handling-owner-decision.json`, SHA-256 `6a63891440b9c5ae6e5b814a4795485e50b9ccb321837891cded533c46c09398`.
+
+Before transfer, independent review must establish the publication basis for these exact inputs.
+The review supports publication of the synthetic base with its source notices.
+The S1 publication basis stays unresolved.
+The S1 model and its rendered evidence stay local.
+The source and data for its five body components and twelve fixing components need a compatible disposition for publication.
+The review finds no specific third-party prohibition.
+Existing source licences and owner handling approval do not resolve the remaining data rights.
+The review record is `input-publication-basis-independent-review.json`, SHA-256 `e231247aec491dde85af9915d664cdde9ec6f00f07e8a87dfd256ce30e766d2f`.
+The separate correction record preserves the initial review and verdict.
+
+The prepared native and GUI tests use the existing GitHub workflows and resource controls.
+Their fixed TO-001 scope contains twelve chair assemblies: eleven L1 and one S1.
+The tests use 59 source frames and 270 component placements.
+The native test compares the components and checks rollback.
+The GUI test examines 42 layers, viewport selection, rollback and preview disposal.
+The original native test, source fixture and product geometry do not change.
+Offline tests examine the input contracts, launch sequence, result checks and cleanup.
+They give no native or GUI execution evidence.
+
+Independent review finds two fixture defects before hosted execution.
+Malformed numeric reports need rejection without an uncaught exception.
+The GUI fixture must set its intended selection before it checks selection preservation.
+The corrections keep the original assertions and failed evidence.
+The existing rights gate stops input transfer and hosted qualification until the S1 publication basis is established.
+
+The full FreeCAD test keeps its 4 GiB memory limit and 7200-second time limit.
+The separate display keeps its 256 MiB memory limit and 7300-second time limit.
+The initial host reserve stays 8 GiB.
+CPU, task, swap, cleanup and independent review controls do not change.
+The shorter limits for `readiness` stay unchanged.
+
+Phase 9B stays `Open` at 3/6.
+LMS work stays stopped.
+The historical 2/2 record and documentation limits stay unchanged.
+This preparation gives no acceptance for physical fit, rights, production, a phase exit or Phase 10.
