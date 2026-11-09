@@ -373,7 +373,8 @@ class JointExitTests(unittest.TestCase):
                 verify(layers[:-1])
 
     def test_adapter_refuses_missing_extra_wrong_and_blocked_identities(self):
-        values = preview(source_case(), include_joint_exit=True)[0][1]
+        args = preview(source_case(), include_joint_exit=True)[0]
+        values = args[1]
         chosen = next(p for p in values if p.family == "S1J")
         blocked = replace(chosen, position_id=BLOCKED,
                           fixing_frames=tuple(replace(f, position_id=BLOCKED)
@@ -385,6 +386,23 @@ class JointExitTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 adapter(host, bad, include_joint_exit=True)
             host.materialise.assert_not_called()
+        # Generic S1J support must not replace any corrected L1 heel,
+        # even when this preview admits S1J at its qualified positions.
+        heels = args[3]["corrected_heel_positions"]
+        self.assertEqual(len(heels), 5)
+        for heel in heels:
+            original = next(p for p in values
+                            if p.position_id == heel["position_id"])
+            self.assertEqual(original.family, "L1")
+            wrong = replace(original, family="S1J",
+                            fixing_frames=original.fixing_frames[:3])
+            candidate = tuple(wrong if p is original else p for p in values)
+            host = boundary()
+            with self.subTest(heel=original.position_id):
+                with self.assertRaisesRegex(ValueError,
+                                            "fixed TO-001 single-rail identities"):
+                    adapter(host, candidate, include_joint_exit=True)
+                host.materialise.assert_not_called()
         host = boundary()
         with self.assertRaises(ValueError):
             adapter(host, values)
