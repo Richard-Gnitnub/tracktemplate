@@ -1,8 +1,9 @@
-"""Bind retained central CC assemblies to the fixed TO-001 reference.
+"""Bind retained check assemblies to the fixed TO-001 reference.
 
 The left-hand main-side source uses rail 1 without the RH jaw rotation.
 Its stock/check pair shares one rigid frame. Three turnout-side pairs
 require explicit opt-in and independently qualified component frames.
+Three separately requested check ends retain their own qualified frames.
 Canonical labels, exclusions and existing S1/S1J/P routes stay unchanged.
 """
 
@@ -35,6 +36,7 @@ from tracktemplate.domain.central_check_placement import (
     CentralCheckPlacement,
     place_left_hand_central_check,
 )
+from tracktemplate.domain.check_end_placement import place_left_hand_check_end
 
 
 _ANALYSIS_SHA256 = (
@@ -51,6 +53,13 @@ _RAILS = (("main-side stock rail", "stock rail"),
           ("main-side check rail", "check rail"))
 _TS_RAILS = (("turnout-side stock rail", "stock rail"),
              ("turnout-side check rail", "check rail"))
+_CHECK_END_MODELS = (
+    ("CCL", "692a8cfbe6845fd9fce4e8b471f1ec37d5388366c6451f9bff2d65601dbccb3d"),
+    ("CCR", "d594dfb2f387c2b2a0360863ea8dcc30cd2057ed06095f8eb1e49a9421282fa7"),
+)
+_CHECK_END_CONTEXT_SHA256 = (
+    "4c6d059f99889cb292fc028783d2ee425b7493540e6b22b80f55961df543d2ef"
+)
 
 
 def _require(condition, message):
@@ -349,4 +358,177 @@ def preview_private_catalogue_turnout_cc_chairs(
     return create_preview(
         catalogue_path, tuple(placements), shapes, receipt, verify_inputs,
         **options,
+    )
+
+
+def preview_private_catalogue_turnout_check_end_chairs(
+    module, source_document, turnout_id, catalogue_path, create_preview,
+):
+    """Prepare three fixed LH check ends through the existing lifecycle.
+
+    Source heave_chairs.pas:1363-1396 supplies the handed CCL/CCR selection.
+    Its raw ZY/AB stock and CC check records remain canonical and deferred.
+    Entire X1-Z turnout-side support stays excluded. This source-only view
+    gives no native, physical-fit, production or model-transfer acceptance.
+    """
+    def require(condition, message):
+        if not condition:
+            raise ValueError("Private TO-001 check ends: " + message)
+
+    require(turnout_id == "TO-001" and callable(create_preview),
+            "TO-001 and the native adapter are required")
+    signature, analysis, settings, plan, rails, timbers = _open_source_context(
+        module, source_document, turnout_id, "CCL/CCR",
+    )
+    config = _configuration(module, json.loads(signature), settings, plan)
+    positions = _indexed(analysis.get("positions"),
+                         "stable_chair_position_identity")
+    rail_map = _indexed(rails, "stable_identity")
+    timber_map = _indexed(timbers, "stable_identity")
+    instances = _indexed(plan.get("instances"), "chair_position_identity")
+    excluded = _indexed(plan.get("analytical_only"), "chair_position_identity")
+    require(len(positions) == 168 and not instances.keys() & excluded.keys()
+            and instances.keys() | excluded.keys() == positions.keys(),
+            "the inherited plan must account for all 168 positions once")
+    datums = [item.get("base_z") for item in instances.values()]
+    require(datums and all(_finite(value) and value == datums[0]
+                          for value in datums), "source mounting datum differs")
+    selections = {}
+    for family, digest in _CHECK_END_MODELS:
+        prepared = prepare_catalogue_chair(
+            catalogue_path, family, run="context-native-02",
+        )
+        require(prepared.label == family and prepared.run == "context-native-02"
+                and prepared.model_sha256 == digest
+                and prepared.context.get("context_sha256")
+                == _CHECK_END_CONTEXT_SHA256 and len(prepared.components) == 33,
+                "the fixed check-end catalogue differs")
+        selections[family] = prepared
+    obj, host, host_signature = _host(module, source_document, config)
+    dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
+    layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0),
+                      "identifier")
+    placements, selected, shared = [], [], []
+    represented = set()
+    # heave_chairs.pas LH selection, qualified against the exact TO source.
+    # The fourth source pair is deliberately absent, not partly admitted.
+    targets = (("X1-Z", -30, False, "CCL", 14, 21, "ZY"),
+               ("X5-B", 10, False, "CCR", 16, 25, "AB"),
+               ("X5-B", 10, True, "CCL", 16, 25, "AB"))
+    for name, offset, turnout_side, family, source_code, code, label in targets:
+        pair = []
+        for role, (rail_name, _rail_role) in enumerate(
+            _TS_RAILS if turnout_side else _RAILS,
+        ):
+            identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
+                        + rail_name.replace(" ", "-"))
+            require(identity in positions and identity in excluded,
+                    "a selected check-end position is missing or physical")
+            position = positions[identity]
+            timber = timber_map.get(position.get("timber_identity"), {})
+            rail = rail_map.get(position.get("rail_identity"), {})
+            _source_binding(
+                position, rail, timber, excluded[identity], name,
+                code if role == 0 else 15, label if role == 0 else "CC",
+                role, turnout_side=turnout_side,
+            )
+            require(all(position.get(field) is False for field in (
+                "assignment_complete_in_current_stage", "deliberate_omission",
+                "stale_signature_state",
+            )) and position.get("special_assignment_deferred") is True,
+                "the deferred source state differs")
+            _finite_rail_timber_support(
+                position, rail, timber, label="check end", require=require,
+            )
+            pair.append(position)
+        local_x = timber["source_configuration"]["local_x"]
+        require(_finite(local_x)
+                and local_x == dimensions["a_timber_x"] + offset,
+                "the fixed check-end station differs")
+        prefix = "check_turnout_" if turnout_side else "check_main_"
+        bounds = (dimensions.get(prefix + field) for field in (
+            ("start_x", "flare_in_x") if source_code == 14 else
+            ("flare_out_x", "end_x")
+        ))
+        low, high = bounds
+        require(_finite(low) and _finite(high) and low < local_x <= high,
+                "the source does not select this check end")
+        station, point, heading = _timber_frame(
+            module, host, config, timber, layout.get(name, {}),
+        )
+        angle, gauge_y = 0.0, 0.0
+        if turnout_side:
+            x, y, angle = module._rea_c10_turnout_outer_gauge_point_at_x(
+                dimensions, local_x,
+            )
+            curve_end = (dimensions["switch_curve_end_x"]
+                         - dimensions["gauge"] * math.sin(dimensions["k3"]))
+            require(all(_finite(value) for value in (x, y, angle, curve_end))
+                    and x == local_x and x >= curve_end
+                    and angle == dimensions["k3"],
+                    "only the qualified X5 tangent source pose is supported")
+            gauge_y = y + config["track_gauge"] / 2
+        owner, companion = pair
+        placement = place_left_hand_check_end(
+            owner["stable_chair_position_identity"], owner["rail_identity"],
+            owner["timber_identity"], (point.x, point.y), heading, datums[0],
+            side="TS" if turnout_side else "MS", family=family,
+            source_angle_rad=angle, source_gauge_y_mm=gauge_y,
+        )
+        placements.append(placement)
+        represented.update(p["stable_chair_position_identity"] for p in pair)
+        shared.append({"position_id": companion["stable_chair_position_identity"],
+                       "assembly_position_id": placement.position_id})
+        selected.append({
+            "position_id": placement.position_id, "family": family,
+            "prototype_timber_identifier": name,
+            "source_chair_code": source_code,
+            "source_rail_code": 4 if turnout_side else 1,
+            "source_station_mm": local_x, "host_station_mm": station,
+            "source_angle_rad": angle, "source_gauge_y_mm": gauge_y,
+            "source_branch": "turnoutst_main" if turnout_side else "main_straight",
+            "source_model_sha256": selections[family].model_sha256,
+            "source_context_sha256": _CHECK_END_CONTEXT_SHA256,
+            "original_positions": copy.deepcopy(pair),
+            "physical_fit": "NOT_PROVED",
+        })
+    shapes, verify_source = _context_shapes_and_verifier(
+        module, source_document, turnout_id, "CCL/CCR", signature,
+    )
+
+    def verify_inputs():
+        verify_source()
+        current_obj, _data, current_host = _host(module, source_document, config)
+        require(current_obj is obj and current_host == host_signature,
+                "the canonical host changed during preview")
+        for prepared in selections.values():
+            verify_catalogue_sources(prepared)
+
+    receipt = {
+        "document_name": source_document.Name, "turnout_id": turnout_id,
+        "source_context_signature": "sha256:" + hashlib.sha256(
+            signature.encode()).hexdigest(),
+        "source_analysis_signature": analysis["geometry_signature"],
+        "analysis_position_count": len(positions),
+        "selected_check_end_count": len(placements),
+        "selected_family_counts": {"CCL": 2, "CCR": 1},
+        "represented_source_position_count": len(represented),
+        "shared_supports": shared, "selected_positions": selected,
+        "remaining_positions": [copy.deepcopy(position)
+                                for identity, position in sorted(positions.items())
+                                if identity not in represented],
+        "original_analytical_exclusions": copy.deepcopy(plan["analytical_only"]),
+        "source_base_z_mm": datums[0],
+        "embedding_basis": "unchanged existing source-plan base_z",
+        "model_support_adjustments_applied": False,
+        "source_document_mutation": False,
+        "limits": [
+            "Three fixed TO-001 LH check ends; the X1 turnout-side pair is excluded.",
+            "Original analytical labels and exclusions remain unchanged.",
+            "No native, physical-fit, production, export or phase acceptance.",
+        ],
+    }
+    return create_preview(
+        catalogue_path, tuple(sorted(placements, key=lambda p: p.position_id)),
+        shapes, receipt, verify_inputs,
     )

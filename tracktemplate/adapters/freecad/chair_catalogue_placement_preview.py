@@ -326,6 +326,184 @@ def create_private_catalogue_cc_preview(
     )
 
 
+def create_private_catalogue_turnout_check_end_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place three qualified LH check ends through one existing lifecycle.
+
+    The caller supplies the unchanged six source records and finite support.
+    This boundary independently binds the exact owners, families and models.
+    The complete X1 turnout-side assembly remains outside this private view.
+    """
+    family = "TurnoutCheckEnds"
+
+    def require(condition, message):
+        _require(condition, message, family=family)
+
+    if not callable(verify_source):
+        raise TypeError("Turnout check ends require source verification")
+    placements = prepare_check_end_placements(placements)
+    targets = (("X1-Z", "main-side", "CCL", 14, 21, "ZY"),
+               ("X5-B", "main-side", "CCR", 16, 25, "AB"),
+               ("X5-B", "turnout-side", "CCL", 16, 25, "AB"))
+    expected = {
+        (f"TO-001:chair:to-001-timber-{timber.lower()}:{side}-stock-rail",
+         f"TO-001:rail:{side}-stock-rail", f"TO-001:timber:{timber}", label)
+        for timber, side, label, _code, _raw, _text in targets
+    }
+    require({(p.position_id, p.rail_id, p.timber_id, p.family)
+             for p in placements} == expected,
+            "the three fixed TO-001 check-end identities are required")
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    selected = receipt.get("selected_positions")
+    shared = receipt.get("shared_supports")
+    owners = {identity for identity, _rail, _timber, _label in expected}
+    require(
+        receipt.get("turnout_id") == "TO-001"
+        and receipt.get("analysis_position_count") == 168
+        and receipt.get("selected_check_end_count") == 3
+        and receipt.get("represented_source_position_count") == 6
+        and receipt.get("selected_family_counts") == {"CCL": 2, "CCR": 1}
+        and isinstance(selected, list) and len(selected) == 3
+        and all(isinstance(item, dict) for item in selected)
+        and {item.get("position_id") for item in selected} == owners
+        and isinstance(shared, list) and len(shared) == 3
+        and all(isinstance(item, dict) for item in shared)
+        and {(item.get("position_id"), item.get("assembly_position_id"))
+             for item in shared}
+        == {(identity.replace("stock-rail", "check-rail"), identity)
+            for identity in owners},
+        "the three source-qualified stock/check pairs are required",
+    )
+    models = dict(_CHECK_END_MODELS)
+    records = {item["position_id"]: item for item in selected}
+    for timber, side, label, code, raw_code, raw_label in targets:
+        owner = (f"TO-001:chair:to-001-timber-{timber.lower()}:"
+                 f"{side}-stock-rail")
+        record = records[owner]
+        originals = record.get("original_positions")
+        require(
+            record.get("family") == label
+            and record.get("prototype_timber_identifier") == timber
+            and record.get("source_chair_code") == code
+            and record.get("source_rail_code")
+            == (1 if side == "main-side" else 4)
+            and record.get("source_model_sha256") == models[label]
+            and record.get("source_context_sha256") == _CHECK_END_CONTEXT_SHA256
+            and isinstance(originals, list) and len(originals) == 2
+            and all(isinstance(item, dict) for item in originals),
+            "the check-end family or source binding differs",
+        )
+        for role, original in zip(("stock", "check"), originals):
+            require(
+                original.get("stable_chair_position_identity")
+                == owner.replace("stock-rail", role + "-rail")
+                and original.get("rail_identity")
+                == f"TO-001:rail:{side}-{role}-rail"
+                and original.get("timber_identity") == f"TO-001:timber:{timber}"
+                and original.get("chair_code")
+                == (raw_code if role == "stock" else 15)
+                and original.get("chair_code_label")
+                == (raw_label if role == "stock" else "CC"),
+                "the original stock/check identities or raw labels differ",
+            )
+    selections = []
+    layer_specs = _CONTEXT_SPECS
+    for label, digest in _CHECK_END_MODELS:
+        prepared = prepare_catalogue_chair(
+            catalogue_path, label, run="context-native-02",
+        )
+        require(isinstance(prepared.context, dict)
+                and prepared.context.get("context_sha256")
+                == _CHECK_END_CONTEXT_SHA256,
+                "the qualified check-end source context differs")
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, tuple(p for p in placements if p.family == label),
+            None, receipt, family=label, placement_type=CheckEndPlacement,
+            model_sha256=digest, source_names=dict(_CHECK_END_NAMES)[label],
+            run="context-native-02", source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefixed = tuple((label + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((label, prepared, prefixed, prepare))
+
+    def prepare_layers():
+        layers = _context_layers(context_shapes)
+        families, verifiers = {}, []
+        for label, _prepared, specs, prepare in selections:
+            components, result, verify = prepare()
+            start = len(layers)
+            layers += components
+            verifiers.append((start, len(layers), verify))
+            result.pop("source_receipt")
+            result["family"] = label
+            # Only this independently qualified LH cohort changes the label.
+            # The generic preparation contract and RH receipts stay unchanged.
+            result["fixing_angle_frame"] = (
+                "uncurved-LH-source-before-common-host-rotation"
+            )
+            result["layers"] = [dict(_measure_layer(shape), name=spec[0])
+                                for spec, shape in zip(specs, components)]
+            families[label] = result
+        result = {
+            "contract_id": "tracktemplate.private-catalogue-turnout-check-ends.v1",
+            "source_receipt": receipt, "families": families,
+            "family_count": len(families), "placement_count": len(placements),
+            "component_count": sum(item["component_count"]
+                                   for item in families.values()),
+            "layer_count": len(layers),
+            "solid_count": sum(item["solid_count"]
+                               for item in families.values()),
+            "layers": [dict(_measure_layer(shape), name=spec[0])
+                       for spec, shape in zip(layer_specs, layers)],
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "length_unit": "mm", "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "source-check-end-component-frames.v1",
+            "fixing_angle_frame": "uncurved-LH-source-before-common-host-rotation",
+            "fixing_head_rotation_rad": 0.0, "random_export_parity": False,
+            "templot_global_fixing_angle_parity": False,
+            "geometry_rebuilt": False,
+            "track_placements_added": len(placements),
+            "limits": [
+                "Only three fixed TO-001 LH check-end assemblies are placed.",
+                "The complete X1 turnout-side assembly remains excluded.",
+                "No native, physical-fit, production, export or phase acceptance.",
+                "Source overlaps and hidden mating closures remain.",
+                "No source XML placement, scale or frame conversion reapplied.",
+            ],
+        }
+
+        def verify_layers(stored):
+            require(len(stored) == len(layers), "stored layer count changed")
+            for actual, expected in zip(stored[:2], layers[:2]):
+                require(_same_presented_shape(actual, expected),
+                        "stored context geometry or placement changed")
+                _measure_layer(actual)
+                require(not actual.Faces and not actual.Solids
+                        and len(actual.Edges) == len(expected.Edges),
+                        "stored context is no longer the copied wires")
+            for start, end, verify in verifiers:
+                verify(stored[start:end])
+
+        return layers, result, verify_layers
+
+    def verify_inputs():
+        verify_source()
+        for _label, prepared, _specs, _prepare in selections:
+            verify_catalogue_sources(prepared)
+
+    return _materialise_preview(
+        family, receipt, layer_specs, prepare_layers, verify_inputs,
+        title_suffix="retained catalogue assemblies",
+    )
+
+
 def create_private_catalogue_turnout_single_rail_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, include_r2_exit=False, include_crossing_tail=False,
