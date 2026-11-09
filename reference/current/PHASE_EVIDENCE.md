@@ -4270,7 +4270,7 @@ The previous `2/2` repair record stays the same. LMS work stays stopped.
 
 <a id="to-check-end-source-placement-panel"></a>
 
-**Level 2 result for Exit 9B-3:** The private command `preview_private_catalogue_turnout_check_end_chairs` places three assemblies with the previous geometry.
+**Level 2 result for Exit 9B-3:** The private command `preview_private_catalogue_turnout_check_end_chairs` puts three assemblies at their positions with the previous geometry.
 This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
 Independent source and quality reviews give `PASS` for this specified check against the source.
 
@@ -4280,36 +4280,36 @@ Independent source and quality reviews give `PASS` for this specified check agai
 | `X5-B` | `main-side-stock-rail` | `CCR` |
 | `X5-B` | `turnout-side-stock-rail` | `CCL` |
 
-Each assembly represents its initial stock/check pair, for six source positions in total.
-The operation places 99 copies of 66 source components in 68 display layers.
-Both chair types use one document transaction and the previous functions for construction and removal.
+Each assembly is for its initial stock/check pair. The three assemblies are for six source positions.
+The operation puts 99 copies of 66 source components in 68 display layers.
+The two chair types use one document transaction and the previous functions that make and remove the assemblies.
 The initial `ZY`, `AB` and `CC` labels stay the same.
 
 All twelve [new tests](../../tests/validate_phase9b_turnout_check_ends.py) and all 64 previous tests give `PASS`, with no skips.
-The twelve tests first failed because the new functions were absent. The test and fixture bytes did not change.
+The twelve tests first gave `FAIL` because the new functions were missing. The test and fixture bytes did not change.
 
-Independent source comparison checks eighteen sets of position and direction values, containing 126 values.
-It checks all six original records, eighteen rail paths and two complete support shapes, each defined by eighteen points.
-All checks give `PASS`. The complete set of 168 records, initial plan and exclusions stay the same.
+The independent source review compares eighteen sets of position and direction values with the source. These sets contain 126 values.
+The review examines all six initial records, eighteen rail paths and two full support shapes, each with eighteen points.
+All checks give `PASS`. The full set of 168 records, initial plan and exclusions stay the same.
 The previous CC and right-hand results keep the same bytes as commit `b1fcb832a52faa08a110b8b7e5108b88275f0ccd`.
 
 The [fixture](../../tests/fixtures/phase9b-to-check-end-source-frames.json) has SHA-256 `25c88cae53fc70fb114d75b3025fe19d51001e6b83ae442a7e701b880d813541`.
-The independent source comparison review has SHA-256 `ee9afe0c681042ab6ccbfb2471dd3458c971c5a8864240f55d44c6b5046621ac`.
+The independent source review has SHA-256 `ee9afe0c681042ab6ccbfb2471dd3458c971c5a8864240f55d44c6b5046621ac`.
 The project did no FreeCAD tests for these three assemblies, with or without the display. Those tests stay necessary.
-The existing TO-001 FreeCAD evidence stays limited to the initial twelve assemblies.
-The numeric fixture gives no authority to send the CCL/CCR models or source package to GitHub.
+The previous TO-001 FreeCAD evidence stays limited to the initial twelve assemblies.
+The fixture gives no authority to send the CCL/CCR models or source package to GitHub.
 
-The complete `X1-Z` pair for `turnout-side-stock-rail` and `turnout-side-check-rail` stays excluded.
-The source centre for `turnout-side-check-rail` is outside its support. The support check, centre and numerical limits stay the same.
-The [X9-F position without sufficient support](#to-joint-exit-source-placement-panel) also stays excluded.
+The command does not include the two positions in the `X1-Z` pair for `turnout-side-stock-rail` and `turnout-side-check-rail`.
+The support shape does not contain the source centre for `turnout-side-check-rail`. The support check, centre and limits for values stay the same.
+The command also does not include the [X9-F position without sufficient support](#to-joint-exit-source-placement-panel).
 
 Together, these and the previous TO-001 routes include 111 of 168 source positions.
-This count includes all optional positions in the previous routes.
+These 111 positions include all optional positions in the previous routes.
 Independent review shows that the six new positions were not in the previous set of 105.
 The remaining 57 positions contain 24 empty `chair_code_label` values and 33 other values.
 The empty values give no evidence for shared supports or exclusions.
 
-The necessary [monthly restore test](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) is overdue. Risk `PR-13` stays open.
+The project did not complete the necessary [monthly restore test](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) by its deadline. Risk `PR-13` stays open.
 
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
