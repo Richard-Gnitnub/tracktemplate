@@ -4171,13 +4171,13 @@ The previous [R2 input](#to-r2-source-placement-panel) and [crossing-tail input]
 
 Templot 556b `math_unit.pas:29655-29665,29752-29804` controls the source selection.
 The command validates the joint interval, check-rail clearance and wing-rail clearance before it changes a document.
-At R1, it validates the source calculation for the opposing rail with the previous numerical method.
-The new left-hand S1J path permits only source rails 1 and 3. It refuses source rails 2 and 4.
+At R1, it validates the source calculation for the opposite rail with the previous numerical method.
+Only source rails 1 and 3 are permitted in the new path for left-hand S1J. This path rejects source rails 2 and 4.
 The right-hand calculations, finite-support check and catalogue construction functions stay the same.
 
 The fourth candidate is the turnout-side stock rail at `X9-F`.
-Its stored analytical centre lies outside the retained timber outline. This position stays unavailable.
-The original failed check and all seventeen diagnostic sets of coordinates stay preserved.
+The preserved timber outline does not contain the analytical centre from the position record. This position is not available.
+The initial `FAIL` result and all seventeen diagnostic sets of coordinates stay preserved.
 The project did not change that centre, a tolerance or a support condition.
 
 With `include_joint_exit=True`, the other two inputs give these results:
@@ -4195,13 +4195,14 @@ The five heel corrections, source identities, raw labels and previous analytical
 
 All fourteen new tests and all 57 previous tests give `PASS`, with no skips.
 The fixture contains thirteen independently reviewed sets of coordinates and has SHA-256 `04736591db0df308f2a3b7ce15146c8557fb529ffb7921e478c44bf4adf55cd9`.
-The check of the actual retained context validates nine finite rail paths against the complete R1 and X9-F timber outlines.
+The check uses the preserved TO-001 context.
+It validates nine rail paths of finite length against the complete timber outlines for R1 and X9-F.
 Independent quality review has SHA-256 `26ee27d069453fb8ca2b48b327ce1711766bade3c41f0c33b3c8b7257274e682`.
 
 The [previous FreeCAD qualification for twelve chairs](#to-single-gui-pass-panel) stays applicable to construction and document operations that did not change.
 The project did no FreeCAD tests for these new positions, with or without the display.
-The new left-hand S1J operation and the larger groups still need their applicable FreeCAD qualification.
-The numeric comparison fixture gives no authority to transfer the S1J model or source package to GitHub.
+The applicable FreeCAD tests stay necessary for the new operation for left-hand S1J and for the larger groups.
+The numeric comparison fixture gives no authority to send the S1J model or source package to GitHub.
 
 With all three inputs set to `True`, the TO-001 routes include 99 of 168 source positions.
 The remaining 69 positions contain 24 empty `chair_code_label` values and 45 other values.
