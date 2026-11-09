@@ -1,4 +1,4 @@
-"""Place retained check-end components in the qualified RH C10 context.
+"""Place retained check ends in qualified RH and bounded LH C10 contexts.
 
 Source-informed adaptation of Templot 556b math_unit.pas:26696-26820,
 30140-30369,31622-31824 and dxf_unit.pas:7046-7126,8543-8571,
@@ -139,6 +139,89 @@ def place_check_end(
         centre = ((x, -y) if side == "MS" else
                   (cosine * x + sine * y + anchor[0],
                    -sine * x + cosine * y + anchor[1]))
+        fixings.append(frame(math.pi, (centre[0] - x,
+                                      centre[1] - y - 0.45)))
+    return CheckEndPlacement(
+        body.position_id, body.rail_id, body.timber_id,
+        body.origin_mm, body.x_axis, body.y_axis,
+        family, check, tuple(fixings),
+    )
+
+
+def place_left_hand_check_end(
+    position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
+    base_z_mm, *, side, family, source_angle_rad, source_gauge_y_mm,
+):
+    """Compose the qualified LH body, check and indexed fixing frames.
+
+    Inputs are model mm and radians in the square uncurved source frame.
+    Main-side CCL/CCR and the tangent X5 turnout-side CCL pose are admitted.
+    The caller qualifies exact source identities, station and finite support;
+    curved X1 turnout-side support remains outside this contract.
+
+    Retained native XY is (-source_x, -source_y-0.45). The LH source gauge
+    origin is 8.25 mm below the host frame. Fixed-zero source fixings keep
+    their indexed centres and rotate only with the common host. Source
+    math_unit.pas:30140-30369 and dxf_unit.pas:7046-7126,11880-12078
+    require a separate check-seat/key translation on rail 4. No geometry,
+    random fixing angle, physical fit or additional source mode is admitted.
+    """
+    point = _coordinates(host_point_mm, 2, "host_point_mm")
+    heading = _finite_number(travel_heading_rad, "travel_heading_rad")
+    base_z = _finite_number(base_z_mm, "base_z_mm")
+    angle = _finite_number(source_angle_rad, "source_angle_rad")
+    gauge_y = _finite_number(source_gauge_y_mm, "source_gauge_y_mm")
+    if (family not in ("CCL", "CCR") or side not in ("MS", "TS")
+            or (side == "MS" and (angle != 0 or gauge_y != 0))
+            or (side == "TS" and (family != "CCL"
+                                  or angle != math.atan(0.1)
+                                  or gauge_y <= 0))):
+        raise ValueError("Check ends require the qualified LH C10 source pose")
+    tangent = (math.cos(heading), math.sin(heading))
+    normal = (-tangent[1], tangent[0])
+
+    def frame(local_angle, origin):
+        cosine, sine = math.cos(local_angle), math.sin(local_angle)
+        return S1Placement(
+            position_id, rail_id, timber_id,
+            (point[0] + origin[0] * tangent[0]
+             + (origin[1] - 8.25) * normal[0],
+             point[1] + origin[0] * tangent[1]
+             + (origin[1] - 8.25) * normal[1], base_z),
+            (cosine * tangent[0] + sine * normal[0],
+             cosine * tangent[1] + sine * normal[1]),
+            (-sine * tangent[0] + cosine * normal[0],
+             -sine * tangent[1] + cosine * normal[1]),
+        )
+
+    cosine, sine = math.cos(angle), math.sin(angle)
+    flare_angle = math.atan(1 / 18)
+    inlong = _OUTLONG + 1 + _FLARE + 4 * _SCALE * math.sin(flare_angle)
+    fixing_centres = (
+        (-2 * _SCALE, inlong - 1.75 * _SCALE),
+        (2 * _SCALE, inlong - 1.75 * _SCALE),
+        (-2 * _SCALE, -_OUTLONG + 1.75 * _SCALE),
+        (2 * _SCALE, -_OUTLONG + 1.75 * _SCALE),
+    )
+    shift = (_OUTLONG - inlong) / 2 * sine
+    anchor = (shift * cosine, gauge_y + shift * sine)
+    body_angle = math.pi if side == "MS" else angle
+    origin = ((0.0, -0.45) if side == "MS" else
+              (anchor[0] - 0.45 * sine, anchor[1] + 0.45 * cosine))
+    body = frame(body_angle, origin)
+    check = body
+    if side == "TS":
+        # Remove the retained CCL main-side half-flare insertion from the
+        # native coordinates before the source rail-4 frame is applied.
+        dx = -_FLARE * math.cos(flare_angle) / 2
+        dy = _FLARE * math.sin(flare_angle) / 2
+        check = frame(body_angle, (origin[0] + dx * cosine - dy * sine,
+                                   origin[1] + dx * sine + dy * cosine))
+    fixings = []
+    for x, y in fixing_centres:
+        centre = ((x, y) if side == "MS" else
+                  (cosine * x + sine * y + anchor[0],
+                   sine * x - cosine * y + anchor[1]))
         fixings.append(frame(math.pi, (centre[0] - x,
                                       centre[1] - y - 0.45)))
     return CheckEndPlacement(

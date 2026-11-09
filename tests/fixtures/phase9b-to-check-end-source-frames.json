@@ -1,0 +1,596 @@
+{
+  "positions": [
+    {
+      "body": {
+        "origin_mm": [
+          858.6597957286513,
+          388.64128811843875,
+          0.8
+        ],
+        "x_axis": [
+          -0.3925212176837965,
+          -0.9197429497789203
+        ],
+        "y_axis": [
+          0.9197429497789203,
+          -0.3925212176837965
+        ]
+      },
+      "check_frame": {
+        "origin_mm": [
+          858.6597957286513,
+          388.64128811843875,
+          0.8
+        ],
+        "x_axis": [
+          -0.3925212176837965,
+          -0.9197429497789203
+        ],
+        "y_axis": [
+          0.9197429497789203,
+          -0.3925212176837965
+        ]
+      },
+      "companion": {
+        "position_id": "TO-001:chair:to-001-timber-x1-z:main-side-check-rail",
+        "rail_id": "TO-001:rail:main-side-check-rail",
+        "raw_code": 15,
+        "raw_label": "CC"
+      },
+      "family": "CCL",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            858.6597957286513,
+            388.64128811843875,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.3925212176837965,
+            -0.9197429497789203
+          ],
+          "y_axis": [
+            0.9197429497789203,
+            -0.3925212176837965
+          ]
+        },
+        {
+          "origin_mm": [
+            858.6597957286513,
+            388.64128811843875,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.3925212176837965,
+            -0.9197429497789203
+          ],
+          "y_axis": [
+            0.9197429497789203,
+            -0.3925212176837965
+          ]
+        },
+        {
+          "origin_mm": [
+            858.6597957286513,
+            388.64128811843875,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.3925212176837965,
+            -0.9197429497789203
+          ],
+          "y_axis": [
+            0.9197429497789203,
+            -0.3925212176837965
+          ]
+        },
+        {
+          "origin_mm": [
+            858.6597957286513,
+            388.64128811843875,
+            0.8
+          ],
+          "source_index": 4,
+          "x_axis": [
+            -0.3925212176837965,
+            -0.9197429497789203
+          ],
+          "y_axis": [
+            0.9197429497789203,
+            -0.3925212176837965
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.1674251123351245,
+        "host_point_mm": [
+          850.6580320655746,
+          392.05622271228776
+        ],
+        "host_station_mm": 1003.5309004372145
+      },
+      "inner_shear_rad": -0.05549850524571683,
+      "outer_shear_rad": 0.05549850524571683,
+      "position_id": "TO-001:chair:to-001-timber-x1-z:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 21,
+      "raw_label": "ZY",
+      "source_angle_rad": 0.0,
+      "source_branch": "main_straight",
+      "source_chair_code": 14,
+      "source_crop_mm": 0.7552083333333333,
+      "source_gauge_y_mm": 0.0,
+      "source_rail_code": 1,
+      "source_station_mm": 257.23290043721454,
+      "timber_id": "TO-001:timber:X1-Z"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          873.4638761516084,
+          426.3346145381227,
+          0.8
+        ],
+        "x_axis": [
+          -0.33883822994358476,
+          -0.9408446492002271
+        ],
+        "y_axis": [
+          0.9408446492002271,
+          -0.33883822994358476
+        ]
+      },
+      "check_frame": {
+        "origin_mm": [
+          873.4638761516084,
+          426.3346145381227,
+          0.8
+        ],
+        "x_axis": [
+          -0.33883822994358476,
+          -0.9408446492002271
+        ],
+        "y_axis": [
+          0.9408446492002271,
+          -0.33883822994358476
+        ]
+      },
+      "companion": {
+        "position_id": "TO-001:chair:to-001-timber-x5-b:main-side-check-rail",
+        "rail_id": "TO-001:rail:main-side-check-rail",
+        "raw_code": 15,
+        "raw_label": "CC"
+      },
+      "family": "CCR",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            873.4638761516084,
+            426.3346145381227,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            873.4638761516084,
+            426.3346145381227,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            873.4638761516084,
+            426.3346145381227,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            873.4638761516084,
+            426.3346145381227,
+            0.8
+          ],
+          "source_index": 4,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.2251145203034044,
+        "host_point_mm": [
+          865.2785277035664,
+          429.2825071386319
+        ],
+        "host_station_mm": 1043.5309004372145
+      },
+      "inner_shear_rad": 0.05549850524571683,
+      "outer_shear_rad": -0.05549850524571683,
+      "position_id": "TO-001:chair:to-001-timber-x5-b:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 25,
+      "raw_label": "AB",
+      "source_angle_rad": 0.0,
+      "source_branch": "main_straight",
+      "source_chair_code": 16,
+      "source_crop_mm": 0.7552083333333333,
+      "source_gauge_y_mm": 0.0,
+      "source_rail_code": 1,
+      "source_station_mm": 297.23290043721454,
+      "timber_id": "TO-001:timber:X5-B"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          840.1602587219005,
+          438.21113602623785,
+          0.8
+        ],
+        "x_axis": [
+          0.24353909864236106,
+          0.969891080190176
+        ],
+        "y_axis": [
+          -0.969891080190176,
+          0.24353909864236106
+        ]
+      },
+      "check_frame": {
+        "origin_mm": [
+          840.1223648766576,
+          438.0892882529984,
+          0.8
+        ],
+        "x_axis": [
+          0.24353909864236106,
+          0.969891080190176
+        ],
+        "y_axis": [
+          -0.969891080190176,
+          0.24353909864236106
+        ]
+      },
+      "companion": {
+        "position_id": "TO-001:chair:to-001-timber-x5-b:turnout-side-check-rail",
+        "rail_id": "TO-001:rail:turnout-side-check-rail",
+        "raw_code": 15,
+        "raw_label": "CC"
+      },
+      "family": "CCL",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            848.4001513526686,
+            435.699681101138,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            848.2730858442669,
+            435.7384096757913,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            836.306783230851,
+            439.3856452625124,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        },
+        {
+          "origin_mm": [
+            836.1797177224494,
+            439.42437383716566,
+            0.8
+          ],
+          "source_index": 4,
+          "x_axis": [
+            -0.33883822994358476,
+            -0.9408446492002271
+          ],
+          "y_axis": [
+            0.9408446492002271,
+            -0.33883822994358476
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.2251145203034044,
+        "host_point_mm": [
+          865.2785277035664,
+          429.2825071386319
+        ],
+        "host_station_mm": 1043.5309004372145
+      },
+      "inner_shear_rad": -0.05549850524571683,
+      "outer_shear_rad": 0.05549850524571683,
+      "position_id": "TO-001:chair:to-001-timber-x5-b:turnout-side-stock-rail",
+      "rail_id": "TO-001:rail:turnout-side-stock-rail",
+      "raw_code": 25,
+      "raw_label": "AB",
+      "source_angle_rad": 0.09966865249116202,
+      "source_branch": "turnoutst_main",
+      "source_chair_code": 16,
+      "source_crop_mm": 0.7552083333333333,
+      "source_gauge_y_mm": 34.46656308246111,
+      "source_rail_code": 4,
+      "source_station_mm": 297.23290043721454,
+      "timber_id": "TO-001:timber:X5-B"
+    }
+  ],
+  "provenance": {
+    "api_wrapper_review": {
+      "bytes": 4040,
+      "name": "lh-check-end-api-wrapper-clarification.json",
+      "sha256": "1f41a419880993e5f2db435c51dfca92cc129c8fd162d5377ed9fbbdcab5c2ad"
+    },
+    "classification": [
+      "project_derivation",
+      "templot_reference_data"
+    ],
+    "fixed_source_context": {
+      "ccl_ccr_variable": false,
+      "flare_angle_rad": 0.05549850524571683,
+      "flare_mm": 0.2552083333333333,
+      "fw_correction_check_mm": 0.0,
+      "fw_mods_mm": 0.0
+    },
+    "frame": "TO-001 world body, separate check seat/key, and source-indexed fixing frames; existing unrounded source-plan mounting datum.",
+    "independent_source_review": {
+      "bytes": 35424,
+      "name": "lh-check-end-source-independent-review.json",
+      "sha256": "9bb6d53b0c5cc7ab7669c07b261c802b8eb32656268635517cf5a3dbf076d36f"
+    },
+    "limits": [
+      "Only X1-Z main-side CCL, X5-B main-side CCR and X5-B turnout-side CCL are included.",
+      "The whole X1-Z turnout-side assembly remains excluded by the unchanged canonical-centre support guard.",
+      "Original four-assembly GAP evidence remains unchanged; this subset does not repair its failed guard.",
+      "Numeric-only candidate for independent disclosure review; no tracked copy, public transfer or native/GUI execution is authorised by this file.",
+      "No model contents, source archive or source text, constituent vertices, timber polygons, rail polylines, or workstation paths are embedded.",
+      "No engineering fit, production, broader host or phase acceptance; CCL/CCR model transfer remains unapproved."
+    ],
+    "models": {
+      "CCL": {
+        "bytes": 350215,
+        "context_sha256": "4c6d059f99889cb292fc028783d2ee425b7493540e6b22b80f55961df543d2ef",
+        "name": "CCL.FCStd",
+        "run": "context-native-02",
+        "sha256": "692a8cfbe6845fd9fce4e8b471f1ec37d5388366c6451f9bff2d65601dbccb3d"
+      },
+      "CCR": {
+        "bytes": 350318,
+        "context_sha256": "4c6d059f99889cb292fc028783d2ee425b7493540e6b22b80f55961df543d2ef",
+        "name": "CCR.FCStd",
+        "run": "context-native-02",
+        "sha256": "d594dfb2f387c2b2a0360863ea8dcc30cd2057ed06095f8eb1e49a9421282fa7"
+      }
+    },
+    "normalisation": {
+      "body_and_check": "Distinct frames are preserved for the turnout-side check seat/key; main-side frames coincide.",
+      "geometric_reuse": "Finite retained base symmetry and all selected source constituent mappings are established in the bound source review, not inferred from handedness.",
+      "indexed_fixings": "Source indices 1 through 4 retain their order; each owns four unchanged parts.",
+      "native_xy": "(-source_x, -source_y - 0.45 mm)",
+      "native_z": "Retained mounting-plane-normalised Z; no second source XML transform."
+    },
+    "notice": "Source-informed comparison derived from Martin Wynne/OpenTemplot Templot 556b. See NOTICE.md and reference/PROVENANCE.md. This is not clean-room or production-cleared data.",
+    "project_status": "reference-only",
+    "source_bindings": [
+      {
+        "bytes": 26070,
+        "name": "crossing_tail_source_derivation.py",
+        "sha256": "d8940591522f722a780fe51d453bcbcbb48cf754fbbadf29c39e40a5137727d3"
+      },
+      {
+        "bytes": 34142,
+        "name": "check_end_source_oracle.py",
+        "sha256": "c2c4ad91320ec956c1404a2158cf208dffce64a54ba10ec2f06b40ce981ccaad"
+      },
+      {
+        "bytes": 22517,
+        "name": "central_check_source_oracle.py",
+        "sha256": "1fad60666dfc8bce7af85e70a9cea78690c43cd2c46e35ba8712e0724a69dc65"
+      },
+      {
+        "bytes": 17393,
+        "name": "paired_switch_source_oracle.py",
+        "sha256": "334fb0f179705de0844ea6810f9430c1df15e474de759bbad7be088579bed318"
+      },
+      {
+        "bytes": 1174052,
+        "name": "000-source-context.json",
+        "sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c"
+      },
+      {
+        "bytes": 2350856,
+        "name": "t5_files_556b_06_feb_2025.zip",
+        "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3"
+      },
+      {
+        "bytes": 2666045,
+        "name": "result.json",
+        "sha256": "794e14a1a395cb63a22692d2f2ab7cf5e19bf103274faf4f0f8679ae719a8237"
+      },
+      {
+        "bytes": 776816,
+        "name": "assembly-recipes.json",
+        "sha256": "e484b241fb8edc435b12a162f5eec99ba6c3a3f36100d47fb624fd07956e90a9"
+      },
+      {
+        "bytes": 20630,
+        "name": "requests.json",
+        "sha256": "879726329cd59126abd80e7aaf37dcfc4503115193ddbcb9c943ae23360128c2"
+      },
+      {
+        "bytes": 350215,
+        "name": "CCL.FCStd",
+        "sha256": "692a8cfbe6845fd9fce4e8b471f1ec37d5388366c6451f9bff2d65601dbccb3d"
+      },
+      {
+        "bytes": 350318,
+        "name": "CCR.FCStd",
+        "sha256": "d594dfb2f387c2b2a0360863ea8dcc30cd2057ed06095f8eb1e49a9421282fa7"
+      },
+      {
+        "bytes": 210360,
+        "name": "515fe85189c68fd841eb.normalisation.json",
+        "sha256": "a2f0636651eac7acdc94c8fa4185e818dc615084e4f20c7ff2897df73fee7d08"
+      },
+      {
+        "bytes": 294203,
+        "name": "04f5464f083c8ca02d0a.normalisation.json",
+        "sha256": "fa1bf68ac8f13242b9a14a44a774aada0098ad098a3a095ad976c593b0e4e239"
+      },
+      {
+        "bytes": 12942,
+        "name": "423e88aa43f52473c8e3.normalisation.json",
+        "sha256": "540ae60b49f6fa890d517bdd8e12da411e304ee92e9101622728095448e8b789"
+      },
+      {
+        "bytes": 20076,
+        "name": "fe618a6c4da5480c984a.normalisation.json",
+        "sha256": "b57a4def2b7b678b4adcc9ad37b365b637d8fda83d7a35477add7da05d6a5b0f"
+      },
+      {
+        "bytes": 313317,
+        "name": "b18739f93ed1801e2019.normalisation.json",
+        "sha256": "3431156aba2da515a6ea7b230aa5f2779e64aeb5cd7e84683732e1e0a7452a5a"
+      },
+      {
+        "bytes": 208579,
+        "name": "9ee0ac01860bf58a0d18.normalisation.json",
+        "sha256": "81d73d3b1a284a4aa6a73cf55372365c9393d1b425d55d37f41dfffe13bd6c6d"
+      },
+      {
+        "bytes": 13448,
+        "name": "5e9ae18f2c8aa15e4bab.normalisation.json",
+        "sha256": "60d8a385470ddedf02ee8fad41713d9a9f12ff6d18e58b5fcfd68f37537e120a"
+      },
+      {
+        "bytes": 20103,
+        "name": "7f86841a7011e33b9885.normalisation.json",
+        "sha256": "1b2246b1997293fc8a64098c90d9b10a152587730cd93d37afd947303653bc82"
+      },
+      {
+        "bytes": 313273,
+        "name": "622d0ca1b4fcce98f29c.normalisation.json",
+        "sha256": "9b0107a3d9349489704b2ed0d86f19e320803a0d4784e4b71d9cd1e3c45c0b63"
+      },
+      {
+        "bytes": 208576,
+        "name": "8701acf7d79f5cbf724f.normalisation.json",
+        "sha256": "4cb1f21eda21da5727be7ff8233f35c2293360e93fe577778aabbb61a8389d70"
+      },
+      {
+        "bytes": 349396,
+        "name": "prepared-01.json",
+        "sha256": "d977520baca779d8bb165a2e9e6bd764e2d1c74dc99d5c797230c4ca83e9d778"
+      },
+      {
+        "bytes": 63983,
+        "name": "bolt.faces.json",
+        "sha256": "a6cd7fda8decb63fe707291a7f0c41b535b77cbab94ef38052414edec0eb5115"
+      },
+      {
+        "bytes": 1900585,
+        "name": "math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65"
+      },
+      {
+        "bytes": 771317,
+        "name": "dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d"
+      },
+      {
+        "bytes": 62067,
+        "name": "chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b"
+      },
+      {
+        "bytes": 211218,
+        "name": "switch_select.pas",
+        "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb"
+      },
+      {
+        "bytes": 43386,
+        "name": "OpenTemplot2024.lpr",
+        "sha256": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766"
+      }
+    ],
+    "source_expectations": {
+      "bytes": 113941,
+      "name": "lh-check-end-source-expectations.json",
+      "sha256": "433903e8bec869269db6a1405b49ac466b90eabdb42fa35fe1e4d26dabfc815a"
+    },
+    "source_informed_license": "GPL-3.0-or-later",
+    "units": {
+      "angles": "radians",
+      "axes": "dimensionless",
+      "positions": "model mm"
+    }
+  },
+  "schema_version": 1
+}
