@@ -2834,6 +2834,7 @@ class ModularCoreLayoutWorkflowSession:
         private_catalogue_l1_preview_factory=None,
         private_catalogue_cc_preview_factory=None,
         private_catalogue_turnout_check_end_preview_factory=None,
+        private_catalogue_turnout_block_preview_factory=None,
         private_catalogue_turnout_single_rail_preview_factory=None,
         private_catalogue_crossover_preview_factory=None,
     ):
@@ -2873,6 +2874,9 @@ class ModularCoreLayoutWorkflowSession:
         )
         self._private_catalogue_turnout_check_end_preview_factory = (
             private_catalogue_turnout_check_end_preview_factory
+        )
+        self._private_catalogue_turnout_block_preview_factory = (
+            private_catalogue_turnout_block_preview_factory
         )
         self._private_catalogue_turnout_single_rail_preview_factory = (
             private_catalogue_turnout_single_rail_preview_factory
@@ -3311,6 +3315,20 @@ class ModularCoreLayoutWorkflowSession:
             self._private_catalogue_turnout_check_end_preview_factory,
         )
 
+    def preview_private_catalogue_turnout_block_chairs(
+        self, source_document, turnout_id, catalogue_path,
+    ):
+        """Place the five qualified fixed TO-001 main-side block chairs."""
+        from tracktemplate.compatibility.chair_pair_placement import (
+            preview_private_catalogue_turnout_block_chairs,
+        )
+
+        self.routing_record()
+        return preview_private_catalogue_turnout_block_chairs(
+            self.module, source_document, turnout_id, catalogue_path,
+            self._private_catalogue_turnout_block_preview_factory,
+        )
+
     def preview_private_catalogue_turnout_single_rail_chairs(
         self, source_document, turnout_id, catalogue_path,
         *, include_r2_exit=False, include_crossing_tail=False,
@@ -3411,6 +3429,7 @@ def load_modular_transition_workflow_session(
     private_catalogue_l1_preview_factory=None,
     private_catalogue_cc_preview_factory=None,
     private_catalogue_turnout_check_end_preview_factory=None,
+    private_catalogue_turnout_block_preview_factory=None,
     private_catalogue_turnout_single_rail_preview_factory=None,
     private_catalogue_crossover_preview_factory=None,
 ):
@@ -3481,6 +3500,9 @@ def load_modular_transition_workflow_session(
         private_catalogue_cc_preview_factory=private_catalogue_cc_preview_factory,
         private_catalogue_turnout_check_end_preview_factory=(
             private_catalogue_turnout_check_end_preview_factory
+        ),
+        private_catalogue_turnout_block_preview_factory=(
+            private_catalogue_turnout_block_preview_factory
         ),
         private_catalogue_turnout_single_rail_preview_factory=(
             private_catalogue_turnout_single_rail_preview_factory

@@ -4314,3 +4314,54 @@ The project did not complete the necessary [monthly restore test](../RECOVERY_AN
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Five `1P` to `5P` chairs on TO-001 — 2026-11-09
+
+<a id="to-main-block-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The command `preview_private_catalogue_turnout_block_chairs` puts the previous `1P` to `5P` assemblies at the five `S8` to `S12` positions for `main-side-stock-rail`.
+This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
+It uses only the specified TO-001 source with `handedness="Left-hand"`.
+The previous functions make the same component shapes and use the same `openTransaction` and `commitTransaction` operations.
+
+All fourteen [new tests](../../tests/validate_phase9b_turnout_block_chairs.py) and all 96 selected previous tests give `PASS`. The commands did all these tests.
+The separate `validate_phase9b_p_dependent_recalculation.py` test gives `PASS`.
+The `validate_core_export_staging.py` test gives `PASS`: `CORE_EXPORT_DOCUMENT_CASES=21`, `CORE_EXPORT_OBSERVER_CASES=3` and `CORE_EXPORT_STAGING_CASES=34`.
+The fourteen tests first gave `FAIL` because the new operation was missing. The test and fixture bytes stay the same.
+
+The previous dependency check gave `FAIL` for the first new source.
+The correction moves seven functions, without changes, to `chair_source_support.py`.
+The checks of the assembly files are now in `tracktemplate/application`.
+The check that gave `FAIL` now gives `PASS`. Eight previous route results keep the same bytes as commit `6ede48a49514046819e277291903f50a6d98231d`.
+
+The source review compares 61 sets of position and direction values with the source, with 427 values in total.
+These include five assembly positions, 36 component positions and twenty positions for the fastening components.
+All these checks give `PASS` within the previous limits for differences between values. These limits do not specify physical fit.
+The check uses the five initial timber outlines, each with eighteen points, and thirty full rail paths.
+All 168 initial records, the initial plan and its `analytical_only` entries stay the same.
+
+The [fixture](../../tests/fixtures/phase9b-to-lh-main-block-source-frames.json) has SHA-256 `808f672e5df7f63b67cd0e6e2e8e0b0930e646eeb23a2791f8867b38c7ac087a`.
+The independent source review has SHA-256 `8be32b349aadabd1bc3fdce5061c609fd10cad5e229de6e79250859c64ecd2fa`.
+
+The adapter tests examine all 161 component copies and `layer_count=163` with test objects in place of FreeCAD shapes.
+New FreeCAD tests for these five assemblies, with and without the display, are still necessary.
+The previous TO-001 FreeCAD evidence stays limited to the initial twelve assemblies.
+This result gives no authority to send the files for the five assemblies or their source package to GitHub.
+
+The source `key_direction_sign` stays `0`. A decision about its meaning is still necessary.
+The assembly files keep their previous values: `retained_research_key_direction_sign=1` and `retained_research_key_offset_mm=0`. This result gives no acceptance for a rule about key direction.
+The `S10` to `S12` records keep `temporary visual approximation` in `source_or_assumed_classification`.
+The empty `chair_code_label` values at other positions on these timbers do not add chairs or supports for multiple positions.
+
+Together, these and the previous TO-001 routes include 116 of 168 source positions.
+The five new positions were not in the previous set of 111.
+The remaining 52 positions contain 24 empty `chair_code_label` values and 28 other values.
+The empty values give no evidence for supports for multiple positions or for the plan’s `analytical_only` entries.
+The routes still do not include positions without sufficient evidence.
+
+The project did not complete the restore test that is necessary each month by its deadline. Risk `PR-13` stays open.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

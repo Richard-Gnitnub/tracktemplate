@@ -165,3 +165,124 @@ def verify_paired_catalogue(selections):
              "Expected the complete ordered paired catalogue")
     _require(prepare_paired_catalogue(selections[0].catalogue_path) == selections,
              "Paired catalogue or prepared state changed")
+
+
+# Fixed reference-only 556b LH main-side model and source-recipe bindings.
+# GPL-3.0-or-later source-informed values; see NOTICE.md. No key-policy
+# or physical-fit acceptance follows from this private selection.
+_TO_MAIN_BLOCK_BINDINGS = (
+    ("1P", (
+        "f91a528e232fd8eb80ae55745f94bed588342c7047f812840a6704c42239b693",
+        "30481fd010f5f68f0d6f4b812d0b76f9b3444cc5aa1bc2cda6bb74ed63d1299f",
+        "ff065519fc2db613ac92d124ea5dd426969d5457ac93880d3c9e09ea59326d43",
+        69.66666666666666, "S8",
+    )),
+    ("2P", (
+        "bcdcf82ca8ade6c5470ad8dcde7edbe792e4af436de1e03ea51b197c41c87f93",
+        "d9ba7b95d4fc8be8e4b9a6d58941d67bb8413e4783d228436e6f7f2848b8bf73",
+        "65037d96776b6bd452d2199ad7f8bffd2a339f3a694a4faf2d841f969fa4bd55",
+        79.66666666666666, "S9",
+    )),
+    ("3P", (
+        "8ba16c037c8f404f5546a4065f9f4630529a9bd7325b7b9a6a31f3f035a9720f",
+        "51cefb0ba8214d7f8672ed5ed88bfd608217a0b66e094ab9fc54a88aa8f6223b",
+        "612dec4f8021c12f836adc4a3325c7b170c87c5571d6b9a667e30ed1d99799e5",
+        89.66666666666666, "S10",
+    )),
+    ("4P", (
+        "66ddcfa5b3b64594cd2695b4103f4861ddf971640e1fbb31e11422c20cad97ac",
+        "f402cf4fca91b0fb64a6b72eb1b321debc4cb8c1dacb2ac640a33fbba7f039f5",
+        "e92fce654e3e2d48c0a5ebdb2f1bc134fd5901bb7a37d42879f929b03a2c0b35",
+        99.66666666666666, "S11",
+    )),
+    ("5P", (
+        "ddbd7eba4838648d515e7d046328b713ee59884f1cbeae374699396bdbe7bee0",
+        "0e2fefc4cc31b67678e962ffb12f03d54a5ad3c9613145a0484eaf259a10e94c",
+        "fee800faad82ff38f14225cbf7beb22b24778aa8b86c519d8fbbba8805610d51",
+        109.66666666666666, "S12",
+    )),
+)
+
+
+def _turnout_block_component_names(family):
+    """Bind saved semantic order, including four indexed fixing groups."""
+    common = (
+        "base_plinth",
+        "c00_SCOUTJAW_SCOUTJAW",
+        "c01_SCINJAW_body",
+        "c01_SCINJAW_bevel_negative",
+        "c01_SCINJAW_bevel_positive",
+        "c01_SCINJAW_grip",
+        "c01_SCINJAW_stiffener",
+        "c02_SCCCSEAT_SCCCSEAT",
+        "c03_KEY_KEY",
+    )
+    tail = (
+        (
+            "c04_MM_body",
+            "c04_MM_bevel_negative",
+            "c04_MM_bevel_positive",
+            "c04_MM_grip",
+            "c04_MM_stiffener",
+            "c05_PLR1SEAT_PLR1SEAT",
+        )
+        if family in ("1P", "2P")
+        else (
+            "c04_MN_body",
+            "c04_MN_stiffener",
+            "c05_MH_body",
+            "c05_MH_bevel_negative",
+            "c05_MH_bevel_positive",
+            "c05_MH_grip",
+            "c06_PLR3SEAT_PLR3SEAT",
+            "c07_KEY_KEY",
+        )
+    )
+    return (
+        common
+        + tail
+        + ("SourceFixing",)
+        + tuple(f"SourceFixing{index:03d}" for index in range(1, 16))
+    )
+
+
+def _verify_turnout_block_selection(prepared, family, *, require):
+    """Admit only the retained model, context and once-applied fixing recipe."""
+    bindings = dict(_TO_MAIN_BLOCK_BINDINGS)
+    require(family in bindings, "unknown TO block family")
+    model_hash, context_hash, fixing_hash, station, timber = bindings[family]
+    number = int(family[0])
+    context = prepared.context
+    record = prepared.metadata.get("native_record", {})
+    recipe = record.get("source_recipe", {})
+    fixing = record.get("fixing_proof", {})
+    source_fixings = fixing.get("source_fixings", {})
+    placement = source_fixings.get("placement", {})
+    require(
+        prepared.label == family
+        and prepared.run == "context-native-02"
+        and prepared.model_sha256 == model_hash
+        and isinstance(context, dict)
+        and context.get("context_sha256") == context_hash
+        and context.get("station_mm") == station
+        and context.get("timber_id") == timber
+        and context.get("sample_kind") == "fixture_timber"
+        and record.get("family") == family
+        and recipe.get("family") == family
+        and recipe.get("context_sha256") == context_hash
+        and recipe.get("station_mm") == station
+        and recipe.get("timber_id") == timber
+        and type(recipe.get("chair_code")) is int
+        and recipe["chair_code"] == (11 if number <= 2 else 12)
+        and fixing.get("model_sha256") == model_hash
+        and placement.get("recipe_sha256") == fixing_hash
+        and placement.get("source_twist_reapplied") is False
+        and type(source_fixings.get("head_rotation_degrees")) in (int, float)
+        and source_fixings["head_rotation_degrees"] == 0
+        and source_fixings.get("random_export_parity") is False
+        and source_fixings.get("p_bolt_status")
+        == "NOT_APPLICABLE_SOURCE_DISPATCH"
+        and tuple(item.name for item in prepared.components)
+        == _turnout_block_component_names(family),
+        "the fixed LH block model, context, recipe or component order differs",
+    )
