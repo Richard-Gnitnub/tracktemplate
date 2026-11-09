@@ -4365,3 +4365,52 @@ The project did not complete the restore test that is necessary each month by it
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## One ZY assembly on TO-001 — 2026-11-09
+
+<a id="to-zy-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The private command `preview_private_catalogue_turnout_zy_chairs` puts one previous ZY assembly at `X1-Z`.
+It uses only the specified TO-001 C10 source with `handedness="Left-hand"`, under [D-P9-019](#rea-bc-scope-panel).
+The assembly supports two source positions: `straight-switch-and-closure-rail` and `curved-switch-and-closure-rail`.
+The previous component shapes and preview operations stay the same.
+
+All fourteen [new tests](../../tests/validate_phase9b_turnout_zy.py) and 41 selected previous tests give `PASS`, with no skipped tests.
+The `validate_core_export_staging.py` test gives `PASS`: `CORE_EXPORT_DOCUMENT_CASES=21`, `CORE_EXPORT_OBSERVER_CASES=3` and `CORE_EXPORT_STAGING_CASES=34`.
+Seven previous route results keep the same bytes as commit `ef65e62b8b7bc73d763b74dee5367ea31cdfcc52`.
+The dependency check gives `PASS`.
+
+The initial new tests gave `FAIL` because the operation was missing.
+After implementation, one new test counted component checks incorrectly. The previous verifier checks both each compound and its child component.
+The corrected test counts both sets of 33 checks and tests failure at the last fixing component. It keeps all previous assertions.
+
+Two failures came from the test launcher.
+One omitted the test import path. The other inserted module entries that an unchanged test requires to be absent.
+The corrected launcher gives `PASS` for the original checks. These corrections change no product code or previous assertion. The failed evidence stays preserved.
+
+The source comparison gives `PASS` for thirteen sets of position and direction values, with 91 values in total.
+It uses the initial timber outline with eighteen points, both rail positions and six full rail paths.
+All 168 initial records, the initial plan and its `analytical_only` entries stay the same.
+The comparison uses the previous limits for differences between calculated values. These limits do not specify physical fit.
+The [fixture](../../tests/fixtures/phase9b-to-zy-source-frames.json) has SHA-256 `ba36ffd49820a0a032d391e63fe0327a7df37c5a19f192cd183c13740462b7c4`.
+
+The adapter tests examine 33 component copies and `layer_count=35` with test objects in place of FreeCAD shapes.
+The source comparison uses the initial sample of the host position and direction, with assembly metadata in place of model loading.
+It does not prove the complete host calculation or the new assembly in FreeCAD.
+New FreeCAD tests for this assembly, with and without the display, remain necessary. The previous TO-001 FreeCAD evidence stays limited to the initial twelve assemblies.
+This result gives no authority to send the ZY model or its source package to GitHub.
+
+The source `key_direction_sign` stays `0`, with its meaning unresolved.
+The model keeps `retained_research_key_direction_sign=1` and `retained_research_key_offset_mm=0`.
+The source classification `temporary visual approximation` stays unchanged.
+
+Together, these and the previous routes include 118 of 168 source positions. The two new positions were not in the previous set of 116.
+The remaining fifty positions contain 24 empty `chair_code_label` values and 26 other values.
+The empty values give no evidence for supports for multiple positions or an assembly count.
+Positions without sufficient evidence stay outside these routes.
+
+Risk `PR-13` stays open: the monthly restore test is overdue.
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

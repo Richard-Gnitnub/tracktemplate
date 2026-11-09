@@ -1,0 +1,617 @@
+{
+  "positions": [
+    {
+      "body": {
+        "origin_mm": [
+          843.484037057299,
+          395.1178882102214,
+          0.8
+        ],
+        "x_axis": [
+          -0.392521217683797,
+          -0.9197429497789201
+        ],
+        "y_axis": [
+          0.9197429497789201,
+          -0.392521217683797
+        ]
+      },
+      "constituent_frames": [
+        {
+          "frame": {
+            "origin_mm": [
+              843.0701527298985,
+              395.2945227581791,
+              3.283333333333333
+            ],
+            "x_axis": [
+              -0.392521217683797,
+              -0.9197429497789201
+            ],
+            "y_axis": [
+              0.9197429497789201,
+              -0.392521217683797
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.0,
+            -0.45,
+            2.4833333333333334
+          ],
+          "rail_code": 3,
+          "source_angle_rad": 3.141592653589793,
+          "source_block": "WA",
+          "source_index": 0,
+          "source_origin": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              843.0701527298985,
+              395.2945227581791,
+              3.283333333333333
+            ],
+            "x_axis": [
+              -0.392521217683797,
+              -0.9197429497789201
+            ],
+            "y_axis": [
+              0.9197429497789201,
+              -0.392521217683797
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.0,
+            -0.45,
+            2.4833333333333334
+          ],
+          "rail_code": 3,
+          "source_angle_rad": 3.141592653589793,
+          "source_block": "WH",
+          "source_index": 1,
+          "source_origin": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              843.0701527298985,
+              395.2945227581791,
+              3.283333333333333
+            ],
+            "x_axis": [
+              -0.392521217683797,
+              -0.9197429497789201
+            ],
+            "y_axis": [
+              0.9197429497789201,
+              -0.392521217683797
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.0,
+            -0.45,
+            2.4833333333333334
+          ],
+          "rail_code": 3,
+          "source_angle_rad": 3.141592653589793,
+          "source_block": "ZYSEAT",
+          "source_index": 2,
+          "source_origin": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              843.0701527298985,
+              395.2945227581791,
+              3.283333333333333
+            ],
+            "x_axis": [
+              -0.392521217683797,
+              -0.9197429497789201
+            ],
+            "y_axis": [
+              0.9197429497789201,
+              -0.392521217683797
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.0,
+            -0.45,
+            2.4833333333333334
+          ],
+          "rail_code": 3,
+          "source_angle_rad": 3.141592653589793,
+          "source_block": "KEY",
+          "source_index": 3,
+          "source_origin": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              845.5087134936455,
+              394.3944206293221,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3011414987030492,
+              0.9535794658857129
+            ],
+            "y_axis": [
+              -0.9535794658857129,
+              0.3011414987030492
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.1293242532846477,
+            2.1461582537224784,
+            2.4833333333333334
+          ],
+          "rail_code": 2,
+          "source_angle_rad": 0.09748171913806784,
+          "source_block": "VA",
+          "source_index": 4,
+          "source_origin": [
+            0.1293242532846477,
+            -2.5961582537224785,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              845.5087134936455,
+              394.3944206293221,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3011414987030492,
+              0.9535794658857129
+            ],
+            "y_axis": [
+              -0.9535794658857129,
+              0.3011414987030492
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.1293242532846477,
+            2.1461582537224784,
+            2.4833333333333334
+          ],
+          "rail_code": 2,
+          "source_angle_rad": 0.09748171913806784,
+          "source_block": "VH",
+          "source_index": 5,
+          "source_origin": [
+            0.1293242532846477,
+            -2.5961582537224785,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              845.5087134936455,
+              394.3944206293221,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3011414987030492,
+              0.9535794658857129
+            ],
+            "y_axis": [
+              -0.9535794658857129,
+              0.3011414987030492
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.1293242532846477,
+            2.1461582537224784,
+            2.4833333333333334
+          ],
+          "rail_code": 2,
+          "source_angle_rad": 0.09748171913806784,
+          "source_block": "ZYSEAT",
+          "source_index": 6,
+          "source_origin": [
+            0.1293242532846477,
+            -2.5961582537224785,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              845.5087134936455,
+              394.3944206293221,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3011414987030492,
+              0.9535794658857129
+            ],
+            "y_axis": [
+              -0.9535794658857129,
+              0.3011414987030492
+            ]
+          },
+          "normalised_source_origin_mm": [
+            -0.1293242532846477,
+            2.1461582537224784,
+            2.4833333333333334
+          ],
+          "rail_code": 2,
+          "source_angle_rad": 0.09748171913806784,
+          "source_block": "KEY",
+          "source_index": 7,
+          "source_origin": [
+            0.1293242532846477,
+            -2.5961582537224785,
+            0.0
+          ]
+        }
+      ],
+      "family": "ZY",
+      "fixing_frames": [
+        {
+          "frame": {
+            "origin_mm": [
+              847.6233496390466,
+              392.9035871674486,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3925212176837965,
+              0.9197429497789203
+            ],
+            "y_axis": [
+              -0.9197429497789203,
+              0.3925212176837965
+            ]
+          },
+          "source_index": 1,
+          "source_origin_mm": [
+            -0.41181975781693214,
+            -5.126263705621249,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              848.0849737884519,
+              394.15445923223524,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3925212176837965,
+              0.9197429497789203
+            ],
+            "y_axis": [
+              -0.9197429497789203,
+              0.3925212176837965
+            ]
+          },
+          "source_index": 2,
+          "source_origin_mm": [
+            0.9198582780827999,
+            -5.059845436447703,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              840.4939555337209,
+              395.53463200592057,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3925212176837965,
+              0.9197429497789203
+            ],
+            "y_axis": [
+              -0.9197429497789203,
+              0.3925212176837965
+            ]
+          },
+          "source_index": 3,
+          "source_origin_mm": [
+            -0.7903732726502655,
+            2.4636871827252245,
+            0.0
+          ]
+        },
+        {
+          "frame": {
+            "origin_mm": [
+              840.9555796831261,
+              396.78550407070725,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.3925212176837965,
+              0.9197429497789203
+            ],
+            "y_axis": [
+              -0.9197429497789203,
+              0.3925212176837965
+            ]
+          },
+          "source_index": 4,
+          "source_origin_mm": [
+            0.5413047632494665,
+            2.5301054518987707,
+            0.0
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.1674251123351245,
+        "host_point_mm": [
+          850.6580320655746,
+          392.05622271228776
+        ],
+        "host_station_mm": 1003.5309004372145
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          844.2334800260554,
+          394.79804638185885
+        ],
+        "host_chainage": 1003.5309004372145,
+        "local_rail_heading_radians": 1.1674251123351245,
+        "source_configuration": {
+          "crossing_suffix": "Z",
+          "length_prototype_inches": 138.0,
+          "local_far_y": 29.98516040928988,
+          "local_near_y": -16.01483959071012,
+          "local_x": 257.23290043721454,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "REA wing-front crossing-chair spacing: 30 inches",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-x1-z:straight-switch-and-closure-rail",
+      "rail_id": "TO-001:rail:straight-switch-and-closure-rail",
+      "raw_code": 21,
+      "raw_label": "ZY",
+      "source_hand_i": 1,
+      "source_positions": [
+        {
+          "canonical_centre_mm": [
+            842.6489170381551,
+            395.4751565942734
+          ],
+          "canonical_input": {
+            "assignment_complete_in_current_stage": false,
+            "assignment_status": "deferred to special-chair assignment",
+            "centre_point": [
+              842.6489170381551,
+              395.4751565942734
+            ],
+            "chair_family": "common-crossing chair",
+            "chair_subtype": "REA common-crossing subtype awaiting detailed special-chair assignment",
+            "deliberate_omission": false,
+            "handedness": "Left-hand",
+            "handedness_classification": "source-derived prototype requirement",
+            "key_direction_sign": 0,
+            "key_orientation": "requires confirmation from the final special-chair subtype and keying arrangement",
+            "key_orientation_classification": "dimension requiring later confirmation",
+            "source_or_assumed_classification": "temporary visual approximation",
+            "special_assignment_deferred": true,
+            "stale_signature_state": false,
+            "validation_status": "Advisory"
+          },
+          "position_id": "TO-001:chair:to-001-timber-x1-z:straight-switch-and-closure-rail",
+          "rail_id": "TO-001:rail:straight-switch-and-closure-rail",
+          "raw_code": 21,
+          "raw_label": "ZY",
+          "source_rail_code": 3
+        },
+        {
+          "canonical_centre_mm": [
+            845.9460050901803,
+            394.2575588008103
+          ],
+          "canonical_input": {
+            "assignment_complete_in_current_stage": false,
+            "assignment_status": "deferred to special-chair assignment",
+            "centre_point": [
+              845.9460050901803,
+              394.2575588008103
+            ],
+            "chair_family": "common-crossing chair",
+            "chair_subtype": "REA common-crossing subtype awaiting detailed special-chair assignment",
+            "deliberate_omission": false,
+            "handedness": "Left-hand",
+            "handedness_classification": "source-derived prototype requirement",
+            "key_direction_sign": 0,
+            "key_orientation": "requires confirmation from the final special-chair subtype and keying arrangement",
+            "key_orientation_classification": "dimension requiring later confirmation",
+            "source_or_assumed_classification": "temporary visual approximation",
+            "special_assignment_deferred": true,
+            "stale_signature_state": false,
+            "validation_status": "Advisory"
+          },
+          "position_id": "TO-001:chair:to-001-timber-x1-z:curved-switch-and-closure-rail",
+          "rail_id": "TO-001:rail:curved-switch-and-closure-rail",
+          "raw_code": 21,
+          "raw_label": "ZY",
+          "source_rail_code": 2
+        }
+      ],
+      "source_rail_code": 3,
+      "source_station_mm": 257.23290043721454,
+      "timber_id": "TO-001:timber:X1-Z"
+    }
+  ],
+  "provenance": {
+    "classification": [
+      "project_derivation",
+      "templot_reference_data"
+    ],
+    "independent_source_review": {
+      "bytes": 15642,
+      "name": "next-lh-zy-source-preparation-independent-review.json",
+      "sha256": "13ef72ed964e6884ebbd6da23cf5fafe649fb8f708af93f8e04c8f2cd06ede15"
+    },
+    "intended_use": "Bounded numeric comparison under LICENSING_BOUNDARIES canonical-data admission rule 3; independent disclosure review and adoption remain separate.",
+    "key_policy": {
+      "canonical_sign": 0,
+      "production_policy": "UNRESOLVED",
+      "retained_longitudinal_offset_mm": 0,
+      "retained_research_sign": 1
+    },
+    "limits": [
+      "Exactly one LH X1-Z ZY assembly represents only rail3 owner and rail2 companion.",
+      "X1 stock/check, X9-F turnout stock, XN, other ZY, RH and XO admission remain excluded.",
+      "No raw source, model contents, polygons, rail polylines, local paths or binary data.",
+      "Thirteen world frames and 91 scalars are copied from independent source evidence, never product output. Source insertions and canonical settings are separate input data.",
+      "No native/GUI, body-to-rail fit, production or binary/source-package publication authority."
+    ],
+    "metadata_gap_classification": {
+      "bytes": 1685,
+      "name": "metadata-hash-failure-classification.json",
+      "sha256": "c7cef9b78f32497408f5f8697051df25bb15583d345b9653bffa44a97001d11a"
+    },
+    "model": {
+      "body_component_count": 17,
+      "bytes": 392792,
+      "catalogue_recipe_sha256": "1dc3bec236e05e4a902e23adbfd51114c43affdd8c3b56666a71faba43cb03f2",
+      "catalogue_sha256": "f1016a97f35cc87cca9e0b9f09e70ea1cec4620c43d9451430dfb299eed6b885",
+      "component_count": 33,
+      "component_names": [
+        "base_plinth",
+        "c00_WA_WA",
+        "c01_WH_body",
+        "c01_WH_bevel_negative",
+        "c01_WH_bevel_positive",
+        "c01_WH_grip",
+        "c01_WH_stiffener",
+        "c02_ZYSEAT_ZYSEAT",
+        "c03_KEY_KEY",
+        "c04_VA_VA",
+        "c05_VH_body",
+        "c05_VH_bevel_negative",
+        "c05_VH_bevel_positive",
+        "c05_VH_grip",
+        "c05_VH_stiffener",
+        "c06_ZYSEAT_ZYSEAT",
+        "c07_KEY_KEY",
+        "SourceFixing",
+        "SourceFixing001",
+        "SourceFixing002",
+        "SourceFixing003",
+        "SourceFixing004",
+        "SourceFixing005",
+        "SourceFixing006",
+        "SourceFixing007",
+        "SourceFixing008",
+        "SourceFixing009",
+        "SourceFixing010",
+        "SourceFixing011",
+        "SourceFixing012",
+        "SourceFixing013",
+        "SourceFixing014",
+        "SourceFixing015"
+      ],
+      "context_sha256": "5f560e710eea23d350d46a8df3b739bb0b845960767a6eeb57089d82b1cafdee",
+      "family": "ZY",
+      "fixing_component_count": 16,
+      "fixing_recipe_sha256": "3d25b0a0d137c257d1062f02ebf6a57c12f2ec27b94e6359316b1d5a83c9e338",
+      "model_sha256": "794a9115892a7c5e6b20021a5492705be23d8b17be3fbd78eb95c925d500af35",
+      "name": "ZY.FCStd",
+      "run": "context-native-02",
+      "sample_kind": "fixture_timber_X1-Z",
+      "source_code": 21,
+      "station_mm": 257.23290043721454
+    },
+    "normalisation": {
+      "formula": "(-x,-y-0.45,z+149/60)",
+      "mount_datum_mm": 0.8,
+      "raw_source_frame_world_z_mm": 3.283333333333333,
+      "retained_z_translation_mm": 2.4833333333333334,
+      "source_rail_top_z_mm": 0.0
+    },
+    "notice": "Source-informed numeric comparison from Martin Wynne/OpenTemplot Templot 556b; see NOTICE.md and reference/PROVENANCE.md. No clean-room or project-cleared claim.",
+    "original_metadata_gap": {
+      "bytes": 6312,
+      "name": "retained-metadata-crosscheck.json",
+      "sha256": "9596310be62082031937a95dbe155125d31caf62c38ce6c33cd00c83a437606b"
+    },
+    "project_status": "reference-only",
+    "source_archive": {
+      "bytes": 2350856,
+      "name": "t5_files_556b_06_feb_2025.zip",
+      "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3"
+    },
+    "source_context": {
+      "bytes": 1174052,
+      "name": "000-source-context.json",
+      "sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c"
+    },
+    "source_freeze": {
+      "bytes": 4663,
+      "name": "source-preparation-freeze.json",
+      "sha256": "dd44cbd87ad47ddcbe6219906faa0d5741f65e5992f706e08e9d4f5bd167d88c"
+    },
+    "source_licence": "GPL-3.0-or-later",
+    "source_members": [
+      {
+        "bytes": 1900585,
+        "name": "math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65"
+      },
+      {
+        "bytes": 771317,
+        "name": "dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d"
+      },
+      {
+        "bytes": 62067,
+        "name": "chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b"
+      },
+      {
+        "bytes": 211218,
+        "name": "switch_select.pas",
+        "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb"
+      },
+      {
+        "bytes": 43386,
+        "name": "OpenTemplot2024.lpr",
+        "sha256": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766"
+      }
+    ],
+    "source_metadata_review": {
+      "bytes": 7144,
+      "name": "retained-metadata-crosscheck-v2.json",
+      "sha256": "312d8ee28801f9b8d73ba84173c1a0f5e7b93f7a3312d97b4ffd9c4690ba4169"
+    },
+    "source_result": {
+      "bytes": 63649,
+      "name": "source-numeric-result.json",
+      "sha256": "76f5b15c21ffcc63cce149e0e856766686da5992926ca573b6b89458eac4c7d3"
+    }
+  },
+  "schema_version": 1
+}

@@ -504,6 +504,136 @@ def create_private_catalogue_turnout_check_end_preview(
     )
 
 
+def create_private_catalogue_turnout_zy_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place one retained LH X1-Z model through the existing lifecycle.
+
+    The strict source/model boundary admits one owner and one companion.
+    Its saved components receive one proper outer frame, without geometry
+    reconstruction or a change to generic LH/RH admission.
+    """
+    from tracktemplate.application.chair_crossing_zy_catalogue import (
+        _TO_ZY_CONTEXT_SHA256,
+        _TO_ZY_FIXING_SHA256,
+        _TO_ZY_MODEL_SHA256,
+        _TO_ZY_SOURCE_NAMES,
+        _TO_ZY_STATION_MM,
+        prepare_turnout_zy_catalogue,
+        verify_turnout_zy_catalogue,
+    )
+
+    def require(condition, message):
+        _require(condition, message, family="TurnoutZY")
+
+    if not callable(verify_source):
+        raise TypeError("Turnout ZY placement requires source verification")
+    values = _placements(placements, PairedChairPlacement)
+    owner = "TO-001:chair:to-001-timber-x1-z:straight-switch-and-closure-rail"
+    mate = "TO-001:chair:to-001-timber-x1-z:curved-switch-and-closure-rail"
+    rail_id = "TO-001:rail:straight-switch-and-closure-rail"
+    timber_id = "TO-001:timber:X1-Z"
+    require(len(values) == 1 and values[0].position_id == owner
+            and values[0].rail_id == rail_id
+            and values[0].timber_id == timber_id
+            and values[0].origin_mm[2] == 0.8,
+            "the one fixed TO-001 ZY placement is required")
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    selected = receipt.get("selected_positions")
+    require(
+        receipt.get("turnout_id") == "TO-001"
+        and all(type(receipt.get(key)) is int and receipt[key] == expected
+                for key, expected in (
+                    ("analysis_position_count", 168), ("selected_zy_count", 1),
+                    ("represented_source_position_count", 2),
+                    ("retained_research_key_direction_sign", 1),
+                ))
+        and type(receipt.get("retained_research_key_offset_mm")) in (int, float)
+        and receipt["retained_research_key_offset_mm"] == 0
+        and receipt.get("selected_family_counts") == {"ZY": 1}
+        and receipt.get("shared_supports") == {mate: owner}
+        and isinstance(selected, list) and len(selected) == 1
+        and isinstance(selected[0], dict),
+        "the exact owner/companion receipt and research key policy are required",
+    )
+    record = selected[0]
+    require(
+        record.get("position_id") == owner and record.get("family") == "ZY"
+        and record.get("source_hand") == "LH"
+        and type(record.get("source_rail_code")) is int
+        and record["source_rail_code"] == 3
+        and type(record.get("source_chair_code")) is int
+        and record["source_chair_code"] == 21
+        and record.get("prototype_timber_identifier") == "X1-Z"
+        and record.get("source_station_mm") == _TO_ZY_STATION_MM
+        and record.get("source_model_sha256") == _TO_ZY_MODEL_SHA256
+        and record.get("source_context_sha256") == _TO_ZY_CONTEXT_SHA256
+        and record.get("fixing_recipe_sha256") == _TO_ZY_FIXING_SHA256,
+        "the fixed LH ZY source/model binding differs",
+    )
+    for field, identity, rail in (
+        ("original_position", owner, rail_id),
+        ("original_companion", mate,
+         "TO-001:rail:curved-switch-and-closure-rail"),
+    ):
+        original = record.get(field)
+        require(
+            isinstance(original, dict)
+            and original.get("stable_chair_position_identity") == identity
+            and original.get("rail_identity") == rail
+            and original.get("timber_identity") == timber_id
+            and original.get("parent_turnout_identity") == "TO-001"
+            and original.get("handedness") == "Left-hand"
+            and type(original.get("chair_code")) is int
+            and original["chair_code"] == 21
+            and original.get("chair_code_label") == "ZY"
+            and original.get("special_assignment_deferred") is True
+            and original.get("deliberate_omission") is False
+            and type(original.get("key_direction_sign")) is int
+            and original["key_direction_sign"] == 0
+            and original.get("key_orientation")
+            == "requires confirmation from the final special-chair subtype and keying arrangement",
+            "the original ZY identity, raw assignment or unresolved key differs",
+        )
+    prepared = prepare_turnout_zy_catalogue(catalogue_path)
+    prepared, specs, prepare = _prepare_catalogue_family(
+        catalogue_path, values, context_shapes, receipt,
+        family="ZY", placement_type=PairedChairPlacement,
+        model_sha256=_TO_ZY_MODEL_SHA256, source_names=_TO_ZY_SOURCE_NAMES,
+        run="context-native-02", source_context=prepared.context,
+        prepared_selection=prepared,
+    )
+
+    def prepare_layers():
+        layers, result, verify = prepare()
+        result.pop("source_receipt")
+        # This wrapper qualifies the handed whole model, not the generic
+        # helper's SingleRail-only LH component-frame option.
+        result.update(
+            placement="source-paired-common-timber-frame.v1",
+            source_hand="LH", source_rail_code=3,
+            retained_research_key_direction_sign=1,
+            retained_research_key_offset_mm=0,
+        )
+        report = {
+            **result,
+            "contract_id": "tracktemplate.private-catalogue-turnout-zy.v1",
+            "source_receipt": receipt, "families": {"ZY": result},
+            "family_count": 1,
+        }
+        return layers, report, verify
+
+    def verify_inputs():
+        verify_source()
+        verify_turnout_zy_catalogue(prepared)
+
+    return _materialise_preview(
+        "TurnoutZY", receipt, specs, prepare_layers, verify_inputs,
+        title_suffix="retained catalogue assembly",
+    )
+
+
 def create_private_catalogue_turnout_block_preview(
     catalogue_path,
     placements,
