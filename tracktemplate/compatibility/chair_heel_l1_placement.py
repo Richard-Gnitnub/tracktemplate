@@ -10,7 +10,6 @@ import copy
 import hashlib
 import json
 import math
-import sys
 
 from tracktemplate.application.chair_catalogue import (
     prepare_catalogue_chair,
@@ -32,6 +31,7 @@ from tracktemplate.compatibility.chair_single_rail_placement import (
     _family,
     _source_pose,
 )
+from tracktemplate.compatibility.chair_source_support import _same_number
 from tracktemplate.domain.single_rail_placement import place_single_rail
 
 
@@ -155,13 +155,6 @@ def _source_binding(module, position, rail, timber, original, expected):
              and original.get("timber_identity") == timber_id
              and original.get("chair_label") == "S1",
              "the original physical-plan identity differs")
-
-
-def _same_number(actual, expected):
-    """Use the retained single-rail arithmetic budget, never a fit limit."""
-    return (_finite(actual) and _finite(expected)
-            and abs(actual - expected) <= 128 * sys.float_info.epsilon
-            * max(1000.0, abs(actual), abs(expected)))
 
 
 def _nominal_world_timber(timber, station, point, travel):

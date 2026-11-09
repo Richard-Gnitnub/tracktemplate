@@ -504,6 +504,242 @@ def create_private_catalogue_turnout_check_end_preview(
     )
 
 
+def create_private_catalogue_turnout_block_preview(
+    catalogue_path,
+    placements,
+    context_shapes,
+    source_receipt,
+    verify_source,
+):
+    """Place five fixed LH main-side blocks through the existing lifecycle.
+
+    Each retained component receives its common outer frame exactly once.
+    Five independently bound family slices share two copied context layers.
+    Canonical key0 remains unresolved; the pinned models retain +1 keys.
+    """
+    from tracktemplate.application.chair_pair_catalogue import (
+        _TO_MAIN_BLOCK_BINDINGS,
+        _turnout_block_component_names,
+        _verify_turnout_block_selection,
+    )
+
+    family = "TurnoutBlocks"
+
+    def require_selection(condition, message):
+        # Preserve the original selection diagnostic across the owner move.
+        if not condition:
+            raise ValueError("Private paired placement: " + message)
+
+    def require(condition, message):
+        _require(condition, message, family=family)
+
+    if not callable(verify_source):
+        raise TypeError("Turnout block placement requires source verification")
+    bindings = dict(_TO_MAIN_BLOCK_BINDINGS)
+    families = tuple(bindings)
+    require(
+        isinstance(placements, dict) and tuple(placements) == families,
+        "the five ordered main-side block families are required",
+    )
+    groups = {
+        label: _placements(placements[label], PairedChairPlacement)
+        for label in families
+    }
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    selected = receipt.get("selected_positions")
+    require(
+        receipt.get("turnout_id") == "TO-001"
+        and all(
+            type(receipt.get(key)) is int and receipt[key] == expected
+            for key, expected in (
+                ("analysis_position_count", 168),
+                ("selected_block_count", 5),
+                ("represented_source_position_count", 5),
+                ("retained_research_key_direction_sign", 1),
+            )
+        )
+        and type(receipt.get("retained_research_key_offset_mm"))
+        in (int, float)
+        and receipt["retained_research_key_offset_mm"] == 0
+        and receipt.get("selected_family_counts") == dict.fromkeys(families, 1)
+        and isinstance(selected, list)
+        and len(selected) == 5
+        and all(isinstance(record, dict) for record in selected)
+        and not receipt.get("shared_supports"),
+        "the five fixed source records and retained research key policy are required",
+    )
+    selections = []
+    layer_specs = _CONTEXT_SPECS
+    for number, label in enumerate(families, 1):
+        name = "S" + str(number + 7)
+        owner = (
+            f"TO-001:chair:to-001-timber-{name.lower()}:main-side-stock-rail"
+        )
+        rail_id, timber_id = (
+            "TO-001:rail:main-side-stock-rail",
+            "TO-001:timber:" + name,
+        )
+        values = groups[label]
+        require(
+            len(values) == 1
+            and values[0].position_id == owner
+            and values[0].rail_id == rail_id
+            and values[0].timber_id == timber_id
+            and values[0].origin_mm[2] == 0.8,
+            "the block family and fixed placement identity differ",
+        )
+        record = selected[number - 1]
+        original = record.get("original_position", {})
+        model_hash, context_hash, fixing_hash, station, _timber = bindings[
+            label
+        ]
+        require(
+            record.get("position_id") == owner
+            and record.get("family") == label
+            and record.get("source_rail_code") == 1
+            and record.get("source_hand") == "LH"
+            and record.get("source_station_mm")
+            == station
+            and record.get("source_branch")
+            == ("closure" if number == 5 else "switch")
+            and record.get("source_model_sha256") == model_hash
+            and record.get("source_context_sha256") == context_hash
+            and record.get("fixing_recipe_sha256") == fixing_hash
+            and isinstance(original, dict)
+            and original.get("stable_chair_position_identity") == owner
+            and original.get("rail_identity") == rail_id
+            and original.get("timber_identity") == timber_id
+            and original.get("handedness") == "Left-hand"
+            and type(original.get("chair_code")) is int
+            and original["chair_code"] == (11 if number <= 2 else 12)
+            and original.get("chair_code_label")
+            == ("1P/2P" if number <= 2 else "3P-11P")
+            and type(original.get("key_direction_sign")) is int
+            and original["key_direction_sign"] == 0
+            and original.get("key_orientation")
+            == "requires a configurable key-direction policy",
+            "the original block identity, recipe or unresolved key differs",
+        )
+        prepared = prepare_catalogue_chair(
+            catalogue_path, label, run="context-native-02"
+        )
+        _verify_turnout_block_selection(
+            prepared, label, require=require_selection,
+        )
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path,
+            values,
+            None,
+            receipt,
+            family=label,
+            placement_type=PairedChairPlacement,
+            model_sha256=model_hash,
+            source_names=_turnout_block_component_names(label),
+            run="context-native-02",
+            source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefixed = tuple(
+            (label + "_" + name, title, colour)
+            for name, title, colour in specs
+        )
+        layer_specs += prefixed
+        selections.append((label, prepared, prefixed, prepare))
+
+    def prepare_layers():
+        layers = _context_layers(context_shapes)
+        reports, verifiers = {}, []
+        for label, _prepared, specs, prepare in selections:
+            components, result, verify = prepare()
+            start = len(layers)
+            layers += components
+            verifiers.append((start, len(layers), verify))
+            result.pop("source_receipt")
+            # This wrapper qualifies the handed whole model; the generic
+            # helper's SingleRail-only LH option and RH callers stay intact.
+            result.update(
+                placement="source-paired-common-timber-frame.v1",
+                source_hand="LH",
+                source_rail_code=1,
+                retained_research_key_direction_sign=1,
+                retained_research_key_offset_mm=0,
+                layers=[
+                    dict(_measure_layer(shape), name=spec[0])
+                    for spec, shape in zip(specs, components)
+                ],
+            )
+            reports[label] = result
+        result = {
+            "contract_id": "tracktemplate.private-catalogue-turnout-blocks.v1",
+            "source_receipt": receipt,
+            "families": reports,
+            "family_count": len(reports),
+            "placement_count": sum(map(len, groups.values())),
+            "component_count": sum(
+                r["component_count"] for r in reports.values()
+            ),
+            "layer_count": len(layers),
+            "solid_count": sum(r["solid_count"] for r in reports.values()),
+            "layers": [
+                dict(_measure_layer(shape), name=spec[0])
+                for spec, shape in zip(layer_specs, layers)
+            ],
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "length_unit": "mm",
+            "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "source-paired-common-timber-frame.v1",
+            "source_hand": "LH",
+            "source_rail_code": 1,
+            "retained_research_key_direction_sign": 1,
+            "retained_research_key_offset_mm": 0,
+            "geometry_rebuilt": False,
+            "track_placements_added": len(groups),
+            "limits": [
+                "Only five fixed LH main-side blocks; no empty-companion admission.",
+                "Canonical key0 and original exclusions remain unchanged.",
+                "No native, GUI, physical-fit, production, export or phase acceptance.",
+                "No source XML placement, crop, shear, twist or normalisation reapplied.",
+            ],
+        }
+
+        def verify_layers(stored):
+            require(len(stored) == len(layers), "stored layer count changed")
+            for actual, expected in zip(stored[:2], layers[:2]):
+                require(
+                    _same_presented_shape(actual, expected),
+                    "stored context geometry or placement changed",
+                )
+                _measure_layer(actual)
+                require(
+                    not actual.Faces
+                    and not actual.Solids
+                    and len(actual.Edges) == len(expected.Edges),
+                    "stored context is no longer the copied wires",
+                )
+            for start, end, verify in verifiers:
+                verify(stored[start:end])
+
+        return layers, result, verify_layers
+
+    def verify_inputs():
+        verify_source()
+        for _label, prepared, _specs, _prepare in selections:
+            verify_catalogue_sources(prepared)
+
+    return _materialise_preview(
+        family,
+        receipt,
+        layer_specs,
+        prepare_layers,
+        verify_inputs,
+        title_suffix="retained catalogue assemblies",
+    )
+
+
 def create_private_catalogue_turnout_single_rail_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, include_r2_exit=False, include_crossing_tail=False,

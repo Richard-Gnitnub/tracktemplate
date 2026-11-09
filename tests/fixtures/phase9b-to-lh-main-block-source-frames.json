@@ -1,0 +1,2155 @@
+{
+  "positions": [
+    {
+      "body": {
+        "origin_mm": [
+          758.792561416917,
+          227.61487141207027,
+          0.8
+        ],
+        "x_axis": [
+          -0.6524228654845685,
+          -0.7578551343053003
+        ],
+        "y_axis": [
+          0.7578551343053003,
+          -0.6524228654845685
+        ]
+      },
+      "canonical_input": {
+        "assignment_complete_in_current_stage": true,
+        "assignment_status": "confirmed ordinary or turnout assignment",
+        "centre_point": [
+          758.8027167103833,
+          227.61453768719812
+        ],
+        "chair_family": "switch-support chair",
+        "chair_subtype": "REA 1P/2P PLR block-slide chair",
+        "deliberate_omission": false,
+        "handedness": "Left-hand",
+        "key_direction_sign": 0,
+        "key_orientation": "requires a configurable key-direction policy",
+        "key_orientation_classification": "dimension requiring later confirmation",
+        "special_assignment_deferred": false,
+        "stale_signature_state": false,
+        "validation_status": "validated"
+      },
+      "constituent_frames": [
+        {
+          "request_id": "515fe85189c68fd841eb",
+          "source_block": "SCOUTJAW",
+          "source_component_index": 0,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              758.4515266064797,
+              227.90846170153833,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "request_id": "a85a8b8548d9b735773e",
+          "source_block": "SCINJAW",
+          "source_component_index": 1,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              758.4515266064797,
+              227.90846170153833,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "request_id": "423e88aa43f52473c8e3",
+          "source_block": "SCCCSEAT",
+          "source_component_index": 2,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              758.4515266064797,
+              227.90846170153833,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 3,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              758.4515266064797,
+              227.90846170153833,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "request_id": "fcb87d13b7be98e50786",
+          "source_block": "MM",
+          "source_component_index": 4,
+          "source_insertion": {
+            "rotation_rad": 0.03359524283762622,
+            "x_mm": 0.0,
+            "y_mm": 1.883728200089081,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              757.0239335184065,
+              229.13744905163455,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6265991864443609,
+              0.7793416834401103
+            ],
+            "y_axis": [
+              -0.7793416834401103,
+              0.6265991864443609
+            ]
+          }
+        },
+        {
+          "request_id": "147e3fd8ee43cb855a30",
+          "source_block": "PLR1SEAT",
+          "source_component_index": 5,
+          "source_insertion": {
+            "rotation_rad": 0.03359524283762622,
+            "x_mm": 0.0,
+            "y_mm": 1.883728200089081,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              757.0239335184065,
+              229.13744905163455,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6265991864443609,
+              0.7793416834401103
+            ],
+            "y_axis": [
+              -0.7793416834401103,
+              0.6265991864443609
+            ]
+          }
+        }
+      ],
+      "family": "1P",
+      "fixing_frames": [
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            3.154561533422414
+          ],
+          "source_index": 1,
+          "world_source_frame": {
+            "origin_mm": [
+              755.6258773749037,
+              229.46133302031762,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            3.154561533422414
+          ],
+          "source_index": 2,
+          "world_source_frame": {
+            "origin_mm": [
+              756.4957745288832,
+              230.4718065327247,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 3,
+          "world_source_frame": {
+            "origin_mm": [
+              759.9112158652531,
+              225.77216778162335,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 4,
+          "world_source_frame": {
+            "origin_mm": [
+              760.7811130192326,
+              226.78264129403044,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6524228654845684,
+              0.7578551343053004
+            ],
+            "y_axis": [
+              -0.7578551343053004,
+              0.6524228654845684
+            ]
+          }
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 0.860019268590973,
+        "host_point_mm": [
+          752.1992217484609,
+          233.29095034178602
+        ],
+        "host_station_mm": 815.9646666666666
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          751.4818799964372,
+          233.90849601800022
+        ],
+        "host_chainage": 815.9646666666666,
+        "local_rail_heading_radians": 0.860019268590973,
+        "source_configuration": {
+          "crossing_suffix": "",
+          "length_prototype_inches": 102.0,
+          "local_far_y": 17.94654204946596,
+          "local_near_y": -16.05345795053404,
+          "local_x": 69.66666666666666,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "published REA C-switch individual centre",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-s8:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 11,
+      "raw_label": "1P/2P",
+      "raw_source_classification": "source-derived prototype requirement",
+      "source_branch": "switch",
+      "source_hand_i": 1,
+      "source_rail_code": 1,
+      "source_station_mm": 69.66666666666666,
+      "timber_id": "TO-001:timber:S8"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          765.3487484983942,
+          235.35731422585064,
+          0.8
+        ],
+        "x_axis": [
+          -0.639657056396562,
+          -0.7686604258071866
+        ],
+        "y_axis": [
+          0.7686604258071866,
+          -0.639657056396562
+        ]
+      },
+      "canonical_input": {
+        "assignment_complete_in_current_stage": true,
+        "assignment_status": "confirmed ordinary or turnout assignment",
+        "centre_point": [
+          765.3556754235528,
+          235.35407423351378
+        ],
+        "chair_family": "switch-support chair",
+        "chair_subtype": "REA 1P/2P PLR block-slide chair",
+        "deliberate_omission": false,
+        "handedness": "Left-hand",
+        "key_direction_sign": 0,
+        "key_orientation": "requires a configurable key-direction policy",
+        "key_orientation_classification": "dimension requiring later confirmation",
+        "special_assignment_deferred": false,
+        "stale_signature_state": false,
+        "validation_status": "validated"
+      },
+      "constituent_frames": [
+        {
+          "request_id": "515fe85189c68fd841eb",
+          "source_block": "SCOUTJAW",
+          "source_component_index": 0,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              765.0028513067809,
+              235.6451599012291,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "request_id": "a85a8b8548d9b735773e",
+          "source_block": "SCINJAW",
+          "source_component_index": 1,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              765.0028513067809,
+              235.6451599012291,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "request_id": "423e88aa43f52473c8e3",
+          "source_block": "SCCCSEAT",
+          "source_component_index": 2,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              765.0028513067809,
+              235.6451599012291,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 3,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              765.0028513067809,
+              235.6451599012291,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "request_id": "d811f51daa51ae72ddd4",
+          "source_block": "MM",
+          "source_component_index": 4,
+          "source_insertion": {
+            "rotation_rad": 0.03620099682624643,
+            "x_mm": 0.0,
+            "y_mm": 2.2328511397226976,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              763.2865469989576,
+              237.07341888863584,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6114177667346082,
+              0.7913079770362891
+            ],
+            "y_axis": [
+              -0.7913079770362891,
+              0.6114177667346082
+            ]
+          }
+        },
+        {
+          "request_id": "147e3fd8ee43cb855a30",
+          "source_block": "PLR1SEAT",
+          "source_component_index": 5,
+          "source_insertion": {
+            "rotation_rad": 0.03620099682624643,
+            "x_mm": 0.0,
+            "y_mm": 2.2328511397226976,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              763.2865469989576,
+              237.07341888863584,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6114177667346082,
+              0.7913079770362891
+            ],
+            "y_axis": [
+              -0.7913079770362891,
+              0.6114177667346082
+            ]
+          }
+        }
+      ],
+      "family": "2P",
+      "fixing_frames": [
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            3.5036844730560306
+          ],
+          "source_index": 1,
+          "world_source_frame": {
+            "origin_mm": [
+              761.88326967023,
+              237.373876113935,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            3.5036844730560306
+          ],
+          "source_index": 2,
+          "world_source_frame": {
+            "origin_mm": [
+              762.7361457454253,
+              238.39875668167792,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 3,
+          "world_source_frame": {
+            "origin_mm": [
+              766.4980643337012,
+              233.53357697636625,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 4,
+          "world_source_frame": {
+            "origin_mm": [
+              767.3509404088966,
+              234.55845754410916,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6396570563965619,
+              0.7686604258071867
+            ],
+            "y_axis": [
+              -0.7686604258071867,
+              0.6396570563965619
+            ]
+          }
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 0.8767443015248171,
+        "host_point_mm": [
+          758.6614027938716,
+          240.92233061650074
+        ],
+        "host_station_mm": 825.9646666666666
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          757.7990751377629,
+          241.6399348428099
+        ],
+        "host_chainage": 825.9646666666666,
+        "local_rail_heading_radians": 0.8767443015248171,
+        "source_configuration": {
+          "crossing_suffix": "",
+          "length_prototype_inches": 102.0,
+          "local_far_y": 18.121857750388486,
+          "local_near_y": -15.878142249611516,
+          "local_x": 79.66666666666666,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "published REA C-switch individual centre",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-s9:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 11,
+      "raw_label": "1P/2P",
+      "raw_source_classification": "source-derived prototype requirement",
+      "source_branch": "switch",
+      "source_hand_i": 1,
+      "source_rail_code": 1,
+      "source_station_mm": 79.66666666666666,
+      "timber_id": "TO-001:timber:S9"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          771.7709477859074,
+          243.20568074336455,
+          0.8
+        ],
+        "x_axis": [
+          -0.6270989954729814,
+          -0.7789395675383153
+        ],
+        "y_axis": [
+          0.7789395675383153,
+          -0.6270989954729814
+        ]
+      },
+      "canonical_input": {
+        "assignment_complete_in_current_stage": true,
+        "assignment_status": "confirmed ordinary or turnout assignment",
+        "centre_point": [
+          771.7738289714506,
+          243.1970002519627
+        ],
+        "chair_family": "switch-heel chair",
+        "chair_subtype": "REA 3P-5P PLR block-heel chair",
+        "deliberate_omission": false,
+        "handedness": "Left-hand",
+        "key_direction_sign": 0,
+        "key_orientation": "requires a configurable key-direction policy",
+        "key_orientation_classification": "dimension requiring later confirmation",
+        "special_assignment_deferred": false,
+        "stale_signature_state": false,
+        "validation_status": "validated"
+      },
+      "constituent_frames": [
+        {
+          "request_id": "515fe85189c68fd841eb",
+          "source_block": "SCOUTJAW",
+          "source_component_index": 0,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              771.4204249805152,
+              243.48787529132738,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "request_id": "a85a8b8548d9b735773e",
+          "source_block": "SCINJAW",
+          "source_component_index": 1,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              771.4204249805152,
+              243.48787529132738,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "request_id": "423e88aa43f52473c8e3",
+          "source_block": "SCCCSEAT",
+          "source_component_index": 2,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              771.4204249805152,
+              243.48787529132738,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 3,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              771.4204249805152,
+              243.48787529132738,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "request_id": "5115194ff2a330a2d2b9",
+          "source_block": "MN",
+          "source_component_index": 4,
+          "source_insertion": {
+            "rotation_rad": 0.03880699674930317,
+            "x_mm": 0.0,
+            "y_mm": 2.6080670440469476,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              769.3888983651144,
+              245.12339151477542,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5964061359005534,
+              0.8026828271865362
+            ],
+            "y_axis": [
+              -0.8026828271865362,
+              0.5964061359005534
+            ]
+          }
+        },
+        {
+          "request_id": "6c920e01a1ead821f8ec",
+          "source_block": "MH",
+          "source_component_index": 5,
+          "source_insertion": {
+            "rotation_rad": 0.03880699674930317,
+            "x_mm": 0.0,
+            "y_mm": 2.6080670440469476,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              769.3888983651144,
+              245.12339151477542,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5964061359005534,
+              0.8026828271865362
+            ],
+            "y_axis": [
+              -0.8026828271865362,
+              0.5964061359005534
+            ]
+          }
+        },
+        {
+          "request_id": "b7a2bf972135bc182c15",
+          "source_block": "PLR3SEAT",
+          "source_component_index": 6,
+          "source_insertion": {
+            "rotation_rad": 0.03880699674930317,
+            "x_mm": 0.0,
+            "y_mm": 2.6080670440469476,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              769.3888983651144,
+              245.12339151477542,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5964061359005534,
+              0.8026828271865362
+            ],
+            "y_axis": [
+              -0.8026828271865362,
+              0.5964061359005534
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 7,
+          "source_insertion": {
+            "rotation_rad": 0.03880699674930317,
+            "x_mm": 0.0,
+            "y_mm": 2.6080670440469476,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              769.3888983651144,
+              245.12339151477542,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5964061359005534,
+              0.8026828271865362
+            ],
+            "y_axis": [
+              -0.8026828271865362,
+              0.5964061359005534
+            ]
+          }
+        }
+      ],
+      "family": "3P",
+      "fixing_frames": [
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            3.8059837107136145
+          ],
+          "source_index": 1,
+          "world_source_frame": {
+            "origin_mm": [
+              768.0377276778521,
+              245.3553108080769,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            3.8059837107136145
+          ],
+          "source_index": 2,
+          "world_source_frame": {
+            "origin_mm": [
+              768.8738596718161,
+              246.39389689812796,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 3,
+          "world_source_frame": {
+            "origin_mm": [
+              772.949707902379,
+              241.4008347576194,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 4,
+          "world_source_frame": {
+            "origin_mm": [
+              773.7858398963431,
+              242.43942084767048,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6270989954729813,
+              0.7789395675383154
+            ],
+            "y_axis": [
+              -0.7789395675383154,
+              0.6270989954729813
+            ]
+          }
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 0.8929730238779185,
+        "host_point_mm": [
+          764.9941735483242,
+          248.6614420039795
+        ],
+        "host_station_mm": 835.9646666666666
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          763.973547370886,
+          249.48311505449308
+        ],
+        "host_chainage": 835.9646666666666,
+        "local_rail_heading_radians": 0.8929730238779185,
+        "source_configuration": {
+          "crossing_suffix": "",
+          "length_prototype_inches": 102.0,
+          "local_far_y": 18.3102764578563,
+          "local_near_y": -15.6897235421437,
+          "local_x": 89.66666666666666,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "published REA C-switch individual centre",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-s10:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 12,
+      "raw_label": "3P-11P",
+      "raw_source_classification": "temporary visual approximation",
+      "source_branch": "switch",
+      "source_hand_i": 1,
+      "source_rail_code": 1,
+      "source_station_mm": 89.66666666666666,
+      "timber_id": "TO-001:timber:S10"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          778.0670070964934,
+          251.16658273840937,
+          0.8
+        ],
+        "x_axis": [
+          -0.6135930165477064,
+          -0.7896224477836773
+        ],
+        "y_axis": [
+          0.7896224477836773,
+          -0.6135930165477064
+        ]
+      },
+      "canonical_input": {
+        "assignment_complete_in_current_stage": true,
+        "assignment_status": "confirmed ordinary or turnout assignment",
+        "centre_point": [
+          778.0677198788829,
+          251.15433956603982
+        ],
+        "chair_family": "switch-heel chair",
+        "chair_subtype": "REA 3P-5P PLR block-heel chair",
+        "deliberate_omission": false,
+        "handedness": "Left-hand",
+        "key_direction_sign": 0,
+        "key_orientation": "requires a configurable key-direction policy",
+        "key_orientation_classification": "dimension requiring later confirmation",
+        "special_assignment_deferred": false,
+        "stale_signature_state": false,
+        "validation_status": "validated"
+      },
+      "constituent_frames": [
+        {
+          "request_id": "515fe85189c68fd841eb",
+          "source_block": "SCOUTJAW",
+          "source_component_index": 0,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              777.7116769949907,
+              251.44269959585586,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "request_id": "a85a8b8548d9b735773e",
+          "source_block": "SCINJAW",
+          "source_component_index": 1,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              777.7116769949907,
+              251.44269959585586,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "request_id": "423e88aa43f52473c8e3",
+          "source_block": "SCCCSEAT",
+          "source_component_index": 2,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              777.7116769949907,
+              251.44269959585586,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 3,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              777.7116769949907,
+              251.44269959585586,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "request_id": "03a3a074b98b00386dd2",
+          "source_block": "MN",
+          "source_component_index": 4,
+          "source_insertion": {
+            "rotation_rad": 0.04141326037962665,
+            "x_mm": 0.0,
+            "y_mm": 3.009383568451085,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              775.3354001753504,
+              253.28923633757086,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5803754243713458,
+              0.814349044811732
+            ],
+            "y_axis": [
+              -0.814349044811732,
+              0.5803754243713458
+            ]
+          }
+        },
+        {
+          "request_id": "885da50d199e5f632c56",
+          "source_block": "MH",
+          "source_component_index": 5,
+          "source_insertion": {
+            "rotation_rad": 0.04141326037962665,
+            "x_mm": 0.0,
+            "y_mm": 3.009383568451085,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              775.3354001753504,
+              253.28923633757086,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5803754243713458,
+              0.814349044811732
+            ],
+            "y_axis": [
+              -0.814349044811732,
+              0.5803754243713458
+            ]
+          }
+        },
+        {
+          "request_id": "b7a2bf972135bc182c15",
+          "source_block": "PLR3SEAT",
+          "source_component_index": 6,
+          "source_insertion": {
+            "rotation_rad": 0.04141326037962665,
+            "x_mm": 0.0,
+            "y_mm": 3.009383568451085,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              775.3354001753504,
+              253.28923633757086,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5803754243713458,
+              0.814349044811732
+            ],
+            "y_axis": [
+              -0.814349044811732,
+              0.5803754243713458
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 7,
+          "source_insertion": {
+            "rotation_rad": 0.04141326037962665,
+            "x_mm": 0.0,
+            "y_mm": 3.009383568451085,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              775.3354001753504,
+              253.28923633757086,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5803754243713458,
+              0.814349044811732
+            ],
+            "y_axis": [
+              -0.814349044811732,
+              0.5803754243713458
+            ]
+          }
+        }
+      ],
+      "family": "4P",
+      "fixing_frames": [
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            4.207300235117752
+          ],
+          "source_index": 1,
+          "world_source_frame": {
+            "origin_mm": [
+              773.9804362737444,
+              253.4978546734545,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            4.207300235117752
+          ],
+          "source_index": 2,
+          "world_source_frame": {
+            "origin_mm": [
+              774.798560295808,
+              254.55068460383276,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 3,
+          "world_source_frame": {
+            "origin_mm": [
+              779.2766711034182,
+              249.38230208929747,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 4,
+          "world_source_frame": {
+            "origin_mm": [
+              780.0947951254817,
+              250.43513201967573,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6135930165477063,
+              0.7896224477836774
+            ],
+            "y_axis": [
+              -0.7896224477836774,
+              0.6135930165477063
+            ]
+          }
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 0.9101934398173377,
+        "host_point_mm": [
+          771.1972918007754,
+          256.50484198237444
+        ],
+        "host_station_mm": 845.9646666666666
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          770.0035389659236,
+          257.43247316232004
+        ],
+        "host_chainage": 845.9646666666666,
+        "local_rail_heading_radians": 0.9101934398173377,
+        "source_configuration": {
+          "crossing_suffix": "",
+          "length_prototype_inches": 108.0,
+          "local_far_y": 19.511802049450914,
+          "local_near_y": -16.488197950549086,
+          "local_x": 99.66666666666666,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "published REA C-switch individual centre",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-s11:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 12,
+      "raw_label": "3P-11P",
+      "raw_source_classification": "temporary visual approximation",
+      "source_branch": "switch",
+      "source_hand_i": 1,
+      "source_rail_code": 1,
+      "source_station_mm": 99.66666666666666,
+      "timber_id": "TO-001:timber:S11"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          784.2269180551448,
+          259.2249549941761,
+          0.8
+        ],
+        "x_axis": [
+          -0.600515226053134,
+          -0.7996133210986128
+        ],
+        "y_axis": [
+          0.7996133210986128,
+          -0.600515226053134
+        ]
+      },
+      "canonical_input": {
+        "assignment_complete_in_current_stage": true,
+        "assignment_status": "confirmed ordinary or turnout assignment",
+        "centre_point": [
+          784.2457253578128,
+          259.2365613688457
+        ],
+        "chair_family": "switch-heel chair",
+        "chair_subtype": "REA 3P-5P PLR block-heel chair",
+        "deliberate_omission": false,
+        "handedness": "Left-hand",
+        "key_direction_sign": 0,
+        "key_orientation": "requires a configurable key-direction policy",
+        "key_orientation_classification": "dimension requiring later confirmation",
+        "special_assignment_deferred": false,
+        "stale_signature_state": false,
+        "validation_status": "validated"
+      },
+      "constituent_frames": [
+        {
+          "request_id": "515fe85189c68fd841eb",
+          "source_block": "SCOUTJAW",
+          "source_component_index": 0,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              783.8670920606504,
+              259.4951868459,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "request_id": "a85a8b8548d9b735773e",
+          "source_block": "SCINJAW",
+          "source_component_index": 1,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              783.8670920606504,
+              259.4951868459,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "request_id": "423e88aa43f52473c8e3",
+          "source_block": "SCCCSEAT",
+          "source_component_index": 2,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              783.8670920606504,
+              259.4951868459,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 3,
+          "source_insertion": {
+            "rotation_rad": 0.0,
+            "x_mm": 0.0,
+            "y_mm": 0.0,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              783.8670920606504,
+              259.4951868459,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "request_id": "eceea92f321e754ba821",
+          "source_block": "MN",
+          "source_component_index": 4,
+          "source_insertion": {
+            "rotation_rad": 0.044019805506208015,
+            "x_mm": 0.0,
+            "y_mm": 3.4368089041590792,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              781.1189738788145,
+              261.5590429218825,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5647460415654082,
+              0.8252647505717193
+            ],
+            "y_axis": [
+              -0.8252647505717193,
+              0.5647460415654082
+            ]
+          }
+        },
+        {
+          "request_id": "d520f557ee349bc18f54",
+          "source_block": "MH",
+          "source_component_index": 5,
+          "source_insertion": {
+            "rotation_rad": 0.044019805506208015,
+            "x_mm": 0.0,
+            "y_mm": 3.4368089041590792,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              781.1189738788145,
+              261.5590429218825,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5647460415654082,
+              0.8252647505717193
+            ],
+            "y_axis": [
+              -0.8252647505717193,
+              0.5647460415654082
+            ]
+          }
+        },
+        {
+          "request_id": "b7a2bf972135bc182c15",
+          "source_block": "PLR3SEAT",
+          "source_component_index": 6,
+          "source_insertion": {
+            "rotation_rad": 0.044019805506208015,
+            "x_mm": 0.0,
+            "y_mm": 3.4368089041590792,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              781.1189738788145,
+              261.5590429218825,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5647460415654082,
+              0.8252647505717193
+            ],
+            "y_axis": [
+              -0.8252647505717193,
+              0.5647460415654082
+            ]
+          }
+        },
+        {
+          "request_id": "fe618a6c4da5480c984a",
+          "source_block": "KEY",
+          "source_component_index": 7,
+          "source_insertion": {
+            "rotation_rad": 0.044019805506208015,
+            "x_mm": 0.0,
+            "y_mm": 3.4368089041590792,
+            "z_mm": 0.0
+          },
+          "world_source_frame": {
+            "origin_mm": [
+              781.1189738788145,
+              261.5590429218825,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.5647460415654082,
+              0.8252647505717193
+            ],
+            "y_axis": [
+              -0.8252647505717193,
+              0.5647460415654082
+            ]
+          }
+        }
+      ],
+      "family": "5P",
+      "fixing_frames": [
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            4.634725570825746
+          ],
+          "source_index": 1,
+          "world_source_frame": {
+            "origin_mm": [
+              779.7607602705464,
+              261.7453345723596,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            4.634725570825746
+          ],
+          "source_index": 2,
+          "world_source_frame": {
+            "origin_mm": [
+              780.5614472386171,
+              262.8114856671577,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            -0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 3,
+          "world_source_frame": {
+            "origin_mm": [
+              785.4657818793615,
+              257.4608232333681,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        },
+        {
+          "source_centre_mm": [
+            0.6666666666666714,
+            -2.5
+          ],
+          "source_index": 4,
+          "world_source_frame": {
+            "origin_mm": [
+              786.2664688474323,
+              258.5269743281662,
+              3.283333333333333
+            ],
+            "x_axis": [
+              0.6005152260531339,
+              0.7996133210986129
+            ],
+            "y_axis": [
+              -0.7996133210986129,
+              0.6005152260531339
+            ]
+          }
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 0.9266510297737188,
+        "host_point_mm": [
+          777.2702821615868,
+          264.44943746083834
+        ],
+        "host_station_mm": 855.9646666666666
+      },
+      "nominal_timber_basis": {
+        "centre": [
+          775.8897880553972,
+          265.48619824054185
+        ],
+        "host_chainage": 855.9646666666666,
+        "local_rail_heading_radians": 0.9266510297737188,
+        "source_configuration": {
+          "crossing_suffix": "",
+          "length_prototype_inches": 108.0,
+          "local_far_y": 19.726452110994074,
+          "local_near_y": -16.273547889005926,
+          "local_x": 109.66666666666666,
+          "longitudinal_reference_axis": [
+            0.7358589851037945,
+            0.6771348123099369
+          ],
+          "source_note": "published REA C-switch individual centre",
+          "turnout_geometry_revision": 2
+        }
+      },
+      "position_id": "TO-001:chair:to-001-timber-s12:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 12,
+      "raw_label": "3P-11P",
+      "raw_source_classification": "temporary visual approximation",
+      "source_branch": "closure",
+      "source_hand_i": 1,
+      "source_rail_code": 1,
+      "source_station_mm": 109.66666666666666,
+      "timber_id": "TO-001:timber:S12"
+    }
+  ],
+  "provenance": {
+    "classification": [
+      "project_derivation",
+      "templot_reference_data"
+    ],
+    "independent_source_review": {
+      "bytes": 9373,
+      "name": "independent-peer-review.json",
+      "sha256": "96ef1f9e3153c3aa3415d36c4b29cb878d9b4f39c51178a22a2f053bd260039a"
+    },
+    "intended_use": "Bounded numeric comparison under LICENSING_BOUNDARIES canonical-data admission rule 3; independent disclosure review and retained adoption remain separate.",
+    "key_policy": {
+      "canonical_sign": 0,
+      "production_policy": "UNRESOLVED",
+      "retained_longitudinal_offset_mm": 0,
+      "retained_research_sign": 1
+    },
+    "limits": [
+      "Exactly five LH main-side S8-S12 stock identities; no companion or turnout-side admission and no global coverage arithmetic.",
+      "No raw source, model contents, polygons, rail polylines or local paths. Semantic model names and hashes are comparison bindings.",
+      "Frame values are copied from corrected V2, never product output.",
+      "Canonical input and nominal timber basis are selected settings from the independently hashed 168-position context.",
+      "No native/GUI, physical fit, production, source package or binary model publication authority follows from this numeric fixture."
+    ],
+    "models": {
+      "1P": {
+        "bytes": 306991,
+        "component_count": 31,
+        "component_names": [
+          "base_plinth",
+          "c00_SCOUTJAW_SCOUTJAW",
+          "c01_SCINJAW_body",
+          "c01_SCINJAW_bevel_negative",
+          "c01_SCINJAW_bevel_positive",
+          "c01_SCINJAW_grip",
+          "c01_SCINJAW_stiffener",
+          "c02_SCCCSEAT_SCCCSEAT",
+          "c03_KEY_KEY",
+          "c04_MM_body",
+          "c04_MM_bevel_negative",
+          "c04_MM_bevel_positive",
+          "c04_MM_grip",
+          "c04_MM_stiffener",
+          "c05_PLR1SEAT_PLR1SEAT",
+          "SourceFixing",
+          "SourceFixing001",
+          "SourceFixing002",
+          "SourceFixing003",
+          "SourceFixing004",
+          "SourceFixing005",
+          "SourceFixing006",
+          "SourceFixing007",
+          "SourceFixing008",
+          "SourceFixing009",
+          "SourceFixing010",
+          "SourceFixing011",
+          "SourceFixing012",
+          "SourceFixing013",
+          "SourceFixing014",
+          "SourceFixing015"
+        ],
+        "context_sha256": "30481fd010f5f68f0d6f4b812d0b76f9b3444cc5aa1bc2cda6bb74ed63d1299f",
+        "document_xml_sha256": "c5d317ab7560b0fcf1cf6137227a6e2b2a617f2478524c043cfc3a86b4dbb2e7",
+        "fixing_recipe_sha256": "ff065519fc2db613ac92d124ea5dd426969d5457ac93880d3c9e09ea59326d43",
+        "name": "1P.FCStd",
+        "run": "context-native-02",
+        "sha256": "f91a528e232fd8eb80ae55745f94bed588342c7047f812840a6704c42239b693"
+      },
+      "2P": {
+        "bytes": 307393,
+        "component_count": 31,
+        "component_names": [
+          "base_plinth",
+          "c00_SCOUTJAW_SCOUTJAW",
+          "c01_SCINJAW_body",
+          "c01_SCINJAW_bevel_negative",
+          "c01_SCINJAW_bevel_positive",
+          "c01_SCINJAW_grip",
+          "c01_SCINJAW_stiffener",
+          "c02_SCCCSEAT_SCCCSEAT",
+          "c03_KEY_KEY",
+          "c04_MM_body",
+          "c04_MM_bevel_negative",
+          "c04_MM_bevel_positive",
+          "c04_MM_grip",
+          "c04_MM_stiffener",
+          "c05_PLR1SEAT_PLR1SEAT",
+          "SourceFixing",
+          "SourceFixing001",
+          "SourceFixing002",
+          "SourceFixing003",
+          "SourceFixing004",
+          "SourceFixing005",
+          "SourceFixing006",
+          "SourceFixing007",
+          "SourceFixing008",
+          "SourceFixing009",
+          "SourceFixing010",
+          "SourceFixing011",
+          "SourceFixing012",
+          "SourceFixing013",
+          "SourceFixing014",
+          "SourceFixing015"
+        ],
+        "context_sha256": "d9ba7b95d4fc8be8e4b9a6d58941d67bb8413e4783d228436e6f7f2848b8bf73",
+        "document_xml_sha256": "f0fe3ae718c54e8071f07e96f2f817e941b8622f24efd4479de5b0db99195c97",
+        "fixing_recipe_sha256": "65037d96776b6bd452d2199ad7f8bffd2a339f3a694a4faf2d841f969fa4bd55",
+        "name": "2P.FCStd",
+        "run": "context-native-02",
+        "sha256": "bcdcf82ca8ade6c5470ad8dcde7edbe792e4af436de1e03ea51b197c41c87f93"
+      },
+      "3P": {
+        "bytes": 366897,
+        "component_count": 33,
+        "component_names": [
+          "base_plinth",
+          "c00_SCOUTJAW_SCOUTJAW",
+          "c01_SCINJAW_body",
+          "c01_SCINJAW_bevel_negative",
+          "c01_SCINJAW_bevel_positive",
+          "c01_SCINJAW_grip",
+          "c01_SCINJAW_stiffener",
+          "c02_SCCCSEAT_SCCCSEAT",
+          "c03_KEY_KEY",
+          "c04_MN_body",
+          "c04_MN_stiffener",
+          "c05_MH_body",
+          "c05_MH_bevel_negative",
+          "c05_MH_bevel_positive",
+          "c05_MH_grip",
+          "c06_PLR3SEAT_PLR3SEAT",
+          "c07_KEY_KEY",
+          "SourceFixing",
+          "SourceFixing001",
+          "SourceFixing002",
+          "SourceFixing003",
+          "SourceFixing004",
+          "SourceFixing005",
+          "SourceFixing006",
+          "SourceFixing007",
+          "SourceFixing008",
+          "SourceFixing009",
+          "SourceFixing010",
+          "SourceFixing011",
+          "SourceFixing012",
+          "SourceFixing013",
+          "SourceFixing014",
+          "SourceFixing015"
+        ],
+        "context_sha256": "51cefb0ba8214d7f8672ed5ed88bfd608217a0b66e094ab9fc54a88aa8f6223b",
+        "document_xml_sha256": "e34f4fd22e85e22fbb13f8b7d51e173d6392068cedbc6ad26ccb45d150c53bb2",
+        "fixing_recipe_sha256": "612dec4f8021c12f836adc4a3325c7b170c87c5571d6b9a667e30ed1d99799e5",
+        "name": "3P.FCStd",
+        "run": "context-native-02",
+        "sha256": "8ba16c037c8f404f5546a4065f9f4630529a9bd7325b7b9a6a31f3f035a9720f"
+      },
+      "4P": {
+        "bytes": 367114,
+        "component_count": 33,
+        "component_names": [
+          "base_plinth",
+          "c00_SCOUTJAW_SCOUTJAW",
+          "c01_SCINJAW_body",
+          "c01_SCINJAW_bevel_negative",
+          "c01_SCINJAW_bevel_positive",
+          "c01_SCINJAW_grip",
+          "c01_SCINJAW_stiffener",
+          "c02_SCCCSEAT_SCCCSEAT",
+          "c03_KEY_KEY",
+          "c04_MN_body",
+          "c04_MN_stiffener",
+          "c05_MH_body",
+          "c05_MH_bevel_negative",
+          "c05_MH_bevel_positive",
+          "c05_MH_grip",
+          "c06_PLR3SEAT_PLR3SEAT",
+          "c07_KEY_KEY",
+          "SourceFixing",
+          "SourceFixing001",
+          "SourceFixing002",
+          "SourceFixing003",
+          "SourceFixing004",
+          "SourceFixing005",
+          "SourceFixing006",
+          "SourceFixing007",
+          "SourceFixing008",
+          "SourceFixing009",
+          "SourceFixing010",
+          "SourceFixing011",
+          "SourceFixing012",
+          "SourceFixing013",
+          "SourceFixing014",
+          "SourceFixing015"
+        ],
+        "context_sha256": "f402cf4fca91b0fb64a6b72eb1b321debc4cb8c1dacb2ac640a33fbba7f039f5",
+        "document_xml_sha256": "fae14ffcb2fb7b49a46812e44e16db205a793cc4b80a5f5a2ccbf480b21f78e0",
+        "fixing_recipe_sha256": "e92fce654e3e2d48c0a5ebdb2f1bc134fd5901bb7a37d42879f929b03a2c0b35",
+        "name": "4P.FCStd",
+        "run": "context-native-02",
+        "sha256": "66ddcfa5b3b64594cd2695b4103f4861ddf971640e1fbb31e11422c20cad97ac"
+      },
+      "5P": {
+        "bytes": 366784,
+        "component_count": 33,
+        "component_names": [
+          "base_plinth",
+          "c00_SCOUTJAW_SCOUTJAW",
+          "c01_SCINJAW_body",
+          "c01_SCINJAW_bevel_negative",
+          "c01_SCINJAW_bevel_positive",
+          "c01_SCINJAW_grip",
+          "c01_SCINJAW_stiffener",
+          "c02_SCCCSEAT_SCCCSEAT",
+          "c03_KEY_KEY",
+          "c04_MN_body",
+          "c04_MN_stiffener",
+          "c05_MH_body",
+          "c05_MH_bevel_negative",
+          "c05_MH_bevel_positive",
+          "c05_MH_grip",
+          "c06_PLR3SEAT_PLR3SEAT",
+          "c07_KEY_KEY",
+          "SourceFixing",
+          "SourceFixing001",
+          "SourceFixing002",
+          "SourceFixing003",
+          "SourceFixing004",
+          "SourceFixing005",
+          "SourceFixing006",
+          "SourceFixing007",
+          "SourceFixing008",
+          "SourceFixing009",
+          "SourceFixing010",
+          "SourceFixing011",
+          "SourceFixing012",
+          "SourceFixing013",
+          "SourceFixing014",
+          "SourceFixing015"
+        ],
+        "context_sha256": "0e2fefc4cc31b67678e962ffb12f03d54a5ad3c9613145a0484eaf259a10e94c",
+        "document_xml_sha256": "caeda4a61309ec0a39b08b41c261ae71ca7e00fe502d9843764acf97ec2f3317",
+        "fixing_recipe_sha256": "fee800faad82ff38f14225cbf7beb22b24778aa8b86c519d8fbbba8805610d51",
+        "name": "5P.FCStd",
+        "run": "context-native-02",
+        "sha256": "ddbd7eba4838648d515e7d046328b713ee59884f1cbeae374699396bdbe7bee0"
+      }
+    },
+    "normalisation": {
+      "application": "One proper outer frame only; no second XML, crop, shear, twist, reflection or model normalisation.",
+      "outer_mounting_z_mm": 0.8,
+      "raw_source_world_z": "outer_mounting_z_mm+149/60+source_z",
+      "retained_xyz": "(-source_x, -source_y-0.45, source_z+149/60)"
+    },
+    "notice": "Source-informed comparison from Martin Wynne/OpenTemplot Templot 556b; see NOTICE.md and reference/PROVENANCE.md. No clean-room or project-cleared production claim.",
+    "project_status": "reference-only",
+    "raw_z_classification": {
+      "bytes": 1629,
+      "name": "raw-source-z-reporting-classification.json",
+      "sha256": "ff7d5936e7c1333a73f8d601a96bce7fedbc66502694663fbc935c71fceb31ad"
+    },
+    "report_clarification": {
+      "bytes": 4055,
+      "name": "mm-crop-constant-factual-clarification.json",
+      "sha256": "e37f0615a97efc2d473b68359a7052aa3081a7186539650a1844e9fc09637691"
+    },
+    "source_bindings": [
+      {
+        "bytes": 1174052,
+        "name": "000-source-context.json",
+        "sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c"
+      },
+      {
+        "bytes": 17393,
+        "name": "036-paired_switch_source_oracle.py",
+        "sha256": "334fb0f179705de0844ea6810f9430c1df15e474de759bbad7be088579bed318"
+      },
+      {
+        "bytes": 17393,
+        "name": "paired_switch_source_oracle.py",
+        "sha256": "334fb0f179705de0844ea6810f9430c1df15e474de759bbad7be088579bed318"
+      },
+      {
+        "bytes": 8015,
+        "name": "context.json",
+        "sha256": "3c89b48622530cb3a02c842264efa230f3dbc33af1d1c31978461e96fa2db3ef"
+      },
+      {
+        "bytes": 776816,
+        "name": "assembly-recipes.json",
+        "sha256": "e484b241fb8edc435b12a162f5eec99ba6c3a3f36100d47fb624fd07956e90a9"
+      },
+      {
+        "bytes": 20630,
+        "name": "requests.json",
+        "sha256": "879726329cd59126abd80e7aaf37dcfc4503115193ddbcb9c943ae23360128c2"
+      },
+      {
+        "bytes": 32087,
+        "name": "context_adapter.py",
+        "sha256": "91499057501948f7e8863ef104be6a5335a528124501f63cc3c034860603bf1a"
+      },
+      {
+        "bytes": 2666045,
+        "name": "result.json",
+        "sha256": "794e14a1a395cb63a22692d2f2ab7cf5e19bf103274faf4f0f8679ae719a8237"
+      },
+      {
+        "bytes": 4679,
+        "name": "family_assembly.py",
+        "sha256": "447c59290cb9648b1a65e77d2e6d75da1ac8df29fcf19a11617f5cfbf317ee38"
+      },
+      {
+        "bytes": 8554,
+        "name": "context_native.py",
+        "sha256": "2fffe64936463ece57f7c5d042706393c639a0edc0646415413479837497d763"
+      },
+      {
+        "bytes": 18746,
+        "name": "independent_check_end_probe.py",
+        "sha256": "ca7ec99327b7336d01018cee9a49bc19d3741cdad3978ac0631df18633fee975"
+      },
+      {
+        "bytes": 1900585,
+        "name": "math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65"
+      },
+      {
+        "bytes": 771317,
+        "name": "dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d"
+      },
+      {
+        "bytes": 62067,
+        "name": "chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b"
+      },
+      {
+        "bytes": 211218,
+        "name": "switch_select.pas",
+        "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb"
+      },
+      {
+        "bytes": 43386,
+        "name": "OpenTemplot2024.lpr",
+        "sha256": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766"
+      },
+      {
+        "bytes": 306991,
+        "name": "1P.FCStd",
+        "sha256": "f91a528e232fd8eb80ae55745f94bed588342c7047f812840a6704c42239b693"
+      },
+      {
+        "bytes": 307393,
+        "name": "2P.FCStd",
+        "sha256": "bcdcf82ca8ade6c5470ad8dcde7edbe792e4af436de1e03ea51b197c41c87f93"
+      },
+      {
+        "bytes": 366897,
+        "name": "3P.FCStd",
+        "sha256": "8ba16c037c8f404f5546a4065f9f4630529a9bd7325b7b9a6a31f3f035a9720f"
+      },
+      {
+        "bytes": 367114,
+        "name": "4P.FCStd",
+        "sha256": "66ddcfa5b3b64594cd2695b4103f4861ddf971640e1fbb31e11422c20cad97ac"
+      },
+      {
+        "bytes": 366784,
+        "name": "5P.FCStd",
+        "sha256": "ddbd7eba4838648d515e7d046328b713ee59884f1cbeae374699396bdbe7bee0"
+      }
+    ],
+    "source_expression_license": "GPL-3.0-or-later",
+    "source_result": {
+      "bytes": 152844,
+      "name": "source-numeric-result-v2.json",
+      "sha256": "6e612a706ecdc877a2931bec71d2a4b6c2427bf0b5397e19fb04971dcc596d43"
+    }
+  },
+  "schema_version": 1
+}
