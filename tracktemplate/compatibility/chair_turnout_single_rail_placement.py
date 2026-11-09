@@ -1,12 +1,14 @@
-"""Bind twelve retained single-rail assemblies to the fixed TO-001 source.
+"""Bind retained single-rail assemblies to the fixed TO-001 source.
 
-Templot 556b math_unit.pas:29551-29665 selects eleven L1 and one S1.
+Templot 556b math_unit.pas:29551-29665 selects eleven L1 and one S1;
+29502-29515 and 29760-29804 select the optional two R2 vee-rail S1s.
 Source-informed adaptation is GPL-3.0-or-later; see NOTICE.md and
 reference/PROVENANCE.md. Canonical labels, analytical exclusions and all
 unrelated preview routes remain unchanged. This is not fit admission.
 """
 
 import copy
+from fractions import Fraction
 import hashlib
 import json
 
@@ -52,6 +54,7 @@ _MODELS = (
     ("L1", "a0289c046b6ae8cb1e2df88a8f6a1f3f0dc79f7a0ae1870d0b3b13154e0eb042", 23),
     ("S1", "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb", 17),
 )
+_R2_RAILS = ((2, "vee splice rail"), (3, "vee point rail"))
 
 
 def _require(condition, message):
@@ -69,8 +72,8 @@ def _fixed_source(function, *args):
         ) from error
 
 
-def _source_binding(position, rail, timber, original, name, rail_code):
-    rail_name = dict(_RAILS)[rail_code]
+def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exit=False):
+    rail_name = dict(_R2_RAILS if r2_exit else _RAILS)[rail_code]
     rail_id = "TO-001:rail:" + rail_name.replace(" ", "-")
     timber_id = "TO-001:timber:" + name
     identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
@@ -93,7 +96,21 @@ def _source_binding(position, rail, timber, original, name, rail_code):
         "subtype and keying arrangement",
         "key_orientation_classification": "dimension requiring later confirmation",
     }
-    heel = rail_code in (1, 3)
+    heel = not r2_exit and rail_code in (1, 3)
+    if r2_exit:
+        label, code, family = (("AB", 25, "splice-rail support") if rail_code == 2
+                               else ("BB/BC", 26, "vee support"))
+        expected.update({
+            "chair_code": code, "chair_code_label": label, "chair_family": family,
+            "handedness": "Left-hand", "assignment_complete_in_current_stage": False,
+            "source_or_assumed_classification": "temporary visual approximation",
+            "key_orientation": "requires confirmation from the final special-chair "
+            "subtype and keying arrangement",
+        })
+        _require(name == "R2" and all(
+            position.get(key) is value for key, value in expected.items()
+            if type(value) is bool
+        ), "the original R2 source state differs")
     if heel:
         expected.update({
             "chair_code": 1, "chair_code_label": "S1",
@@ -139,7 +156,9 @@ def _source_binding(position, rail, timber, original, name, rail_code):
     _require(original.get("chair_position_identity") == identity
              and original.get("rail_identity") == rail_id
              and original.get("timber_identity") == timber_id
-             and original.get("chair_label") == ("S1" if heel else "L1"),
+             and original.get("chair_label") == (
+                 expected["chair_code_label"] if r2_exit else "S1" if heel else "L1"
+             ),
              "the original physical-plan binding differs")
     if not heel or name == "T2":
         reason = ("gauge normal is not perpendicular to the local rail tangent"
@@ -153,6 +172,92 @@ def _source_binding(position, rail, timber, original, name, rail_code):
                  and original["chair_code"] == 1
                  and _finite(original.get("base_z")),
                  "the original S1 physical instance differs")
+
+
+def _r2_finite_support(position, rail, timber):
+    """Require actual finite rail spans inside the actual R2 outline.
+
+    Exact rational predicates use stored model-mm coordinates. A strict
+    interior span must exist on each named finite face and centre polyline;
+    an infinite continuation or boundary contact is insufficient. This is
+    source-domain admission, not chair-footprint or physical-fit clearance.
+    """
+    def points(values, minimum):
+        _require(isinstance(values, (list, tuple)) and len(values) >= minimum
+                 and all(isinstance(p, (list, tuple)) and len(p) == 2
+                         and all(_finite(v) for v in p) for p in values),
+                 "R2 support geometry is not finite XY")
+        return [tuple(Fraction(v) for v in p) for p in values]
+
+    def sub(a, b):
+        return a[0] - b[0], a[1] - b[1]
+
+    def cross(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    def on_segment(p, a, b):
+        return (cross(sub(b, a), sub(p, a)) == 0
+                and all(min(a[i], b[i]) <= p[i] <= max(a[i], b[i]) for i in (0, 1)))
+
+    polygon = points(timber.get("outline_polygon"), 3)
+    _require(len(set(polygon)) == len(polygon), "R2 outline repeats a vertex")
+    edges = list(zip(polygon, polygon[1:] + polygon[:1]))
+    _require(sum(cross(a, b) for a, b in edges) != 0, "R2 outline is degenerate")
+    for i, (a, b) in enumerate(edges):
+        for j, (c, d) in enumerate(edges[i + 1:], i + 1):
+            if j == i + 1 or (i == 0 and j == len(edges) - 1):
+                continue
+            r, s = sub(b, a), sub(d, c)
+            denominator = cross(r, s)
+            if denominator:
+                t = cross(sub(c, a), s) / denominator
+                u = cross(sub(c, a), r) / denominator
+                intersects = 0 <= t <= 1 and 0 <= u <= 1
+            else:
+                intersects = any((on_segment(c, a, b), on_segment(d, a, b),
+                                  on_segment(a, c, d), on_segment(b, c, d)))
+            _require(not intersects, "R2 outline intersects itself")
+
+    def inside(p):
+        crossings = 0
+        for a, b in edges:
+            if on_segment(p, a, b):
+                return False
+            if (a[1] > p[1]) != (b[1] > p[1]):
+                x = a[0] + (p[1] - a[1]) * (b[0] - a[0]) / (b[1] - a[1])
+                crossings += p[0] < x
+        return crossings % 2 == 1
+
+    centre = points([position.get("centre_point")], 1)[0]
+    _require(inside(centre), "R2 canonical centre is outside its finite timber")
+
+    def supported(vertices):
+        for a, b in zip(vertices, vertices[1:]):
+            r = sub(b, a)
+            if r == (0, 0):
+                continue
+            cuts = {Fraction(0), Fraction(1)}
+            for c, d in edges:
+                s = sub(d, c)
+                denominator = cross(r, s)
+                if denominator:
+                    t = cross(sub(c, a), s) / denominator
+                    u = cross(sub(c, a), r) / denominator
+                    if 0 <= t <= 1 and 0 <= u <= 1:
+                        cuts.add(t)
+                elif cross(sub(c, a), r) == 0:
+                    axis = 0 if r[0] else 1
+                    cuts.update((p[axis] - a[axis]) / r[axis] for p in (c, d)
+                                if on_segment(p, a, b))
+            cuts = sorted(cuts)
+            if any(inside(tuple(a[k] + (lo + hi) / 2 * r[k] for k in (0, 1)))
+                   for lo, hi in zip(cuts, cuts[1:])):
+                return True
+        return False
+
+    for field in ("gauge_face_points", "points", "outer_face_points"):
+        _require(supported(points(rail.get(field), 2)),
+                 "R2 finite " + field + " has no interior timber span")
 
 
 def exclude_turnout_heel_l1(module, document, source, placements, excluded):
@@ -211,13 +316,15 @@ def exclude_turnout_heel_l1(module, document, source, placements, excluded):
 
 def preview_private_catalogue_turnout_single_rail_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
+    *, include_r2_exit=False,
 ):
-    """Create twelve private assemblies without changing source records.
+    """Create twelve private assemblies, with an explicit R2-pair option.
 
     Admission is limited to the fixed left-hand TO-001 source. The source
     clearance selects S1 at T2 rail 4 despite its raw L1 candidate label.
     Existing catalogue verification and the adapter own safe materialisation.
     """
+    _require(type(include_r2_exit) is bool, "include_r2_exit must be a boolean")
     _require(turnout_id == "TO-001" and callable(create_preview),
              "TO-001 and the native adapter are required")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
@@ -249,17 +356,22 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0), "identifier")
     placements, selected = [], []
     represented = set()
-    for name, rail_code, family in _SELECTION:
+    selection = _SELECTION + ((("R2", 2, "S1"), ("R2", 3, "S1"))
+                              if include_r2_exit else ())
+    for name, rail_code, family in selection:
+        r2_exit = name == "R2"
         identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
-                    + dict(_RAILS)[rail_code].replace(" ", "-"))
-        heel = rail_code in (1, 3)
+                    + dict(_R2_RAILS if r2_exit else _RAILS)[rail_code].replace(" ", "-"))
+        heel = not r2_exit and rail_code in (1, 3)
         originals = instances if heel and name != "T2" else excluded
         _require(identity in positions and identity in originals,
                  "a selected position or its original plan record is missing")
         position = positions[identity]
         timber = timber_map.get(position.get("timber_identity"), {})
         _source_binding(position, rail_map.get(position.get("rail_identity"), {}),
-                        timber, originals[identity], name, rail_code)
+                        timber, originals[identity], name, rail_code, r2_exit=r2_exit)
+        if r2_exit:
+            _r2_finite_support(position, rail_map[position["rail_identity"]], timber)
         station, point, heading = _fixed_source(
             _timber_frame, module, host, config, timber, layout.get(name, {}),
         )
@@ -307,11 +419,12 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         "source_context_signature": "sha256:" + hashlib.sha256(signature.encode()).hexdigest(),
         "source_analysis_signature": analysis["geometry_signature"],
         "analysis_position_count": len(positions),
-        "selected_family_counts": {"L1": 11, "S1": 1},
-        "represented_source_position_count": 12,
+        "selected_family_counts": {"L1": 11, "S1": 3 if include_r2_exit else 1},
+        "represented_source_position_count": len(placements),
         "selected_positions": sorted(selected, key=lambda item: item["position_id"]),
         "corrected_heel_positions": sorted(
-            (item for item in selected if item["source_rail_code"] in (1, 3)),
+            (item for item in selected if item["source_rail_code"] in (1, 3)
+             and item["prototype_timber_identifier"] != "R2"),
             key=lambda item: item["position_id"],
         ),
         "remaining_positions": [copy.deepcopy(position)
@@ -329,4 +442,5 @@ def preview_private_catalogue_turnout_single_rail_chairs(
                    "Five original S1 records select L1 only in this private preview."],
     }
     ordered = tuple(sorted(placements, key=lambda item: item.position_id))
-    return create_preview(catalogue_path, ordered, shapes, receipt, verify_inputs)
+    options = {"include_r2_exit": True} if include_r2_exit else {}
+    return create_preview(catalogue_path, ordered, shapes, receipt, verify_inputs, **options)
