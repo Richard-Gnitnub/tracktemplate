@@ -4106,3 +4106,51 @@ Independent preservation keeps the candidate and previous evidence available. Th
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+## Eight S1 and L1 chairs on TO-001 — 2026-11-09
+
+<a id="to-crossing-tail-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The private preview command for fixed TO-001 can add eight assemblies with the previous catalogue geometry and placement functions.
+This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
+The independent source review and quality review give `PASS`.
+
+The input `include_crossing_tail=True` adds six S1 chairs on the stock rails at `X6-C`, `X7-D` and `X8-E`.
+It also adds two L1 chairs on the vee rails at `X9-F`.
+The input must be `True` or `False`. Its default value is `False`.
+The previous [R2 option](#to-r2-source-placement-panel) remains available independently.
+
+Templot 556b `math_unit.pas:29502-29515,29657-29665,29760-29804` controls the chair selection.
+At `X9-F`, the source first selects S1J. Its later clearance rule selects L1.
+The command checks source conditions for joints, check rails and wing rails before it changes a document.
+It also checks actual finite rail segments in the timber outlines. These checks give no evidence for physical fit.
+
+| `include_crossing_tail` | `include_r2_exit` | Assemblies | Sets of coordinates | Component positions |
+| --- | --- | ---: | ---: | ---: |
+| `False` | `False` | 12 | 59 | 270 |
+| `False` | `True` | 14 | 67 | 304 |
+| `True` | `False` | 20 | 93 | 418 |
+| `True` | `True` | 22 | 101 | 452 |
+
+The two catalogue models continue to contain forty components. Placement repeats those components at the specified source positions.
+For the same inputs, default placements and R2 placements have the same data as in commit `bbdd36c17241f800d4742bd74eee237772ebb5e9`.
+The original five heel corrections, source identities, raw labels and analytical exclusions stay the same.
+
+All ten new tests and all 39 previous tests give `PASS`.
+The new fixture contains 34 independently reviewed sets of coordinates and has SHA-256 `b375ed2446c815e3988da128dc54520184f8b746cda3b32fe744035f79d3ccd4`.
+The check of the retained source uses all eighteen vertices in each of the four timber outlines.
+Independent quality review has SHA-256 `dcd6063a43122ed218cda5bb1578494fea49b2d3bc0ec2367d86da66a7460a42`.
+The project preserves the initial failures and their classifications.
+
+The [previous FreeCAD qualification for twelve chairs](#to-single-gui-pass-panel) remains applicable to the unchanged construction and document operations.
+The project did no FreeCAD tests for the eight new positions, with or without the display.
+Those tests remain necessary before the project can claim qualification of these positions.
+
+With both options, the TO-001 routes include 96 of 168 source positions.
+The remaining 72 positions contain 24 empty `chair_code_label` values and 48 other values.
+The empty values give no evidence for shared supports or exclusions.
+The [monthly restore test](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) remains overdue under risk `PR-13`.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.
