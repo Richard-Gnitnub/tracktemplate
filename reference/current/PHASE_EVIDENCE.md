@@ -4417,3 +4417,47 @@ Risk `PR-13` stays open. The project did not complete the restore test that is n
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Four crossing assemblies on TO-001 — 2026-11-09
+
+<a id="to-crossing-cohort-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The command `preview_private_catalogue_turnout_crossing_chairs` uses four previous assemblies with authority from [D-P9-019](#rea-bc-scope-panel).
+The fixed TO-001 C10 source has `handedness="Left-hand"`.
+The assemblies are `XA` at `X3-X`, `AA` at `X4-A`, `CD` at `X6-C` and `DD` at `X7-D`.
+Each assembly represents two source positions. The previous component shapes and operations stay the same.
+
+All fourteen [new tests](../../tests/validate_phase9b_turnout_crossing_chairs.py) and 55 selected previous tests give `PASS`, with no skips.
+The core test gives `PASS`: `CORE_EXPORT_DOCUMENT_CASES=21`, `CORE_EXPORT_OBSERVER_CASES=3` and `CORE_EXPORT_STAGING_CASES=34`.
+Nine previous route results keep the same bytes as commit `869f21d7a1fc0265956998a6dbb70047f28a10a8`.
+The dependency check gives `PASS`.
+The new tests examine 135 component copies and `layer_count=137` through one operation. They use test objects, not FreeCAD shapes.
+
+The initial new tests gave `FAIL` because the operation was missing.
+The first implementation test found duplicate identities in the new test setup. The inherited setup already contained `X3-X` and `X4-A`.
+The corrected setup replaces those two records and checks that all identities are unique. The product guard and all fourteen test methods stay the same.
+The original commands then give `PASS`. The failed evidence stays preserved.
+
+The source check compares fifty sets of position and direction values, with 350 values in total, and gives `PASS`.
+It uses four initial source shapes with eighteen points each and 24 checks across twelve full paths.
+All 168 initial records, the initial plan and its `analytical_only` entries stay the same.
+The [fixture](../../tests/fixtures/phase9b-to-crossing-cohort-source-frames.json) has SHA-256 `3fe86e5e6e0a565e1e151555fb9e1bca7723c176df804281486ec795c10da900`.
+The source check uses four initial samples from the host and assembly metadata. It does not open assembly files.
+The previous limits for calculated differences stay the same. They are not limits for physical fit.
+
+Together, these and the previous routes include 126 of 168 source positions. The eight new positions were not in the previous set of 118.
+The remaining 42 positions contain 24 empty `chair_code_label` values and eighteen other values.
+The empty values give no evidence for an assembly count.
+The whole `BB` assembly at `X5-B` stays outside this operation. Both `outer_face_points` paths fail the previous check for a span inside the source boundary.
+Optional `AA` attachments stay outside this operation. This result gives no evidence for Issue #254.
+
+The source keeps `key_direction_sign=0` and `temporary visual approximation`. Their meaning is not changed.
+The assemblies keep `retained_research_key_direction_sign=1` and `retained_research_key_offset_mm=0`.
+New FreeCAD tests for these four assemblies, with and without the display, are necessary. The previous TO-001 FreeCAD evidence is for the initial twelve assemblies only.
+This result gives no authority to send the four assembly files or their source packages to GitHub.
+
+Risk `PR-13` stays open. The project did not complete the restore test that is necessary each month by its deadline.
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

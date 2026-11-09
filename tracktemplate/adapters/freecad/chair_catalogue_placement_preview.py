@@ -634,6 +634,212 @@ def create_private_catalogue_turnout_zy_preview(
     )
 
 
+def create_private_catalogue_turnout_crossing_preview(
+    catalogue_path, placements, context_shapes, source_receipt, verify_source,
+):
+    """Place four fixed LH assemblies through one existing owned lifecycle.
+
+    Retained model placements already include source geometry and fixing
+    normalization. Each component receives its common outer frame once.
+    Four separately verified slices share two copied context layers.
+    """
+    from tracktemplate.application.chair_crossing_pair_catalogue import (
+        _TO_CROSSING_BINDINGS,
+        prepare_turnout_crossing_catalogue,
+        verify_turnout_crossing_catalogue,
+    )
+
+    family = "TurnoutCrossings"
+
+    def require(condition, message):
+        _require(condition, message, family=family)
+
+    if not callable(verify_source):
+        raise TypeError("Turnout crossing placement requires source verification")
+    families = tuple(label for label, _spec in _TO_CROSSING_BINDINGS)
+    require(isinstance(placements, dict) and tuple(placements) == families,
+            "the four ordered LH crossing families are required")
+    groups = {label: _placements(placements[label], PairedChairPlacement)
+              for label in families}
+    receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+    require(isinstance(receipt, dict), "source receipt must be a mapping")
+    selected = receipt.get("selected_positions")
+    counts = receipt.get("selected_family_counts")
+    require(
+        receipt.get("turnout_id") == "TO-001"
+        and all(type(receipt.get(key)) is int and receipt[key] == expected
+                for key, expected in (
+                    ("analysis_position_count", 168),
+                    ("selected_crossing_count", 4),
+                    ("represented_source_position_count", 8),
+                    ("retained_research_key_direction_sign", 1),
+                ))
+        and type(receipt.get("retained_research_key_offset_mm"))
+        in (int, float) and receipt["retained_research_key_offset_mm"] == 0
+        and isinstance(counts, dict) and counts == dict.fromkeys(families, 1)
+        and all(type(value) is int for value in counts.values())
+        and isinstance(selected, list) and len(selected) == 4
+        and all(isinstance(record, dict) for record in selected),
+        "the four source assemblies and retained research key are required",
+    )
+    raw_codes = {"XA": (23, "XA"), "AA": (25, "AB"),
+                 "CD": (26, "BB/BC"), "DD": (27, "CD")}
+    shared = {}
+    for (label, specification), record in zip(_TO_CROSSING_BINDINGS, selected):
+        (name, code, station, model_hash, context_hash, fixing_hash,
+         _centres, _names) = specification
+        rail_names = (("turnout-side wing rail", "main-side wing rail")
+                      if label in ("XA", "AA") else
+                      ("vee point rail", "vee splice rail"))
+        identities = tuple(
+            "TO-001:chair:to-001-timber-" + name.lower() + ":"
+            + rail.replace(" ", "-") for rail in rail_names
+        )
+        owner, companion = identities
+        timber_id = "TO-001:timber:" + name
+        rail_id = "TO-001:rail:" + rail_names[0].replace(" ", "-")
+        values = groups[label]
+        require(len(values) == 1 and values[0].position_id == owner
+                and values[0].rail_id == rail_id
+                and values[0].timber_id == timber_id
+                and values[0].origin_mm[2] == 0.8,
+                "the crossing family and fixed placement identity differ")
+        require(
+            record.get("position_id") == owner
+            and record.get("family") == label
+            and record.get("source_rail_code") == 3
+            and record.get("source_hand") == "LH"
+            and record.get("source_chair_code") == code
+            and record.get("source_station_mm") == station
+            and record.get("source_model_sha256") == model_hash
+            and record.get("source_context_sha256") == context_hash
+            and record.get("fixing_recipe_sha256") == fixing_hash,
+            "the crossing identity or retained recipe differs",
+        )
+        raw_code, raw_label = raw_codes[label]
+        for field, identity, rail in zip(
+            ("original_position", "original_companion"), identities, rail_names,
+        ):
+            original = record.get(field, {})
+            require(
+                isinstance(original, dict)
+                and original.get("stable_chair_position_identity") == identity
+                and original.get("rail_identity")
+                == "TO-001:rail:" + rail.replace(" ", "-")
+                and original.get("rail_name") == rail
+                and original.get("timber_identity") == timber_id
+                and original.get("parent_turnout_identity") == "TO-001"
+                and original.get("handedness") == "Left-hand"
+                and type(original.get("chair_code")) is int
+                and original["chair_code"] == raw_code
+                and original.get("chair_code_label") == raw_label
+                and original.get("special_assignment_deferred") is True
+                and original.get("deliberate_omission") is False
+                and type(original.get("key_direction_sign")) is int
+                and original["key_direction_sign"] == 0
+                and original.get("key_orientation")
+                == "requires confirmation from the final special-chair subtype and keying arrangement",
+                "the original crossing record or unresolved key differs",
+            )
+        shared[companion] = owner
+    require(receipt.get("shared_supports") == shared,
+            "the four explicit source companion links differ")
+    prepared_selections = prepare_turnout_crossing_catalogue(catalogue_path)
+    selections = []
+    layer_specs = _CONTEXT_SPECS
+    for (label, specification), prepared in zip(
+        _TO_CROSSING_BINDINGS, prepared_selections,
+    ):
+        _name, _code, _station, model_hash, _context, _fixing, _centres, names = (
+            specification
+        )
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, groups[label], None, receipt,
+            family=label, placement_type=PairedChairPlacement,
+            model_sha256=model_hash, source_names=names,
+            run="context-native-02", source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+        prefixed = tuple((label + "_" + name, title, colour)
+                         for name, title, colour in specs)
+        layer_specs += prefixed
+        selections.append((label, prefixed, prepare))
+
+    def prepare_layers():
+        layers = _context_layers(context_shapes)
+        reports, verifiers = {}, []
+        for label, specs, prepare in selections:
+            components, result, verify = prepare()
+            start = len(layers)
+            layers += components
+            verifiers.append((start, len(layers), verify))
+            result.pop("source_receipt")
+            # Strict whole-model LH admission belongs to this wrapper;
+            # the generic helper's existing handing guard stays unchanged.
+            result.update(
+                placement="source-paired-common-timber-frame.v1",
+                source_hand="LH", source_rail_code=3,
+                retained_research_key_direction_sign=1,
+                retained_research_key_offset_mm=0,
+                layers=[dict(_measure_layer(shape), name=spec[0])
+                        for spec, shape in zip(specs, components)],
+            )
+            reports[label] = result
+        result = {
+            "contract_id": "tracktemplate.private-catalogue-turnout-crossings.v1",
+            "source_receipt": receipt, "families": reports,
+            "family_count": len(reports),
+            "placement_count": sum(map(len, groups.values())),
+            "component_count": sum(r["component_count"]
+                                   for r in reports.values()),
+            "layer_count": len(layers),
+            "solid_count": sum(r["solid_count"] for r in reports.values()),
+            "layers": [dict(_measure_layer(shape), name=spec[0])
+                       for spec, shape in zip(layer_specs, layers)],
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "length_unit": "mm", "length_basis": "model",
+            "scale_denominator": "76.2",
+            "placement": "source-paired-common-timber-frame.v1",
+            "source_hand": "LH", "source_rail_code": 3,
+            "retained_research_key_direction_sign": 1,
+            "retained_research_key_offset_mm": 0,
+            "geometry_rebuilt": False,
+            "track_placements_added": len(groups),
+            "limits": [
+                "Four fixed LH XA/AA/CD/DD assemblies; eight source identities.",
+                "Whole BB and optional AA attachments remain excluded.",
+                "Canonical key0 and original exclusions remain unchanged.",
+                "No native, GUI, physical-fit, production, export or phase acceptance.",
+                "No crop, shear, twist or source normalization reapplied.",
+            ],
+        }
+
+        def verify_layers(stored):
+            require(len(stored) == len(layers), "stored layer count changed")
+            for actual, expected in zip(stored[:2], layers[:2]):
+                require(_same_presented_shape(actual, expected),
+                        "stored context geometry or placement changed")
+                _measure_layer(actual)
+                require(not actual.Faces and not actual.Solids
+                        and len(actual.Edges) == len(expected.Edges),
+                        "stored context is no longer the copied wires")
+            for start, end, verify in verifiers:
+                verify(stored[start:end])
+
+        return layers, result, verify_layers
+
+    def verify_inputs():
+        verify_source()
+        verify_turnout_crossing_catalogue(prepared_selections)
+
+    return _materialise_preview(
+        family, receipt, layer_specs, prepare_layers, verify_inputs,
+        title_suffix="retained catalogue assemblies",
+    )
+
+
 def create_private_catalogue_turnout_block_preview(
     catalogue_path,
     placements,
