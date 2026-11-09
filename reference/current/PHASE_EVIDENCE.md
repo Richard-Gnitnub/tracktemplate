@@ -4212,3 +4212,55 @@ The project did not complete the necessary [monthly restore test](../RECOVERY_AN
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Three more CC chairs on TO-001 — 2026-11-09
+
+<a id="to-central-cc-turnout-side-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The private preview command for TO-001 can add three CC assemblies with the previous geometry.
+This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
+Independent reviews of the source, calculated results and quality give `PASS` for this specified check against the source.
+
+The input `include_turnout_side=True` adds one assembly at each of `X2-Y`, `X3-X` and `X4-A`.
+Each assembly is for two initial source positions: `turnout-side-stock-rail` and `turnout-side-check-rail`.
+The source labels for the three assembly positions stay `XN`, `XA` and `AA`.
+The other three source labels stay `CC`.
+The input must be `True` or `False`. Its default value is `False`.
+
+| Input value | Assemblies | Source positions | Component positions | Display layers |
+| --- | ---: | ---: | ---: | ---: |
+| `False` | 3 | 6 | 99 | 35 |
+| `True` | 6 | 12 | 198 | 35 |
+
+The new function calculates one set of position and direction values for each chair body and four sets for the components that attach the chair.
+The fifteen new sets contain 105 values.
+The previous three assemblies keep their positions when the command includes the new assemblies.
+The previous function for right-hand chairs stays the same.
+The existing function that checks support within the rail and timber limits moves to the source module that both operations use.
+It uses the same operations with numbers and gives the same diagnostics.
+
+All eighteen [new tests](../../tests/validate_phase9b_turnout_cc_turnout_side.py) and all 73 previous tests give `PASS`, with no skips.
+The complete default CC result keeps the same bytes as commit `162c3e344fbaaa14198d6976bd5fbf822e6592f8`.
+All eight results from `preview_private_catalogue_turnout_single_rail_chairs` also keep the same bytes as that commit.
+The reviewer independently checks all six new position records and the three complete timber shapes, each defined by eighteen points.
+The reviewer also checks eighteen rail paths between their start and end points and all fifteen sets of values against the preserved source evidence.
+The complete set of 168 source records, initial plan and exclusions stay unchanged.
+
+The [fixture](../../tests/fixtures/phase9b-to-central-cc-turnout-side-source-frames.json) has SHA-256 `033292c8c1f56dd6f52fc8c3cdee0f2c751aec973ba0b67ea2dd9cca0307e5f9`.
+The independent review of the results calculated from the source has SHA-256 `7f5779d73d43a83e5668ab2591d9ca89925d9251fc79e7b7e75dfa945f342c15`.
+The previous functions that construct the shapes and operate on documents stay in use.
+The project did no FreeCAD tests for this new group, with or without the display.
+Those tests stay necessary. The fixture gives no authority to send the CC model or source package to GitHub.
+
+When all inputs that add chairs are `True`, the TO-001 routes include 105 of 168 source positions.
+The independent review of the identities shows that the six new positions were not in the previous set of 99.
+The remaining 63 positions contain 24 empty `chair_code_label` values and 39 other values.
+
+The empty values give no evidence for shared supports or exclusions.
+The [X9-F position without sufficient support](#to-joint-exit-source-placement-panel) is not available.
+The project did not do the necessary restore test for the month by its deadline. Risk `PR-13` stays open.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

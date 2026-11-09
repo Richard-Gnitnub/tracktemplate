@@ -3274,16 +3274,23 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_turnout_cc_chairs(
         self, source_document, turnout_id, catalogue_path,
+        *, include_turnout_side=False,
     ):
-        """Inspect three retained central CC assemblies on fixed TO-001."""
+        """Inspect fixed TO-001 CC, with optional source-qualified TS pairs."""
         from tracktemplate.compatibility.chair_turnout_check_placement import (
             preview_private_catalogue_turnout_cc_chairs,
         )
 
+        if type(include_turnout_side) is not bool:
+            raise ValueError("include_turnout_side must be a boolean")
         self.routing_record()
+        options = (
+            {"include_turnout_side": True} if include_turnout_side else {}
+        )
         return preview_private_catalogue_turnout_cc_chairs(
             self.module, source_document, turnout_id, catalogue_path,
             self._private_catalogue_cc_preview_factory,
+            **options,
         )
 
     def preview_private_catalogue_turnout_single_rail_chairs(

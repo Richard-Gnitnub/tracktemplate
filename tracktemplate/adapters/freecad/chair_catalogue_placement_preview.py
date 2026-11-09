@@ -233,12 +233,16 @@ def create_private_catalogue_l1_preview(
 
 def create_private_catalogue_cc_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
+    *, include_turnout_side=False,
 ):
-    """Place the fixed LH rail-1 CC through the existing common-frame lifecycle.
+    """Place fixed LH CC through the existing component lifecycle.
 
-    All 33 retained parts, including fixings, share each proper rigid frame.
-    The caller qualifies the finite TO-001 stock/check pairs before this entry.
+    The default retains three common main-side frames. The opt-in combines
+    those with three qualified turnout-side bodies and indexed fixings.
+    The caller qualifies the finite TO-001 source before this entry.
     """
+    _require(type(include_turnout_side) is bool,
+             "include_turnout_side must be a boolean", family="CC")
     prepared = prepare_catalogue_chair(
         catalogue_path, "CC", run="context-native-02",
     )
@@ -246,6 +250,73 @@ def create_private_catalogue_cc_preview(
              and tuple(item.name for item in prepared.components[-16:])
              == _CC_FIXING_NAMES,
              "central CC component identities differ", family="CC")
+    if include_turnout_side:
+        if not callable(verify_source):
+            raise TypeError("CC placement requires source verification")
+        placements = prepare_central_check_placements(placements)
+        expected = {
+            (f"TO-001:chair:to-001-timber-{name.lower()}:{side}-stock-rail",
+             f"TO-001:rail:{side}-stock-rail", f"TO-001:timber:{name}")
+            for name in ("X2-Y", "X3-X", "X4-A")
+            for side in ("main-side", "turnout-side")
+        }
+        _require({(p.position_id, p.rail_id, p.timber_id)
+                  for p in placements} == expected,
+                 "the six fixed TO-001 CC identities are required",
+                 family="CC")
+        receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
+        _require(isinstance(receipt, dict),
+                 "source receipt must be a mapping", family="CC")
+        owners = {identity for identity, _rail, _timber in expected}
+        pairs = {(identity.replace("stock-rail", "check-rail"), identity)
+                 for identity in owners}
+        selected = receipt.get("selected_positions")
+        shared = receipt.get("shared_supports")
+        _require(
+            receipt.get("turnout_id") == "TO-001"
+            and receipt.get("analysis_position_count") == 168
+            and receipt.get("selected_cc_count") == 6
+            and receipt.get("represented_source_position_count") == 12
+            and isinstance(selected, list) and len(selected) == 6
+            and all(isinstance(item, dict) for item in selected)
+            and {item.get("position_id") for item in selected} == owners
+            and isinstance(shared, list) and len(shared) == 6
+            and all(isinstance(item, dict) for item in shared)
+            and {(item.get("position_id"), item.get("assembly_position_id"))
+                 for item in shared} == pairs,
+            "the six source-qualified CC pairs are required", family="CC",
+        )
+        _require(
+            prepared.context.get("context_sha256")
+            == "5291c5d1b350373d93d686feb3bad35c5e2dfb62347bfc5d9906bf2c81077b6d",
+            "the qualified CC source context differs", family="CC",
+        )
+        prepared, specs, prepare = _prepare_catalogue_family(
+            catalogue_path, placements, context_shapes, receipt,
+            family="CC", placement_type=CentralCheckPlacement,
+            model_sha256=_CC_MODEL_SHA256,
+            source_names=tuple(item.name for item in prepared.components),
+            run="context-native-02", source_context=prepared.context,
+            prepared_selection=prepared,
+        )
+
+        def prepare_layers():
+            layers, result, verify = prepare()
+            # Only this exact LH cohort changes the inherited RH label.
+            # Generic RH and XO callers retain their original receipt.
+            result["fixing_angle_frame"] = (
+                "uncurved-LH-source-before-common-host-rotation"
+            )
+            return layers, result, verify
+
+        def verify_inputs():
+            verify_source()
+            verify_catalogue_sources(prepared)
+
+        return _materialise_preview(
+            "CC", receipt, specs, prepare_layers, verify_inputs,
+            title_suffix="catalogue placements",
+        )
     return _create_private_catalogue_preview(
         catalogue_path, placements, context_shapes, source_receipt,
         verify_source, family="CC", placement_type=PairedChairPlacement,
