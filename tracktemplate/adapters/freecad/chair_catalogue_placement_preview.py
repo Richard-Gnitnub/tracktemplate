@@ -258,11 +258,12 @@ def create_private_catalogue_cc_preview(
 def create_private_catalogue_turnout_single_rail_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
     *, include_r2_exit=False, include_crossing_tail=False,
+    include_joint_exit=False,
 ):
     """Place fixed LH TO-001 assemblies with explicit source-qualified options.
 
     Exact source identities and indexed fixing frames are mandatory.
-    Both families share copied context and the existing transaction.
+    Selected families share copied context and the existing transaction.
     This private snapshot gives no native-fit or production acceptance.
     """
     family = "TurnoutSingleRail"
@@ -273,6 +274,8 @@ def create_private_catalogue_turnout_single_rail_preview(
     require(type(include_r2_exit) is bool, "include_r2_exit must be a boolean")
     require(type(include_crossing_tail) is bool,
             "include_crossing_tail must be a boolean")
+    require(type(include_joint_exit) is bool,
+            "include_joint_exit must be a boolean")
     if not callable(verify_source):
         raise TypeError("Turnout single rails require source verification")
     placements = prepare_single_rail_placements(placements)
@@ -304,6 +307,10 @@ def create_private_catalogue_turnout_single_rail_preview(
             ("X9-F", "vee-splice-rail", "L1"),
             ("X9-F", "vee-point-rail", "L1"),
         )
+    if include_joint_exit:
+        selected += (("X9-F", "main-side-stock-rail", "S1J"),
+                     ("R1", "vee-splice-rail", "L1"),
+                     ("R1", "vee-point-rail", "S1J"))
     expected = {
         (f"TO-001:chair:to-001-timber-{timber.lower()}:{rail}",
          f"TO-001:rail:{rail}", f"TO-001:timber:{timber}", label)
@@ -312,7 +319,7 @@ def create_private_catalogue_turnout_single_rail_preview(
     require({(p.position_id, p.rail_id, p.timber_id, p.family)
              for p in placements} == expected,
             (f"the {len(selected)} fixed TO-001 single-rail identities are required"
-             if include_crossing_tail else
+             if include_crossing_tail or include_joint_exit else
              "the fourteen fixed TO-001 single-rail identities are required"
              if include_r2_exit else
              "the twelve fixed TO-001 single-rail identities are required"))
@@ -320,15 +327,20 @@ def create_private_catalogue_turnout_single_rail_preview(
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     selections = []
     layer_specs = _CONTEXT_SPECS
-    for label, digest, names in (
+    families = (
         ("L1", _L1_MODEL_SHA256, _L1_SOURCE_NAMES),
         ("S1", _S1_MODEL_SHA256, _S1_SOURCE_NAMES),
-    ):
+    )
+    if include_joint_exit:
+        families += (("S1J", _S1J_MODEL_SHA256, _S1J_SOURCE_NAMES),)
+    for label, digest, names in families:
         prepared, specs, prepare = _prepare_catalogue_family(
             catalogue_path, tuple(p for p in placements if p.family == label),
             None, receipt, family=label, placement_type=SingleRailPlacement,
-            model_sha256=digest, source_names=names, run="existing-02",
-            source_context="retained-S1-L1-reference-package",
+            model_sha256=digest, source_names=names,
+            run="basic-04" if label == "S1J" else "existing-02",
+            source_context=("fixed-basic-source-context" if label == "S1J"
+                            else "retained-S1-L1-reference-package"),
             source_handing="LH",
         )
         prefixed = tuple((label + "_" + name, title, colour)

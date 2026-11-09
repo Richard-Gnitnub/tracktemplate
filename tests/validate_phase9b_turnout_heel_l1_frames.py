@@ -218,7 +218,9 @@ class TurnoutHeelL1FrameTests(unittest.TestCase):
                     math.nextafter(gauge, math.inf), 16.5 - gauge,
                 ),
                 "source_rail_code": (True, False, 0, 2, 4, 5, 1.0, "1"),
-                "family": ("S1J", "P", None, [], "l1"),
+                # S1J is qualified on generic rails 1/3. The TO adapter
+                # separately requires L1 for these five heel identities.
+                "family": ("P", None, [], "l1"),
             }
             for field, bad_values in invalid.items():
                 for value in bad_values:

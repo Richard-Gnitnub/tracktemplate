@@ -4154,3 +4154,61 @@ The project did not complete the necessary [monthly restore test](../RECOVERY_AN
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Three S1J and L1 chairs on TO-001 — 2026-11-09
+
+<a id="to-joint-exit-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The private preview command for specified TO-001 can add three assemblies with the previous catalogue geometry.
+This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
+The independent source review and quality review give `PASS` for this specified source-only scope.
+
+The input `include_joint_exit=True` adds an S1J chair on the main-side stock rail at `X9-F`.
+It also adds an L1 chair on the vee-splice rail and an S1J chair on the vee-point rail at `R1`.
+The input must be `True` or `False`. Its default value is `False`.
+The previous [R2 input](#to-r2-source-placement-panel) and [crossing-tail input](#to-crossing-tail-source-placement-panel) stay available independently.
+
+Templot 556b `math_unit.pas:29655-29665,29752-29804` controls the source selection.
+The command validates the joint interval, check-rail clearance and wing-rail clearance before it changes a document.
+At R1, it validates the source calculation for the opposite rail with the previous numerical method.
+Only source rails 1 and 3 are permitted in the new path for left-hand S1J. This path rejects source rails 2 and 4.
+The right-hand calculations, finite-support check and catalogue construction functions stay the same.
+
+The fourth candidate is the turnout-side stock rail at `X9-F`.
+The preserved timber outline does not contain the analytical centre from the position record. This position is not available.
+The initial `FAIL` result and all seventeen diagnostic sets of coordinates stay preserved.
+The project did not change that centre, a tolerance or a support condition.
+
+With `include_joint_exit=True`, the other two inputs give these results:
+
+| `include_crossing_tail` | `include_r2_exit` | Assemblies | Sets of coordinates | Component positions |
+| --- | --- | ---: | ---: | ---: |
+| `False` | `False` | 15 | 72 | 327 |
+| `False` | `True` | 17 | 80 | 361 |
+| `True` | `False` | 23 | 106 | 475 |
+| `True` | `True` | 25 | 114 | 509 |
+
+The three new assemblies add thirteen sets of coordinates and 57 component positions.
+Without the new input, all four previous results have the same data as in commit `aa1db70514f00d8ee08a6da72dd2c7509167b1a0`.
+The five heel corrections, source identities, raw labels and previous analytical records stay the same.
+
+All fourteen new tests and all 57 previous tests give `PASS`, with no skips.
+The fixture contains thirteen independently reviewed sets of coordinates and has SHA-256 `04736591db0df308f2a3b7ce15146c8557fb529ffb7921e478c44bf4adf55cd9`.
+The check uses the preserved TO-001 context.
+It validates nine rail paths of finite length against the complete timber outlines for R1 and X9-F.
+Independent quality review has SHA-256 `26ee27d069453fb8ca2b48b327ce1711766bade3c41f0c33b3c8b7257274e682`.
+
+The [previous FreeCAD qualification for twelve chairs](#to-single-gui-pass-panel) stays applicable to construction and document operations that did not change.
+The project did no FreeCAD tests for these new positions, with or without the display.
+The applicable FreeCAD tests stay necessary for the new operation for left-hand S1J and for the larger groups.
+The numeric comparison fixture gives no authority to send the S1J model or source package to GitHub.
+
+With all three inputs set to `True`, the TO-001 routes include 99 of 168 source positions.
+The remaining 69 positions contain 24 empty `chair_code_label` values and 45 other values.
+The empty values give no evidence for shared supports or exclusions.
+The project did not complete the necessary [monthly restore test](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) by its deadline. Risk `PR-13` stays open.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

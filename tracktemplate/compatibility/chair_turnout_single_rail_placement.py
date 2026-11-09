@@ -63,6 +63,8 @@ _CROSSING_TAIL = (
     ("X9-F", 2, "L1"), ("X9-F", 3, "L1"),
 )
 _HEEL_SELECTION = (("S13", 1), ("S13", 3), ("T1", 1), ("T1", 3), ("T2", 3))
+_JOINT_EXIT = (("X9-F", 1, "S1J"), ("R1", 2, "L1"), ("R1", 3, "S1J"))
+_S1J_MODEL = "fd5cb5ffa9fa2004ef2930ab9280b4e906175b9233364448d07d8ef63c212c4b"
 
 
 def _require(condition, message):
@@ -81,8 +83,9 @@ def _fixed_source(function, *args):
 
 
 def _source_binding(position, rail, timber, original, name, rail_code, *,
-                    r2_exit=False, crossing_tail=False):
-    vee = r2_exit or (crossing_tail and name == "X9-F")
+                    r2_exit=False, crossing_tail=False, joint_exit=False):
+    vee = (r2_exit or (crossing_tail and name == "X9-F")
+           or (joint_exit and name == "R1"))
     rail_name = dict(_R2_RAILS if vee else _RAILS)[rail_code]
     rail_id = "TO-001:rail:" + rail_name.replace(" ", "-")
     timber_id = "TO-001:timber:" + name
@@ -107,7 +110,7 @@ def _source_binding(position, rail, timber, original, name, rail_code, *,
         "key_orientation_classification": "dimension requiring later confirmation",
     }
     heel = (name, rail_code) in _HEEL_SELECTION
-    if r2_exit or crossing_tail:
+    if r2_exit or crossing_tail or joint_exit:
         label, code, family = (("AB", 25, "splice-rail support") if rail_code == 2
                                else ("BB/BC", 26, "vee support"))
         if crossing_tail:
@@ -115,6 +118,8 @@ def _source_binding(position, rail, timber, original, name, rail_code, *,
                            "X8-E": (28, "EF"), "X9-F": (28, "EF")}[name]
             if name != "X9-F":
                 family = "common-crossing chair"
+        if joint_exit and name == "X9-F":
+            label, code, family = "EF", 28, "common-crossing chair"
         expected.update({
             "chair_code": code, "chair_code_label": label, "chair_family": family,
             "handedness": "Left-hand", "assignment_complete_in_current_stage": False,
@@ -122,13 +127,15 @@ def _source_binding(position, rail, timber, original, name, rail_code, *,
             "key_orientation": "requires confirmation from the final special-chair "
             "subtype and keying arrangement",
         })
-        _require((name == "R2" if r2_exit else
+        _require(((name, rail_code) in tuple((n, r) for n, r, _f in _JOINT_EXIT)
+                  if joint_exit else name == "R2" if r2_exit else
                   (name, rail_code) in tuple(
                       (n, r) for n, r, _f in _CROSSING_TAIL))
                  and all(
                      position.get(key) is value
                      for key, value in expected.items() if type(value) is bool
-                 ), "the original crossing-tail source state differs"
+                 ), "the original joint-exit source state differs"
+                 if joint_exit else "the original crossing-tail source state differs"
                  if crossing_tail else "the original R2 source state differs")
     if heel:
         expected.update({
@@ -176,7 +183,7 @@ def _source_binding(position, rail, timber, original, name, rail_code, *,
              and original.get("rail_identity") == rail_id
              and original.get("timber_identity") == timber_id
              and original.get("chair_label") == (
-                 expected["chair_code_label"] if r2_exit or crossing_tail
+                 expected["chair_code_label"] if r2_exit or crossing_tail or joint_exit
                  else "S1" if heel else "L1"
              ),
              "the original physical-plan binding differs")
@@ -327,6 +334,45 @@ def _crossing_tail_domain(module, dimensions, name, station, rail_code):
              "X9-F source still requires a wing-chair context")
 
 
+def _joint_exit_domain(module, dimensions, name, station):
+    """Bind the three fixed joint/exit rows to their 556b source predicates.
+
+    R1 retains the independently qualified 186-step get_xtimbcl2 result.
+    This does not admit the excluded X9 turnout-side stock position.
+    """
+    fields = ("a_timber_x", "check_main_end_x", "wing_end_main_x",
+              "wing_flare_turnout_x", "flare_length", "flare_angle", "k3")
+    _require(all(_finite(dimensions.get(key)) for key in fields),
+             "joint-exit source dimensions are not finite")
+    joint = dimensions["a_timber_x"] + (12.5 + 5 * 30) / 3
+    _require(joint - 13.5 / 3 < station < joint + 13.5 / 3,
+             "joint-exit source lies outside the joint-chair interval")
+    if name == "X9-F":
+        _require(station > dimensions["check_main_end_x"] - 4 / 3,
+                 "X9-F main stock still requires a check-chair context")
+        return
+    ratios = []
+    for steps in (185, 186):
+        shift = steps / 600
+        _angle, gauge_y, branch = _source_pose(
+            module, dimensions, station - shift, 2,
+        )
+        _require(branch == "turnoutst_main" and gauge_y > 16.5,
+                 "R1 opposing rail source branch differs")
+        ratios.append(shift / (gauge_y - 16.5))
+    _require(ratios[0] <= math.tan(dimensions["k3"] / 2) < ratios[1],
+             "R1 opposing source station differs")
+    flare = dimensions["flare_angle"]
+    _require(0 < flare < math.pi / 2 and dimensions["flare_length"] > 0,
+             "R1 source flare domain differs")
+    turnout_end = (dimensions["wing_flare_turnout_x"]
+                   + dimensions["flare_length"] / math.cos(flare)
+                   * math.cos(dimensions["k3"] + flare))
+    _require(station > dimensions["wing_end_main_x"] - 4 / 3
+             and station - 185.5 / 600 > turnout_end - 4 / 3,
+             "R1 source still requires a wing-chair context")
+
+
 def exclude_turnout_heel_l1(module, document, source, placements, excluded):
     """Keep five source-selected L1 chairs out of the fixed TO S1 preview.
 
@@ -384,8 +430,9 @@ def exclude_turnout_heel_l1(module, document, source, placements, excluded):
 def preview_private_catalogue_turnout_single_rail_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
     *, include_r2_exit=False, include_crossing_tail=False,
+    include_joint_exit=False,
 ):
-    """Create twelve assemblies with explicit R2 and crossing-tail options.
+    """Create twelve assemblies with explicit source-qualified options.
 
     Admission is limited to the fixed left-hand TO-001 source. The source
     clearance selects S1 at T2 rail 4 despite its raw L1 candidate label.
@@ -394,6 +441,8 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     _require(type(include_r2_exit) is bool, "include_r2_exit must be a boolean")
     _require(type(include_crossing_tail) is bool,
              "include_crossing_tail must be a boolean")
+    _require(type(include_joint_exit) is bool,
+             "include_joint_exit must be a boolean")
     _require(turnout_id == "TO-001" and callable(create_preview),
              "TO-001 and the native adapter are required")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
@@ -420,6 +469,13 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         _require(item.label == family and item.run == "existing-02"
                  and item.model_sha256 == digest and len(item.components) == count,
                  "the qualified " + family + " catalogue differs")
+    if include_joint_exit:
+        item = prepare_catalogue_chair(catalogue_path, "S1J", run="basic-04")
+        _require(item.label == "S1J" and item.run == "basic-04"
+                 and item.context == "fixed-basic-source-context"
+                 and item.model_sha256 == _S1J_MODEL and len(item.components) == 18,
+                 "the qualified S1J catalogue differs")
+        prepared["S1J"] = item
     obj, host, host_signature = _fixed_source(_host, module, source_document, config)
     dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
     layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0), "identifier")
@@ -429,10 +485,14 @@ def preview_private_catalogue_turnout_single_rail_chairs(
                               if include_r2_exit else ())
     if include_crossing_tail:
         selection += _CROSSING_TAIL
+    if include_joint_exit:
+        selection += _JOINT_EXIT
     for name, rail_code, family in selection:
         r2_exit = name == "R2"
         crossing_tail = (name, rail_code, family) in _CROSSING_TAIL
-        vee = r2_exit or (crossing_tail and name == "X9-F")
+        joint_exit = (name, rail_code, family) in _JOINT_EXIT
+        vee = (r2_exit or (crossing_tail and name == "X9-F")
+               or (joint_exit and name == "R1"))
         identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
                     + dict(_R2_RAILS if vee else _RAILS)[rail_code].replace(" ", "-"))
         heel = (name, rail_code) in _HEEL_SELECTION
@@ -443,11 +503,13 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         timber = timber_map.get(position.get("timber_identity"), {})
         _source_binding(position, rail_map.get(position.get("rail_identity"), {}),
                         timber, originals[identity], name, rail_code,
-                        r2_exit=r2_exit, crossing_tail=crossing_tail)
-        if r2_exit or crossing_tail:
+                        r2_exit=r2_exit, crossing_tail=crossing_tail,
+                        joint_exit=joint_exit)
+        if r2_exit or crossing_tail or joint_exit:
             _r2_finite_support(
                 position, rail_map[position["rail_identity"]], timber,
-                label="crossing-tail" if crossing_tail else "R2",
+                label=("joint-exit" if joint_exit else
+                       "crossing-tail" if crossing_tail else "R2"),
             )
         station, point, heading = _fixed_source(
             _timber_frame, module, host, config, timber, layout.get(name, {}),
@@ -457,6 +519,8 @@ def preview_private_catalogue_turnout_single_rail_chairs(
             _crossing_tail_domain(
                 module, dimensions, name, source_station, rail_code,
             )
+        if joint_exit:
+            _joint_exit_domain(module, dimensions, name, source_station)
         _require(_family(module, dimensions, name, source_station, rail_code) == family,
                  "the source clearance no longer selects the qualified family")
         angle, gauge_y, branch = _source_pose(
@@ -502,7 +566,7 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         "analysis_position_count": len(positions),
         "selected_family_counts": {
             family: sum(item["family"] == family for item in selected)
-            for family in ("L1", "S1")
+            for family in prepared
         },
         "represented_source_position_count": len(placements),
         "selected_positions": sorted(selected, key=lambda item: item["position_id"]),
@@ -530,4 +594,6 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     options = {"include_r2_exit": True} if include_r2_exit else {}
     if include_crossing_tail:
         options["include_crossing_tail"] = True
+    if include_joint_exit:
+        options["include_joint_exit"] = True
     return create_preview(catalogue_path, ordered, shapes, receipt, verify_inputs, **options)

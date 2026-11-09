@@ -133,7 +133,7 @@ def place_left_hand_single_rail(
     position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
     base_z_mm, *, family, source_rail_code, source_angle_rad, source_gauge_y_mm,
 ):
-    """Place retained S1/L1 parts on LH source rails 1-4, in mm/radians.
+    """Place LH S1/L1 on rails 1-4, or S1J on rails 1/3, in mm/radians.
 
     Gauge Y is measured from the main gauge face, without RH reflection.
     The caller qualifies the nominal station, source family and host.
@@ -148,9 +148,10 @@ def place_left_hand_single_rail(
     base_z = _finite_number(base_z_mm, "base_z_mm")
     angle = _finite_number(source_angle_rad, "source_angle_rad")
     gauge_y = _finite_number(source_gauge_y_mm, "source_gauge_y_mm")
-    if (family not in ("S1", "L1")
+    if (family not in ("S1", "S1J", "L1")
             or type(source_rail_code) is not int
             or source_rail_code not in (1, 2, 3, 4)
+            or (family == "S1J" and source_rail_code not in (1, 3))
             or (source_rail_code in (1, 3)
                 and (angle != 0
                      or gauge_y != (0 if source_rail_code == 1 else 16.5)))
