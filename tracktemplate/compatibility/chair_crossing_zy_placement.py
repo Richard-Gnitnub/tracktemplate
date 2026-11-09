@@ -6,13 +6,20 @@ chair label, owns this selection. Source-informed, GPL-3.0-or-later;
 see NOTICE.md and reference/PROVENANCE.md. No geometry is reconstructed.
 """
 
+import copy
 import hashlib
 import json
 import math
 
 from tracktemplate.application.chair_crossing_zy_catalogue import (
     ZY_CONTEXT_IDS,
+    _TO_ZY_CONTEXT_SHA256,
+    _TO_ZY_FIXING_SHA256,
+    _TO_ZY_MODEL_SHA256,
+    _TO_ZY_STATION_MM,
+    prepare_turnout_zy_catalogue,
     prepare_zy_catalogue,
+    verify_turnout_zy_catalogue,
 )
 from tracktemplate.compatibility.chair_pair_placement import _host_context
 from tracktemplate.domain.chair_placement import place_paired_chair
@@ -155,3 +162,258 @@ def prepare_crossing_zy(
 
     return ({name: tuple(sorted(values, key=lambda item: item.position_id))
              for name, values in groups.items()}, witnesses, companions, verify)
+
+
+def preview_private_catalogue_turnout_zy_chairs(
+    module, source_document, turnout_id, catalogue_path, create_preview,
+):
+    """Preview the fixed LH X1-Z assembly without changing its two records.
+
+    The retained model already contains constituent and fixing transforms.
+    Only its proper common outer frame is applied. Canonical key0 stays
+    unresolved; the retained research key does not change source policy.
+    """
+    from tracktemplate.compatibility.chair_reference_preview import (
+        _context_shapes_and_verifier,
+        _open_source_context,
+    )
+    from tracktemplate.compatibility.chair_source_support import (
+        _finite,
+        _finite_rail_timber_support,
+        _indexed,
+        _require_context,
+        _same_number,
+    )
+
+    _require(turnout_id == "TO-001" and callable(create_preview),
+             "TO-001 and the native adapter are required")
+    signature, analysis, settings, plan, rails, timbers = _open_source_context(
+        module, source_document, turnout_id, "ZY",
+    )
+    context = json.loads(signature)
+    _require_context(module, context, turnout_id, settings, plan, family="ZY")
+    config = context["configuration"]
+    fixed = {
+        "handing": "Left-hand",
+        "orientation": "Facing in host travel direction",
+        "rail_geometry_revision": 2,
+        "timber_geometry_revision": 2,
+        "toe_chainage": 746.298,
+        "template_width": 32.0,
+        "chair_analysis_signature": "dad7acd2955b47ec82ad76e3827443eecce54c072c647e5e7e9ba865303b7379",
+    }
+    _require(
+        all(config.get(key) == value
+            and (type(value) not in (int, float) or _finite(config[key]))
+            for key, value in fixed.items())
+        and analysis.get("geometry_signature")
+        == fixed["chair_analysis_signature"]
+        and settings.get("future_chair_embed_depth") == 0.2,
+        "only the fixed LH facing TO-001 source is supported",
+    )
+    positions = _indexed(analysis.get("positions"),
+                         "stable_chair_position_identity")
+    rail_map = _indexed(rails, "stable_identity")
+    timber_map = _indexed(timbers, "stable_identity")
+    instances = _indexed(plan.get("instances"), "chair_position_identity")
+    excluded = _indexed(plan.get("analytical_only"), "chair_position_identity")
+    _require(
+        len(positions) == 168
+        and not instances.keys() & excluded.keys()
+        and instances.keys() | excluded.keys() == positions.keys(),
+        "the inherited plan must account for all 168 positions once",
+    )
+    _require(instances and all(_finite(p.get("base_z")) and p["base_z"] == 0.8
+                               for p in instances.values()),
+             "the source mounting plane differs")
+    timber_id = "TO-001:timber:X1-Z"
+    identities = tuple("TO-001:chair:to-001-timber-x1-z:"
+                       + rail.replace(" ", "-") for rail in _RAILS)
+    _require(
+        {key for key, p in positions.items()
+         if p.get("prototype_timber_identifier") == "X1-Z"
+         and p.get("rail_name") in _RAILS} == set(identities)
+        and all(key in excluded for key in identities)
+        and timber_id in timber_map,
+        "the exact two unresolved X1-Z source identities are required",
+    )
+    timber = timber_map[timber_id]
+    source = timber.get("source_configuration", {})
+    dimensions = module.rea_c10_dimensions(16.5, 1.0, 76.2)
+    layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0),
+                      "identifier")
+    nominal = layout.get("X1-Z", {})
+    _require(
+        timber.get("identifier") == timber.get("prototype_reference")
+        == "X1-Z"
+        and timber.get("parent_turnout_identity") == "TO-001"
+        and timber.get("crossover_identity") == ""
+        and timber.get("section") == "crossing wing front"
+        and "extended_source_timber_identity" not in source
+        and type(source.get("turnout_geometry_revision")) is int
+        and source["turnout_geometry_revision"] == 2
+        and source.get("crossing_suffix") == "Z"
+        and source.get("source_note")
+        == "REA wing-front crossing-chair spacing: 30 inches"
+        and all(_finite(source.get(field))
+                and source[field] == nominal.get(key) == expected
+                for field, key, expected in (
+                    ("local_x", "x", _TO_ZY_STATION_MM),
+                    ("local_near_y", "near_y", -16.01483959071012),
+                    ("local_far_y", "far_y", 29.98516040928988),
+                    ("length_prototype_inches", "length_prototype_inches",
+                     138.0),
+                )),
+        "the fixed nominal X1-Z timber differs",
+    )
+    axis = source.get("longitudinal_reference_axis")
+    _require(isinstance(axis, (list, tuple)) and len(axis) == 2
+             and all(_same_number(a, b) for a, b in zip(
+                 axis, (0.7358589851037945, 0.6771348123099369))),
+             "the source longitudinal timber axis differs")
+    for identity, rail_name in zip(identities, _RAILS):
+        rail_id = "TO-001:rail:" + rail_name.replace(" ", "-")
+        position = positions[identity]
+        expected = {
+            "stable_chair_position_identity": identity,
+            "rail_identity": rail_id, "rail_name": rail_name,
+            "rail_role": rail_name, "timber_identity": timber_id,
+            "prototype_timber_identifier": "X1-Z",
+            "timber_identifier": "X1-Z", "parent_turnout_identity": "TO-001",
+            "parent_crossover_identity": "", "handedness": "Left-hand",
+            "handedness_classification": "source-derived prototype requirement",
+            "chair_code": 21, "chair_code_label": "ZY",
+            "chair_family": "common-crossing chair",
+            "chair_subtype": "REA common-crossing subtype awaiting detailed special-chair assignment",
+            "source_or_assumed_classification": "temporary visual approximation",
+            "assignment_status": "deferred to special-chair assignment",
+            "assignment_complete_in_current_stage": False,
+            "special_assignment_deferred": True, "deliberate_omission": False,
+            "stale_signature_state": False, "validation_status": "Advisory",
+            "key_direction_sign": 0,
+            "key_orientation": "requires confirmation from the final special-chair subtype and keying arrangement",
+            "key_orientation_classification": "dimension requiring later confirmation",
+        }
+        _require(all(position.get(key) == value
+                     and (type(value) not in (bool, int)
+                          or type(position.get(key)) is type(value))
+                     for key, value in expected.items()),
+                 "the canonical ZY assignment or unresolved key differs")
+        original = excluded[identity]
+        _require(original.get("rail_identity") == rail_id
+                 and original.get("timber_identity") == timber_id
+                 and original.get("chair_label") == "ZY"
+                 and original.get("chair_family") == "common-crossing chair"
+                 and original.get("deliberate_omission") is False
+                 and original.get("unresolved_special") is True,
+                 "the original ZY exclusion differs")
+        rail = rail_map.get(rail_id, {})
+        rail_source = {
+            "gauge_face": rail_name + " gauge face",
+            "outer_face": rail_name + " outer face",
+            "gauge_orientation_source": "mapped named turnout rail faces",
+            "rail_geometry_revision": 2,
+        }
+        _require(
+            rail.get("name") == rail.get("rail_role") == rail_name
+            and rail.get("parent_turnout_identity") == "TO-001"
+            and rail.get("parent_crossover_identity") == ""
+            and rail.get("turnout_side") == ""
+            and rail.get("source_configuration") == rail_source
+            and position.get("source_configuration")
+            == {"rail": rail_source, "timber": source},
+            "the named supporting rail or position source binding differs",
+        )
+        _finite_rail_timber_support(position, rail, timber,
+                                    label="ZY", require=_require)
+
+    def host_state():
+        obj = source_document.getObject(config.get("host_object", ""))
+        _require(obj is not None and not obj.Shape.isNull()
+                 and obj.Shape.isValid(), "the canonical host is unavailable")
+        data = module.turnout_host_alignment(obj)
+        record = {
+            "object_name": obj.Name,
+            "points": [[p.x, p.y] for p in data["points"]],
+            "headings": data["headings"], "stations": data["stations"],
+            "total": data["total"],
+        }
+        _require(_finite(record["total"]) and record["total"] > 0
+                 and all(_finite(v) for p in record["points"] for v in p)
+                 and all(_finite(v) for key in ("headings", "stations")
+                         for v in record[key]), "nonfinite canonical host")
+        return obj, data, _encoded(record)
+
+    host_object, host, host_signature = host_state()
+    station = config["toe_chainage"] + source["local_x"]
+    _require(0 <= station <= host["total"], "ZY lies outside its host")
+    point, heading = module.interpolate_alignment_station(host, station)
+    centre_y = (source["local_near_y"] + source["local_far_y"]) / 2
+    centre = timber.get("centre")
+    _require(
+        all(_same_number(a, b) for a, b in zip(
+            (point.x, point.y, heading),
+            (850.6580320655746, 392.05622271228776, 1.1674251123351245)))
+        and _same_number(timber.get("host_chainage"), station)
+        and _same_number(timber.get("local_rail_heading_radians"), heading)
+        and isinstance(centre, (list, tuple)) and len(centre) == 2
+        and _same_number(centre[0], point.x - centre_y * math.sin(heading))
+        and _same_number(centre[1], point.y + centre_y * math.cos(heading)),
+        "the initial fixed host anchor or nominal timber frame differs",
+    )
+    prepared = prepare_turnout_zy_catalogue(catalogue_path)
+    owner, companion = identities
+    placements = (place_paired_chair(
+        owner, positions[owner]["rail_identity"], timber_id,
+        (point.x, point.y), heading, 0.8, 8.25, 0.45,
+    ),)
+    shapes, verify_source = _context_shapes_and_verifier(
+        module, source_document, turnout_id, "ZY", signature,
+    )
+
+    def verify_inputs():
+        verify_source()
+        current_object, _data, current_signature = host_state()
+        _require(current_object is host_object
+                 and current_signature == host_signature,
+                 "canonical host changed during ZY preview")
+        verify_turnout_zy_catalogue(prepared)
+
+    receipt = {
+        "document_name": source_document.Name, "turnout_id": turnout_id,
+        "source_context_signature": "sha256:"
+        + hashlib.sha256(signature.encode()).hexdigest(),
+        "source_analysis_signature": analysis["geometry_signature"],
+        "analysis_position_count": len(positions), "selected_zy_count": 1,
+        "represented_source_position_count": 2,
+        "selected_family_counts": {"ZY": 1},
+        "selected_positions": [{
+            "position_id": owner, "family": "ZY", "source_hand": "LH",
+            "prototype_timber_identifier": "X1-Z", "source_rail_code": 3,
+            "source_chair_code": 21, "source_station_mm": source["local_x"],
+            "host_station_mm": station,
+            "source_model_sha256": _TO_ZY_MODEL_SHA256,
+            "source_context_sha256": _TO_ZY_CONTEXT_SHA256,
+            "fixing_recipe_sha256": _TO_ZY_FIXING_SHA256,
+            "original_position": copy.deepcopy(positions[owner]),
+            "original_companion": copy.deepcopy(positions[companion]),
+            "physical_fit": "NOT_PROVED",
+        }],
+        "shared_supports": {companion: owner},
+        "remaining_positions": [copy.deepcopy(p)
+                                for identity, p in sorted(positions.items())
+                                if identity not in identities],
+        "original_analytical_exclusions": copy.deepcopy(plan["analytical_only"]),
+        "retained_research_key_direction_sign": 1,
+        "retained_research_key_offset_mm": 0, "source_base_z_mm": 0.8,
+        "source_document_mutation": False,
+        "model_support_adjustments_applied": False,
+        "limits": [
+            "One fixed LH X1-Z assembly; only its two explicit source identities.",
+            "Canonical key0 and all original classifications remain unchanged.",
+            "Retained research +1 key/zero offset does not resolve key policy.",
+            "No native, GUI, physical-fit, production, export or phase acceptance.",
+        ],
+    }
+    return create_preview(catalogue_path, placements, shapes, receipt,
+                          verify_inputs)

@@ -632,6 +632,7 @@ def validate_composition_boundary():
     catalogue_cc_preview_factory = lambda *args: None
     catalogue_turnout_check_end_preview_factory = lambda *args: None
     catalogue_turnout_block_preview_factory = lambda *args: None
+    catalogue_turnout_zy_preview_factory = lambda *args: None
     catalogue_turnout_single_rail_preview_factory = lambda *args: None
     catalogue_crossover_preview_factory = lambda *args: None
     routing = {"route": "modular"}
@@ -661,6 +662,9 @@ def validate_composition_boundary():
             ),
             "private_catalogue_turnout_block_preview_factory": (
                 catalogue_turnout_block_preview_factory
+            ),
+            "private_catalogue_turnout_zy_preview_factory": (
+                catalogue_turnout_zy_preview_factory
             ),
             "private_catalogue_turnout_single_rail_preview_factory": (
                 catalogue_turnout_single_rail_preview_factory
@@ -703,6 +707,9 @@ def validate_composition_boundary():
                 ),
                 create_private_catalogue_turnout_block_preview=(
                     catalogue_turnout_block_preview_factory
+                ),
+                create_private_catalogue_turnout_zy_preview=(
+                    catalogue_turnout_zy_preview_factory
                 ),
                 create_private_catalogue_turnout_single_rail_preview=(
                     catalogue_turnout_single_rail_preview_factory
