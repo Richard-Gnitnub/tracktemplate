@@ -4314,3 +4314,52 @@ The project did not complete the necessary [monthly restore test](../RECOVERY_AN
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Five main-side block chairs on TO-001 — 2026-11-09
+
+<a id="to-main-block-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The private command `preview_private_catalogue_turnout_block_chairs` puts the existing `1P` to `5P` assemblies at the five `S8` to `S12` main-side positions.
+This change continues the work with the authority in [D-P9-019](#rea-bc-scope-panel).
+It is limited to the fixed left-hand TO-001 source.
+The previous constructors, component geometry and document transaction stay in use.
+
+All fourteen [new tests](../../tests/validate_phase9b_turnout_block_chairs.py) and all 96 selected previous tests give `PASS`, with no skips.
+The separate P-chair recalculation test gives `PASS`.
+The core export test gives `PASS` for 21 document cases, three observer cases and 34 staging cases.
+The fourteen tests first gave `FAIL` because the new operation was absent. The test and fixture bytes stay unchanged.
+
+The first implementation failed the existing dependency check.
+The correction moves seven unchanged admission functions to one shared module and puts model checks in the application layer.
+The original failed check now gives `PASS`. Eight previous route results keep the same bytes as commit `6ede48a49514046819e277291903f50a6d98231d`.
+
+The source comparison examines 61 sets of position and direction values, with 427 values in total.
+These include five assembly positions, 36 component positions and twenty fixing positions.
+All comparisons give `PASS` within the previous arithmetic limits. These limits are not physical-fit tolerances.
+The check uses the five initial timber outlines, each with eighteen points, and thirty complete rail paths.
+All 168 initial records, the initial plan and its exclusions stay unchanged.
+
+The [fixture](../../tests/fixtures/phase9b-to-lh-main-block-source-frames.json) has SHA-256 `808f672e5df7f63b67cd0e6e2e8e0b0930e646eeb23a2791f8867b38c7ac087a`.
+The independent source review has SHA-256 `8be32b349aadabd1bc3fdce5061c609fd10cad5e229de6e79250859c64ecd2fa`.
+
+The adapter tests examine all 161 component copies and 163 display layers with shape substitutes.
+New FreeCAD tests for these five assemblies, with and without the display, remain necessary.
+The previous TO-001 FreeCAD evidence stays limited to the initial twelve assemblies.
+This result gives no authority to send the five models or their source package to GitHub.
+
+The source `key_direction_sign` stays `0`, with its unresolved policy.
+The models keep their previous research keys at `+1` and zero longitudinal offset. This does not accept a key policy.
+The `S10` to `S12` records keep their `temporary visual approximation` classification.
+The empty labels for the companion positions do not become chair assignments or shared supports.
+
+Together, these and the previous TO-001 routes include 116 of 168 source positions.
+The five new positions were not in the previous set of 111.
+The remaining 52 positions contain 24 empty `chair_code_label` values and 28 other values.
+The empty values give no evidence for shared supports or exclusions. Previous unsupported positions remain outside the routes.
+
+The necessary monthly restore test remains overdue. Risk `PR-13` stays open.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.
