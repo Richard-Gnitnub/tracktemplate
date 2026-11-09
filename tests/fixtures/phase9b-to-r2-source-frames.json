@@ -1,0 +1,510 @@
+{
+  "host": {
+    "gauge_origin_mm": [
+      890.8496439654824,
+      482.6775733036032
+    ],
+    "host_heading_rad": 1.3010046720678783,
+    "host_point_mm": [
+      882.8980757721066,
+      484.87645103237634
+    ],
+    "host_station_mm": 1101.8642337705478,
+    "local_station_mm": 355.5662337705479,
+    "mounting_plane_z_mm": 0.8,
+    "source_mean_y_mm": 11.89994820789717,
+    "timber_id": "TO-001:timber:R2"
+  },
+  "positions": [
+    {
+      "body": {
+        "origin_mm": [
+          874.512785677274,
+          487.19526754635524,
+          0.8
+        ],
+        "x_axis": [
+          0.2665306337906826,
+          0.9638264476819138
+        ],
+        "y_axis": [
+          -0.9638264476819138,
+          0.2665306337906826
+        ]
+      },
+      "canonical_centre_strictly_inside_actual_outline": true,
+      "finite_support": {
+        "gauge_face_points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.9668823471142137,
+              "segment_index_zero_based": 91
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 92
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 93
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 94
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 95
+            },
+            {
+              "high_parameter": 0.42604856450253936,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 96
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 102
+        },
+        "outer_face_points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.9379907153011736,
+              "segment_index_zero_based": 70
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 71
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 72
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 73
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 74
+            },
+            {
+              "high_parameter": 0.4100004590791652,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 75
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 81
+        },
+        "points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.6775665454829212,
+              "segment_index_zero_based": 90
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 91
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 92
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 93
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 94
+            },
+            {
+              "high_parameter": 0.7097747999300112,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 95
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 102
+        }
+      },
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            877.6291578581122,
+            486.3334851637654,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        },
+        {
+          "origin_mm": [
+            877.6291578581122,
+            486.3334851637654,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        },
+        {
+          "origin_mm": [
+            870.5610972417782,
+            488.2880431448971,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        }
+      ],
+      "position_id": "TO-001:chair:to-001-timber-r2:vee-point-rail",
+      "rail_id": "TO-001:rail:vee-point-rail",
+      "raw_label": "BB/BC",
+      "source_anchor_mm": [
+        0.0,
+        16.5
+      ],
+      "source_angle_rad": 0.0,
+      "source_fixing_targets_mm": [
+        [
+          -0.6666666666666666,
+          15.333333333333334
+        ],
+        [
+          0.6666666666666666,
+          15.333333333333334
+        ],
+        [
+          0.0,
+          19.0
+        ]
+      ],
+      "source_gauge_y_mm": 16.5,
+      "source_midpoint_delta_mm": 0.0,
+      "source_rail_code": 3,
+      "source_selected_family": "S1",
+      "timber_id": "TO-001:timber:R2"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          868.4222651153322,
+          488.857475905798,
+          0.8
+        ],
+        "x_axis": [
+          -0.16930357691681974,
+          -0.9855639496466835
+        ],
+        "y_axis": [
+          0.9855639496466835,
+          -0.16930357691681974
+        ]
+      },
+      "canonical_centre_strictly_inside_actual_outline": true,
+      "finite_support": {
+        "gauge_face_points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.9685357285293611,
+              "segment_index_zero_based": 91
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 92
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 93
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 94
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 95
+            },
+            {
+              "high_parameter": 0.426993487978882,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 96
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 102
+        },
+        "outer_face_points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.9379899778592504,
+              "segment_index_zero_based": 70
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 71
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 72
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 73
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 74
+            },
+            {
+              "high_parameter": 0.4100257329569713,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 75
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 81
+        },
+        "points": {
+          "first_endpoint_location": "outside",
+          "interior_spans": [
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.6786067260756862,
+              "segment_index_zero_based": 90
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 91
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 92
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 93
+            },
+            {
+              "high_parameter": 1.0,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 94
+            },
+            {
+              "high_parameter": 0.7103735623143338,
+              "low_parameter": 0.0,
+              "segment_index_zero_based": 95
+            }
+          ],
+          "last_endpoint_location": "outside",
+          "segment_count": 102
+        }
+      },
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            868.451940858405,
+            488.68580049587547,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        },
+        {
+          "origin_mm": [
+            868.3223047825733,
+            488.71478383182847,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        },
+        {
+          "origin_mm": [
+            868.46682699436,
+            489.05679137238945,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.2665306337906826,
+            -0.9638264476819138
+          ],
+          "y_axis": [
+            0.9638264476819138,
+            -0.2665306337906826
+          ]
+        }
+      ],
+      "position_id": "TO-001:chair:to-001-timber-r2:vee-splice-rail",
+      "rail_id": "TO-001:rail:vee-splice-rail",
+      "raw_label": "AB",
+      "source_anchor_mm": [
+        -0.066006600660066,
+        23.71100098087897
+      ],
+      "source_angle_rad": 0.09966865249116202,
+      "source_fixing_targets_mm": [
+        [
+          -0.8454523996578908,
+          24.805541890109957
+        ],
+        [
+          0.4812638539554281,
+          24.93821351547129
+        ],
+        [
+          0.1827526968924313,
+          21.223408005354
+        ]
+      ],
+      "source_gauge_y_mm": 23.717601640944977,
+      "source_midpoint_delta_mm": -0.06633581268066593,
+      "source_rail_code": 2,
+      "source_selected_family": "S1",
+      "timber_id": "TO-001:timber:R2"
+    }
+  ],
+  "provenance": {
+    "model_sha256": "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb",
+    "source_assessment_sha256": "6c75324c7e37b046ae7a417b34246ad0c5079221deb4075d88994e0be85f2334",
+    "source_context_sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c",
+    "source_members": [
+      {
+        "bytes": 1900585,
+        "line_ranges": [
+          [
+            22760,
+            22821
+          ],
+          [
+            29502,
+            29515
+          ],
+          [
+            29655,
+            29665
+          ],
+          [
+            29760,
+            29804
+          ],
+          [
+            30497,
+            30595
+          ],
+          [
+            31445,
+            31496
+          ],
+          [
+            24152,
+            24237
+          ],
+          [
+            17766,
+            17927
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65"
+      },
+      {
+        "bytes": 62067,
+        "line_ranges": [
+          [
+            920,
+            930
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_math": {
+    "S1_pair_threshold_mm": "6.333333333333333333333333333333333333333333333333333333333333333333333",
+    "a_timber_mm": "287.2329004372135107774257741372755203535621623849394308786085556002690",
+    "clearance_above_threshold_mm": "0.750934974278309347833036459679028959236544908030625349945407244381257",
+    "closure_join_mm": "263.3902173610981398550029687365430437409678842530270798338792608895208",
+    "closure_radius_mm": "2769.887101251707247322817869651171272299338162595830756696181965609359",
+    "fine_point_mm": "283.3902173610981398550029687365430437409678842530270798338792608895208",
+    "gap_at_station_minus_halfwidth_mm": "7.08426830761164268116636979301236229256987824136395868327874057771459",
+    "joint_high_open_mm": "345.8995671038801774440924408039421870202288290516060975452752222669357",
+    "joint_low_open_mm": "336.8995671038801774440924408039421870202288290516060975452752222669357",
+    "nominal_R2_mm": "355.5662337705468441107591074706088536868954957182727642119418889336023",
+    "nominal_module_end_mm": "361.3995671038801774440924408039421870202288290516060975452752222669357",
+    "rail2_gauge_y_mm": "23.71760164094497601449970312634569562590321157469729201661207391104792",
+    "retained_R2_minus_exact_source_mm": "1.0558892408925293911463131045042817272357880581110663977E-12",
+    "scale_mm_per_inch": "0.3333333333333333333333333333333333333333333333333333333333333333333333"
+  }
+}

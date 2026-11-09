@@ -4063,3 +4063,46 @@ Evidence for other B/C combinations and remaining chair positions stays necessar
 
 The result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+## Two S1 chairs at TO-001 R2 — 2026-11-09
+
+<a id="to-r2-source-placement-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The specified TO-001 command can add two S1 assemblies at R2.
+This change continues the chair work with the authority in [D-P9-019](#rea-bc-scope-panel).
+The independent source review and quality review give `PASS`.
+
+The input `include_r2_exit=True` adds the `vee-point-rail` and `vee-splice-rail` positions on `TO-001:timber:R2`.
+The input must be `True` or `False`. If the caller does not supply it, its value is `False`.
+Without this input, the twelve placements, all data in the receipt and the copied context are the same as in commit `e77906f00270007d0a408b07aa20b0c19b424fbc`.
+
+Templot 556b `math_unit.pas:29502-29515,29760-29804` selects S1 for these two positions.
+The command calculates values with the previous method and uses the previous catalogue geometry and `place_left_hand_single_rail` code.
+The source records keep their `AB` and `BB/BC` values and their previous exclusions.
+
+The command validates each specified identity, owner, source configuration and host position before it changes a document.
+It also validates actual rail segments in the R2 timber outline. Segments that only touch the outline are not sufficient.
+These checks give no evidence for physical fit.
+
+Before the code change, an independent reviewer calculated eight sets of coordinates.
+The fixture is `tests/fixtures/phase9b-to-r2-source-frames.json`, with SHA-256 `009c1a8aaf46a7f33d1422d948c85ddcb6eda8a03abcafcb767c93f2f55ff095`.
+The project did all ten new tests and all 29 previous tests. Each test gave `PASS`.
+
+The tests compare 67 sets of coordinates and 304 component positions for fourteen assemblies.
+Independent reviewers also validated the actual R2 outline with sixteen vertices and 570 rail segments.
+The quality review has SHA-256 `f0b946882cc186607e10a69eee5ac21f24725998831d37cf0e0ec6919a6aae79`.
+The project preserves the initial `FAIL` results and their failure classes.
+
+The [previous TO-001 qualification](#to-single-gui-pass-panel) supplies applicable evidence for the unchanged construction and document operations.
+Those FreeCAD tests keep their twelve-assembly identities and results.
+The project did no FreeCAD tests for the two new R2 positions, with or without the display.
+FreeCAD tests for the two R2 positions stay necessary before the project can claim those results.
+
+With `include_r2_exit=True`, the TO-001 routes include 88 of 168 source positions.
+The remaining eighty positions contain 24 empty `chair_code_label` values and 56 other values.
+The empty values give no evidence for shared supports or exclusions.
+Independent preservation keeps the candidate and previous evidence available. The project did not complete the necessary [monthly restore test](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) by its deadline. Risk `PR-13` stays open.
+
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

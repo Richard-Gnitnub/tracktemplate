@@ -257,8 +257,9 @@ def create_private_catalogue_cc_preview(
 
 def create_private_catalogue_turnout_single_rail_preview(
     catalogue_path, placements, context_shapes, source_receipt, verify_source,
+    *, include_r2_exit=False,
 ):
-    """Place eleven retained L1 and one S1 assembly on fixed LH TO-001.
+    """Place fixed LH TO-001 assemblies, optionally including two R2 S1s.
 
     Exact source identities and indexed fixing frames are mandatory.
     Both families share copied context and the existing transaction.
@@ -269,6 +270,7 @@ def create_private_catalogue_turnout_single_rail_preview(
     def require(condition, message):
         _require(condition, message, family=family)
 
+    require(type(include_r2_exit) is bool, "include_r2_exit must be a boolean")
     if not callable(verify_source):
         raise TypeError("Turnout single rails require source verification")
     placements = prepare_single_rail_placements(placements)
@@ -286,6 +288,9 @@ def create_private_catalogue_turnout_single_rail_preview(
         ("T1", "straight-switch-and-closure-rail", "L1"),
         ("T2", "straight-switch-and-closure-rail", "L1"),
     )
+    if include_r2_exit:
+        selected += (("R2", "vee-point-rail", "S1"),
+                     ("R2", "vee-splice-rail", "S1"))
     expected = {
         (f"TO-001:chair:to-001-timber-{timber.lower()}:{rail}",
          f"TO-001:rail:{rail}", f"TO-001:timber:{timber}", label)
@@ -293,7 +298,9 @@ def create_private_catalogue_turnout_single_rail_preview(
     }
     require({(p.position_id, p.rail_id, p.timber_id, p.family)
              for p in placements} == expected,
-            "the twelve fixed TO-001 single-rail identities are required")
+            ("the fourteen fixed TO-001 single-rail identities are required"
+             if include_r2_exit else
+             "the twelve fixed TO-001 single-rail identities are required"))
     receipt = json.loads(json.dumps(source_receipt, allow_nan=False))
     require(isinstance(receipt, dict), "source receipt must be a mapping")
     selections = []
@@ -353,7 +360,9 @@ def create_private_catalogue_turnout_single_rail_preview(
             "geometry_rebuilt": False,
             "track_placements_added": len(placements),
             "limits": [
-                "Only twelve fixed TO-001 single-rail positions are placed.",
+                ("Only fourteen fixed TO-001 single-rail positions are placed."
+                 if include_r2_exit else
+                 "Only twelve fixed TO-001 single-rail positions are placed."),
                 "No physical-fit, production, export or phase acceptance.",
                 "Source overlaps and hidden mating closures remain.",
                 "No source XML placement, scale or frame conversion reapplied.",
