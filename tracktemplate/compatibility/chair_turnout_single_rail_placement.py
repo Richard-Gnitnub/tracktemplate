@@ -11,6 +11,7 @@ import copy
 from fractions import Fraction
 import hashlib
 import json
+import math
 
 from tracktemplate.application.chair_catalogue import (
     prepare_catalogue_chair,
@@ -55,6 +56,13 @@ _MODELS = (
     ("S1", "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb", 17),
 )
 _R2_RAILS = ((2, "vee splice rail"), (3, "vee point rail"))
+_CROSSING_TAIL = (
+    ("X6-C", 1, "S1"), ("X6-C", 4, "S1"),
+    ("X7-D", 1, "S1"), ("X7-D", 4, "S1"),
+    ("X8-E", 1, "S1"), ("X8-E", 4, "S1"),
+    ("X9-F", 2, "L1"), ("X9-F", 3, "L1"),
+)
+_HEEL_SELECTION = (("S13", 1), ("S13", 3), ("T1", 1), ("T1", 3), ("T2", 3))
 
 
 def _require(condition, message):
@@ -72,8 +80,10 @@ def _fixed_source(function, *args):
         ) from error
 
 
-def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exit=False):
-    rail_name = dict(_R2_RAILS if r2_exit else _RAILS)[rail_code]
+def _source_binding(position, rail, timber, original, name, rail_code, *,
+                    r2_exit=False, crossing_tail=False):
+    vee = r2_exit or (crossing_tail and name == "X9-F")
+    rail_name = dict(_R2_RAILS if vee else _RAILS)[rail_code]
     rail_id = "TO-001:rail:" + rail_name.replace(" ", "-")
     timber_id = "TO-001:timber:" + name
     identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
@@ -96,10 +106,15 @@ def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exi
         "subtype and keying arrangement",
         "key_orientation_classification": "dimension requiring later confirmation",
     }
-    heel = not r2_exit and rail_code in (1, 3)
-    if r2_exit:
+    heel = (name, rail_code) in _HEEL_SELECTION
+    if r2_exit or crossing_tail:
         label, code, family = (("AB", 25, "splice-rail support") if rail_code == 2
                                else ("BB/BC", 26, "vee support"))
+        if crossing_tail:
+            code, label = {"X6-C": (26, "BB/BC"), "X7-D": (27, "CD"),
+                           "X8-E": (28, "EF"), "X9-F": (28, "EF")}[name]
+            if name != "X9-F":
+                family = "common-crossing chair"
         expected.update({
             "chair_code": code, "chair_code_label": label, "chair_family": family,
             "handedness": "Left-hand", "assignment_complete_in_current_stage": False,
@@ -107,10 +122,14 @@ def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exi
             "key_orientation": "requires confirmation from the final special-chair "
             "subtype and keying arrangement",
         })
-        _require(name == "R2" and all(
-            position.get(key) is value for key, value in expected.items()
-            if type(value) is bool
-        ), "the original R2 source state differs")
+        _require((name == "R2" if r2_exit else
+                  (name, rail_code) in tuple(
+                      (n, r) for n, r, _f in _CROSSING_TAIL))
+                 and all(
+                     position.get(key) is value
+                     for key, value in expected.items() if type(value) is bool
+                 ), "the original crossing-tail source state differs"
+                 if crossing_tail else "the original R2 source state differs")
     if heel:
         expected.update({
             "chair_code": 1, "chair_code_label": "S1",
@@ -157,7 +176,8 @@ def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exi
              and original.get("rail_identity") == rail_id
              and original.get("timber_identity") == timber_id
              and original.get("chair_label") == (
-                 expected["chair_code_label"] if r2_exit else "S1" if heel else "L1"
+                 expected["chair_code_label"] if r2_exit or crossing_tail
+                 else "S1" if heel else "L1"
              ),
              "the original physical-plan binding differs")
     if not heel or name == "T2":
@@ -174,8 +194,8 @@ def _source_binding(position, rail, timber, original, name, rail_code, *, r2_exi
                  "the original S1 physical instance differs")
 
 
-def _r2_finite_support(position, rail, timber):
-    """Require actual finite rail spans inside the actual R2 outline.
+def _r2_finite_support(position, rail, timber, *, label="R2"):
+    """Require actual finite rail spans inside the scoped timber outline.
 
     Exact rational predicates use stored model-mm coordinates. A strict
     interior span must exist on each named finite face and centre polyline;
@@ -186,7 +206,7 @@ def _r2_finite_support(position, rail, timber):
         _require(isinstance(values, (list, tuple)) and len(values) >= minimum
                  and all(isinstance(p, (list, tuple)) and len(p) == 2
                          and all(_finite(v) for v in p) for p in values),
-                 "R2 support geometry is not finite XY")
+                 label + " support geometry is not finite XY")
         return [tuple(Fraction(v) for v in p) for p in values]
 
     def sub(a, b):
@@ -200,9 +220,11 @@ def _r2_finite_support(position, rail, timber):
                 and all(min(a[i], b[i]) <= p[i] <= max(a[i], b[i]) for i in (0, 1)))
 
     polygon = points(timber.get("outline_polygon"), 3)
-    _require(len(set(polygon)) == len(polygon), "R2 outline repeats a vertex")
+    _require(len(set(polygon)) == len(polygon),
+             label + " outline repeats a vertex")
     edges = list(zip(polygon, polygon[1:] + polygon[:1]))
-    _require(sum(cross(a, b) for a, b in edges) != 0, "R2 outline is degenerate")
+    _require(sum(cross(a, b) for a, b in edges) != 0,
+             label + " outline is degenerate")
     for i, (a, b) in enumerate(edges):
         for j, (c, d) in enumerate(edges[i + 1:], i + 1):
             if j == i + 1 or (i == 0 and j == len(edges) - 1):
@@ -216,7 +238,7 @@ def _r2_finite_support(position, rail, timber):
             else:
                 intersects = any((on_segment(c, a, b), on_segment(d, a, b),
                                   on_segment(a, c, d), on_segment(b, c, d)))
-            _require(not intersects, "R2 outline intersects itself")
+            _require(not intersects, label + " outline intersects itself")
 
     def inside(p):
         crossings = 0
@@ -229,7 +251,8 @@ def _r2_finite_support(position, rail, timber):
         return crossings % 2 == 1
 
     centre = points([position.get("centre_point")], 1)[0]
-    _require(inside(centre), "R2 canonical centre is outside its finite timber")
+    _require(inside(centre),
+             label + " canonical centre is outside its finite timber")
 
     def supported(vertices):
         for a, b in zip(vertices, vertices[1:]):
@@ -257,7 +280,51 @@ def _r2_finite_support(position, rail, timber):
 
     for field in ("gauge_face_points", "points", "outer_face_points"):
         _require(supported(points(rail.get(field), 2)),
-                 "R2 finite " + field + " has no interior timber span")
+                 label + " finite " + field + " has no interior timber span")
+
+
+def _crossing_tail_domain(module, dimensions, name, station, rail_code):
+    """Retain the fixed 556b check, joint and wing predicate domain.
+
+    The X9 opposing station uses the independently qualified 161-step
+    get_xtimbcl2 result. Both bracketing inequalities must still hold;
+    this is not a new general source-station solver.
+    """
+    fields = ("a_timber_x", "check_main_end_x", "check_turnout_end_x",
+              "wing_end_main_x", "wing_flare_turnout_x", "flare_length",
+              "flare_angle", "k3")
+    _require(all(_finite(dimensions.get(key)) for key in fields),
+             "crossing-tail source dimensions are not finite")
+    joint = dimensions["a_timber_x"] + (12.5 + 5 * 30) / 3
+    at_joint = joint - 13.5 / 3 < station < joint + 13.5 / 3
+    if name != "X9-F":
+        end = dimensions["check_main_end_x" if rail_code == 1
+                         else "check_turnout_end_x"]
+        _require(station > end - 4 / 3 and not at_joint,
+                 "crossing-tail stock chair requires a check or joint family")
+        return
+    _require(at_joint, "X9-F no longer lies in its source joint interval")
+    ratios = []
+    for steps in (160, 161):
+        shift = steps / 600
+        _angle, gauge_y, branch = _source_pose(
+            module, dimensions, station - shift, 2,
+        )
+        _require(branch == "turnoutst_main" and gauge_y > 16.5,
+                 "X9-F opposing rail source branch differs")
+        ratios.append(shift / (gauge_y - 16.5))
+    _require(ratios[0] <= math.tan(dimensions["k3"] / 2) < ratios[1],
+             "X9-F opposing source station differs")
+    flare = dimensions["flare_angle"]
+    _require(0 < flare < math.pi / 2 and dimensions["flare_length"] > 0,
+             "X9-F source flare domain differs")
+    # Regular source wing end, including the source /cos(flare) factor.
+    turnout_end = (dimensions["wing_flare_turnout_x"]
+                   + dimensions["flare_length"] / math.cos(flare)
+                   * math.cos(dimensions["k3"] + flare))
+    _require(station > dimensions["wing_end_main_x"] - 4 / 3
+             and station - 160.5 / 600 > turnout_end - 4 / 3,
+             "X9-F source still requires a wing-chair context")
 
 
 def exclude_turnout_heel_l1(module, document, source, placements, excluded):
@@ -316,15 +383,17 @@ def exclude_turnout_heel_l1(module, document, source, placements, excluded):
 
 def preview_private_catalogue_turnout_single_rail_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
-    *, include_r2_exit=False,
+    *, include_r2_exit=False, include_crossing_tail=False,
 ):
-    """Create twelve private assemblies, with an explicit R2-pair option.
+    """Create twelve assemblies with explicit R2 and crossing-tail options.
 
     Admission is limited to the fixed left-hand TO-001 source. The source
     clearance selects S1 at T2 rail 4 despite its raw L1 candidate label.
     Existing catalogue verification and the adapter own safe materialisation.
     """
     _require(type(include_r2_exit) is bool, "include_r2_exit must be a boolean")
+    _require(type(include_crossing_tail) is bool,
+             "include_crossing_tail must be a boolean")
     _require(turnout_id == "TO-001" and callable(create_preview),
              "TO-001 and the native adapter are required")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
@@ -358,24 +427,36 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     represented = set()
     selection = _SELECTION + ((("R2", 2, "S1"), ("R2", 3, "S1"))
                               if include_r2_exit else ())
+    if include_crossing_tail:
+        selection += _CROSSING_TAIL
     for name, rail_code, family in selection:
         r2_exit = name == "R2"
+        crossing_tail = (name, rail_code, family) in _CROSSING_TAIL
+        vee = r2_exit or (crossing_tail and name == "X9-F")
         identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
-                    + dict(_R2_RAILS if r2_exit else _RAILS)[rail_code].replace(" ", "-"))
-        heel = not r2_exit and rail_code in (1, 3)
+                    + dict(_R2_RAILS if vee else _RAILS)[rail_code].replace(" ", "-"))
+        heel = (name, rail_code) in _HEEL_SELECTION
         originals = instances if heel and name != "T2" else excluded
         _require(identity in positions and identity in originals,
                  "a selected position or its original plan record is missing")
         position = positions[identity]
         timber = timber_map.get(position.get("timber_identity"), {})
         _source_binding(position, rail_map.get(position.get("rail_identity"), {}),
-                        timber, originals[identity], name, rail_code, r2_exit=r2_exit)
-        if r2_exit:
-            _r2_finite_support(position, rail_map[position["rail_identity"]], timber)
+                        timber, originals[identity], name, rail_code,
+                        r2_exit=r2_exit, crossing_tail=crossing_tail)
+        if r2_exit or crossing_tail:
+            _r2_finite_support(
+                position, rail_map[position["rail_identity"]], timber,
+                label="crossing-tail" if crossing_tail else "R2",
+            )
         station, point, heading = _fixed_source(
             _timber_frame, module, host, config, timber, layout.get(name, {}),
         )
         source_station = timber["source_configuration"]["local_x"]
+        if crossing_tail:
+            _crossing_tail_domain(
+                module, dimensions, name, source_station, rail_code,
+            )
         _require(_family(module, dimensions, name, source_station, rail_code) == family,
                  "the source clearance no longer selects the qualified family")
         angle, gauge_y, branch = _source_pose(
@@ -419,12 +500,16 @@ def preview_private_catalogue_turnout_single_rail_chairs(
         "source_context_signature": "sha256:" + hashlib.sha256(signature.encode()).hexdigest(),
         "source_analysis_signature": analysis["geometry_signature"],
         "analysis_position_count": len(positions),
-        "selected_family_counts": {"L1": 11, "S1": 3 if include_r2_exit else 1},
+        "selected_family_counts": {
+            family: sum(item["family"] == family for item in selected)
+            for family in ("L1", "S1")
+        },
         "represented_source_position_count": len(placements),
         "selected_positions": sorted(selected, key=lambda item: item["position_id"]),
         "corrected_heel_positions": sorted(
-            (item for item in selected if item["source_rail_code"] in (1, 3)
-             and item["prototype_timber_identifier"] != "R2"),
+            (item for item in selected
+             if (item["prototype_timber_identifier"], item["source_rail_code"])
+             in _HEEL_SELECTION),
             key=lambda item: item["position_id"],
         ),
         "remaining_positions": [copy.deepcopy(position)
@@ -443,4 +528,6 @@ def preview_private_catalogue_turnout_single_rail_chairs(
     }
     ordered = tuple(sorted(placements, key=lambda item: item.position_id))
     options = {"include_r2_exit": True} if include_r2_exit else {}
+    if include_crossing_tail:
+        options["include_crossing_tail"] = True
     return create_preview(catalogue_path, ordered, shapes, receipt, verify_inputs, **options)

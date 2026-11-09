@@ -3288,17 +3288,21 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_turnout_single_rail_chairs(
         self, source_document, turnout_id, catalogue_path,
-        *, include_r2_exit=False,
+        *, include_r2_exit=False, include_crossing_tail=False,
     ):
-        """Inspect twelve fixed TO assemblies, optionally adding the R2 pair."""
+        """Inspect fixed TO assemblies with explicit source-qualified options."""
         from tracktemplate.compatibility.chair_turnout_single_rail_placement import (
             preview_private_catalogue_turnout_single_rail_chairs,
         )
 
         if type(include_r2_exit) is not bool:
             raise ValueError("include_r2_exit must be a boolean")
+        if type(include_crossing_tail) is not bool:
+            raise ValueError("include_crossing_tail must be a boolean")
         self.routing_record()
         options = {"include_r2_exit": True} if include_r2_exit else {}
+        if include_crossing_tail:
+            options["include_crossing_tail"] = True
         return preview_private_catalogue_turnout_single_rail_chairs(
             self.module, source_document, turnout_id, catalogue_path,
             self._private_catalogue_turnout_single_rail_preview_factory,

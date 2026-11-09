@@ -1,0 +1,933 @@
+{
+  "positions": [
+    {
+      "body": {
+        "origin_mm": [
+          876.8270328501496,
+          435.876687596407,
+          0.8
+        ],
+        "x_axis": [
+          -0.3261019322436622,
+          -0.9453346126038916
+        ],
+        "y_axis": [
+          0.9453346126038916,
+          -0.3261019322436622
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            876.8270328501496,
+            435.876687596407,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        },
+        {
+          "origin_mm": [
+            876.8270328501496,
+            435.876687596407,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        },
+        {
+          "origin_mm": [
+            876.8270328501496,
+            435.876687596407,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.238619179580687,
+        "host_point_mm": [
+          868.6026217204957,
+          438.71377440692686
+        ],
+        "host_station_mm": 1053.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x6-c:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 26,
+      "raw_label": "BB/BC",
+      "source_rail_code": 1,
+      "source_station_mm": 307.23290043721454,
+      "timber_id": "TO-001:timber:X6-C"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          842.4512564968203,
+          447.7573876877336,
+          0.8
+        ],
+        "x_axis": [
+          0.2304192407084194,
+          0.9730914517718031
+        ],
+        "y_axis": [
+          -0.9730914517718031,
+          0.2304192407084194
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            845.6165004285846,
+            446.8391738986825,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        },
+        {
+          "origin_mm": [
+            845.4889235065375,
+            446.87618301757306,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        },
+        {
+          "origin_mm": [
+            838.5184830648501,
+            448.8982560922854,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.3261019322436622,
+            -0.9453346126038916
+          ],
+          "y_axis": [
+            0.9453346126038916,
+            -0.3261019322436622
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.238619179580687,
+        "host_point_mm": [
+          868.6026217204957,
+          438.71377440692686
+        ],
+        "host_station_mm": 1053.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x6-c:turnout-side-stock-rail",
+      "rail_id": "TO-001:rail:turnout-side-stock-rail",
+      "raw_code": 26,
+      "raw_label": "BB/BC",
+      "source_rail_code": 4,
+      "source_station_mm": 307.23290043721454,
+      "timber_id": "TO-001:timber:X6-C"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          880.0605045362656,
+          445.4645778999516,
+          0.8
+        ],
+        "x_axis": [
+          -0.31319268721446347,
+          -0.9496896022782303
+        ],
+        "y_axis": [
+          0.9496896022782303,
+          -0.31319268721446347
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            880.0605045362656,
+            445.4645778999516,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        },
+        {
+          "origin_mm": [
+            880.0605045362656,
+            445.4645778999516,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        },
+        {
+          "origin_mm": [
+            880.0605045362656,
+            445.4645778999516,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.2522433277530218,
+        "host_point_mm": [
+          871.7982049964451,
+          448.1893542787174
+        ],
+        "host_station_mm": 1063.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x7-d:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 27,
+      "raw_label": "CD",
+      "source_rail_code": 1,
+      "source_station_mm": 317.23290043721454,
+      "timber_id": "TO-001:timber:X7-D"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          844.576369491649,
+          457.18904188112396,
+          0.8
+        ],
+        "x_axis": [
+          0.2171407241379385,
+          0.976140310570592
+        ],
+        "y_axis": [
+          -0.976140310570592,
+          0.2171407241379385
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            847.7538291594723,
+            456.3140357272427,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        },
+        {
+          "origin_mm": [
+            847.6257598753702,
+            456.3493033382992,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        },
+        {
+          "origin_mm": [
+            840.6284181703089,
+            458.2762253743964,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.31319268721446347,
+            -0.9496896022782303
+          ],
+          "y_axis": [
+            0.9496896022782303,
+            -0.31319268721446347
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.2522433277530218,
+        "host_point_mm": [
+          871.7982049964451,
+          448.1893542787174
+        ],
+        "host_station_mm": 1063.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x7-d:turnout-side-stock-rail",
+      "rail_id": "TO-001:rail:turnout-side-stock-rail",
+      "raw_code": 27,
+      "raw_label": "CD",
+      "source_rail_code": 4,
+      "source_station_mm": 317.23290043721454,
+      "timber_id": "TO-001:timber:X7-D"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          883.1657761907511,
+          455.090835531876,
+          0.8
+        ],
+        "x_axis": [
+          -0.3006346745132723,
+          -0.953739373456029
+        ],
+        "y_axis": [
+          0.953739373456029,
+          -0.3006346745132723
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            883.1657761907511,
+            455.090835531876,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        },
+        {
+          "origin_mm": [
+            883.1657761907511,
+            455.090835531876,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        },
+        {
+          "origin_mm": [
+            883.1657761907511,
+            455.090835531876,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.265438283443774,
+        "host_point_mm": [
+          874.8682436416836,
+          457.70635720014144
+        ],
+        "host_station_mm": 1073.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x8-e:main-side-stock-rail",
+      "rail_id": "TO-001:rail:main-side-stock-rail",
+      "raw_code": 28,
+      "raw_label": "EF",
+      "source_rail_code": 1,
+      "source_station_mm": 327.23290043721454,
+      "timber_id": "TO-001:timber:X8-E"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          846.5762914498464,
+          466.64671554430896,
+          0.8
+        ],
+        "x_axis": [
+          0.20424206717174886,
+          0.9789204145370607
+        ],
+        "y_axis": [
+          -0.9789204145370607,
+          0.20424206717174886
+        ]
+      },
+      "family": "S1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            849.7650198453296,
+            465.8137107845308,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        },
+        {
+          "origin_mm": [
+            849.6364963688742,
+            465.8472855059722,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        },
+        {
+          "origin_mm": [
+            842.6143388844605,
+            467.68171286476326,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.3006346745132723,
+            -0.953739373456029
+          ],
+          "y_axis": [
+            0.953739373456029,
+            -0.3006346745132723
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.265438283443774,
+        "host_point_mm": [
+          874.8682436416836,
+          457.70635720014144
+        ],
+        "host_station_mm": 1073.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x8-e:turnout-side-stock-rail",
+      "rail_id": "TO-001:rail:turnout-side-stock-rail",
+      "raw_code": 28,
+      "raw_label": "EF",
+      "source_rail_code": 4,
+      "source_station_mm": 327.23290043721454,
+      "timber_id": "TO-001:timber:X8-E"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          865.1894099466983,
+          471.05314055893325,
+          0.8
+        ],
+        "x_axis": [
+          -0.1918088596384099,
+          -0.981432300958254
+        ],
+        "y_axis": [
+          0.981432300958254,
+          -0.1918088596384099
+        ]
+      },
+      "family": "L1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            865.285535361051,
+            470.92326738492284,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            865.0437747284853,
+            470.98315827668944,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            865.3414335266998,
+            471.1489106419841,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            865.0996728941341,
+            471.20880153375066,
+            0.8
+          ],
+          "source_index": 4,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.278122777136951,
+        "host_point_mm": [
+          877.8133826552881,
+          467.262755453052
+        ],
+        "host_station_mm": 1083.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x9-f:vee-splice-rail",
+      "rail_id": "TO-001:rail:vee-splice-rail",
+      "raw_code": 28,
+      "raw_label": "EF",
+      "source_rail_code": 2,
+      "source_station_mm": 337.23290043721454,
+      "timber_id": "TO-001:timber:X9-F"
+    },
+    {
+      "body": {
+        "origin_mm": [
+          869.4833419402989,
+          469.7728195332346,
+          0.8
+        ],
+        "x_axis": [
+          0.2885131126646681,
+          0.9574759442516269
+        ],
+        "y_axis": [
+          -0.9574759442516269,
+          0.2885131126646681
+        ]
+      },
+      "family": "L1",
+      "fixing_frames": [
+        {
+          "origin_mm": [
+            871.4621255584191,
+            469.1765591003943,
+            0.8
+          ],
+          "source_index": 1,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            871.4621255584191,
+            469.1765591003943,
+            0.8
+          ],
+          "source_index": 2,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            866.9939044852448,
+            470.52295362616275,
+            0.8
+          ],
+          "source_index": 3,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        },
+        {
+          "origin_mm": [
+            866.9939044852448,
+            470.52295362616275,
+            0.8
+          ],
+          "source_index": 4,
+          "x_axis": [
+            -0.2885131126646681,
+            -0.9574759442516269
+          ],
+          "y_axis": [
+            0.9574759442516269,
+            -0.2885131126646681
+          ]
+        }
+      ],
+      "host_basis": {
+        "heading_radians": 1.278122777136951,
+        "host_point_mm": [
+          877.8133826552881,
+          467.262755453052
+        ],
+        "host_station_mm": 1083.5309004372145
+      },
+      "position_id": "TO-001:chair:to-001-timber-x9-f:vee-point-rail",
+      "rail_id": "TO-001:rail:vee-point-rail",
+      "raw_code": 28,
+      "raw_label": "EF",
+      "source_rail_code": 3,
+      "source_station_mm": 337.23290043721454,
+      "timber_id": "TO-001:timber:X9-F"
+    }
+  ],
+  "provenance": {
+    "classification": "templot_reference_data",
+    "correction": {
+      "actual_outline_vertices": 18,
+      "author_receipt": "crossing-tail-vertex-count-author-correction.json",
+      "author_receipt_sha256": "599347c70ac27076881156f83cd482397dcedbac4b5ffa7ab952644aed6417b7",
+      "frames_changed": false,
+      "review_clarification": "independent-crossing-tail-source-review-reference-clarification.json",
+      "review_clarification_sha256": "f4b419eab2e51c3f9b604757c06a313ec79ff10dbc5036230f77f4f1660200fb"
+    },
+    "frame_convention": "world mm/radians, +Z, proper rigid rotations; retained native XY normalisation N(z)=-z-.45i; mounting Z=.8mm; indexed fixing head local angle zero.",
+    "limits": [
+      "Exact reviewed source frames and numeric host inputs only; no new source calculation or product placement output was used.",
+      "No raw archive, polygons, rail polylines, CAD bodies or private paths are included.",
+      "The source licence does not establish production output clearance, physical fit or independent prototype evidence.",
+      "No native or GUI execution, full chair-footprint containment, production or phase acceptance is claimed."
+    ],
+    "model_sha256": {
+      "L1": "a0289c046b6ae8cb1e2df88a8f6a1f3f0dc79f7a0ae1870d0b3b13154e0eb042",
+      "S1": "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb"
+    },
+    "scope": "Eight fixed TO-001 C10 left-hand/facing crossing-tail positions only.",
+    "source_archive_sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3",
+    "source_assessment_sha256": "906c8b46191075daabb62f502e4c813a20378cfa140b54144e2b489161fc9a71",
+    "source_context_sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c",
+    "source_derivation_sha256": "d8940591522f722a780fe51d453bcbcbb48cf754fbbadf29c39e40a5137727d3",
+    "source_freeze_sha256": "f84f45f5706d0fb73b3a2fe0b1ad6eba7eb6b64cb6d8c7a0f70989e4899503b0",
+    "source_inputs": [
+      {
+        "bytes": 1174052,
+        "name": "000-source-context.json",
+        "sha256": "bb7035772a8926742ac5226f499dde83ded18b75b95c6fc33f455269edb8469c"
+      },
+      {
+        "bytes": 2350856,
+        "name": "t5_files_556b_06_feb_2025.zip",
+        "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3"
+      },
+      {
+        "bytes": 19473,
+        "name": "independent-source-contexts-01.json",
+        "sha256": "3fb0c524dcf5e81152c41e86e350facbfdaed65d9394fdedf62ddfa2d67f1c45"
+      },
+      {
+        "bytes": 150989,
+        "name": "S1.FCStd",
+        "sha256": "a3c8c99a67d9f18b0ee5668400a8bf94f9f39fa641a22da7477141b74cc120eb"
+      },
+      {
+        "bytes": 166364,
+        "name": "L1.FCStd",
+        "sha256": "a0289c046b6ae8cb1e2df88a8f6a1f3f0dc79f7a0ae1870d0b3b13154e0eb042"
+      },
+      {
+        "bytes": 4695,
+        "name": "family_assembly.py",
+        "sha256": "8cf4b88c8533b68f5b1954d68be49a7f118a326d8939f1c0bba37d816d7b376e"
+      },
+      {
+        "bytes": 9649,
+        "name": "fixing_adapter.py",
+        "sha256": "767c4b82ee7e94a3b09238623893b1a14b13c6ed9ea3d07a68c99eeab63e0e98"
+      },
+      {
+        "bytes": 15250,
+        "name": "to001-next-crossing-tail-readonly-assessment.json",
+        "sha256": "265b3ef7c6962ea7a8f5307680b8cf034a02a25cfc367895f166bb043a66bbe3"
+      }
+    ],
+    "source_license": "GPL-3.0-or-later",
+    "source_members": [
+      {
+        "line_ranges": [
+          [
+            920,
+            965
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b"
+      },
+      {
+        "line_ranges": [
+          [
+            2534,
+            2542
+          ],
+          [
+            8543,
+            8571
+          ],
+          [
+            11880,
+            11910
+          ],
+          [
+            11980,
+            12010
+          ],
+          [
+            12048,
+            12078
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d"
+      },
+      {
+        "line_ranges": [
+          [
+            3034,
+            3059
+          ],
+          [
+            3335,
+            3435
+          ],
+          [
+            3532,
+            3623
+          ],
+          [
+            3818,
+            3877
+          ],
+          [
+            4138,
+            4176
+          ],
+          [
+            4280,
+            4381
+          ],
+          [
+            4430,
+            4518
+          ],
+          [
+            17766,
+            17927
+          ],
+          [
+            24152,
+            24285
+          ],
+          [
+            26648,
+            26815
+          ],
+          [
+            28250,
+            28314
+          ],
+          [
+            28360,
+            28413
+          ],
+          [
+            28517,
+            28559
+          ],
+          [
+            29502,
+            29515
+          ],
+          [
+            29657,
+            29665
+          ],
+          [
+            29750,
+            29831
+          ],
+          [
+            31377,
+            31479
+          ],
+          [
+            31685,
+            31736
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65"
+      },
+      {
+        "line_ranges": [
+          [
+            1804,
+            1858
+          ]
+        ],
+        "member": "T556B_ZIPPED_FOR_UPLOAD/switch_select.pas",
+        "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb"
+      }
+    ],
+    "source_notice": "Copyright 2024 Martin Wynne and OpenTemplot contributors; GNU General Public License version 3 or later.",
+    "source_receipts": [
+      {
+        "bytes": 72208,
+        "name": "crossing-tail-independent-source-frames-and-support.json",
+        "sha256": "906c8b46191075daabb62f502e4c813a20378cfa140b54144e2b489161fc9a71"
+      },
+      {
+        "bytes": 3500,
+        "name": "crossing-tail-source-qualification-freeze.json",
+        "sha256": "f84f45f5706d0fb73b3a2fe0b1ad6eba7eb6b64cb6d8c7a0f70989e4899503b0"
+      },
+      {
+        "bytes": 8987,
+        "name": "independent-crossing-tail-source-review.json",
+        "sha256": "ac1e728649f02cdcbdb94b842917eb1641894b547b365552dc365277948b4614"
+      },
+      {
+        "bytes": 7875,
+        "name": "crossing-tail-vertex-count-author-correction.json",
+        "sha256": "599347c70ac27076881156f83cd482397dcedbac4b5ffa7ab952644aed6417b7"
+      },
+      {
+        "bytes": 971,
+        "name": "independent-crossing-tail-source-review-reference-clarification.json",
+        "sha256": "f4b419eab2e51c3f9b604757c06a313ec79ff10dbc5036230f77f4f1660200fb"
+      },
+      {
+        "bytes": 88116,
+        "name": "crossing-tail-source-extracts.json",
+        "sha256": "de0602df2c153d9a4bd27d2ac3a8a90e0be78ac32a45e23d9f9000124babd8c6"
+      }
+    ],
+    "source_review_sha256": "ac1e728649f02cdcbdb94b842917eb1641894b547b365552dc365277948b4614",
+    "status": "reference-only"
+  },
+  "schema_version": 1
+}
