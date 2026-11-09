@@ -4015,3 +4015,51 @@ The product, the ten input files and execution limits stay the same.
 The previous record shows `2/2` used repairs. That record gives no remaining repairs.
 LMS work stays stopped.
 This result gives no acceptance for production, a package, a rights state or a phase exit.
+
+## TO-001 display qualification — 2026-11-03
+
+<a id="to-single-gui-pass-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The specified TO-001 display test for twelve assemblies gives `PASS`.
+The independent result review, visual inspection and preservation checks also give `PASS`.
+Exit 9B-3 stays `Pending`. Phase 9B stays `Open` at 3/6.
+
+The [readiness test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41549836482) and [full display test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41552585620) use commit `e77906f00270007d0a408b07aa20b0c19b424fbc`.
+Each workflow completes one test with no skips in the qualified FreeCAD 1.1.4 profile.
+The full test gives the specified success message: `Fixed TO single-rail hosted GUI validation passed`.
+
+The test validates eleven L1 assemblies and one S1 assembly.
+This includes the five corrected heel assignments.
+It completes 59 `source_frame_comparisons` checks and puts all 270 components in their specified positions.
+All 42 `layer_visibility_checks` checks give `PASS`.
+Mouse selection identifies the specified chair component.
+
+The test completes the controlled failure, puts the previous display back and validates all 270 `rolled_back_components`.
+It completes four `source_preservation_checks` and one `preview_disposals` check.
+It makes all six specified PNG files.
+The last record shows no remaining documents. Process cleanup gives `PASS`.
+
+[PR #263](https://github.com/Richard-Gnitnub/tracktemplate/pull/263) corrects the mouse target in the test.
+[PR #264](https://github.com/Richard-Gnitnub/tracktemplate/pull/264) corrects the check of the selection state after FreeCAD closes the preview document.
+FreeCAD removes all items from the selection during that operation.
+The test validates that state and the remaining documents before it selects the other selection witness again.
+These changes preserve the product geometry and the ten input files.
+All previous test failures and their reviews stay preserved.
+
+The [previous native result](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/41506601704) keeps commit `1436dcd2bbe100249745d90d759fadedfa88a31e` and its initial identity.
+The independent review compares the source and shows that the evidence for construction and component positions stays applicable.
+No new native test or full XO-001 test was necessary.
+The display test keeps the same resource limits. The project measures installation independently and records its cleanup evidence.
+
+The last display evidence archive has SHA-256 `3c51fd8e52f7503793ac9bd4b2e5774e7523431b987624b46bbcede91063ee13`.
+The independent result review has SHA-256 `1daf0d42fb8b19026c7a47e41e190449360f025b069a095c8eaddac8930bd6d3`.
+The independent preservation check has SHA-256 `c0099032664924c96caf3d5baf90b168e436c9f61a0067589ceea1c1dc6c2ab7`.
+The project preserves this evidence independently of the 30-day GitHub Actions retention period.
+
+This result adds no chair positions. The TO-001 routes continue to include 86 of 168 source positions.
+Of the remaining 82 positions, 24 have `chair_code_label=""` and 58 have other values.
+The empty values give no evidence for shared supports or exclusions.
+Evidence for other B/C combinations and remaining chair positions stays necessary.
+
+The result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.
