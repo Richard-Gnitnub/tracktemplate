@@ -1,8 +1,9 @@
-"""Bind three retained central CC assemblies to the fixed TO-001 reference.
+"""Bind retained central CC assemblies to the fixed TO-001 reference.
 
 The left-hand main-side source uses rail 1 without the RH jaw rotation.
-Its stock/check pair shares one rigid frame. Canonical analytical labels,
-physical exclusions and the existing S1/S1J/P routes remain unchanged.
+Its stock/check pair shares one rigid frame. Three turnout-side pairs
+require explicit opt-in and independently qualified component frames.
+Canonical labels, exclusions and existing S1/S1J/P routes stay unchanged.
 """
 
 import copy
@@ -16,6 +17,7 @@ from tracktemplate.application.chair_catalogue import (
 )
 from tracktemplate.compatibility.chair_catalogue_placement import (
     _finite,
+    _finite_rail_timber_support,
     _indexed,
     _require_context,
 )
@@ -25,7 +27,14 @@ from tracktemplate.compatibility.chair_reference_preview import (
     _context_shapes_and_verifier,
     _open_source_context,
 )
-from tracktemplate.domain.chair_placement import place_paired_chair
+from tracktemplate.domain.chair_placement import (
+    S1Placement,
+    place_paired_chair,
+)
+from tracktemplate.domain.central_check_placement import (
+    CentralCheckPlacement,
+    place_left_hand_central_check,
+)
 
 
 _ANALYSIS_SHA256 = (
@@ -40,6 +49,8 @@ _CC_CONTEXT_SHA256 = (
 _SELECTION = (("X2-Y", 22, "XN"), ("X3-X", 23, "XA"), ("X4-A", 24, "AA"))
 _RAILS = (("main-side stock rail", "stock rail"),
           ("main-side check rail", "check rail"))
+_TS_RAILS = (("turnout-side stock rail", "stock rail"),
+             ("turnout-side check rail", "check rail"))
 
 
 def _require(condition, message):
@@ -81,8 +92,9 @@ def _host(module, document, config):
     return obj, data, _canonical_json(record)
 
 
-def _source_binding(position, rail, timber, original, name, code, label, role):
-    rail_name, rail_role = _RAILS[role]
+def _source_binding(position, rail, timber, original, name, code, label, role,
+                    *, turnout_side=False):
+    rail_name, rail_role = (_TS_RAILS if turnout_side else _RAILS)[role]
     rail_id = "TO-001:rail:" + rail_name.replace(" ", "-")
     timber_id = "TO-001:timber:" + name
     identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
@@ -104,6 +116,11 @@ def _source_binding(position, rail, timber, original, name, code, label, role):
         "subtype and keying arrangement",
         "key_orientation_classification": "dimension requiring later confirmation",
     }
+    if turnout_side:
+        _require(all(position.get(key) is value
+                     for key, value in expected.items() if type(value) is bool)
+                 and rail.get("rail_role") == rail_role,
+                 "the turnout-side source state or rail role differs")
     _require(all(position.get(key) == value for key, value in expected.items())
              and type(position.get("chair_code")) is int,
              "the selected chair identity or deferred assignment differs")
@@ -165,12 +182,15 @@ def _timber_frame(module, host, config, timber, nominal):
 
 def preview_private_catalogue_turnout_cc_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
+    *, include_turnout_side=False,
 ):
-    """Create three private CC assemblies covering six fixed source positions.
+    """Create fixed CC assemblies, optionally including turnout-side pairs.
 
     No geometry, analytical assignment or accepted placement is replaced.
     The existing adapter owns catalogue revalidation, transaction and cleanup.
     """
+    _require(type(include_turnout_side) is bool,
+             "include_turnout_side must be a boolean")
     _require(turnout_id == "TO-001" and callable(create_preview),
              "TO-001 and the native adapter are required")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
@@ -200,46 +220,97 @@ def preview_private_catalogue_turnout_cc_chairs(
     layout = _indexed(module.rea_c10_timber_layout(dimensions, 32.0), "identifier")
     placements, selected, shared = [], [], []
     represented = set()
-    for index, (name, code, label) in enumerate(_SELECTION):
-        pair = []
-        for role, (rail_name, _rail_role) in enumerate(_RAILS):
-            identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
-                        + rail_name.replace(" ", "-"))
-            _require(identity in positions and identity in excluded,
-                     "a selected central CC position is missing or already physical")
-            position = positions[identity]
-            timber = timber_map.get(position.get("timber_identity"), {})
-            _source_binding(
-                position, rail_map.get(position.get("rail_identity"), {}),
-                timber, excluded[identity], name,
-                code if role == 0 else 15, label if role == 0 else "CC", role,
+    for turnout_side in ((False, True) if include_turnout_side else (False,)):
+        selected_rails = _TS_RAILS if turnout_side else _RAILS
+        for index, (name, code, label) in enumerate(_SELECTION):
+            pair = []
+            for role, (rail_name, _rail_role) in enumerate(selected_rails):
+                identity = ("TO-001:chair:to-001-timber-" + name.lower() + ":"
+                            + rail_name.replace(" ", "-"))
+                _require(
+                    identity in positions and identity in excluded,
+                    "a selected central CC position is missing or already physical",
+                )
+                position = positions[identity]
+                timber = timber_map.get(position.get("timber_identity"), {})
+                _source_binding(
+                    position, rail_map.get(position.get("rail_identity"), {}),
+                    timber, excluded[identity], name,
+                    code if role == 0 else 15,
+                    label if role == 0 else "CC", role,
+                    turnout_side=turnout_side,
+                )
+                if turnout_side:
+                    _finite_rail_timber_support(
+                        position, rail_map[position["rail_identity"]], timber,
+                        label="turnout-side CC", require=_require,
+                    )
+                pair.append(position)
+            source = timber["source_configuration"]
+            _require(
+                source["local_x"] == dimensions["a_timber_x"] + 10 * (index - 2),
+                "the source does not select a parallel central CC station",
             )
-            pair.append(position)
-        source = timber["source_configuration"]
-        _require(source["local_x"] == dimensions["a_timber_x"] + 10 * (index - 2),
-                 "the source does not select a parallel central CC station")
-        station, point, heading = _timber_frame(
-            module, host, config, timber, layout.get(name, {}),
-        )
-        owner, companion = pair
-        placement = place_paired_chair(
-            owner["stable_chair_position_identity"], owner["rail_identity"],
-            owner["timber_identity"], (point.x, point.y), heading, datums[0],
-            -config["track_gauge"] / 2, 0.45,
-        )
-        placements.append(placement)
-        represented.update(item["stable_chair_position_identity"] for item in pair)
-        shared.append({"position_id": companion["stable_chair_position_identity"],
-                       "assembly_position_id": placement.position_id})
-        selected.append({
-            "position_id": placement.position_id, "family": "CC",
-            "prototype_timber_identifier": name, "source_rail_code": 1,
-            "source_station_mm": source["local_x"], "host_station_mm": station,
-            "source_model_sha256": prepared.model_sha256,
-            "source_context_sha256": _CC_CONTEXT_SHA256,
-            "original_positions": copy.deepcopy(pair),
-            "physical_fit": "NOT_PROVED",
-        })
+            station, point, heading = _timber_frame(
+                module, host, config, timber, layout.get(name, {}),
+            )
+            owner, companion = pair
+            if turnout_side:
+                low = dimensions.get("check_turnout_flare_in_x")
+                high = dimensions.get("check_turnout_flare_out_x")
+                _require(_finite(low) and _finite(high)
+                         and low < source["local_x"] <= high,
+                         "the turnout-side source is not parallel central CC")
+                x, y, angle = module._rea_c10_turnout_outer_gauge_point_at_x(
+                    dimensions, source["local_x"],
+                )
+                _require(all(_finite(value) for value in (x, y, angle))
+                         and x == source["local_x"],
+                         "the turnout-side source rail pose differs")
+                placement = place_left_hand_central_check(
+                    owner["stable_chair_position_identity"],
+                    owner["rail_identity"],
+                    owner["timber_identity"], (point.x, point.y), heading,
+                    datums[0], source_angle_rad=angle,
+                    source_gauge_y_mm=y + config["track_gauge"] / 2,
+                )
+            else:
+                placement = place_paired_chair(
+                    owner["stable_chair_position_identity"],
+                    owner["rail_identity"], owner["timber_identity"],
+                    (point.x, point.y), heading, datums[0],
+                    -config["track_gauge"] / 2, 0.45,
+                )
+                if include_turnout_side:
+                    frame = S1Placement(
+                        placement.position_id, placement.rail_id,
+                        placement.timber_id, placement.origin_mm,
+                        placement.x_axis, placement.y_axis,
+                    )
+                    placement = CentralCheckPlacement(
+                        frame.position_id, frame.rail_id, frame.timber_id,
+                        frame.origin_mm, frame.x_axis, frame.y_axis,
+                        (frame,) * 4,
+                    )
+            placements.append(placement)
+            represented.update(
+                item["stable_chair_position_identity"] for item in pair
+            )
+            shared.append({
+                "position_id": companion["stable_chair_position_identity"],
+                "assembly_position_id": placement.position_id,
+            })
+            selected.append({
+                "position_id": placement.position_id, "family": "CC",
+                "prototype_timber_identifier": name,
+                "source_rail_code": 4 if turnout_side else 1,
+                "source_station_mm": source["local_x"],
+                "host_station_mm": station,
+                "source_model_sha256": prepared.model_sha256,
+                "source_context_sha256": _CC_CONTEXT_SHA256,
+                "original_positions": copy.deepcopy(pair),
+                "physical_fit": "NOT_PROVED",
+            })
     shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, turnout_id, "CC", signature,
     )
@@ -255,8 +326,10 @@ def preview_private_catalogue_turnout_cc_chairs(
         "document_name": source_document.Name, "turnout_id": turnout_id,
         "source_context_signature": "sha256:" + hashlib.sha256(signature.encode()).hexdigest(),
         "source_analysis_signature": analysis["geometry_signature"],
-        "analysis_position_count": len(positions), "selected_cc_count": 3,
-        "represented_source_position_count": 6, "shared_supports": shared,
+        "analysis_position_count": len(positions),
+        "selected_cc_count": len(placements),
+        "represented_source_position_count": len(represented),
+        "shared_supports": shared,
         "selected_positions": selected,
         "remaining_positions": [copy.deepcopy(position)
                                 for identity, position in sorted(positions.items())
@@ -270,4 +343,10 @@ def preview_private_catalogue_turnout_cc_chairs(
                    "Original analytical labels and exclusions remain unchanged.",
                    "No production, export, persistence or live-update authority."],
     }
-    return create_preview(catalogue_path, tuple(placements), shapes, receipt, verify_inputs)
+    options = {"include_turnout_side": True} if include_turnout_side else {}
+    if include_turnout_side:
+        placements.sort(key=lambda value: value.position_id)
+    return create_preview(
+        catalogue_path, tuple(placements), shapes, receipt, verify_inputs,
+        **options,
+    )

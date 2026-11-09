@@ -125,3 +125,55 @@ def place_central_check(
         body.position_id, body.rail_id, body.timber_id, body.origin_mm,
         body.x_axis, body.y_axis, tuple(fixings),
     )
+
+
+def place_left_hand_central_check(
+    position_id, rail_id, timber_id, host_point_mm, travel_heading_rad,
+    base_z_mm, *, source_angle_rad, source_gauge_y_mm,
+):
+    """Map the qualified LH turnout-side CC body and indexed fixings.
+
+    Inputs use model mm and radians. Retained XY is (-source_x,
+    -source_y-0.45); the qualified LH body uses +k while each fixing
+    retains its independent pi rotation. The caller qualifies the fixed
+    C10 source context and finite support. No RH context is reinterpreted.
+    """
+    point = _coordinates(host_point_mm, 2, "host_point_mm")
+    heading = _finite_number(travel_heading_rad, "travel_heading_rad")
+    base_z = _finite_number(base_z_mm, "base_z_mm")
+    angle = _finite_number(source_angle_rad, "source_angle_rad")
+    gauge_y = _finite_number(source_gauge_y_mm, "source_gauge_y_mm")
+    if angle != math.atan(0.1) or gauge_y <= 0:
+        raise ValueError("Central CC requires the qualified LH TS source pose")
+    tangent = (math.cos(heading), math.sin(heading))
+    normal = (-tangent[1], tangent[0])
+
+    def frame(local_angle, origin):
+        cosine, sine = math.cos(local_angle), math.sin(local_angle)
+        return S1Placement(
+            position_id, rail_id, timber_id,
+            (point[0] + origin[0] * tangent[0]
+             + (origin[1] - 8.25) * normal[0],
+             point[1] + origin[0] * tangent[1]
+             + (origin[1] - 8.25) * normal[1], base_z),
+            (cosine * tangent[0] + sine * normal[0],
+             cosine * tangent[1] + sine * normal[1]),
+            (-sine * tangent[0] + cosine * normal[0],
+             -sine * tangent[1] + cosine * normal[1]),
+        )
+
+    cosine, sine = math.cos(angle), math.sin(angle)
+    shift = -0.5 * sine
+    anchor = (shift * cosine, gauge_y + shift * sine)
+    body = frame(angle, (anchor[0] - 0.45 * sine,
+                         anchor[1] + 0.45 * cosine))
+    fixings = []
+    for x, y in _FIXING_CENTRES_MM:
+        centre = (anchor[0] + cosine * x + sine * y,
+                  anchor[1] + sine * x - cosine * y)
+        fixings.append(frame(math.pi, (centre[0] - x,
+                                      centre[1] - y - 0.45)))
+    return CentralCheckPlacement(
+        body.position_id, body.rail_id, body.timber_id, body.origin_mm,
+        body.x_axis, body.y_axis, tuple(fixings),
+    )
