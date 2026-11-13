@@ -9708,7 +9708,8 @@ def validate_to_research_publication_mutations() -> None:
             "D-P9-020",
         )
     for name, changed in (
-        ("missing-decision", document["decisions"][:-1]),
+        ("missing-decision", document["decisions"][:14]
+         + document["decisions"][15:]),
         ("duplicate-decision", [*document["decisions"], record]),
     ):
         altered = copy.deepcopy(document)
@@ -9737,6 +9738,116 @@ def validate_to_research_publication_mutations() -> None:
         ),
         "D-P9-020",
     )
+
+
+def validate_to_crossing_qualification_mutations() -> None:
+    """Reject widened handling and qualification of the four assemblies."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    progress._validate_phase9b_decisions(document)
+    record = document["decisions"][15]
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    progress._validate_dp9_021_qualification(evidence, record)
+    for name, field, value in (
+        ("unaccepted", "status", "Proposed"),
+        ("wrong-date", "decided_on", "2026-11-12"),
+        ("missing-panel", "panel_required_under_current_policy", False),
+        ("wrong-evidence", "evidence", record["panel_record"] + "-other"),
+        ("wrong-panel", "panel_record", record["evidence"] + "-other"),
+        ("wider-owner-answer", "authority", replace_once(
+            record["authority"], "Approve exact reviewed handling scope",
+            "Approve all handling scopes",
+        )),
+        ("changed-owner-receipt", "authority", replace_once(
+            record["authority"], "2b292f0b", "3b292f0b",
+        )),
+        ("changed-manifest", "decision", replace_once(
+            record["decision"], "303135d7", "403135d7",
+        )),
+        ("changed-scope", "decision", replace_once(
+            record["decision"], "981f1e0d", "881f1e0d",
+        )),
+        ("wider-files", "decision", replace_once(
+            record["decision"], "55-file set", "56-file set",
+        )),
+        ("lost-source-obligation", "decision", replace_once(
+            record["decision"],
+            "The 30-day diagnostic period does not end the source obligation.",
+            "The source obligation ends after 30 days.",
+        )),
+        ("production-acceptance", "exclusions", replace_once(
+            record["exclusions"], "No physical-fit, production,",
+            "Accept physical-fit, production,",
+        )),
+        ("phase-acceptance", "exclusions", replace_once(
+            record["exclusions"], "Phase 9B stays Open at 3/6.",
+            "Phase 9B is complete at 6/6.",
+        )),
+        ("restore-acceptance", "exclusions", replace_once(
+            record["exclusions"], "PR-13 stays open and overdue.",
+            "PR-13 is closed;",
+        )),
+    ):
+        altered = copy.deepcopy(document)
+        altered["decisions"][15][field] = value
+        expect_rejected(
+            "to-crossing-qualification/" + name,
+            lambda item=altered: progress._validate_phase9b_decisions(item),
+            "D-P9-021",
+        )
+    for name, records in (
+        ("missing-decision", document["decisions"][:15]),
+        ("duplicate-decision", [*document["decisions"], record]),
+    ):
+        altered = copy.deepcopy(document)
+        altered["decisions"] = records
+        expect_rejected(
+            "to-crossing-qualification/" + name,
+            lambda item=altered: progress._validate_phase9b_decisions(item),
+            "decision chain incomplete or widened",
+        )
+    plan = read("reference/PROJECT_PLAN.md")
+    row = next(line for line in plan.splitlines()
+               if line.startswith("| D-P9-021 |"))
+    for name, changed in (
+        ("wider-dashboard", row + " All production accepted."),
+        ("duplicate-dashboard", row + "\n" + row),
+    ):
+        changed_plan = replace_once(plan, row, changed)
+        expect_rejected(
+            "to-crossing-qualification/" + name,
+            lambda item=changed_plan: progress._validate_plan_shape(item),
+            "authorised added dashboard row drifted: D-P9-021",
+        )
+    heading = "D-P9-021 Four-assembly handling and test results — 2026-11-13"
+    panel = progress._section(evidence, heading)
+    anchor = '<a id="to-crossing-qualification-panel"></a>'
+    for name, old, new in (
+        ("missing-anchor", anchor, ""),
+        ("duplicate-anchor", anchor, anchor + "\n" + anchor),
+        ("changed-native-run", "actions/runs/43369380474",
+         "actions/runs/43369380475"),
+        ("changed-gui-run", "actions/runs/43373643528",
+         "actions/runs/43373643529"),
+        ("inflated-component-count", "135 components compared",
+         "270 components compared"),
+        ("retrospective-failure-pass", "earlier readiness failures with their `FAIL` results",
+         "earlier readiness failures are now `PASS`"),
+        ("invented-source-coverage", "represent 126 of 168 source positions",
+         "represent 168 of 168 source positions"),
+        ("bb-acceptance", "whole `BB` assembly stays Pending",
+         "whole `BB` assembly is accepted"),
+        ("panel-phase-acceptance", "Exits 9B-1, 9B-3 and 9B-6 stay `Pending`",
+         "Exits 9B-1, 9B-3 and 9B-6 are accepted"),
+    ):
+        changed_panel = replace_once(panel, old, new)
+        changed_evidence = replace_once(evidence, panel, changed_panel)
+        expect_rejected(
+            "to-crossing-qualification/" + name,
+            lambda item=changed_evidence: (
+                progress._validate_dp9_021_qualification(item, record)
+            ),
+            "D-P9-021",
+        )
 
 
 def main() -> None:
@@ -9779,6 +9890,7 @@ def main() -> None:
     validate_ontology_mutation()
     validate_hosted_policy_acceptance_mutations()
     validate_to_research_publication_mutations()
+    validate_to_crossing_qualification_mutations()
     summary = {
         "escaped": 0,
         "independent_protections": len(PROTECTIONS),
