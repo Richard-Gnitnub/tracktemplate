@@ -4642,3 +4642,25 @@ The historical `2/2` repair record stays the same. D-P9-019 keeps its separate n
 | `native-full43369380474-independent-review.json` | `c6f33bbc2365afd64b3d2e32b824a7fd9ecb03cd81203a41dfb9bd52ded3f2c5` |
 | `gui-readiness43372189588-independent-review.json` | `2433616af714044600d6b17ca25412e9f84ca531e43addfa7331f38222c2ea11` |
 | `gui-full43373643528-independent-review.json` | `bb91882a6cd7efbccf2cd918141b23571c16715abd7b56ff99a8b014b191cc28` |
+
+## Source evidence for two TO-001 positions — 2026-11-13
+
+The `classify_knuckle_exclusions=True` operation gives two TO-001 positions at X3-X the `source-endpoint-exclusion` value.
+It adds no assembly or component. If the caller does not supply `classify_knuckle_exclusions`, its value is `False`. With `False`, the previous TO output bytes stay the same. The previous XO output bytes stay the same.
+
+For the specified TO-001 inputs with `source_hand="LH"`, Templot 556b `math_unit.pas:29843-29919` selects one XA assembly and no XN assembly at X3-X.
+The [source checks](../../tracktemplate/compatibility/chair_crossing_endpoint_exclusions.py) compare six pairs of rail ends in `points`, `gauge_face_points` and `outer_face_points`. The values in each pair are equal.
+The `centre_point` values of the two canonical records are equal to the rail ends. The `XN` values in `chair_code_label` and all 168 canonical records stay the same.
+These checks give no evidence that XA holds the `main-side wing knuckle` or the `turnout-side wing knuckle`.
+
+Across TO routes, 126 positions have assembly data. Two positions have the `source-endpoint-exclusion` value, and 40 stay Pending.
+Of those 40 positions, 24 have empty `chair_code_label` values. Sixteen have other values.
+This route has four assemblies, eight positions with assembly data, two `source-endpoint-exclusion` values and 158 remaining positions.
+
+The validators completed fourteen [new tests](../../tests/validate_phase9b_turnout_crossing_endpoints.py) and fifty previous tests. Each test gave a PASS result.
+Source checks by an independent reviewer show the two identities and no changes to the canonical records.
+GitHub operations `43369380474` (native) and `43373643528` (GUI) supply evidence only for the previous assembly and document operations.
+Those operations did not use `classify_knuckle_exclusions=True`.
+
+Geometry and tolerances do not change. This result gives no acceptance for physical fit, production or a phase, and no positive rights claim.
+The full BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` result stays the same.
