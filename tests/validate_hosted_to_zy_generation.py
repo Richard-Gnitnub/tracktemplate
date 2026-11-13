@@ -771,6 +771,266 @@ class ZyGenerationControls(unittest.TestCase):
         with self.assertRaises(ValueError):
             g.source_owner(changed, intent)
 
+    def run_source_observation(
+        self, name, *, terminal_changes=None, final_changes=None,
+        host_changes=None, live_changes=None, no_live=False,
+        final_group_present=False, deadline_expired=False,
+    ):
+        """Run the real monitor against inert service and kernel snapshots."""
+        g = self.generation
+        work = self.work / name
+        (work / "evidence").mkdir(parents=True)
+        lease = Mock(lease_id="lease")
+        lease.read.return_value = {}
+        sample = {
+            "memory.current": "100", "memory.peak": "100",
+            "memory.swap.current": "0", "pids.current": "1",
+            "memory.events": "high 0\nmax 0\noom 0\noom_kill 0\n",
+            "cpu.stat": "usage_usec 10\n",
+            "memory.pressure": (
+                "some avg10=0.00 avg60=0.00 avg300=0.00 total=0\n"
+                "full avg10=0.00 avg60=0.00 avg300=0.00 total=0\n"
+            ),
+            "cgroup.events": "populated 1\n", "cgroup.procs": "31415\n",
+        }
+        host = {
+            "MemAvailable": 13 * 1024**3, "SwapTotal": 0, "SwapFree": 0,
+            "memory_pressure": sample["memory.pressure"],
+        }
+        final = dict.fromkeys(g.pilot.SAMPLE_FIELDS)
+        final.update(final_changes or {})
+        sample.update(live_changes or {})
+        snapshots, present = {}, [True]
+        clock = [100]
+        samples = [final] if no_live else [sample, final]
+        original_exists, original_read = Path.exists, Path.read_text
+        limits = {
+            "memory.max": str(4096 * 1024**2),
+            "memory.high": str(4096 * 1024**2),
+            "memory.swap.max": "0", "cpu.max": "100000 100000",
+            "pids.max": "128",
+        }
+
+        def gate(_work, intent, _deadline):
+            _, state = self.gate_state()
+            state["ProcessCommandLine"] = intent["command"]
+            state["ExecStart"] = (
+                "{ argv[]=" + " ".join(intent["command"])
+                + " ; ignore_errors=no ; }"
+            )
+            owner = g.source_owner(state, intent)
+            snapshots["running"] = dict(state, ProcessState="S")
+            snapshots["terminal"] = dict(
+                state, MainPID="0", ControlGroup="", ProcessStart=None,
+                ProcessCommandLine=None, ExecMainExitTimestampMonotonic="1",
+                ExecMainCode="1", ExecMainStatus="0", Result="success",
+                ActiveState="active", SubState="exited",
+            )
+            snapshots["terminal"].update(terminal_changes or {})
+            return owner, state
+
+        def show(_unit, _deadline):
+            if not snapshots:
+                return {"MainPID": "0"}
+            return snapshots["terminal" if not present[0] else "running"]
+
+        def measure(_group):
+            value = samples.pop(0)
+            if not samples:
+                present[0] = final_group_present
+                clock[0] = 134 if deadline_expired else 100
+            return value
+
+        def exists(path):
+            if str(path).startswith("/sys/fs/cgroup/"):
+                return present[0]
+            return original_exists(path)
+
+        def read_text(path, *args, **kwargs):
+            if str(path).startswith("/sys/fs/cgroup/"):
+                return limits[path.name]
+            return original_read(path, *args, **kwargs)
+
+        hosts = [dict(host, **(host_changes or {}))]
+        if not no_live:
+            hosts.insert(0, host)
+        with (
+            patch.dict(g.os.environ, {"GITHUB_RUN_ID": "123"}),
+            patch.object(g, "verify_inputs"),
+            patch.object(g, "wait_source_gate", side_effect=gate),
+            patch.object(g, "show_unit", side_effect=show),
+            patch.object(g, "bounded_command"),
+            patch.object(g, "source_cleanup", return_value={"cleanup": True}),
+            patch.object(g.guard, "_sample", side_effect=measure),
+            patch.object(g, "host_sample", side_effect=hosts),
+            patch.object(g.time, "monotonic", side_effect=lambda: clock[0]),
+            patch.object(g.time, "sleep"),
+            patch.object(Path, "exists", exists),
+            patch.object(Path, "read_text", read_text),
+        ):
+            result = g.run_preparation(
+                work, {"stage": "readiness"}, lease, 133
+            )
+        rows = [
+            json.loads(line) for line in
+            (work / "evidence/source-measurements.jsonl").read_text()
+            .splitlines()
+        ]
+        self.assertEqual(rows[-1]["cgroup"], final if not samples else sample)
+        return result, snapshots, rows
+
+    def test_removed_source_group_refreshes_exact_terminal_evidence(self):
+        _, live = self.gate_state()
+        for index, group in enumerate(("", live["ControlGroup"])):
+            with self.subTest(retained_group=group):
+                result, states, rows = self.run_source_observation(
+                    "race-" + str(index),
+                    terminal_changes={"ControlGroup": group},
+                )
+                self.assertEqual(result["status"], "PASS", result["errors"])
+                self.assertEqual(result["live_samples"], 1)
+                self.assertEqual(
+                    result["resource_accounting"], "sampled-lower-bound"
+                )
+                observed = result["removed_group_observation"]
+                self.assertEqual(
+                    observed["initial_state"], states["running"]
+                )
+                self.assertEqual(
+                    observed["terminal_state"], states["terminal"]
+                )
+                self.assertEqual(observed["sample"], rows[-1]["cgroup"])
+                self.assertIs(observed["group_removed"], True)
+
+    def test_removed_group_requires_successful_unchanged_terminal_owner(self):
+        changes = (
+            {"InvocationID": "b" * 32}, {"MainPID": "991"},
+            {"ControlPID": "991"}, {"ControlGroup": "/foreign"},
+            {"ExecStart": "changed ; ignore_errors=no ; }"},
+            {"RuntimeMaxUSec": "34s"},
+            {"ExecMainExitTimestampMonotonic": "0"},
+            {"ExecMainCode": "2"}, {"ExecMainStatus": "1"},
+            {"Result": "timeout"},
+        )
+        for index, change in enumerate(changes):
+            with self.subTest(change=change):
+                result, _, _ = self.run_source_observation(
+                    "terminal-" + str(index), terminal_changes=change
+                )
+                self.assertEqual(result["status"], "FAIL")
+                self.assertTrue(result["errors"])
+
+    def test_removed_group_never_excuses_telemetry_or_deadline_failures(self):
+        cases = (
+            {"no_live": True}, {"final_group_present": True},
+            {"final_changes": {"memory.current": "1"}},
+            {"host_changes": {"MemAvailable": 1}},
+            {"host_changes": {"SwapTotal": 1}},
+            {"host_changes": {"memory_pressure": "unavailable"}},
+            {"live_changes": {"memory.events": "high 1\nmax 0\noom 0\n"}},
+            {"deadline_expired": True},
+        )
+        for index, options in enumerate(cases):
+            with self.subTest(options=options):
+                result, _, _ = self.run_source_observation(
+                    "resource-" + str(index), **options
+                )
+                self.assertEqual(result["status"], "FAIL")
+                self.assertTrue(result["errors"])
+
+    def cleanup_fixture(self, name):
+        g = self.generation
+        work = self.work / name
+        (work / "evidence").mkdir(parents=True)
+        intent, state = self.gate_state()
+        owner = g.source_owner(state, intent)
+        gone = dict(
+            state, MainPID="0", ControlPID="0", ControlGroup="",
+            InvocationID="", RuntimeMaxUSec="infinity", ExecStart="",
+            ActiveState="inactive", SubState="dead", ProcessStart=None,
+            ProcessCommandLine=None,
+        )
+        for filename, value in (
+            ("source-intent.json", intent), ("source-ownership.json", owner),
+        ):
+            (work / "evidence" / filename).write_bytes(encoded(value))
+        with (
+            patch.dict(g.os.environ, {"GITHUB_RUN_ID": "123"}),
+            patch.object(g, "show_unit", side_effect=[state, gone]),
+            patch.object(g, "bounded_command") as stop,
+            patch.object(g.guard, "_empty", return_value=True),
+        ):
+            first = g.source_cleanup(work)
+        self.assertIs(first["cleanup"], True)
+        self.assertIs(first["group_removed"], True)
+        stop.assert_called_once()
+        proof = {"status": "FAIL", "finalization": first}
+        (work / "evidence/source-result.json").write_bytes(encoded(proof))
+        return work, owner, gone, proof
+
+    def test_repeated_cleanup_requires_prior_owned_removal_and_fresh_absence(
+        self,
+    ):
+        g = self.generation
+        work, owner, gone, _ = self.cleanup_fixture("repeat")
+        original = (work / "evidence/source-result.json").read_bytes()
+        with (
+            patch.dict(g.os.environ, {"GITHUB_RUN_ID": "123"}),
+            patch.object(g, "show_unit", return_value=gone),
+            patch.object(g, "bounded_command") as stop,
+            patch.object(g.guard, "_empty", return_value=True),
+            patch.object(
+                g.guard, "_process_start", side_effect=FileNotFoundError
+            ),
+        ):
+            for _ in range(2):
+                result = g.source_cleanup(work)
+                self.assertIs(result["cleanup"], True, result["errors"])
+                self.assertEqual(result["owner"], owner)
+            stop.assert_not_called()
+        self.assertEqual(
+            (work / "evidence/source-result.json").read_bytes(), original
+        )
+
+    def test_repeated_cleanup_refuses_foreign_or_unproved_state(self):
+        g = self.generation
+        cases = (
+            ("missing-proof", {}, None, True, None),
+            ("changed-proof", {}, "owner", True, None),
+            ("not-removed", {}, "group_removed", True, None),
+            ("failed-proof", {}, "cleanup", True, None),
+            ("foreign", {"InvocationID": "b" * 32}, None, True, None),
+            ("pid", {"MainPID": "991"}, None, True, None),
+            ("control", {"ControlPID": "991"}, None, True, None),
+            ("group", {"ControlGroup": "/foreign"}, None, True, None),
+            ("residue", {}, None, False, None),
+            ("same-pid", {}, None, True, "12345"),
+        )
+        for name, change, corrupt, empty, process_start in cases:
+            with self.subTest(name=name):
+                work, _, gone, proof = self.cleanup_fixture(name)
+                path = work / "evidence/source-result.json"
+                if name == "missing-proof":
+                    path.unlink()
+                elif corrupt:
+                    proof["finalization"][corrupt] = False
+                    path.write_bytes(encoded(proof))
+                with (
+                    patch.dict(g.os.environ, {"GITHUB_RUN_ID": "123"}),
+                    patch.object(
+                        g, "show_unit", return_value=dict(gone, **change)
+                    ),
+                    patch.object(g, "bounded_command") as stop,
+                    patch.object(g.guard, "_empty", return_value=empty),
+                    patch.object(
+                        g.guard, "_process_start", return_value=process_start
+                    ),
+                ):
+                    result = g.source_cleanup(work)
+                self.assertIs(result["cleanup"], False)
+                self.assertTrue(result["errors"])
+                stop.assert_not_called()
+
     def test_stop_gate_waits_for_same_pid_and_refuses_late_changes(self):
         g = self.generation
         intent, stopped = self.gate_state()
