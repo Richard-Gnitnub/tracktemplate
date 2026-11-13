@@ -1427,6 +1427,8 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
          '0cd43275768d3c42afe0c6a33e69d6099fd09b7f17c95391f2de7fe6d97e09d9'),
         ('D-P9-021',
          '8913a335d220de309e13df1ef728ae910520460fc73cafa9af8207b4cf858714'),
+        ('D-P9-022',
+         'e8e14822f4599348f82db3fbf220995312894693526a7e7f213fa9da070d0a17'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -8041,6 +8043,45 @@ def _validate_dp9_021_qualification(evidence: str, record: dict) -> None:
     )
 
 
+def _validate_dp9_022_decision(record, fields):
+    """Bind exact ZY handling authority without construction acceptance."""
+    panel = "reference/current/PHASE_EVIDENCE.md#to-zy-handling-panel"
+    _require(
+        isinstance(record, dict) and set(record) == fields
+        and record["id"] == "D-P9-022"
+        and record["decided_on"] == "2026-11-13"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-022 handling identity or panel authority drifted",
+    )
+    for field, expected in (
+        ("authority", "459b13885f390dcfcad2cd0078369d0383189ffb3714570f9e201ae88ea9f8b2"),
+        ("decision", "fdc7497f0f358ccbbdceba23c117f2d3ce6a8745d8db37673f412e1883129159"),
+        ("exclusions", "59f07dca22bf7a2e3a421a0baa27beda56b10db98e86be9bff12298dbc936ea1"),
+    ):
+        value = record[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == expected,
+            "D-P9-022 " + field + " authority or boundary drifted",
+        )
+
+
+def _validate_dp9_022_handling(evidence: str, record: dict) -> None:
+    """Preserve exact input/output scope, limits and pending qualification."""
+    heading = "D-P9-022 ZY handling — 2026-11-13"
+    panel = _section(evidence, heading)
+    _require(
+        record["id"] == "D-P9-022"
+        and evidence.count("## " + heading + "\n") == 1
+        and evidence.count('<a id="to-zy-handling-panel"></a>') == 1
+        and hashlib.sha256(_semantic_markdown(panel).encode("utf-8")).hexdigest()
+        == "e609ef4f455c0a05dd763fec49ab643684bfeb252a13c878fa8a549906c35724",
+        "D-P9-022 handling, output or acceptance boundaries drifted",
+    )
+
+
 def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
     """Keep the source menu, wider domain and exact owner quote distinct."""
     panel = _section(evidence, "D-P9-019 REA B and C turnout scope — 2026-11-01")
@@ -8112,7 +8153,7 @@ def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
 
 
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep the sixteen accepted decisions and their exact bounded authority."""
+    """Keep the seventeen accepted decisions and their exact bounded authority."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
@@ -8124,7 +8165,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 16
+        and len(records) == 17
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -8143,6 +8184,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_019_decision(records[13], set(records[0]))
     _validate_dp9_020_decision(records[14], set(records[0]))
     _validate_dp9_021_decision(records[15], set(records[0]))
+    _validate_dp9_022_decision(records[16], set(records[0]))
     for index, identity, expected_digest in (
         (10, 'D-P9-018',
          'be3af2a2720606f2ebc0f48a2ffccd64a0466ea5c9ed022727ba5fbf0aaa5458'),
@@ -9240,7 +9282,7 @@ def _validate_decisions(plan: str) -> None:
         and "history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
         in decision_section
         and "current decision register" in decision_flat
-        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-021, "
+        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-022, "
         "D-GOV-024, D-GOV-025 and D-GOV-026" in decision_flat,
         "Phase 7 closeout or current decision-register ownership is missing",
     )
@@ -9260,7 +9302,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
            "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017", "D-P9-018", "D-P9-019", "D-P9-020",
-           "D-P9-021", "D-GOV-023",
+           "D-P9-021", "D-P9-022", "D-GOV-023",
            "D-GOV-024", "D-GOV-025", "D-GOV-026"},
         "project-plan decisions differ from the current and frozen registers",
     )
@@ -11040,6 +11082,10 @@ def main() -> None:
     _validate_dp9_021_qualification(
         _read(CURRENT_EVIDENCE_PATH),
         _load_json(CURRENT_DECISIONS_PATH)["decisions"][15],
+    )
+    _validate_dp9_022_handling(
+        _read(CURRENT_EVIDENCE_PATH),
+        _load_json(CURRENT_DECISIONS_PATH)["decisions"][16],
     )
     _validate_dgov024_panel(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_014_policy(
