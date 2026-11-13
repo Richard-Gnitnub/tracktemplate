@@ -2698,6 +2698,42 @@ class HostedToCrossingGuiControls(unittest.TestCase):
                                  'widget_valid': True, 'renderer': 'llvmpipe',
                                  'vendor': 'fixture', 'version': 'fixture'},
                 }
+                if stage == 'gui':
+                    # Exercise the actual producer's data assignment only;
+                    # face 7 is a synthetic valid index, not a native result.
+                    entry_path = ROOT / 'tests/freecad_validate_to_crossing_chairs_gui.py'
+                    entry_tree = ast.parse(entry_path.read_text())
+                    entry_class = next(
+                        node for node in entry_tree.body
+                        if isinstance(node, ast.ClassDef)
+                        and node.name == 'ToCrossingGui'
+                    )
+                    pick = next(node for node in entry_class.body
+                                if isinstance(node, ast.FunctionDef)
+                                and node.name == '_pick')
+                    assignments = [
+                        node for node in ast.walk(pick)
+                        if isinstance(node, ast.Assign)
+                        and len(node.targets) == 1
+                        and isinstance(node.targets[0], ast.Subscript)
+                        and isinstance(node.targets[0].value, ast.Attribute)
+                        and node.targets[0].value.attr == 'receipt'
+                        and isinstance(node.targets[0].value.value, ast.Name)
+                        and node.targets[0].value.value.id == 'self'
+                        and isinstance(node.targets[0].slice, ast.Constant)
+                        and node.targets[0].slice.value == 'pick_witness'
+                    ]
+                    self.assertEqual(len(assignments), 1)
+                    producer = ast.Module(body=assignments, type_ignores=[])
+                    exec(compile(producer, str(entry_path), 'exec'),
+                         {'__builtins__': {'dict': dict}},
+                         {'self': SimpleNamespace(receipt=receipt),
+                          'face_index': 7})
+                    self.assertEqual(receipt['pick_witness'], {
+                        'family': 'XA', 'component': 'base_plinth',
+                        'face_index': 7, 'native_interior': True,
+                        'selection_matches': True,
+                    })
                 gui.validate_to_receipt(receipt, work, stage=stage,
                                         workload=self.WORKLOAD)
                 for key, value in (
@@ -2713,6 +2749,43 @@ class HostedToCrossingGuiControls(unittest.TestCase):
                                 dict(receipt, **{key: value}), work,
                                 stage=stage, workload=self.WORKLOAD,
                             )
+                if stage == 'gui':
+                    missing = dict(receipt)
+                    missing.pop('pick_witness')
+                    with self.assertRaises(ValueError):
+                        gui.validate_to_receipt(missing, work, stage=stage,
+                                                workload=self.WORKLOAD)
+                    for field, value in (
+                        ('family', 'AA'), ('component', 'outer_jaw'),
+                        ('face_index', True), ('face_index', 0),
+                        ('face_index', -1), ('face_index', 1.0),
+                        ('native_interior', False), ('native_interior', 1),
+                        ('selection_matches', False),
+                        ('selection_matches', 1), ('extra', True),
+                    ):
+                        bad = copy.deepcopy(receipt)
+                        bad['pick_witness'][field] = value
+                        with self.subTest(witness=field, value=value):
+                            with self.assertRaises(ValueError):
+                                gui.validate_to_receipt(
+                                    bad, work, stage=stage,
+                                    workload=self.WORKLOAD,
+                                )
+                    for field in receipt['pick_witness']:
+                        bad = copy.deepcopy(receipt)
+                        del bad['pick_witness'][field]
+                        with self.subTest(missing_witness_field=field):
+                            with self.assertRaises(ValueError):
+                                gui.validate_to_receipt(
+                                    bad, work, stage=stage,
+                                    workload=self.WORKLOAD,
+                                )
+                else:
+                    with self.assertRaises(ValueError):
+                        gui.validate_to_receipt(
+                            dict(receipt, pick_witness={}), work,
+                            stage=stage, workload=self.WORKLOAD,
+                        )
                 for name in ('unapproved.png', 'operator.FCStd', 'raw-shape.brep'):
                     extra = images / name
                     extra.write_bytes(b'not approved')

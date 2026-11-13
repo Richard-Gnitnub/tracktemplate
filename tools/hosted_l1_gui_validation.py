@@ -1727,14 +1727,27 @@ def validate_to_receipt(receipt, work, *, stage, workload='to-single'):
                 'run_id', 'source_commit', 'entry_sha256', 'evidence_sha256',
             )
         }
+    result_fields = {'checks', 'stage_timings', 'screenshots', 'renderer'}
+    if workload == 'to-crossing' and stage == 'gui':
+        result_fields.add('pick_witness')
     require(type(receipt) is dict
-            and set(receipt) == set(expected) | {
-                'checks', 'stage_timings', 'screenshots', 'renderer',
-            }
+            and set(receipt) == set(expected) | result_fields
             and all(type(receipt.get(key)) is type(value)
                     and receipt[key] == value
                     for key, value in expected.items()),
             'TO GUI receipt incomplete')
+    if workload == 'to-crossing' and stage == 'gui':
+        witness = receipt['pick_witness']
+        require(type(witness) is dict and set(witness) == {
+            'family', 'component', 'face_index',
+            'native_interior', 'selection_matches',
+        } and witness['family'] == 'XA'
+            and witness['component'] == 'base_plinth'
+            and type(witness['face_index']) is int
+            and witness['face_index'] > 0
+            and witness['native_interior'] is True
+            and witness['selection_matches'] is True,
+            'TO crossing pick witness differs')
     validate_to_counts(receipt['checks'], stage, workload=workload)
     timings = receipt['stage_timings']
     names = {'readiness_seconds', 'cleanup_seconds', 'total_seconds'}
