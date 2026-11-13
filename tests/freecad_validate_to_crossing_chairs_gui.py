@@ -25,7 +25,7 @@ BASE = "a801f4444bec2f6799e7d2ad1fa2da3aac78db95"
 PREFIX = "TRACKTEMPLATE_TO_CROSSING_GUI="
 NATIVE_PATH = "tests/freecad_validate_to_crossing_chairs.py"
 NATIVE_SHA256 = (
-    "583f3d37d658e0e8a339ccb7ba58191ebb2d0e38b039ea0486126b3b1496b5ab"
+    "6bcf7a70eb7051fe24ec853c851d6dd35454f8a191cabe978c2ec999abb2af75"
 )
 LEGACY_GUI_PATH = "tests/freecad_validate_to_single_rail_gui.py"
 LEGACY_GUI_SHA256 = (

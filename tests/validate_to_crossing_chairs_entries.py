@@ -3,6 +3,7 @@
 
 import copy
 from contextlib import redirect_stdout
+from dataclasses import replace
 import hashlib
 import importlib
 import io
@@ -91,6 +92,118 @@ class CrossingEntryTests(unittest.TestCase):
                 self.assertIs(entry.component_frame(row, name), row["body"])
             with self.assertRaises(ValueError):
                 entry.component_frame(row, "unknown")
+
+    def test_catalogues_use_real_selection_labels_and_keep_all_guards(self):
+        from tracktemplate.application import chair_crossing_pair_catalogue
+        from tracktemplate.application.chair_catalogue import (
+            CatalogueBinding,
+            CatalogueChair,
+            CatalogueComponent,
+        )
+
+        entry = self.native()
+        families = ("XA", "AA", "CD", "DD")
+        inputs = {
+            key: {
+                "path": "/profile/" + entry.DEPLOYMENT_NAMES[key],
+                "sha256": digest,
+            }
+            for key, digest in entry.INPUT_HASHES.items()
+        }
+        values = tuple(
+            CatalogueChair(
+                catalogue_path=inputs["catalogue"]["path"],
+                label=family,
+                run="context-native-02",
+                context_json="{}",
+                model_path=inputs[family.lower() + "_model"]["path"],
+                model_sha256=inputs[family.lower() + "_model"]["sha256"],
+                catalogue_sha256=inputs["catalogue"]["sha256"],
+                components=tuple(
+                    CatalogueComponent(
+                        name, name, "inert test component",
+                        (0, 0, 0, 0, 0, 0, 1),
+                    )
+                    for name in entry.component_names(family)
+                ),
+                bindings=tuple(
+                    CatalogueBinding(row["path"], row["sha256"])
+                    for row in inputs.values()
+                ),
+                limitations=(),
+                metadata_json="{}",
+            )
+            for family in families
+        )
+        with (
+            self.subTest(case="real immutable catalogue contract"),
+            patch.object(
+                chair_crossing_pair_catalogue,
+                "prepare_turnout_crossing_catalogue", return_value=values,
+            ) as prepare,
+            patch.object(
+                chair_crossing_pair_catalogue,
+                "verify_turnout_crossing_catalogue",
+            ) as verify,
+        ):
+            result = entry.catalogues(inputs)
+            self.assertEqual(tuple(result), families)
+            self.assertEqual(tuple(result.values()), values)
+            prepare.assert_called_once_with(inputs["catalogue"]["path"])
+            verify.assert_called_once_with(values)
+
+        cases = [
+            ("reordered", tuple(reversed(values))),
+            ("missing", values[:-1]),
+            ("extra", (*values, values[0])),
+        ]
+        for index, value in enumerate(values):
+            changes = {
+                "label": "wrong",
+                "catalogue_sha256": "0" * 64,
+                "model_path": "/profile/wrong.FCStd",
+                "model_sha256": "0" * 64,
+                "components": tuple(reversed(value.components)),
+                "bindings": (
+                    replace(value.bindings[0], sha256="0" * 64),
+                    *value.bindings[1:],
+                ),
+            }
+            for field, changed in changes.items():
+                candidate = list(values)
+                candidate[index] = replace(value, **{field: changed})
+                cases.append((value.label + ":" + field, tuple(candidate)))
+        for label, candidate in cases:
+            with (
+                self.subTest(case=label),
+                patch.object(
+                    chair_crossing_pair_catalogue,
+                    "prepare_turnout_crossing_catalogue",
+                    return_value=candidate,
+                ),
+                patch.object(
+                    chair_crossing_pair_catalogue,
+                    "verify_turnout_crossing_catalogue",
+                ) as verify,
+            ):
+                with self.assertRaises(AssertionError):
+                    entry.catalogues(inputs)
+                verify.assert_not_called()
+        with (
+            self.subTest(case="late source change"),
+            patch.object(
+                chair_crossing_pair_catalogue,
+                "prepare_turnout_crossing_catalogue", return_value=values,
+            ),
+            patch.object(
+                chair_crossing_pair_catalogue,
+                "verify_turnout_crossing_catalogue",
+                side_effect=ValueError("source changed"),
+            ) as verify,
+        ):
+            with self.assertRaisesRegex(ValueError, "source changed"):
+                entry.catalogues(inputs)
+            verify.assert_called_once_with(values)
 
     def test_counts_distinguish_source_compounds_and_children(self):
         entry = self.native()

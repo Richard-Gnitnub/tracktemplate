@@ -190,7 +190,7 @@ def catalogues(inputs):
     )
 
     values = prepare_turnout_crossing_catalogue(inputs["catalogue"]["path"])
-    assert tuple(value.family for value in values) == FAMILIES
+    assert tuple(value.label for value in values) == FAMILIES
     approved = {row["path"]: row["sha256"] for row in inputs.values()}
     for family, value in zip(FAMILIES, values):
         record = inputs[family.lower() + "_model"]
