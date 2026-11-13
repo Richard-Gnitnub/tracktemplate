@@ -6,11 +6,12 @@ import importlib
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tarfile
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,7 +33,7 @@ def member(archive, name, raw, *, kind=tarfile.REGTYPE):
 
 
 class ZyGenerationControls(unittest.TestCase):
-    """No compiler, subprocess, network, FreeCAD or Qt runs in these cases."""
+    """Only inert shell syntax runs; no service/compiler/native/network."""
 
     def setUp(self):
         self.generation = importlib.import_module(
@@ -532,6 +533,10 @@ class ZyGenerationControls(unittest.TestCase):
         )
         state = {
             "Id": intent["unit"],
+            "MainPID": "31415",
+            "ControlPID": "0",
+            "ProcessCommandLine": intent["command"],
+            "ProcessStart": "12345",
             "ControlGroup": group,
             "InvocationID": "a" * 32,
             "KillMode": "control-group",
@@ -597,6 +602,329 @@ class ZyGenerationControls(unittest.TestCase):
         ):
             self.assertEqual(g.publish(self.work), 1)
             cleanup.assert_not_called()
+
+    def gate_state(self):
+        g = self.generation
+        command = [
+            "/bin/sh",
+            "-c",
+            'kill -STOP "$$" || exit; exec "$@"',
+            "zy-source",
+            "/usr/bin/python3",
+            "-B",
+            "/fixed/entry.py",
+        ]
+        intent = {
+            "unit": "tracktemplate-zy-source-123.service",
+            "command": command,
+            "seconds": 33,
+            "lease_id": "lease",
+        }
+        state = {
+            "Id": intent["unit"],
+            "MainPID": "31415",
+            "ControlPID": "0",
+            "ControlGroup": (
+                f"/user.slice/user-{g.os.getuid()}.slice/"
+                f"user@{g.os.getuid()}.service/app.slice/" + intent["unit"]
+            ),
+            "InvocationID": "a" * 32,
+            "KillMode": "control-group",
+            "Restart": "no",
+            "SendSIGKILL": "yes",
+            "RuntimeMaxUSec": "33s",
+            "TimeoutStopUSec": "5s",
+            "ExecStart": (
+                "{ path=/bin/sh ; argv[]=/bin/sh -c "
+                'kill -STOP "$$" || exit; exec "$@" zy-source '
+                "/usr/bin/python3 -B /fixed/entry.py ; "
+                "ignore_errors=no ; start_time=[now] ; }"
+            ),
+            "ProcessCommandLine": command,
+            "ProcessStart": "12345",
+            "ProcessState": "T",
+            "CgroupProcesses": ["31415"],
+            "ActiveState": "active",
+            "ExecMainExitTimestampMonotonic": "0",
+        }
+        return intent, state
+
+    def test_real_service_gate_disables_expansion_and_stop_failure_refuses(
+        self,
+    ):
+        g, launches = self.generation, []
+        lease = Mock(lease_id="lease")
+        lease.read.return_value = {}
+
+        def capture(arguments, _deadline, **_kwargs):
+            launches.append(arguments)
+            raise ValueError("inert stop before any service execution")
+
+        with (
+            patch.object(g, "verify_inputs"),
+            patch.object(g, "source_unit", return_value="unit.service"),
+            patch.object(g, "remaining_seconds", return_value=33),
+            patch.object(g, "show_unit", return_value={"MainPID": "0"}),
+            patch.object(g, "bounded_command", side_effect=capture),
+            patch.object(g, "source_cleanup", return_value={"cleanup": True}),
+        ):
+            result = g.run_preparation(
+                self.work, {"stage": "readiness"}, lease, 999
+            )
+        self.assertEqual(result["status"], "FAIL")
+        self.assertEqual(len(launches), 1)
+        argv = launches[0]
+        self.assertIn("--expand-environment=no", argv)
+        script = argv[argv.index("/bin/sh") + 2]
+        inert = subprocess.run(
+            [
+                "/bin/sh",
+                "-c",
+                "kill() { return 7; }; " + script,
+                "zy-source",
+                "/bin/sh",
+                "-c",
+                "printf UNAUTHORISED",
+            ],
+            capture_output=True,
+            timeout=2,
+            check=False,
+        )
+        self.assertNotEqual(inert.returncode, 0)
+        self.assertEqual(inert.stdout, b"")
+
+    def test_complete_gate_argv_and_cleanup_identity(self):
+        g = self.generation
+        intent, state = self.gate_state()
+        properties = {
+            key: value
+            for key, value in state.items()
+            if key
+            not in (
+                "ProcessCommandLine",
+                "ProcessStart",
+                "ProcessState",
+                "CgroupProcesses",
+            )
+        }
+        command = Mock(
+            returncode=0,
+            stdout="\n".join(
+                key + "=" + value for key, value in properties.items()
+            ),
+        )
+        raw = b"\0".join(arg.encode() for arg in intent["command"]) + b"\0"
+        with (
+            patch.object(g, "bounded_command", return_value=command),
+            patch.object(g.guard, "_process_start", return_value="12345"),
+            patch.object(Path, "read_bytes", return_value=raw),
+            patch.object(
+                Path,
+                "read_text",
+                side_effect=["State:\tT (stopped)", "31415\n"],
+            ),
+        ):
+            observed = g.show_unit(intent["unit"], 105)
+        self.assertEqual(observed["ProcessCommandLine"], intent["command"])
+        self.assertEqual(observed["ProcessState"], "T")
+        owner = g.source_owner(state, intent)
+        for index, replacement in (
+            (0, "/bin/other"),
+            (2, "exec unwanted"),
+            (6, "/different/entry.py"),
+        ):
+            changed = deepcopy(state)
+            changed["ProcessCommandLine"][index] = replacement
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                g.source_owner(changed, intent)
+        ended = dict(
+            state,
+            MainPID="0",
+            ControlGroup="",
+            ProcessStart=None,
+            ProcessCommandLine=None,
+            ActiveState="inactive",
+        )
+        self.assertEqual(g.source_owner(ended, intent, owner), owner)
+        with self.assertRaises(ValueError):
+            g.source_owner(dict(ended, InvocationID="b" * 32), intent, owner)
+        (self.work / "evidence/source-intent.json").write_bytes(
+            encoded(intent)
+        )
+        (self.work / "evidence/source-ownership.json").write_bytes(
+            encoded(owner)
+        )
+        with (
+            patch.dict(g.os.environ, {"GITHUB_RUN_ID": "123"}),
+            patch.object(g, "show_unit", side_effect=[state, ended]),
+            patch.object(g, "bounded_command") as stop,
+            patch.object(g.guard, "_empty", return_value=True),
+        ):
+            cleanup = g.source_cleanup(self.work)
+        self.assertIs(cleanup["cleanup"], True)
+        self.assertEqual(
+            stop.call_args.args[0],
+            ["systemctl", "--user", "stop", intent["unit"]],
+        )
+        # A command mismatch must not supply a cleanup owner.
+        changed = dict(state, ProcessCommandLine=["/bin/other"])
+        with self.assertRaises(ValueError):
+            g.source_owner(changed, intent)
+
+    def test_stop_gate_waits_for_same_pid_and_refuses_late_changes(self):
+        g = self.generation
+        intent, stopped = self.gate_state()
+        running = dict(stopped, ProcessState="R")
+        with (
+            patch.object(g, "show_unit", side_effect=[running, stopped]),
+            patch.object(g.time, "monotonic", return_value=100),
+            patch.object(g.time, "sleep") as sleep,
+            patch.object(g, "bounded_command") as command,
+        ):
+            owner, state = g.wait_source_gate(self.work, intent, 105)
+        self.assertEqual(owner["pid"], 31415)
+        self.assertEqual(state["ProcessState"], "T")
+        sleep.assert_called_once()
+        command.assert_not_called()
+        for index, change in enumerate(
+            (
+                {"MainPID": "31416"},
+                {"InvocationID": "b" * 32},
+                {"ProcessStart": "changed"},
+                {"CgroupProcesses": ["31415", "9"]},
+                {"ExecMainExitTimestampMonotonic": "1"},
+            )
+        ):
+            directory = self.work / str(index)
+            (directory / "evidence").mkdir(parents=True)
+            with (
+                self.subTest(change=change),
+                patch.object(
+                    g,
+                    "show_unit",
+                    side_effect=[running, dict(stopped, **change)],
+                ),
+                patch.object(g.time, "monotonic", return_value=100),
+                patch.object(g.time, "sleep"),
+                patch.object(g, "bounded_command") as command,
+                self.assertRaises(ValueError),
+            ):
+                g.wait_source_gate(directory, intent, 105)
+            command.assert_not_called()
+        directory = self.work / "timeout"
+        (directory / "evidence").mkdir(parents=True)
+        clock = [100]
+
+        def late_wake(_seconds):
+            clock[0] = 106
+
+        with (
+            patch.object(g, "show_unit", return_value=running),
+            patch.object(g.time, "monotonic", side_effect=lambda: clock[0]),
+            patch.object(g.time, "sleep", side_effect=late_wake),
+            patch.object(g, "bounded_command") as command,
+            self.assertRaises(ValueError),
+        ):
+            g.wait_source_gate(directory, intent, 105)
+        command.assert_not_called()
+
+    def test_partial_metadata_keeps_first_failure_bytes_before_cleanup(self):
+        g = self.generation
+        cases = (
+            (b'{"returncode":', b'{"status":"FAIL"}'),
+            (b"[]", b'{"status":"FAIL"}'),
+            (b'{"returncode":0}', b"[]"),
+            (None, b"original partial raw bytes"),
+        )
+        for index, (metadata, raw) in enumerate(cases):
+            work = self.work / str(index)
+            evidence = work / "evidence"
+            evidence.mkdir(parents=True)
+            generated = work / "generated"
+            streams = generated / "generated-raw"
+            streams.mkdir(parents=True)
+            rows = [
+                {
+                    "name": name,
+                    "request_identity": identity(name.encode()),
+                    "historical_raw_identity": None,
+                }
+                for name in ("first", "second")
+            ]
+            (streams / "first.faces.json").write_bytes(b'{"status":"PASS"}')
+            (streams / "first.faces.json.process.json").write_bytes(
+                b'{"returncode":0}'
+            )
+            (streams / "first.stderr").write_bytes(b"")
+            (streams / "second.faces.json").write_bytes(raw)
+            (streams / "second.stderr").write_bytes(b"original stderr")
+            if metadata is not None:
+                (streams / "second.faces.json.process.json").write_bytes(
+                    metadata
+                )
+            with self.subTest(metadata=metadata, raw=raw):
+                result = g.preserve_generation_failure(
+                    generated, rows, evidence
+                )
+                self.assertEqual(result["request"], "second")
+                self.assertEqual(
+                    (evidence / "failed-request.stdout").read_bytes(), raw
+                )
+                self.assertEqual(
+                    (evidence / "failed-request.stderr").read_bytes(),
+                    b"original stderr",
+                )
+                self.assertTrue(result["parse_limitations"])
+                if metadata is not None:
+                    self.assertEqual(
+                        (
+                            evidence / "failed-request.process.json"
+                        ).read_bytes(),
+                        metadata,
+                    )
+                self.assertNotIn(
+                    "first.faces.json", [p.name for p in evidence.iterdir()]
+                )
+
+    def test_failed_stream_copy_blocks_staging_retirement(self):
+        g = self.generation
+        generated = self.work / "generated"
+        streams = generated / "generated-raw"
+        streams.mkdir(parents=True)
+        (streams / "failed.faces.json").write_bytes(b"partial original")
+        (streams / "failed.stderr").write_bytes(b"original error")
+        rows = [
+            {
+                "name": "failed",
+                "request_identity": identity(b"request"),
+                "historical_raw_identity": None,
+            }
+        ]
+        approved = self.work / "approved/x2"
+        approved.mkdir(parents=True)
+        (approved / "x2-generation-settings.json").write_bytes(
+            encoded({"requests": rows})
+        )
+        (self.work / "evidence/process-finalization.json").write_bytes(
+            encoded({"cleanup": True})
+        )
+        with patch.object(
+            g, "preserve_copy", side_effect=OSError("copy failed")
+        ):
+            with self.assertRaises(OSError):
+                g.preserve_generation_failure(
+                    generated, rows, self.work / "evidence"
+                )
+        with (
+            patch.object(g, "verify_inputs"),
+            patch.object(g.shutil, "rmtree") as retire,
+            self.assertRaises((ValueError, OSError)),
+        ):
+            g.cleanup_owned(self.work)
+        retire.assert_not_called()
+        self.assertEqual(
+            (streams / "failed.faces.json").read_bytes(), b"partial original"
+        )
 
     def test_import_safe_native_suite_and_readiness_has_no_construction(self):
         entry = importlib.import_module("tests.hosted_to_zy_generation_suite")

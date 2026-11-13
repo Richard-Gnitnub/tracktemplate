@@ -14,7 +14,6 @@ import math
 import os
 from pathlib import Path, PurePosixPath
 import re
-import shlex
 import shutil
 import signal
 import subprocess
@@ -550,8 +549,8 @@ def preserve_copy(source, destination):
     return identity(destination)
 
 
-def preserve_generation_failure(generated, rows, evidence):
-    """Retain only the first incomplete/failed selected request's raw bytes."""
+def first_generation_failure(generated, rows):
+    """Locate original failure streams without trusting partial JSON."""
     for row in rows:
         name = row["name"]
         folder = (
@@ -562,37 +561,104 @@ def preserve_generation_failure(generated, rows, evidence):
         stdout = generated / folder / (name + ".faces.json")
         stderr = generated / "generated-raw" / (name + ".stderr")
         process = Path(str(stdout) + ".process.json")
-        if not stdout.exists() and not stderr.exists():
+        if not any(path.exists() for path in (stdout, stderr, process)):
             continue
-        result = read(process) if process.exists() else None
-        if result is not None and result.get("returncode") == 0:
+        result, limitations = None, []
+        if process.exists():
+            try:
+                result = read(process)
+                if type(result) is not dict:
+                    limitations.append("process-metadata-not-object")
+                    result = None
+            except (OSError, ValueError, UnicodeError):
+                limitations.append("process-metadata-unreadable-json")
+        else:
+            limitations.append("process-metadata-absent")
+        if (
+            result is not None
+            and type(result.get("returncode")) is int
+            and result["returncode"] == 0
+        ):
             try:
                 historical = row.get("historical_raw_identity")
-                if read(stdout).get("status") == "PASS" and (
+                output = read(stdout)
+                if type(output) is not dict:
+                    limitations.append("stdout-not-object")
+                elif output.get("status") == "PASS" and (
                     historical is None or identity(stdout) == historical
                 ):
                     continue
             except (OSError, ValueError, UnicodeError):
-                # A zero process exit does not make malformed source output pass.
-                pass
+                limitations.append("stdout-unreadable-json")
         record = {
             "request": name,
             "request_identity": row["request_identity"],
             "process": result,
             "process_metadata_present": process.exists(),
+            "parse_limitations": limitations,
             "streams": {},
         }
-        for kind, path in (("stdout", stdout), ("stderr", stderr)):
+        return record, {"stdout": stdout, "stderr": stderr, "process": process}
+    return None
+
+
+def preserve_generation_failure(generated, rows, evidence):
+    """Retain first-failure originals before writing their typed receipt."""
+    selected = first_generation_failure(generated, rows)
+    if selected is not None:
+        record, originals = selected
+        for kind in ("stdout", "stderr"):
+            path = originals[kind]
             record["streams"][kind] = (
                 preserve_copy(path, evidence / ("failed-request." + kind))
                 if path.exists()
                 else None
             )
-        write(evidence / "failed-request.json", record)
-        if process.exists():
+        process = originals["process"]
+        record["process_metadata_identity"] = (
             preserve_copy(process, evidence / "failed-request.process.json")
+            if process.exists()
+            else None
+        )
+        write(evidence / "failed-request.json", record)
         return record
     return None
+
+
+def verify_generation_failure_preserved(work):
+    """A failed stream cannot retire without exact retained originals."""
+    generated = work / "generated"
+    if not generated.exists():
+        return
+    rows = read(work / "approved/x2/x2-generation-settings.json")["requests"]
+    selected = first_generation_failure(generated, rows)
+    if selected is None:
+        return
+    expected, originals = selected
+    evidence = work / "evidence"
+    actual = read(evidence / "failed-request.json")
+    for kind in ("stdout", "stderr"):
+        source = originals[kind]
+        expected["streams"][kind] = (
+            identity(source) if source.exists() else None
+        )
+        if source.exists():
+            require(
+                identity(evidence / ("failed-request." + kind))
+                == expected["streams"][kind],
+                "Failed stream not preserved",
+            )
+    source = originals["process"]
+    expected["process_metadata_identity"] = (
+        identity(source) if source.exists() else None
+    )
+    if source.exists():
+        require(
+            identity(evidence / "failed-request.process.json")
+            == expected["process_metadata_identity"],
+            "Original process metadata not preserved",
+        )
+    require(actual == expected, "First-failure preservation receipt differs")
 
 
 def preserve_native_failure(generated, evidence):
@@ -657,9 +723,45 @@ def show_unit(unit, deadline):
     args.extend("--property=" + name for name in fields)
     result = bounded_command(args, deadline, check=False)
     require(result.returncode in (0, 4), "Source unit query failed")
-    return unique_object(
-        line.split("=", 1) for line in result.stdout.splitlines()
+    state = unique_object(
+        [line.split("=", 1) for line in result.stdout.splitlines()]
     )
+    pid = int(state.get("MainPID", "0"))
+    if pid > 0:
+        # The textual ExecStart display is not an argv serialization.
+        try:
+            proc = Path("/proc") / str(pid)
+            before = guard._process_start(pid)
+            raw = (proc / "cmdline").read_bytes()
+            status = (proc / "status").read_text()
+            match = re.search(r"^State:\s+([A-Za-z])", status, re.M)
+            require(
+                raw.endswith(b"\0")
+                and before
+                and guard._process_start(pid) == before
+                and match,
+                "Source PID changed during command observation",
+            )
+            state.update(
+                ProcessStart=before,
+                ProcessCommandLine=[
+                    os.fsdecode(arg) for arg in raw[:-1].split(b"\0")
+                ],
+                ProcessState=match[1],
+            )
+            group = Path("/sys/fs/cgroup") / state["ControlGroup"].lstrip("/")
+            state["CgroupProcesses"] = (
+                (group / "cgroup.procs").read_text().split()
+            )
+        except (OSError, ValueError):
+            # Preserve a raced terminal observation; gate admission refuses it.
+            state.update(
+                ProcessStart=None,
+                ProcessCommandLine=None,
+                ProcessState=None,
+                CgroupProcesses=None,
+            )
+    return state
 
 
 def duration_seconds(text):
@@ -683,7 +785,12 @@ def source_owner(state, intent, previous=None):
         and state.get("MainPID") == "0"
         and state.get("ControlPID") == "0"
     )
-    match = re.search(r"argv\[\]=(.*?)\s*;", state.get("ExecStart", ""))
+    # Retain the complete opaque command prefix, including script semicolons.
+    # Actual argv is independently read from the stopped process, never split
+    # from systemctl's human-readable display. Times/status follow this prefix.
+    command_signature = state.get("ExecStart", "").rsplit(
+        " ; ignore_errors=", 1
+    )[0]
     require(
         state.get("Id") == unit
         and (state.get("ControlGroup") == group or stopped)
@@ -693,18 +800,75 @@ def source_owner(state, intent, previous=None):
         and state.get("SendSIGKILL") == "yes"
         and duration_seconds(state.get("RuntimeMaxUSec")) == intent["seconds"]
         and duration_seconds(state.get("TimeoutStopUSec")) == 5
-        and match
-        and shlex.split(match[1]) == intent["command"],
+        and command_signature,
         "Source unit ownership, deadline or command differs",
     )
+    if previous is None:
+        pid = int(state.get("MainPID", "0"))
+        require(
+            pid > 0
+            and state.get("ProcessStart")
+            and state.get("ProcessCommandLine") == intent["command"],
+            "Source process command is not the complete approved argv",
+        )
+        process_start = state["ProcessStart"]
+    else:
+        pid, process_start = previous["pid"], previous["process_start"]
+        require(
+            command_signature == previous["command_signature"],
+            "Source command changed in its existing invocation",
+        )
     owner = {
         "unit": unit,
         "invocation": state["InvocationID"],
         "cgroup": group,
         "intent": intent,
+        "pid": pid,
+        "process_start": process_start,
+        "command_signature": command_signature,
+        "verified_command": intent["command"],
     }
     require(previous is None or owner == previous, "Source invocation changed")
     return owner
+
+
+def wait_source_gate(work, intent, deadline):
+    """Wait briefly for the same verified shell to stop before release."""
+    gate_deadline = min(deadline, time.monotonic() + 5)
+    owner, first_invocation = None, None
+    while True:
+        require(time.monotonic() < gate_deadline, "Source stop gate timed out")
+        state = show_unit(intent["unit"], gate_deadline)
+        require(
+            state.get("ActiveState") not in ("inactive", "failed")
+            and int(state.get("ExecMainExitTimestampMonotonic", "0")) == 0,
+            "Source service terminated before its stop gate",
+        )
+        invocation = state.get("InvocationID")
+        if first_invocation is None:
+            first_invocation = invocation
+        require(
+            invocation == first_invocation, "Source invocation changed at gate"
+        )
+        candidate = source_owner(state, intent, owner)
+        if owner is None:
+            owner = candidate
+            # This binds a complete observed argv before any later exec.
+            write(work / "evidence/source-ownership.json", owner)
+        require(
+            int(state["MainPID"]) == owner["pid"]
+            and state.get("ProcessStart") == owner["process_start"]
+            and state.get("ProcessCommandLine") == intent["command"]
+            and state.get("CgroupProcesses") == [str(owner["pid"])],
+            "Source gate PID, command or descendants changed",
+        )
+        if state.get("ProcessState") == "T":
+            return owner, state
+        require(
+            state.get("ProcessState") in ("R", "S", "D"),
+            "Source process did not reach a valid stop state",
+        )
+        time.sleep(min(0.05, max(0, gate_deadline - time.monotonic())))
 
 
 def source_cleanup(work):
@@ -796,7 +960,7 @@ def run_preparation(work, control, lease, deadline):
     gated = [
         "/bin/sh",
         "-c",
-        'kill -STOP "$$"; exec "$@"',
+        'kill -STOP "$$" || exit; exec "$@"',
         "zy-source",
         *command,
     ]
@@ -831,6 +995,7 @@ def run_preparation(work, control, lease, deadline):
         "systemd-run",
         "--user",
         "--quiet",
+        "--expand-environment=no",
         "--unit=" + intent["unit"],
     ]
     arguments.extend(
@@ -848,9 +1013,7 @@ def run_preparation(work, control, lease, deadline):
     live_samples = 0
     try:
         bounded_command(arguments, deadline)
-        state = show_unit(intent["unit"], deadline)
-        owner = source_owner(state, intent)
-        write(work / "evidence/source-ownership.json", owner)
+        owner, state = wait_source_gate(work, intent, deadline)
         group = Path("/sys/fs/cgroup") / owner["cgroup"].lstrip("/")
         expected = {
             "memory.max": str(4096 * 1024**2),
@@ -863,15 +1026,6 @@ def run_preparation(work, control, lease, deadline):
             name: (group / name).read_text().strip() for name in expected
         }
         require(kernel == expected, "Source kernel limits differ")
-        pid = int(state["MainPID"])
-        require(
-            pid > 0
-            and re.search(
-                r"^State:\s+T", Path(f"/proc/{pid}/status").read_text(), re.M
-            )
-            and (group / "cgroup.procs").read_text().split() == [str(pid)],
-            "Source service is not stopped alone at its release gate",
-        )
         result["kernel_limits"] = kernel
         record = lease.read()
         record.update(
@@ -1841,6 +1995,7 @@ def cleanup_owned(work):
     )
     if (work / "approved").exists():
         verify_inputs(work / "approved")
+    verify_generation_failure_preserved(work)
     targets = (work / "approved", work / "generated", work / "compiler-home")
     inventory = []
     for directory in targets:
