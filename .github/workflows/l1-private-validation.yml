@@ -12,6 +12,7 @@ on:
           - l1
           - to-single
           - to-crossing
+          - to-zy-generation
       stage:
         description: Independently admitted stage
         required: true
@@ -51,7 +52,7 @@ jobs:
           persist-credentials: false
 
       - name: Check out the separately reviewed candidate
-        if: inputs.workload != 'to-single' && inputs.workload != 'to-crossing'
+        if: inputs.workload != 'to-single' && inputs.workload != 'to-crossing' && inputs.workload != 'to-zy-generation'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: 155cbb0353ca59a144df697197d8a4a68a91beef
@@ -88,6 +89,9 @@ jobs:
           test "$GITHUB_RUN_ATTEMPT" = 1
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y flatpak dbus-user-session
+          if [ "$TRACKTEMPLATE_NATIVE_WORKLOAD" = to-zy-generation ]; then
+            sudo apt-get install --no-install-recommends -y fp-compiler-3.2.2=3.2.2+dfsg-32 fp-units-rtl-3.2.2=3.2.2+dfsg-32
+          fi
           sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
           sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
