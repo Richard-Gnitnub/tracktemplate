@@ -4516,7 +4516,7 @@ The previous `2/2` repair result stays the same. LMS work stays stopped.
 | Owner view | Current information |
 | --- | --- |
 | Current state | D-P9-021 is `Accepted` for the specified handling scope. The four assemblies have `PASS` results from FreeCAD tests, with and without the display. Phase 9B stays `Open` at 3/6. |
-| What changed | The owner approved publication and GitHub processing of the exact 55 files. The subsequent tests completed the specified checks for all four assemblies. |
+| What changed | The owner authorised publication and GitHub processing of the exact 55 files. The subsequent tests completed the specified checks for all four assemblies. |
 | What now works | `XA` at `X3-X`, `AA` at `X4-A`, `CD` at `X6-C` and `DD` at `X7-D` have separate geometry and display evidence on the specified TO-001 C10 source. |
 | Limitations/findings | This result applies only to the specified left-hand source, inputs and runtime. Physical fit, production, rights clearance and wider B/C qualification are not accepted. |
 | Owner decision | The exact answer below accepts the handling scope and its conditions. It does not accept a phase exit. |
@@ -4530,7 +4530,7 @@ The six inputs are four unchanged assembly files, `four-family-manifest.json` an
 The manifest SHA-256 is `303135d7f7f6de4bbee5ee8400bf9a9db2b8ab2e687ef3557ef140154c6b737e`.
 The approved scope has SHA-256 `981f1e0d4c8ea6657dfd39f6e2d401348091cdf87fcf3bda2078694ca7c08e0d`.
 
-The owner approved public distribution in `Richard-Gnitnub/tracktemplate` and the specified GitHub tests.
+The owner authorised public distribution in `Richard-Gnitnub/tracktemplate` and the specified GitHub tests.
 The scope includes one `readiness` image, six GUI images and the reviewed diagnostic records, including `pick_witness` and the specified failure traces.
 
 GitHub Actions diagnostic retention stays 30 days. Keep corresponding source and notices available while the models stay available.
@@ -4541,27 +4541,27 @@ The [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-rese
 This decision gives no third-party permission and is not evidence of such permission.
 
 **Review and owner-decision sequence:** Richard is the project owner and decision authority. `/root` presented the specified scope.
-`/root/to001_heel_quality` supplied the independent authority and source challenge before the owner decision.
-That reviewer did not author the 49-file source successor, projected metadata, retained models or publication manifest.
+`/root/to001_heel_quality` independently reviewed authority and source evidence before the owner decision.
+That reviewer did not make the 49-file source successor, projected metadata, retained models or publication manifest.
 
-The review reused previous package and API reviews. It did not repeat source derivation or establish a new engineering reference.
-The review required one exact handling decision and retained the operational, recovery and independent-review conditions.
+The review used previous package and API reviews. It did not repeat source derivation or establish a new engineering reference.
+The review required one exact handling decision and kept the operational, recovery and independent-review conditions.
 
-The later owner-binding review checked all 55 file identities and found no remaining binding issue.
+The subsequent review of the owner decision checked all 55 file identities and found no remaining binding issue.
 
-It used the preserved question and answer plus the parent's live attestation because its conversation reader returned no events.
-That limitation stays recorded; the review does not claim independent verification through the conversation API.
+It used the preserved question and answer plus `/root`'s record of the live response. Its conversation reader returned no events.
+That limitation stays recorded. The review does not claim independent verification through the conversation API.
 
-This sequence records the actual reviews and decision. It does not assert a new panel meeting or retrospective approval.
+This sequence records the actual reviews and decision. It does not claim a new panel meeting or approval after execution.
 
 | Due risk and condition | Owner and deadline |
 | --- | --- |
-| `PR-06`, `PR-07` and `PR-21`: Publication could obscure source obligations or previous classifications. Keep the exact source, notices and lineage with the models. Give no `project-cleared` status. | Change owner and independent rights reviewer, before publication and while the models stay available. |
-| `PR-13`: Evidence or original inputs could be lost. Preserve original failures and independently verify scoped copies before each dependent stage. | Change owner and independent reviewer, before that stage. The overdue monthly restore test stays necessary. |
-| `PR-22`: Preparation could be mistaken for authority or self-acceptance. Bind the exact owner answer and obtain separate control and result reviews. | Change owner and independent reviewer, before transfer, execution and use of each result. |
+| `PR-06`, `PR-07` and `PR-21`: Publication can make source obligations or previous classifications not clear. Keep the exact source, notices and lineage with the models. Give no `project-cleared` status. | Change owner and independent rights reviewer, before publication and while the models stay available. |
+| `PR-13`: Evidence or original inputs can be missing. Preserve original failures and independently verify scoped copies before each dependent stage. | Change owner and independent reviewer, before that stage. The overdue monthly restore test stays necessary. |
+| `PR-22`: Authors can accept their own preparation without independent review or use it as authority. Bind the exact owner answer and obtain separate control and result reviews. | Change owner and independent reviewer, before transfer, execution and use of each result. |
 
-These conditions retain the existing controls. No risk closes and no control-effectiveness assessment changes.
-The pre-decision review required the handling decision; the subsequent binding review reports no remaining finding.
+These conditions keep the existing controls. No risk closes and no control-effectiveness assessment changes.
+The pre-decision review required the handling decision. The subsequent binding review reports no remaining finding.
 Unresolved source and production questions remain outside this decision.
 
 **Owner answer, exact record, 2026-11-13:**
@@ -4571,24 +4571,25 @@ Unresolved source and production questions remain outside this decision.
 The preserved question and answer have SHA-256 `4ec214883965bf5d83b562b7b2bc018664694355f0e049f15ba64b322f86727f`.
 The owner-decision receipt has SHA-256 `2b292f0bcbeb9d0b57ca973afb08451a8c9019f8691036c7bf11aef433df006c`.
 The scope summary above omits the private locator in the original question. It is not a verbatim question.
-Do not publish other chair models, complete source archives, raw geometry dumps, exports, operator documents, private paths or credentials under this decision.
+Do not publish other chair models or full source archives under this decision.
+Do not publish raw geometry dumps, exports, operator documents, private paths or credentials under this decision.
 
 **Actual tests:** All four stages used source `1cd98446c589c03bb9b453a27a0d3b4aef38a609` and the same six approved input identities.
 Each stage completed one test with no failures, errors or skips. Each original result and independent review gives `PASS`.
 
 | Stage | GitHub run | Bounded result |
 | --- | --- | --- |
-| Native readiness | [43367138823](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43367138823) | Four catalogue contracts, fifty source inputs and eight comparator controls; no component construction. |
-| Full native test | [43369380474](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43369380474) | Fifty source frames and 135 components compared; 135 stored-compound and 135 stored-child checks; rollback and Undo/Redo pass. |
-| GUI readiness | [43372189588](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43372189588) | One empty `TOGuiReadiness` document, closed after one image; no shape construction. |
-| Full GUI test | [43373643528](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43373643528) | Four assemblies, 135 components, 137 layer visibility checks, one actual face selection and six images; all sixteen counters match. |
+| Native readiness | [43367138823](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43367138823) | Four catalogue contracts, fifty source inputs and eight comparator controls. No component construction. |
+| Full native test | [43369380474](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43369380474) | Fifty source frames and 135 components compared. 135 stored-compound and 135 stored-child checks. Rollback and Undo/Redo pass. |
+| GUI readiness | [43372189588](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43372189588) | One empty `TOGuiReadiness` document, closed after one image. No shape construction. |
+| Full GUI test | [43373643528](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/43373643528) | Four assemblies, 135 components, 137 layer visibility checks, one actual face selection and six images. All sixteen counters match. |
 
 The full GUI test uses the separate native comparisons. The two sets of 135 stored-shape checks do not represent 270 components.
 Its expected late verifier failure rolls back 135 components. Four source-preservation checks and one preview disposal give `PASS`.
 
 The face selection records `family=XA`, `component=base_plinth`, `face_index=45`, `native_interior=true` and `selection_matches=true`.
 
-The independent reviewer inspected all six original images. All owned documents closed; the inputs stayed unchanged and the temporary input and working copies were removed.
+The independent reviewer inspected all six original images. The test closed all owned documents. The inputs stayed unchanged. Cleanup removed the temporary input and working copies.
 The runtime was `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
 
 The full native test took 143.193 seconds. The full GUI test took 190.009 seconds.
@@ -4600,27 +4601,27 @@ The GUI display kept its separate limits of 256 MiB, CPU 25%, sixteen tasks and 
 The observed FreeCAD memory peaks were 966,303,744 bytes for the native test and 1,332,600,832 bytes for the GUI test.
 The display peak was 15,249,408 bytes. The sampled execution counters show no swap, pressure or limit-event increase.
 
-Sampling gives lower-bound observations; unavailable counters after cleanup do not mean zero use.
+Sampling gives lower-bound observations. Unavailable counters after cleanup do not mean zero use.
 
 Installation is a separate stage. The GUI installation took 93.710 seconds and had a sampled memory peak of 5,975,388,160 bytes.
 
 That stage does not inherit the FreeCAD 4096 MiB limit. These results make no whole-job zero-pressure claim.
 
-The two earlier readiness failures stay `FAIL` and remain preserved.
-Run `43349917776` failed during public metadata acquisition before native execution. Its masked external cause remains unresolved.
+The project preserves the two earlier readiness failures with their `FAIL` results.
+Run `43349917776` failed during public metadata acquisition before native execution. Its original log did not identify the external cause. That cause remains unresolved.
 PR #276 added bounded diagnostics and early metadata admission. It limited the native installation step to nine minutes, below the approved 570-second ceiling.
 
-Run `43360424426` failed because the test used `CatalogueChair.family`; the actual interface has `CatalogueChair.label`.
+Run `43360424426` failed because the test used `CatalogueChair.family`. The actual interface has `CatalogueChair.label`.
 PR #277 corrected that test contract and its dependent hashes. It preserved the family-order assertion and product geometry.
 
-The independently verified native copies cover 135 file pairs and 6,539,815 bytes. The GUI copies cover 180 file pairs and 20,487,133 bytes.
+The independently verified native copies include 135 file pairs and 6,539,815 bytes. The GUI copies include 180 file pairs and 20,487,133 bytes.
 These are scoped preservation results. They do not complete a monthly restore or establish a new full-history restore result.
 Risk `PR-13` stays open and overdue.
 
-The source asset `741867092` keeps the 49 corresponding source files available; its TAR SHA-256 is `4bea27d6b82644edef569afbd940d7fc485af2862301443af473ab4edf9e320e`.
+The source asset `741867092` keeps the 49 corresponding source files available. Its TAR SHA-256 is `4bea27d6b82644edef569afbd940d7fc485af2862301443af473ab4edf9e320e`.
 
 **Evidence limits:** The completed target is four of four specified assemblies in both native and GUI tests.
-The previous twelve-assembly TO-001 evidence stays preserved separately. The routes still represent 126 of 168 source positions; these tests add no source positions.
+The previous twelve-assembly TO-001 evidence stays preserved separately. The routes still represent 126 of 168 source positions. These tests add no source positions.
 
 The remaining 42 records contain 24 empty `chair_code_label` values and eighteen other values. The whole `BB` assembly stays Pending.
 Optional AA attachments and Issue #254 stay outside this result. The source key policy, source classifications and previous numerical limits do not change.
