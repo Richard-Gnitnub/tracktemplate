@@ -7,6 +7,8 @@ import json
 import os
 from pathlib import Path
 import runpy
+import socket
+import ssl
 import sys
 import tarfile
 import tempfile
@@ -212,6 +214,190 @@ class L1PrivateControls(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         pilot.api_request('https://api.github.com/repos/example')
             self.assertIsNone(opener.open.call_args.args[0].get_header('Authorization'))
+
+    def test_metadata_http_failures_are_bounded_and_anonymous(self):
+        cases = (
+            (403, {'X-RateLimit-Remaining': '0'},
+             {'X-RateLimit-Remaining': 0}),
+            (403, {'X-RateLimit-Remaining': '59'},
+             {'X-RateLimit-Remaining': 59}),
+            (403, {}, {}),
+            (429, {'Retry-After': '30'}, {'Retry-After': 30}),
+            (503, {'X-RateLimit-Limit': '60',
+                   'X-RateLimit-Reset': '1794539821'},
+             {'X-RateLimit-Limit': 60, 'X-RateLimit-Reset': 1794539821}),
+            (302, {}, {}),
+            (403, {'X-RateLimit-Remaining': '9' * 21,
+                   'X-RateLimit-Reset': '12\nSECRET',
+                   'X-RateLimit-Limit': '-1', 'Retry-After': 'SECRET'}, {}),
+        )
+        for status, headers, expected_headers in cases:
+            with self.subTest(status=status, headers=headers):
+                body = Mock()
+                headers = dict(
+                    headers, Location='https://SECRET',
+                    Authorization='SECRET', **{'Set-Cookie': 'SECRET'})
+                error = pilot.urllib.error.HTTPError(
+                    'https://api.github.com/SECRET', status, 'SECRET',
+                    headers, body)
+                opener = Mock()
+                opener.open.side_effect = error
+                with patch.object(pilot.urllib.request, 'build_opener',
+                                  return_value=opener):
+                    with self.assertRaises(ValueError) as caught:
+                        pilot.api_request(
+                            'https://api.github.com/repos/example')
+                message = str(caught.exception)
+                prefix = 'Public metadata request failed: '
+                self.assertTrue(message.startswith(prefix), message)
+                self.assertEqual(json.loads(message[len(prefix):]), {
+                    'category': 'http', 'status': status,
+                    'headers': expected_headers,
+                })
+                self.assertNotIn('SECRET', message)
+                self.assertLess(len(message), 400)
+                self.assertTrue(caught.exception.__suppress_context__)
+                body.read.assert_not_called()
+                opener.open.assert_called_once()
+                self.assertIsNone(
+                    opener.open.call_args.args[0].get_header('Authorization'))
+                self.assertEqual(opener.open.call_args.kwargs, {'timeout': 30})
+
+    def test_metadata_transport_failures_preserve_only_typed_cause(self):
+        for reason, cause, wrapped in (
+            (socket.gaierror(-2, 'SECRET'), 'dns', True),
+            (ssl.SSLCertVerificationError('SECRET'), 'tls', True),
+            (ssl.SSLError('SECRET'), 'tls', True),
+            (TimeoutError('SECRET'), 'timeout', True),
+            (TimeoutError('SECRET'), 'timeout', False),
+            (ConnectionRefusedError('SECRET'), 'connection', True),
+            (ConnectionResetError('SECRET'), 'connection', True),
+            (OSError('SECRET'), 'unknown', True),
+            ('https://SECRET?token=SECRET', 'unknown', True),
+        ):
+            with self.subTest(cause=cause, wrapped=wrapped):
+                opener = Mock()
+                opener.open.side_effect = (
+                    pilot.urllib.error.URLError(reason) if wrapped else reason)
+                with patch.object(pilot.urllib.request, 'build_opener',
+                                  return_value=opener):
+                    with self.assertRaises(ValueError) as caught:
+                        pilot.api_request(
+                            'https://api.github.com/repos/example')
+                message = str(caught.exception)
+                prefix = 'Public metadata request failed: '
+                self.assertTrue(message.startswith(prefix), message)
+                self.assertEqual(json.loads(message[len(prefix):]), {
+                    'category': 'transport', 'cause': cause,
+                })
+                self.assertNotIn('SECRET', message)
+                self.assertTrue(caught.exception.__suppress_context__)
+                opener.open.assert_called_once()
+
+    def test_metadata_payload_errors_keep_original_rejection(self):
+        for content, message in ((b'x' * (1024 * 1024 + 1),
+                                  'Oversized GitHub metadata'),
+                                 (b'{', 'Expecting property name')):
+            with self.subTest(message=message):
+                response = io.BytesIO(content)
+                response.status = 200
+                opener = Mock()
+                opener.open.return_value = response
+                with patch.object(pilot.urllib.request, 'build_opener',
+                                  return_value=opener):
+                    with self.assertRaisesRegex(ValueError, message) as caught:
+                        pilot.api_request(
+                            'https://api.github.com/repos/example')
+                self.assertNotIn('transport', str(caught.exception))
+                opener.open.assert_called_once()
+
+    def test_never_started_prepare_failure_does_not_require_flatpak(self):
+        environment = {'L1_PREPARE': 'failure', 'L1_INSTALL': 'skipped',
+                       'L1_ACQUIRE': 'skipped', 'L1_RUN': 'skipped'}
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            evidence = work / 'evidence'
+            evidence.mkdir()
+            (evidence / 'prepare.log').write_bytes(b'ORIGINAL-FAILURE')
+            (evidence / 'admission.json').write_text('{}')
+            (evidence / 'finalizer.log').write_text('')
+            (work / 'control.json').write_text('{}')
+            with (
+                patch.dict(os.environ, environment, clear=True),
+                patch.object(original, '_clearance',
+                             side_effect=FileNotFoundError('flatpak')) as clear,
+            ):
+                result = pilot.finalize('readiness', work, work / 'public')
+            self.assertEqual(result, 0)
+            clear.assert_not_called()
+            record = json.loads(
+                (evidence / 'process-finalization.json').read_text())
+            self.assertTrue(record['cleanup'])
+            self.assertTrue(record['never_started'])
+            self.assertEqual(record['errors'], [])
+            self.assertEqual(record['workflow_outcomes'], environment)
+            self.assertEqual((evidence / 'prepare.log').read_bytes(),
+                             b'ORIGINAL-FAILURE')
+            self.assertFalse((evidence / 'assessment.json').exists())
+
+    def test_ambiguous_states_never_bypass_runtime_clearance(self):
+        original_environment = {
+            'L1_PREPARE': 'failure', 'L1_INSTALL': 'skipped',
+            'L1_ACQUIRE': 'skipped', 'L1_RUN': 'skipped',
+        }
+        cases = [
+            ('L1_PREPARE', 'success'), ('L1_PREPARE', 'cancelled'),
+            ('L1_INSTALL', 'success'), ('L1_INSTALL', 'failure'),
+            ('L1_INSTALL', 'cancelled'), ('L1_INSTALL', ''),
+            ('L1_ACQUIRE', 'failure'), ('L1_RUN', 'failure'),
+        ]
+        cases.extend(('path', value) for value in (
+            'installer.sh', 'evidence/install.log', 'evidence/guard',
+            'evidence/guard/ownership.json', 'evidence/guard/result.json',
+            'evidence/unexpected.json', 'linked-evidence',
+        ))
+        for kind, value in cases:
+            with (self.subTest(kind=kind, value=value),
+                  tempfile.TemporaryDirectory() as temporary):
+                work = Path(temporary)
+                evidence = work / 'evidence'
+                if value == 'linked-evidence':
+                    (work / 'outside').mkdir()
+                    evidence.symlink_to(
+                        work / 'outside', target_is_directory=True)
+                else:
+                    evidence.mkdir()
+                environment = dict(original_environment)
+                if kind != 'path':
+                    environment[kind] = value
+                elif value != 'linked-evidence':
+                    path = work / value
+                    if value.endswith('/guard'):
+                        path.mkdir()
+                    else:
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text('{}')
+                with (patch.dict(os.environ, environment, clear=True),
+                      patch.object(original, '_clearance',
+                                   side_effect=FileNotFoundError('flatpak')),
+                      patch.object(original, '_deadline_clearance',
+                                   return_value=False),
+                      patch.object(pilot, 'emergency_cleanup',
+                                   return_value={'proved': False})):
+                    pilot.finalize('readiness', work, work / 'public')
+                record = json.loads(
+                    (evidence / 'process-finalization.json').read_text())
+                self.assertFalse(record['cleanup'])
+                self.assertNotEqual(record.get('never_started'), True)
+
+    def test_native_install_deadline_does_not_exceed_approved_budget(self):
+        text = (
+            ROOT / '.github/workflows/l1-private-validation.yml').read_text()
+        installation = text.split('id: install', 1)[1].split(
+            '- name: Acquire only the approved public inputs', 1)[0]
+        self.assertIn('timeout-minutes: 9\n', installation)
+        self.assertNotIn('timeout-minutes: 10', installation)
+        self.assertLessEqual(9 * 60, 570)
 
     def test_runtime_adapter_uses_exact_foundation_report(self):
         record = {'status': 'modular-foundation-ready',
@@ -1478,6 +1664,7 @@ class ToSingleControls(unittest.TestCase):
             ("source_commit", "b" * 40),
             ("workload", "l1"),
             ("independent_review", "PENDING"),
+            ("metadata", "unavailable"),
         ):
             with (
                 self.subTest(field=field),
@@ -1486,7 +1673,7 @@ class ToSingleControls(unittest.TestCase):
                 work = Path(temporary)
                 (work / "evidence").mkdir()
                 candidate = copy.deepcopy(control)
-                if field:
+                if field and field != "metadata":
                     candidate[field] = value
 
                 def command(*args, **kwargs):
@@ -1504,17 +1691,33 @@ class ToSingleControls(unittest.TestCase):
                         pilot, "validate_host", return_value={"status": "PASS"}
                     ),
                     patch.object(pilot.resource, "setrlimit"),
+                    patch.object(
+                        pilot, "validate_input_repository",
+                        side_effect=(ValueError("metadata unavailable")
+                                     if field == "metadata" else None),
+                    ) as metadata,
                 ):
                     if field:
                         with self.assertRaises(ValueError):
                             pilot.prepare("readiness", work)
-                        self.assertFalse((work / "control.json").exists())
+                        if field == "metadata":
+                            self.assertEqual(
+                                json.loads(
+                                    (work / "control.json").read_text()),
+                                control,
+                            )
+                        else:
+                            self.assertFalse((work / "control.json").exists())
                     else:
                         pilot.prepare("readiness", work)
                         self.assertEqual(
                             json.loads((work / "control.json").read_text()),
                             control,
                         )
+                    if field in (None, "metadata"):
+                        metadata.assert_called_once_with()
+                    else:
+                        metadata.assert_not_called()
 
 
 if __name__ == '__main__':

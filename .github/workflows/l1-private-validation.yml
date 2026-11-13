@@ -77,7 +77,7 @@ jobs:
 
       - name: Install the unchanged qualified runtime
         id: install
-        timeout-minutes: 10
+        timeout-minutes: 9
         shell: bash
         run: |
           set +x
