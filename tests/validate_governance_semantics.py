@@ -9783,7 +9783,7 @@ def validate_to_crossing_qualification_mutations() -> None:
             "Phase 9B is complete at 6/6.",
         )),
         ("restore-acceptance", "exclusions", replace_once(
-            record["exclusions"], "PR-13 stays open and overdue.",
+            record["exclusions"], "PR-13 stays open and overdue;",
             "PR-13 is closed;",
         )),
     ):
@@ -9830,7 +9830,7 @@ def validate_to_crossing_qualification_mutations() -> None:
          "actions/runs/43373643529"),
         ("inflated-component-count", "135 components compared",
          "270 components compared"),
-        ("retrospective-failure-pass", "earlier readiness failures with their `FAIL` results",
+        ("retrospective-failure-pass", "earlier readiness failures stay `FAIL`",
          "earlier readiness failures are now `PASS`"),
         ("invented-source-coverage", "represent 126 of 168 source positions",
          "represent 168 of 168 source positions"),
