@@ -101,6 +101,9 @@ def input_ids(profile="l1"):
         return INPUT_IDS
     if profile == "to-single":
         return (*INPUT_IDS[:8], "s1_model", "to_base_fixture")
+    if profile == "to-crossing":
+        return ("catalogue", "xa_model", "aa_model", "cd_model", "dd_model",
+                "to_base_fixture")
     raise PayloadError("unknown input profile")
 
 
@@ -115,7 +118,7 @@ def member_name(group, identity, *, profile="l1"):
 
 
 def validate_manifest(manifest, *, profile="l1"):
-    """Validate the exact ten-file and bounded control-record allowlist."""
+    """Validate the selected fixed inputs and bounded control allowlist."""
     _require(isinstance(manifest, dict)
              and set(manifest) == {"schema", "inputs", "controls"},
              "manifest fields differ")
@@ -423,7 +426,7 @@ def validate_public_summary(value, *, profile="l1"):
         "stage", "outcome", "counts", "flags", "timings_seconds", "resources",
         "evidence",
     }
-    if profile == "to-single":
+    if profile in ("to-single", "to-crossing"):
         fields.add("workload")
         _require(value.get("workload") == profile, "public workload differs")
     _require(isinstance(value, dict) and set(value) == fields,
@@ -464,10 +467,15 @@ def validate_public_summary(value, *, profile="l1"):
              "public evidence receipt differs")
     if value["outcome"] == "PASS":
         counts = value["counts"]
-        frames, components = ((0, 0) if value["stage"] == "readiness"
-                              else (59, 270) if profile == "to-single" else (150, 138))
-        successful, rolled_back = ((0, 0) if value["stage"] == "readiness"
-                                   else (270, 270) if profile == "to-single" else (690, 230))
+        expected = {
+            "l1": (150, 138, 690, 230),
+            "to-single": (59, 270, 270, 270),
+            "to-crossing": (50, 135, 135, 135),
+        }
+        frames, components, successful, rolled_back = (
+            (0, 0, 0, 0) if value["stage"] == "readiness"
+            else expected[profile]
+        )
         _require(all(value["flags"].values()) and counts["skips"] == 0
                  and counts["expected_tests"] == counts["observed_tests"] == 1
                  and counts["expected_frames"] == counts["observed_frames"] == frames

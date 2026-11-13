@@ -1,8 +1,21 @@
 """Admit separate fixed RH/XO and LH/TO private crossing contexts."""
 
+import hashlib
+from pathlib import Path
+import re
+import xml.etree.ElementTree as ET
+import zipfile
+
 from tracktemplate.application.chair_catalogue import (
     CATALOGUE_SHA256,
+    INVENTORY_SHA256,
+    CatalogueBinding,
     CatalogueChair,
+    CatalogueChairError,
+    _components,
+    _encoded,
+    _json,
+    _read,
     _require,
     prepare_catalogue_chair,
 )
@@ -11,6 +24,9 @@ from tracktemplate.application.chair_crossing_catalogue import _prepare_contexts
 
 CROSSING_PAIR_CATALOGUE_SHA256 = (
     "91009b0732e3f2f23f9f941675ab9aef392746d11f1a4334c9da50198ae07e4b"
+)
+TO_CROSSING_PROFILE_SHA256 = (
+    "801a2b43f623aa292b87762970fe3f249e4fb5b3a78d3f36bcf64eb435a3e70e"
 )
 _SPECIFICATIONS = (
     ("RH-X4-A", "AA", 24, 42),
@@ -306,7 +322,9 @@ def _require_turnout_crossing_selection(prepared, family):
     sample = "fixture_timber_" + timber
     _require(
         prepared.label == family and prepared.run == "context-native-02"
-        and prepared.catalogue_sha256 == CATALOGUE_SHA256
+        and prepared.catalogue_sha256 in (
+            CATALOGUE_SHA256, TO_CROSSING_PROFILE_SHA256,
+        )
         and prepared.model_sha256 == model_hash
         and isinstance(context, dict)
         and context.get("context_sha256") == context_hash
@@ -341,8 +359,222 @@ def _require_turnout_crossing_selection(prepared, family):
     )
 
 
+def _profile_object(value, keys):
+    """Reject unknown or absent fields before using projected metadata."""
+    _require(isinstance(value, dict) and set(value) == set(keys.split()),
+             "Fixed TO profile object fields differ: " + keys)
+    return value
+
+
+def _profile_strings(value):
+    _require(isinstance(value, list) and value
+             and all(isinstance(item, str) and item.strip() for item in value),
+             "Fixed TO profile requires nonempty text entries")
+
+
+def _profile_digest(value):
+    _require(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value),
+             "Fixed TO profile requires a SHA256 digest")
+
+
+def _profile_centres(value):
+    _require(isinstance(value, list) and len(value) == 4
+             and all(isinstance(point, list) and len(point) == 2
+                     and all(type(number) in (int, float) for number in point)
+                     for point in value),
+             "Fixed TO profile requires four numeric fixing centres")
+
+
+def _profile_provenance(manifest, families):
+    """Validate lineage links without treating historical text as authority."""
+    authority = _profile_object(
+        manifest["authority"], "acceptance rights_cleared "
+        "native_execution_authorized production_accepted "
+        "public_transfer_authorized",
+    )
+    _require(authority["acceptance"] == "NO_NEW_ACCEPTANCE"
+             and all(value is False for key, value in authority.items()
+                     if key != "acceptance"),
+             "Fixed TO profile gives no additional authority")
+    lineage = _profile_object(
+        manifest["original_lineage"], "catalogue execution_plan_sha256 "
+        "execution_receipt recipe_file result_and_receipt "
+        "source_archive_sha256 source_inventory source_members",
+    )
+    for name in ("catalogue", "execution_receipt", "recipe_file",
+                 "result_and_receipt", "source_inventory"):
+        record = _profile_object(lineage[name], "bytes sha256")
+        _require(type(record["bytes"]) is int and record["bytes"] > 0,
+                 "Original lineage byte count must be positive")
+        _profile_digest(record["sha256"])
+    _require(lineage["catalogue"]["sha256"] == CATALOGUE_SHA256
+             and lineage["source_inventory"]["sha256"] == INVENTORY_SHA256,
+             "Original catalogue or source inventory identity differs")
+    for name in ("execution_plan_sha256", "source_archive_sha256"):
+        _profile_digest(lineage[name])
+    members = _profile_object(
+        lineage["source_members"], "chairs_unit.pas dxf_unit.pas licence.txt "
+        "math_unit.pas pad_unit.pas",
+    )
+    for digest in members.values():
+        _profile_digest(digest)
+    execution = _profile_object(
+        manifest["historical_execution"], "status execution_plan_sha256 "
+        "result_sha256 model_hashes freecad_version occt_version "
+        "python_version qualified_runtime",
+    )
+    _require(execution["status"] == "PASS"
+             and execution["execution_plan_sha256"]
+             == lineage["execution_plan_sha256"]
+             and execution["result_sha256"]
+             == lineage["result_and_receipt"]["sha256"],
+             "Historical execution lineage differs")
+    _profile_object(execution["model_hashes"], " ".join(families))
+    _profile_strings(execution["freecad_version"])
+    _require(len(execution["freecad_version"]) == 8,
+             "Historical FreeCAD version fields differ")
+    for name in ("occt_version", "python_version", "qualified_runtime"):
+        _profile_strings([execution[name]])
+    return execution["model_hashes"]
+
+
+def _profile_family(entry, family, specification):
+    """Check the exact projection shape; the shared qualifier checks values."""
+    timber, code, station, model_hash, context_hash, _, _, names = specification
+    _profile_object(entry, "label run model context component_names "
+                    "limitations metadata")
+    _require(entry["label"] == family and entry["run"] == "context-native-02"
+             and entry["component_names"] == list(names),
+             "Fixed TO profile family, run or component order differs")
+    _profile_strings(entry["limitations"])
+    model = _profile_object(entry["model"], "member bytes sha256")
+    # Compare the literal spelling before Path can normalize aliases.
+    _require(model["member"] == "models/" + family + ".FCStd"
+             and type(model["bytes"]) is int and model["bytes"] > 0
+             and model["sha256"] == model_hash,
+             "Fixed TO profile model identity or member differs")
+    context = _profile_object(entry["context"], "context_id context_sha256 "
+                              "frame sample_id sample_kind station_mm timber_id")
+    _require(context["context_id"] is None and context["sample_id"] is None
+             and context["timber_id"] is None
+             and context["context_sha256"] == context_hash
+             and context["sample_kind"] == "fixture_timber_" + timber
+             and type(context["station_mm"]) in (int, float)
+             and context["station_mm"] == station
+             and context["frame"] == (
+                 "chair-local model mm, X along main rail, rail-top Z=0; "
+                 "crossing origin at main crossing rail gauge face"
+             ), "Fixed TO profile context differs")
+    metadata = _profile_object(
+        entry["metadata"], "acceptance intended_uses native_record "
+        "phase_acceptance production_geometry_authorized project_status "
+        "reference_admission source_codes source_explicit_nyi source_inventory",
+    )
+    _require(metadata["acceptance"] == "NO_NEW_ACCEPTANCE"
+             and metadata["intended_uses"] == ["private-development"]
+             and metadata["phase_acceptance"] == "UNCHANGED_PHASE_9B_3_OF_6"
+             and metadata["production_geometry_authorized"] is False
+             and metadata["project_status"] == "reference-only"
+             and isinstance(metadata["source_codes"], list)
+             and len(metadata["source_codes"]) == 1
+             and type(metadata["source_codes"][0]) is int
+             and metadata["source_codes"] == [code],
+             "Fixed TO profile provenance or authority differs")
+    for name in ("reference_admission", "source_inventory"):
+        _profile_strings([metadata[name]])
+    _profile_strings(metadata["source_explicit_nyi"])
+    native = _profile_object(
+        metadata["native_record"], "family status native_reload scope "
+        "production_ready physical_fit fused_casting source_recipe fixing_proof",
+    )
+    _require(native["physical_fit"] == "NOT_PROVED"
+             and native["fused_casting"] == "NOT_PROVED",
+             "Fixed TO profile does not prove fit or fused geometry")
+    recipe = _profile_object(native["source_recipe"], "family chair_code "
+                             "context_sha256 sample_kind station_mm base")
+    base = _profile_object(recipe["base"], "bolt_centres_twisted_mm")
+    _profile_centres(base["bolt_centres_twisted_mm"])
+    fixing = _profile_object(native["fixing_proof"], "model_sha256 source_fixings")
+    source = _profile_object(fixing["source_fixings"], "head_rotation_degrees "
+                             "p_bolt_status random_export_parity placement")
+    placement = _profile_object(source["placement"], "basis recipe_sha256 "
+                                "centres_source_mm source_twist_reapplied")
+    _profile_centres(placement["centres_source_mm"])
+
+
+def _read_turnout_crossing_profile(path, data):
+    """Read the pinned local projection, without acquiring execution rights."""
+    manifest = _profile_object(
+        _json(data), "schema_version profile status authority scope families "
+        "original_lineage historical_execution limitations",
+    )
+    _require(type(manifest["schema_version"]) is int
+             and manifest["schema_version"] == 1
+             and manifest["profile"]
+             == "TO-001-XA-AA-CD-DD-fixed-reference-candidate-v1"
+             and manifest["status"] == "LOCAL_CANDIDATE_NOT_ADMITTED",
+             "Unsupported fixed TO profile schema or status")
+    families = tuple(family for family, _spec in _TO_CROSSING_BINDINGS)
+    scope = _profile_object(manifest["scope"], "component_count family_count "
+                            "family_order source_position_count")
+    for name, count in (("component_count", 135), ("family_count", 4),
+                        ("source_position_count", 8)):
+        _require(type(scope[name]) is int and scope[name] == count,
+                 "Fixed TO profile scope count differs")
+    _require(scope["family_order"] == list(families)
+             and isinstance(manifest["families"], list)
+             and len(manifest["families"]) == len(families),
+             "Fixed TO profile family scope differs")
+    _profile_strings(manifest["limitations"])
+    model_hashes = _profile_provenance(manifest, families)
+    inputs = []
+    bindings = [CatalogueBinding(str(path), TO_CROSSING_PROFILE_SHA256)]
+    # Bind all four files before interpreting any model archive.
+    for entry, (family, specification) in zip(
+        manifest["families"], _TO_CROSSING_BINDINGS,
+    ):
+        _profile_family(entry, family, specification)
+        model = entry["model"]
+        _require(model_hashes[family] == model["sha256"],
+                 "Historical model hash differs")
+        model_path = path.parent / model["member"]
+        model_data = _read(model_path)
+        _require(len(model_data) == model["bytes"]
+                 and hashlib.sha256(model_data).hexdigest() == model["sha256"],
+                 "Fixed TO profile model bytes changed")
+        bindings.append(CatalogueBinding(str(model_path), model["sha256"]))
+        inputs.append((entry, model_path, model_data))
+    result = []
+    for entry, model_path, model_data in inputs:
+        prepared = CatalogueChair(
+            catalogue_path=str(path), label=entry["label"], run=entry["run"],
+            context_json=_encoded(entry["context"]), model_path=str(model_path),
+            model_sha256=entry["model"]["sha256"],
+            catalogue_sha256=TO_CROSSING_PROFILE_SHA256,
+            components=_components(model_data), bindings=tuple(bindings),
+            limitations=tuple(entry["limitations"]),
+            metadata_json=_encoded(entry["metadata"]),
+        )
+        _require_turnout_crossing_selection(prepared, entry["label"])
+        result.append(prepared)
+    return tuple(result)
+
+
 def prepare_turnout_crossing_catalogue(path):
-    """Read exactly the four retained LH XA/AA/CD/DD selections, in order."""
+    """Dispatch only the original catalogue or the pinned four-family profile."""
+    try:
+        source = Path(path).absolute()
+        data = _read(source)
+        digest = hashlib.sha256(data).hexdigest()
+        _require(digest in (CATALOGUE_SHA256, TO_CROSSING_PROFILE_SHA256),
+                 "Unrecognized fixed TO crossing catalogue identity")
+        if digest == TO_CROSSING_PROFILE_SHA256:
+            return _read_turnout_crossing_profile(source, data)
+    except CatalogueChairError:
+        raise
+    except (OSError, ValueError, KeyError, TypeError, AttributeError,
+            zipfile.BadZipFile, ET.ParseError) as exc:
+        raise CatalogueChairError("Cannot read fixed TO crossing profile") from exc
     result = []
     for family, _specification in _TO_CROSSING_BINDINGS:
         prepared = prepare_catalogue_chair(
