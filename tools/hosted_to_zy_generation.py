@@ -892,6 +892,53 @@ def source_cleanup(work):
             and state.get("ControlGroup") == ""
         ):
             return {"cleanup": True, "never_started": True, "errors": []}
+        if owner is not None and not state.get("InvocationID"):
+            # Repeated finalization may observe the unit after our own stop
+            # unloaded it. Only a retained, exact first removal proves this.
+            proof = read(work / "evidence/source-result.json")["finalization"]
+            expected_group = (
+                f"/user.slice/user-{os.getuid()}.slice/"
+                f"user@{os.getuid()}.service/app.slice/{intent['unit']}"
+            )
+            require(
+                proof.get("cleanup") is True
+                and proof.get("group_removed") is True
+                and proof.get("errors") == []
+                and proof.get("owner") == owner
+                and owner.get("intent") == intent
+                and owner.get("unit") == intent["unit"]
+                and owner.get("cgroup") == expected_group,
+                "Prior source removal is not bound to the exact owner",
+            )
+            removed = proof["final_state"]
+            for observed in (removed, state):
+                require(
+                    observed.get("Id") == intent["unit"]
+                    and observed.get("InvocationID") == ""
+                    and observed.get("ControlGroup") == ""
+                    and observed.get("MainPID") == "0"
+                    and observed.get("ControlPID") == "0"
+                    and observed.get("ActiveState") == "inactive",
+                    "Source removal has a replacement or uncertain unit",
+                )
+            group = Path("/sys/fs/cgroup") / expected_group.lstrip("/")
+            require(
+                not group.exists() and guard._empty(group),
+                "Previously removed source group has residue",
+            )
+            try:
+                start = guard._process_start(owner["pid"])
+            except FileNotFoundError:
+                start = None
+            require(
+                start != owner["process_start"],
+                "Original source process incarnation remains",
+            )
+            return {
+                "cleanup": True, "errors": [], "owner": owner,
+                "group_removed": True, "final_state": state,
+                "prior_removal_reverified": True,
+            }
         owner = source_owner(state, intent, owner)
         group = Path("/sys/fs/cgroup") / owner["cgroup"].lstrip("/")
         result["owner"] = owner
@@ -1066,7 +1113,46 @@ def run_preparation(work, control, lease, deadline):
                     validate_sample(sample, host)
                     live_samples += 1
                 else:
+                    observation = {
+                        "initial_state": state,
+                        "sample": sample,
+                        "group_removed": True,
+                    }
+                    result["removed_group_observation"] = observation
+                    require(
+                        live_samples > 0
+                        and all(
+                            sample.get(name) is None
+                            for name in pilot.SAMPLE_FIELDS
+                        ),
+                        "Removed source group lacks complete prior telemetry",
+                    )
+                    # The unit can exit between the first query and the
+                    # cgroup read. Retain both observations, never infer exit
+                    # from disappearance or a compiler output marker.
+                    state = show_unit(owner["unit"], deadline)
+                    observation["terminal_state"] = state
+                    source_owner(state, intent, owner)
+                    require(
+                        not group.exists()
+                        and state.get("MainPID") == "0"
+                        and state.get("ControlPID") == "0",
+                        "Removed source group or process identity changed",
+                    )
+                    terminated = (
+                        int(state.get("ExecMainExitTimestampMonotonic", "0"))
+                        > 0
+                    )
                     require(terminated, "Live source cgroup disappeared")
+                    pressure(host["memory_pressure"])
+                    require(
+                        host["MemAvailable"] >= 8192 * 1024**2,
+                        "Host 8 GiB reserve lost",
+                    )
+                    require(
+                        host["SwapTotal"] - host["SwapFree"] == 0,
+                        "Host swap in use",
+                    )
                 if terminated:
                     result["terminal_state"] = state
                     require(
@@ -1103,6 +1189,11 @@ def run_preparation(work, control, lease, deadline):
         cleanup = source_cleanup(work)
         result.update(cleanup=cleanup["cleanup"], finalization=cleanup)
         result["live_samples"] = live_samples
+        result["resource_accounting"] = "sampled-lower-bound"
+        result["resource_accounting_limits"] = (
+            "Peaks, CPU and events describe complete observed samples; "
+            "missing terminal counters are unavailable, not zero or final."
+        )
         if cleanup["cleanup"]:
             record = lease.read()
             for key in ("scope", "invocation", "cgroup"):
