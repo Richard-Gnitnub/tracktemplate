@@ -4664,3 +4664,28 @@ Those operations did not use `classify_knuckle_exclusions=True`.
 
 Geometry and tolerances do not change. This result gives no acceptance for physical fit, production or a phase, and no positive rights claim.
 The full BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` result stays the same.
+
+## Source evidence for nineteen TO-001 switch positions — 2026-11-13
+
+The `classify_switch_exclusions=True` operation gives nineteen switch positions the `source-switch-omission` value: fourteen on the P route and five on the main-side block route.
+Each specified stock owner must already have assembly data in the same preview.
+Templot 556b `switch_select.pas:1833-1835` and `math_unit.pas:29668-29728` supply the fixed source selection of `null_chair`.
+This selection gives no evidence of physical support or fit.
+
+The default is `classify_switch_exclusions=False`. With the default, both routes keep their previous output bytes from `a096c285`.
+The [source checks](../../tracktemplate/compatibility/chair_switch_source_exclusions.py) add no assembly or component.
+All 168 canonical records, their raw values and the initial plan stay unchanged.
+
+Across TO routes, 126 positions have assembly data, 21 have source exclusions and 21 stay unresolved.
+The 21 exclusions include the two previous endpoint exclusions and these nineteen positions.
+Five unresolved turnout-side switch records have empty `chair_code_label` values. Sixteen unresolved records have other values.
+
+The validators completed fourteen [new tests](../../tests/validate_phase9b_turnout_switch_exclusions.py) and 48 previous tests, with no failures or skips.
+An independent review confirmed the nineteen identities against the original source context and the unchanged default outputs.
+
+The previous P native and GUI evidence covers 308 components. The five main-side blocks retain source checks of 61 frames and 427 values, plus adapter checks of 161 copies and 163 layers.
+Their native and GUI tests stay Pending. This result adds no native or GUI test, model transfer or physical-fit acceptance.
+The completed XA/AA/CD/DD tests stay unchanged.
+
+Geometry, tolerances and rights do not change.
+Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` result stays unchanged. Risk `PR-13` stays open and overdue.

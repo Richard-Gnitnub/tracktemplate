@@ -166,6 +166,8 @@ def preview_private_catalogue_turnout_block_chairs(
     turnout_id,
     catalogue_path,
     create_preview,
+    *,
+    classify_switch_exclusions=False,
 ):
     """Preview only five fixed LH main-side blocks, preserving all source state.
 
@@ -173,6 +175,8 @@ def preview_private_catalogue_turnout_block_chairs(
     offset belong to these pinned models only. The existing native adapter
     owns geometry reuse, one transaction, late verification and cleanup.
     """
+    _require(type(classify_switch_exclusions) is bool,
+             "the source switch exclusion option must be boolean")
     # The shared admission owner does not import any placement route.
     from tracktemplate.compatibility.chair_source_support import (
         _finite,
@@ -513,6 +517,19 @@ def preview_private_catalogue_turnout_block_chairs(
                 "physical_fit": "NOT_PROVED",
             }
         )
+    switch_exclusions = {}
+
+    def qualify_switches():
+        from tracktemplate.compatibility.chair_switch_source_exclusions import (
+            qualify_turnout_switch_exclusions,
+        )
+
+        return qualify_turnout_switch_exclusions(
+            context, selected, family="1P-5P",
+        )
+
+    if classify_switch_exclusions:
+        switch_exclusions = qualify_switches()
     shapes, verify_source = _context_shapes_and_verifier(
         module,
         source_document,
@@ -531,6 +548,9 @@ def preview_private_catalogue_turnout_block_chairs(
         )
         for prepared in selections:
             verify_catalogue_sources(prepared)
+        if classify_switch_exclusions:
+            _require(qualify_switches() == switch_exclusions,
+                     "source switch evidence changed during block preview")
 
     receipt = {
         "document_name": source_document.Name,
@@ -546,7 +566,7 @@ def preview_private_catalogue_turnout_block_chairs(
         "remaining_positions": [
             copy.deepcopy(p)
             for identity, p in sorted(positions.items())
-            if identity not in owners
+            if identity not in owners and identity not in switch_exclusions
         ],
         "original_analytical_exclusions": copy.deepcopy(
             plan["analytical_only"]
@@ -563,6 +583,12 @@ def preview_private_catalogue_turnout_block_chairs(
             "No native, GUI, physical-fit, production, export or phase acceptance.",
         ],
     }
+    if classify_switch_exclusions:
+        receipt.update(
+            source_switch_exclusions=copy.deepcopy(switch_exclusions),
+            source_switch_exclusion_count=len(switch_exclusions),
+            unresolved_source_position_count=len(receipt["remaining_positions"]),
+        )
     return create_preview(
         catalogue_path, groups, shapes, receipt, verify_inputs
     )

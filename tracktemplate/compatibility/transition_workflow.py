@@ -3234,16 +3234,24 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_p_chairs(
         self, source_document, turnout_id, catalogue_path,
+        *, classify_switch_exclusions=False,
     ):
         """Inspect retained P chairs at confirmed private C10 positions."""
+        if type(classify_switch_exclusions) is not bool:
+            raise ValueError(
+                "The source switch exclusion option must be boolean."
+            )
         from tracktemplate.compatibility.chair_catalogue_placement import (
             preview_private_catalogue_p_chairs,
         )
 
         self.routing_record()
+        options = ({"classify_switch_exclusions": True}
+                   if classify_switch_exclusions else {})
         return preview_private_catalogue_p_chairs(
             self.module, source_document, turnout_id, catalogue_path,
             self._private_catalogue_p_preview_factory,
+            **options,
         )
 
     def preview_private_catalogue_s1j_chairs(
@@ -3325,16 +3333,24 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_turnout_block_chairs(
         self, source_document, turnout_id, catalogue_path,
+        *, classify_switch_exclusions=False,
     ):
         """Place the five qualified fixed TO-001 main-side block chairs."""
+        if type(classify_switch_exclusions) is not bool:
+            raise ValueError(
+                "The source switch exclusion option must be boolean."
+            )
         from tracktemplate.compatibility.chair_pair_placement import (
             preview_private_catalogue_turnout_block_chairs,
         )
 
         self.routing_record()
+        options = ({"classify_switch_exclusions": True}
+                   if classify_switch_exclusions else {})
         return preview_private_catalogue_turnout_block_chairs(
             self.module, source_document, turnout_id, catalogue_path,
             self._private_catalogue_turnout_block_preview_factory,
+            **options,
         )
 
     def preview_private_catalogue_turnout_zy_chairs(
