@@ -4689,3 +4689,118 @@ The completed XA/AA/CD/DD tests stay the same.
 
 Shapes, numerical tolerances and rights states do not change.
 Phase 9B stays `Open` at 3/6. LMS work stays stopped. The previous `2/2` result stays the same. Risk `PR-13` stays open. Its deadline has passed.
+
+## D-P9-022 ZY handling — 2026-11-13
+
+<a id="to-zy-handling-panel"></a>
+
+| Owner view | Current information |
+| --- | --- |
+| Current state | D-P9-022 is `Accepted` for the exact handling scope. Construction, native tests and GUI tests for this scope stay `Pending`. Phase 9B stays `Open` at 3/6. |
+| What changed | The owner authorised 71 known input files, one specified new X2-Y assembly file and the specified test and failure outputs. |
+| What now works | The preparation identifies the source, inputs and conditions for the two ZY assemblies. It supplies no executed construction or display result. |
+| Limitations/findings | The new X2-Y file has no measured identity yet. The existing X1-Z file has no accepted TO-001 native or GUI placement result. |
+| Owner decision | Proceed with the exact reviewed scope under the conditions below and existing execution authority. No broader publication or engineering, production or phase acceptance follows. |
+| Next action | Complete and independently review the specified implementation and execution controls. Obtain actual results before admission of the new assembly file or use of its qualification evidence. |
+
+**Approved scope:** The source manifest identifies 71 known files with 4,009,495 bytes.
+Its SHA-256 is `3ff851541917e251809a5512348ae234b7499adca203bf4bde4263359d74667d`.
+The reviewed plan has SHA-256 `e0ed78d50e84465988d9f55d00874c2a243ccb02207f9bdc152141467233f83d`.
+The manifest is a separate record and is not one of the 71 files.
+
+The inputs include the 49 unchanged published source files, twelve X2-Y construction inputs and ten records for the combined scope.
+Those ten records contain the retained X1-Z assembly, its selected metadata, recipe and two requests.
+They also contain the approved synthetic base, two numerical fixtures, notices and a source map.
+The original 71-file candidate and all failed preparation evidence stay preserved. Only the reviewed successor is approved.
+
+Copy the retained X1-Z file unchanged. Its SHA-256 is `794a9115892a7c5e6b20021a5492705be23d8b17be3fbd78eb95c925d500af35`, with 392,792 bytes.
+Construct only the new X2-Y ZY assembly at station `267.23290043721454 mm`, from the specified recipe and requests.
+The new file must contain 33 components. Measure its actual hash and size after construction. Independent construction review must pass before admission.
+This decision does not assign a future hash or accept a construction result.
+
+**Review and decision sequence:** Richard is the project owner and decision authority. `/root` presented the exact scope.
+`/root/to001_heel_domain` prepared the combined input and source evidence. `/root/rea_bc_object_model` prepared the construction entry.
+`/root/to001_heel_quality` independently reviewed the successor, the numerical source evidence, all 71 identities and the handling plan.
+The reviewer did not author those items. The final handling review reports no remaining preparation finding.
+It provides sufficient source evidence for this handling decision, not a native test result.
+
+The owner then approved the exact manifest and conditions. The panel outcome is **Proceed with bounded conditions**.
+This records the actual review sequence. It does not claim a separate panel meeting.
+The following first paragraph is exact. The decision register preserves the complete owner statement.
+
+> Approved: the exact reviewed ZY handling extension for 71 inputs, 4,009,495 bytes, bound to manifest SHA-256 "3ff851541917e251809a5512348ae234b7499adca203bf4bde4263359d74667d".
+
+The owner-decision receipt has SHA-256 `00e91e606417d0f78c65e2c06aae1132213dc3c61d449087907cd0e63e298acc`.
+It preserves `/root`'s transcription of the latest user statement. It claims no independent retrieval from a conversation API.
+
+**Required tests:** The combined scope contains two assemblies and four source positions: X1-Z and X2-Y, each with its two named rails.
+The native tests must compare 26 independent source frames, 182 scalar values and 66 components.
+They must check two assembly objects, 66 contained component shapes and 66 corresponding displayed children.
+They must also check save/reload, Undo/Redo, failure at the final X2 child, complete rollback, source preservation, unrelated objects and preview disposal.
+
+The twelve finite record/path checks use six distinct rail polylines. The original 168 records, labels and key values stay unchanged.
+
+The GUI tests must display both assemblies and select a real face in each context with its distinct source identity.
+Check 68 visibility states only if the existing two shared context layers stay in use. This decision approves no new layer design.
+The GUI tests must check a late failure and disposal. They can reuse independently reviewed native shape comparisons.
+
+The image scope is one `to-zy-readiness.png` from an empty document and five full-test images:
+`to-zy-overview.png`, `to-zy-X1-selected.png`, `to-zy-X2-selected.png`, `to-zy-layer-hidden.png` and `to-zy-rollback-restored.png`.
+The two selected views must show unobscured closeups of their contexts.
+
+**Publication and failure outputs:** Use only the existing public `Richard-Gnitnub/tracktemplate` destination and reviewed GitHub execution routes.
+The ordinary output scope contains the one new assembly file, selected typed results, declared images and existing execution, resource and cleanup records.
+All eight successful raw face files stay temporary. Publish only their permitted identities, counts and status.
+
+On the first failed or invalid specified generator request, including a timeout, stop immediately.
+The extension permits only that request's original stdout, stderr, identity and existing process record, at the exact paths in the approved plan.
+Record original sizes and hashes. Do not execute the remaining requests or invent an absent process record.
+If native construction fails, also preserve `native-x2/components/component-results.json` and `native-x2/ZY.failure.txt` when present.
+Preserve the inner cause and original neutral-path failure trace before cleanup. No general raw-output publication follows.
+
+Keep corresponding source and notices available while the assembly files remain available. Preserve Martin Wynne/OpenTemplot attribution and applicable GPL recipient rights.
+Keep the `GPL-3.0-or-later` source notices and previous source classifications. The research classification adds no licence restriction.
+
+Actions diagnostics stay available for 30 days, with independently verified separate-device USB copies before cleanup. The source obligation does not end after 30 days.
+The [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research) and [provenance record](../PROVENANCE.md#phase-9a-research-input-provenance) retain their authority.
+This project decision supplies no third-party permission and gives no `project-cleared` status.
+
+**Execution limits and due conditions:**
+
+| Control | Required limit or evidence |
+| --- | --- |
+| Native tests and construction | 4096 MiB, CPU 100%, 128 tasks and zero swap. Checks before construction: 90 seconds. Full test: 7200 seconds. |
+| Construction deadline | One total 7200-second deadline for compilation, all eight generator calls and native construction. Each subprocess gets only the remaining time. |
+| GUI display | 256 MiB, CPU 25%, sixteen tasks and zero swap. The `readiness` stage has 190 seconds; the full stage has 7300 seconds. |
+| Installation and reserve | Keep the existing nine-minute installation ceiling, 8192 MiB reserve and 140-minute job limit with time for final checks. |
+| Compiler | Verify actual hosted `fp-compiler-3.2.2` and `fp-units-rtl-3.2.2`, version `3.2.2+dfsg-32`, with driver, backend, configuration and RTL identities before construction. |
+| Output sizes | The entry has no byte ceiling per request. Time and resource limits are not byte limits. Preserve existing transport limits; do not silently truncate original failure evidence. |
+
+| Due risk and condition | Owner and deadline |
+| --- | --- |
+| `PR-06`, `PR-07`, `PR-21`: Keep exact source, notices, selected input identities and output restrictions. Stop if a known restriction conflicts with the intended use. | Change owner and independent rights reviewer, before transfer and while the assembly files remain available. |
+| `PR-13`: Preserve all original inputs, failures and reviews. Independently verify scoped copies before dependent stages and cleanup. | Change owner and independent reviewer, before each dependent stage. The overdue monthly restore test remains necessary. |
+| `PR-22`: Keep separate author and reviewer roles. Bind exact executable identities, controls, input checks, CI, integration, recovery and publication readback before execution. | Change owner and independent reviewer, before dispatch. Review construction before new-file admission and actual native results before GUI execution. |
+
+These conditions preserve existing controls. No risk closes or control-effectiveness assessment changes. No unresolved dissent was reported in the final handling review.
+Implementation and operational control identities remain pending. The owner decision supplies no missing engineering evidence.
+
+Do not publish other chair files, the upstream archive, the full private catalogue, operator documents, private paths, credentials or production exports.
+Exclude full native reports, intermediate assembly files and raw arrays except the exact failure-only records above.
+
+**Unchanged state:** The routes still represent 126 source positions, exclude 21 and leave 21 unresolved.
+The prospective total of 128 represented positions is not achieved by this decision.
+The completed XA/AA/CD/DD four-assembly evidence stays unchanged. No physical-fit, production, rights-clearance, performance, release or phase-exit acceptance follows.
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`. D-P6-008 stays `Deferred — unmet`.
+
+LMS stays paused. The historical `2/2` record, D-P9-019 repair authority and finite documentation limits stay unchanged.
+PR-13 stays open and overdue; scoped preservation does not establish a full-estate backup or monthly restore result.
+
+**Proof/provenance:**
+
+| Record | SHA-256 |
+| --- | --- |
+| `next-zy-handling-independent-review.json` | `06ffb66536e461885e501b1cc48b4e3110e717d2ee42c4fc8d02e89d7fc32461` |
+| `next-x2-zy-generation-successor-independent-review.json` | `d2b75602430c6d3a1e8d79ef5581c484ce8efbcd2b23dfeef22b774c37700fd3` |
+| `independent-source-review.json` | `9e9ffc2a66d92d1480f822e1db7fd89ad6036002f0c55a7d759ab0254af4f3f7` |
+| `source-completion-review.json` | `069107aa90a97b5503e4abc4991667d61f3f768a26469cfc3727e57620a4e405` |
