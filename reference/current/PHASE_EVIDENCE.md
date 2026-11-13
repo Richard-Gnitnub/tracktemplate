@@ -4642,3 +4642,25 @@ The historical `2/2` repair record stays the same. D-P9-019 keeps its separate n
 | `native-full43369380474-independent-review.json` | `c6f33bbc2365afd64b3d2e32b824a7fd9ecb03cd81203a41dfb9bd52ded3f2c5` |
 | `gui-readiness43372189588-independent-review.json` | `2433616af714044600d6b17ca25412e9f84ca531e43addfa7331f38222c2ea11` |
 | `gui-full43373643528-independent-review.json` | `bb91882a6cd7efbccf2cd918141b23571c16715abd7b56ff99a8b014b191cc28` |
+
+## Source evidence for two TO-001 positions — 2026-11-13
+
+The `classify_knuckle_exclusions=True` operation gives two TO-001 positions at X3-X the `source-endpoint-exclusion` value.
+It adds no assembly or component. With the default `False`, the previous TO output bytes stay the same. The previous XO output bytes stay the same.
+
+In the fixed left-hand context, Templot 556b `math_unit.pas:29843-29919` selects one XA assembly and no separate XN assembly at X3-X.
+The [source checks](../../tracktemplate/compatibility/chair_crossing_endpoint_exclusions.py) confirm six exact connections between the named centre, gauge and outer rail paths.
+Both canonical position centres equal the rail ends. The raw `XN` labels and all 168 source records stay the same.
+These checks give no evidence that XA holds the curved knuckles.
+
+Across TO routes, 126 positions are represented, two have source endpoint exclusions and 40 stay unresolved.
+Those 40 contain 24 empty raw labels and sixteen other records.
+This crossing route has four assemblies, eight represented positions, two exclusions and 158 remaining positions.
+
+Fourteen [new tests](../../tests/validate_phase9b_turnout_crossing_endpoints.py) and fifty previous tests give PASS results, with zero skips.
+Independent source checks confirm both identities and no changes to the records.
+Native run `43369380474` and GUI run `43373643528` supply evidence only for the previous construction and lifecycle operations.
+Those runs did not execute this option.
+
+Geometry and tolerances do not change. This result gives no new physical fit, production, rights or phase acceptance.
+The whole BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` record stays the same.

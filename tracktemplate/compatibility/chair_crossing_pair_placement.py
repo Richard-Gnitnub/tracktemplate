@@ -354,12 +354,14 @@ _TO_CROSSING_SOURCE_INPUTS = (
 
 def preview_private_catalogue_turnout_crossing_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
+    *, classify_knuckle_exclusions=False,
 ):
     """Preview four fixed LH assemblies for eight unchanged source records.
 
     All eight canonical centres and finite rail paths must retain support.
     BB is excluded as a whole. Retained source geometry receives only the
     existing common host transform; canonical key0 remains unresolved.
+    Optional endpoint accounting preserves all source records and geometry.
     """
     from tracktemplate.compatibility.chair_reference_preview import (
         _context_shapes_and_verifier,
@@ -373,6 +375,8 @@ def preview_private_catalogue_turnout_crossing_chairs(
         _same_number,
     )
 
+    _require(type(classify_knuckle_exclusions) is bool,
+             "classify_knuckle_exclusions must be a boolean")
     _require(turnout_id == "TO-001" and callable(create_preview),
              "TO-001 and the native adapter are required")
     signature, analysis, settings, plan, rails, timbers = _open_source_context(
@@ -582,6 +586,31 @@ def preview_private_catalogue_turnout_crossing_chairs(
             "original_companion": copy.deepcopy(positions[companion]),
             "physical_fit": "NOT_PROVED",
         })
+    endpoint_exclusions = {}
+
+    def qualify_endpoints():
+        from tracktemplate.compatibility.chair_crossing_endpoint_exclusions import (
+            qualify_turnout_knuckle_exclusions,
+        )
+
+        result = qualify_turnout_knuckle_exclusions(
+            positions, rail_map, timber_map, selected, shared,
+        )
+        for identity in result:
+            position = positions[identity]
+            original = excluded.get(identity, {})
+            _require(identity not in chosen
+                     and original.get("rail_identity") == position["rail_identity"]
+                     and original.get("timber_identity") == position["timber_identity"]
+                     and original.get("chair_label") == "XN"
+                     and original.get("chair_family") == position.get("chair_family")
+                     and original.get("deliberate_omission") is False
+                     and original.get("unresolved_special") is True,
+                     "the original endpoint exclusion differs")
+        return result
+
+    if classify_knuckle_exclusions:
+        endpoint_exclusions = qualify_endpoints()
     prepared = prepare_turnout_crossing_catalogue(catalogue_path)
     shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, turnout_id, "Crossings", signature,
@@ -594,6 +623,9 @@ def preview_private_catalogue_turnout_crossing_chairs(
                  and current_signature == host_signature,
                  "canonical host changed during crossing preview")
         verify_turnout_crossing_catalogue(prepared)
+        if classify_knuckle_exclusions:
+            _require(qualify_endpoints() == endpoint_exclusions,
+                     "source endpoint evidence changed during crossing preview")
 
     receipt = {
         "document_name": source_document.Name, "turnout_id": turnout_id,
@@ -606,7 +638,8 @@ def preview_private_catalogue_turnout_crossing_chairs(
         "selected_positions": selected, "shared_supports": shared,
         "remaining_positions": [copy.deepcopy(p)
                                 for identity, p in sorted(positions.items())
-                                if identity not in chosen],
+                                if identity not in chosen
+                                and identity not in endpoint_exclusions],
         "original_analytical_exclusions": copy.deepcopy(plan["analytical_only"]),
         "retained_research_key_direction_sign": 1,
         "retained_research_key_offset_mm": 0, "source_base_z_mm": 0.8,
@@ -620,4 +653,10 @@ def preview_private_catalogue_turnout_crossing_chairs(
             "No native, GUI, physical-fit, production, export or phase acceptance.",
         ],
     }
+    if classify_knuckle_exclusions:
+        receipt.update(
+            source_endpoint_exclusions=copy.deepcopy(endpoint_exclusions),
+            source_endpoint_exclusion_count=len(endpoint_exclusions),
+            unresolved_source_position_count=len(receipt["remaining_positions"]),
+        )
     return create_preview(catalogue_path, groups, shapes, receipt, verify_inputs)

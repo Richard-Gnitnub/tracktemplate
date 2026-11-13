@@ -3353,16 +3353,22 @@ class ModularCoreLayoutWorkflowSession:
 
     def preview_private_catalogue_turnout_crossing_chairs(
         self, source_document, turnout_id, catalogue_path,
+        *, classify_knuckle_exclusions=False,
     ):
         """Place the four fixed LH XA/AA/CD/DD assemblies."""
         from tracktemplate.compatibility.chair_crossing_pair_placement import (
             preview_private_catalogue_turnout_crossing_chairs,
         )
 
+        if type(classify_knuckle_exclusions) is not bool:
+            raise ValueError("classify_knuckle_exclusions must be a boolean")
         self.routing_record()
+        options = ({"classify_knuckle_exclusions": True}
+                   if classify_knuckle_exclusions else {})
         return preview_private_catalogue_turnout_crossing_chairs(
             self.module, source_document, turnout_id, catalogue_path,
             self._private_catalogue_turnout_crossing_preview_factory,
+            **options,
         )
 
     def preview_private_catalogue_turnout_single_rail_chairs(
