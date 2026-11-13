@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Coordinate the single approved public L1 workload on GitHub.
+"""Coordinate approved fixed L1 and TO workloads on GitHub.
 
 The workflow preserves complete diagnostics as ordinary Actions artifacts.
 Approved inputs are downloaded anonymously and verified before extraction.
@@ -109,16 +109,101 @@ TO_SELECTORS = {
 TO_COPY_NAMES = ("L1-copy.FCStd", "S1-copy.FCStd", "TO-001-copy.FCStd")
 
 
+TO_CROSSING_ENTRY_SHA256 = "583f3d37d658e0e8a339ccb7ba58191ebb2d0e38b039ea0486126b3b1496b5ab"
+TO_CROSSING_PUBLICATION_SHA256 = (
+    "303135d7f7f6de4bbee5ee8400bf9a9db2b8ab2e687ef3557ef140154c6b737e"
+)
+TO_CROSSING_INPUT_HASHES = {
+    "catalogue": "801a2b43f623aa292b87762970fe3f249e4fb5b3a78d3f36bcf64eb435a3e70e",
+    "xa_model": "92cc129808cf86713fdeb6bb8bb6bcd60bd2c417da5a7428fe0011b3478add5b",
+    "aa_model": "b2b33ddc9a76a848c92bb08e1971291b6643422ead94073babe654968d274132",
+    "cd_model": "d9a411078e8f070565a2358ac1e3f3e68eb504893486a327f658a44a61dd9f4a",
+    "dd_model": "a53a5ddab9603a55abce8b45dcd907df653070bae71bcf4f5b212238cce86699",
+    "to_base_fixture": "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+}
+TO_CROSSING_INPUT_BYTES = {
+    "catalogue": 22951, "xa_model": 397349, "aa_model": 492552,
+    "cd_model": 271016, "dd_model": 286034, "to_base_fixture": 636344,
+}
+
+
+def to_profile(workload="to-single"):
+    """Return detached constants for one fixed TO qualification contract."""
+    require(
+        workload in ("to-single", "to-crossing"), "Unsupported TO workload"
+    )
+    if workload == "to-single":
+        return dict(
+            workload=workload,
+            input_hashes=dict(TO_INPUT_HASHES),
+            input_bytes=dict(TO_INPUT_BYTES),
+            scope=TO_SCOPE,
+            entry=TO_ENTRY,
+            entry_sha256=TO_ENTRY_SHA256,
+            fixture="tests/fixtures/phase9b-to-single-rail-frames.json",
+            fixture_sha256=TO_FIXTURE_SHA256,
+            control_files=TO_CONTROL_FILES,
+            sentinels=dict(TO_SENTINELS),
+            selectors=dict(TO_SELECTORS),
+            copy_names=TO_COPY_NAMES,
+        )
+    entry = "tests/freecad_validate_to_crossing_chairs.py"
+    fixture = "tests/fixtures/phase9b-to-crossing-cohort-source-frames.json"
+    return dict(
+        workload=workload,
+        input_hashes=dict(TO_CROSSING_INPUT_HASHES),
+        input_bytes=dict(TO_CROSSING_INPUT_BYTES),
+        scope="TO-001-fixed-crossing-native-v1",
+        entry=entry,
+        entry_sha256=TO_CROSSING_ENTRY_SHA256,
+        fixture=fixture,
+        fixture_sha256="3fe86e5e6e0a565e1e151555fb9e1bca7723c176df804281486ec795c10da900",
+        control_files=(
+            *CONTROL_FILES,
+            entry,
+            fixture,
+            "tests/validate_to_crossing_chairs_entries.py",
+            "tests/validate_hosted_to_crossing_private_validation.py",
+            "tests/validate_l1_private_payload.py",
+            "tracktemplate/application/chair_crossing_pair_catalogue.py",
+            TO_ENTRY,
+            "tests/hosted_l1_current_source_suite.py",
+            "tests/freecad_validate_phase9b_s1_reference_preview.py",
+            "tests/freecad_validate_phase9b_chair_l1_model.py",
+            'tests/freecad_validate_phase9b_catalogue_p_placement.py',
+            'reference/contracts/phase1-chair-analysis-persistence.json',
+            'tools/freecad_bridge/b14_recipe.py',
+            'tools/freecad_bridge/turnout_recipe.py',
+        ),
+        sentinels={
+            "readiness": "Fixed TO crossing hosted readiness passed",
+            "native": "Fixed TO crossing hosted native validation passed",
+        },
+        selectors={
+            "readiness": "freecad_validate_to_crossing_chairs.ToCrossingChairs.test_readiness",
+            "native": "freecad_validate_to_crossing_chairs.ToCrossingChairs.test_fixed_four",
+        },
+        copy_names=(
+            "XA-copy.FCStd",
+            "AA-copy.FCStd",
+            "CD-copy.FCStd",
+            "DD-copy.FCStd",
+            "TO-001-copy.FCStd",
+        ),
+    )
+
+
 def selected_workload(environ=None):
     """Select the fixed TO workload or the unchanged default L1 proof."""
     environ = os.environ if environ is None else environ
     value = environ.get("TRACKTEMPLATE_NATIVE_WORKLOAD", "l1")
-    require(value in ("l1", "to-single"), "Unsupported native workload")
+    require(value in ("l1", "to-single", "to-crossing"), "Unsupported native workload")
     return value
 
 
-def to_expected_checks(stage):
+def to_expected_checks(stage, *, workload="to-single"):
     """Return the frozen entry's independently reviewed exact counters."""
+    to_profile(workload)
     require(stage in TO_SELECTORS, "Unsupported TO stage")
     values = dict(
         binding_checks=1,
@@ -141,17 +226,30 @@ def to_expected_checks(stage):
             wrong_frame_rejections=2,
             preview_undo_redo=1,
         )
+    if workload == "to-crossing":
+        values.update(
+            catalogue_contracts=4, source_frame_inputs=50,
+            stored_compound_checks=0, stored_child_checks=0,
+        )
+        if stage == "native":
+            values.update(
+                source_frame_comparisons=50, component_comparisons=135,
+                stored_compound_checks=135, stored_child_checks=135,
+                successful_components=135, rolled_back_components=135,
+                wrong_frame_rejections=4,
+            )
     return values
 
 
-def validate_to_acquisition(control):
+def validate_to_acquisition(control, *, workload="to-single"):
     """Require the exact source/input/publication review before transfer."""
+    profile = to_profile(workload)
     require(
-        control.get("scope_id") == TO_SCOPE
-        and control.get("entry_sha256") == TO_ENTRY_SHA256
+        control.get("scope_id") == profile["scope"]
+        and control.get("entry_sha256") == profile["entry_sha256"]
         and isinstance(control.get("source_commit"), str)
         and re.fullmatch(r"[0-9a-f]{40}", control["source_commit"])
-        and control.get("input_hashes") == TO_INPUT_HASHES
+        and control.get("input_hashes") == profile["input_hashes"]
         and isinstance(control.get("handling_decision"), str)
         and control["handling_decision"].strip(),
         "TO acquisition differs",
@@ -160,7 +258,7 @@ def validate_to_acquisition(control):
     require(
         isinstance(review, dict)
         and review.get("status") == review.get("independent_review") == "PASS"
-        and review.get("input_hashes") == TO_INPUT_HASHES
+        and review.get("input_hashes") == profile["input_hashes"]
         and review.get("handling_decision") == control["handling_decision"]
         and isinstance(review.get("evidence_sha256"), str)
         and re.fullmatch(r"[0-9a-f]{64}", review["evidence_sha256"])
@@ -169,14 +267,28 @@ def validate_to_acquisition(control):
         and review["publication_basis"].strip(),
         "Exact TO input publication review absent",
     )
+    if workload == "to-crossing":
+        decision = control["handling_decision"]
+        require(
+            control.get("publication_manifest_sha256")
+            == review.get("publication_manifest_sha256")
+            == TO_CROSSING_PUBLICATION_SHA256
+            and re.fullmatch(
+                r"to-crossing-handling-owner-decision\.json@sha256:[0-9a-f]{64}",
+                decision,
+            )
+            and not decision.endswith("0" * 64),
+            "Exact crossing publication and owner binding absent",
+        )
 
 
-def validate_to_inputs(config, manifest):
-    """Bind all ten input bytes and destinations before deployment."""
+def validate_to_inputs(config, manifest, *, workload="to-single"):
+    """Bind every fixed input and destination before deployment."""
+    profile = to_profile(workload)
     rows = config.get("inputs")
     require(
         type(rows) is list
-        and len(rows) == 10
+        and len(rows) == len(profile["input_hashes"])
         and all(
             type(row) is dict
             and set(row)
@@ -191,16 +303,26 @@ def validate_to_inputs(config, manifest):
         "TO input records differ",
     )
     require(
-        {row["id"]: row["sha256"] for row in rows} == TO_INPUT_HASHES
-        and len({row["path"] for row in rows}) == 10
+        {row["id"]: row["sha256"] for row in rows} == profile["input_hashes"]
+        and len({row["path"] for row in rows}) == len(profile["input_hashes"])
         and all(
             type(row["bytes"]) is int
-            and row["bytes"] == TO_INPUT_BYTES[row["id"]]
+            and row["bytes"] == profile["input_bytes"][row["id"]]
             for row in rows
         ),
         "TO input profile differs",
     )
-    validate_input_map(config, manifest)
+    validate_input_map(config, manifest, workload=workload)
+    if workload == "to-crossing":
+        require([row["id"] for row in rows] == list(profile["input_hashes"]),
+                "Crossing input order differs")
+        paths = {row["id"]: Path(row["path"]) for row in rows}
+        base = paths["catalogue"].parent
+        expected = {"catalogue": base / "four-family-manifest.json",
+                    "to_base_fixture": base / "TO-001-base.FCStd"}
+        expected.update({family.lower() + "_model": base / "models" / (family + ".FCStd")
+                         for family in ("XA", "AA", "CD", "DD")})
+        require(paths == expected, "Crossing relative deployment differs")
     for row in rows:
         destination = Path(row["path"])
         require(
@@ -211,16 +333,17 @@ def validate_to_inputs(config, manifest):
         )
 
 
-def prepare_to(stage, work):
+def prepare_to(stage, work, *, workload="to-single"):
     """Bind the current main checkout and reviewed TO control record."""
+    profile = to_profile(workload)
     require(os.getuid() != 0 and not sys.flags.optimize, "Unsafe interpreter")
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     admission = validate_host(os.environ, Path("/proc/meminfo").read_text())
     control = json.loads(os.environ["L1_PRIVATE_CONTROL"])
-    validate_to_acquisition(control)
+    validate_to_acquisition(control, workload=workload)
     require(
         control.get("stage") == stage
-        and control.get("workload") == "to-single"
+        and control.get("workload") == workload
         and control.get("workflow_commit")
         == control["source_commit"]
         == os.environ["GITHUB_SHA"]
@@ -242,7 +365,7 @@ def prepare_to(stage, work):
         "TO access review absent",
     )
     require(
-        set(control["control_files_sha256"]) == set(TO_CONTROL_FILES),
+        set(control["control_files_sha256"]) == set(profile["control_files"]),
         "TO control bindings incomplete",
     )
     for relative, expected in control["control_files_sha256"].items():
@@ -250,7 +373,7 @@ def prepare_to(stage, work):
             digest(ROOT / relative) == expected, "TO control source changed"
         )
     require(
-        digest(ROOT / TO_ENTRY) == TO_ENTRY_SHA256
+        digest(ROOT / profile["entry"]) == profile["entry_sha256"]
         and digest(ROOT / "tools/freecad_validation_guard.py")
         == original.GUARD_SHA256
         and not command(
@@ -262,29 +385,32 @@ def prepare_to(stage, work):
     write(work / "evidence/admission.json", admission)
 
 
-def acquire_to(stage, work, *, source_root=ROOT, control=None):
+def acquire_to(
+    stage, work, *, source_root=ROOT, control=None, workload="to-single"
+):
     """Acquire one reviewed TO profile for the native or GUI coordinator.
 
     The caller supplies a native acquisition record after its own scope
     checks. Runtime working documents remain outside public evidence.
     """
-    require(stage in TO_SELECTORS, "Unsupported TO stage")
+    profile = to_profile(workload)
+    require(stage in profile["selectors"], "Unsupported TO stage")
     if control is None:
         control = json.loads((work / "control.json").read_text())
-    validate_to_acquisition(control)
+    validate_to_acquisition(control, workload=workload)
     validate_host(os.environ, Path("/proc/meminfo").read_text())
     require(
         control["source_commit"]
         == os.environ.get("GITHUB_SHA")
         == command("git", "rev-parse", "HEAD", cwd=source_root)
-        and digest(source_root / TO_ENTRY) == TO_ENTRY_SHA256,
+        and digest(source_root / profile["entry"]) == profile["entry_sha256"],
         "TO acquisition source changed",
     )
     validate_input_repository()
     download_asset(control["input_archive"], work / "inputs.tar")
-    manifest = payload.read_manifest(work / "inputs.tar", profile="to-single")
+    manifest = payload.read_manifest(work / "inputs.tar", profile=workload)
     extracted = payload.extract_archive(
-        work / "inputs.tar", manifest, work / "unpacked", profile="to-single"
+        work / "inputs.tar", manifest, work / "unpacked", profile=workload
     )
     config = json.loads(extracted["run-config"].read_text())
     require(
@@ -311,13 +437,13 @@ def acquire_to(stage, work, *, source_root=ROOT, control=None):
         ),
         "TO archive configuration differs",
     )
-    validate_to_inputs(config, manifest)
+    validate_to_inputs(config, manifest, workload=workload)
     recovery = extracted["recovery"]
     record = json.loads(recovery.read_text())
     require(
         record.get("status") == record.get("independent_review") == "PASS"
         and record.get("checkpoint_commit") == config["source_commit"]
-        and record.get("input_hashes") == TO_INPUT_HASHES,
+        and record.get("input_hashes") == profile["input_hashes"],
         "TO recovery readiness absent",
     )
     # Check all targets before the first deployed byte; never rewrite paths.
@@ -382,22 +508,25 @@ def acquire_to(stage, work, *, source_root=ROOT, control=None):
     return config
 
 
-def validate_to_receipt(stage, receipt, config):
+def validate_to_receipt(stage, receipt, config, *, workload="to-single"):
     """Validate the whole success shape, including each exact counter."""
+    profile = to_profile(workload)
     expected = {
         "status": "PASS",
         "stage": stage,
-        "scope_id": TO_SCOPE,
-        "test_id": TO_SELECTORS[stage],
+        "scope_id": profile["scope"],
+        "test_id": profile["selectors"][stage],
         "source_commit": config["source_commit"],
-        "fixture_sha256": TO_FIXTURE_SHA256,
+        "fixture_sha256": profile["fixture_sha256"],
         "physical_fit": "NOT_PROVED",
-        "input_sha256": TO_INPUT_HASHES,
+        "input_sha256": profile["input_hashes"],
         "input_bindings_unchanged": True,
         "remaining_documents": 0,
         "owned_documents_closed": True,
-        "sentinel": TO_SENTINELS[stage],
+        "sentinel": profile["sentinels"][stage],
     }
+    if workload == "to-crossing":
+        expected["failures"] = []
     fields = {*expected, "checks", "stage_timings"}
     if stage == "native":
         fields.update(
@@ -411,7 +540,7 @@ def validate_to_receipt(stage, receipt, config):
             is True,
             "TO preview disposal unproved",
         )
-        validate_to_comparisons(receipt.get("component_comparisons"))
+        validate_to_comparisons(receipt.get("component_comparisons"), workload=workload)
     require(
         type(receipt) is dict
         and set(receipt) == fields
@@ -424,7 +553,7 @@ def validate_to_receipt(stage, receipt, config):
     checks = receipt["checks"]
     require(
         type(checks) is dict
-        and checks == to_expected_checks(stage)
+        and checks == to_expected_checks(stage, workload=workload)
         and all(type(value) is int for value in checks.values()),
         "TO exact counters differ",
     )
@@ -444,11 +573,12 @@ def validate_to_receipt(stage, receipt, config):
     )
 
 
-def validate_to_comparisons(records):
+def validate_to_comparisons(records, *, workload="to-single"):
     """Require every frozen assembly/component pair and comparator result."""
-    fixture_path = ROOT / "tests/fixtures/phase9b-to-single-rail-frames.json"
+    profile = to_profile(workload)
+    fixture_path = ROOT / profile["fixture"]
     require(
-        digest(fixture_path) == TO_FIXTURE_SHA256, "TO frame fixture changed"
+        digest(fixture_path) == profile["fixture_sha256"], "TO frame fixture changed"
     )
     positions = json.loads(fixture_path.read_text())["positions"]
     expected = []
@@ -463,8 +593,15 @@ def validate_to_comparisons(records):
             for row in positions
             if row["family"] == family
         )
+    count = 270
+    if workload == "to-crossing":
+        expected = [
+            (row["source_positions"][0]["position_id"], name)
+            for row in positions for name in row["model"]["component_names"]
+        ]
+        count = 135
     require(
-        type(records) is list and len(records) == len(expected) == 270,
+        type(records) is list and len(records) == len(expected) == count,
         "TO component evidence incomplete",
     )
     for record, identity in zip(records, expected):
@@ -492,19 +629,22 @@ def validate_to_comparisons(records):
         )
 
 
-def validate_to_readiness(review, config, current_run, control):
+def validate_to_readiness(
+    review, config, current_run, control, *, workload="to-single"
+):
     """Require a separately preserved, exact-source TO readiness PASS."""
+    profile = to_profile(workload)
     require(
-        set(control["control_files_sha256"]) == set(TO_CONTROL_FILES),
+        set(control["control_files_sha256"]) == set(profile["control_files"]),
         "TO readiness control bindings incomplete",
     )
     expected = {
         "status": "PASS",
         "independent_review": "PASS",
         "source_commit": config["source_commit"],
-        "entry_sha256": TO_ENTRY_SHA256,
-        "scope_id": TO_SCOPE,
-        "workload": "to-single",
+        "entry_sha256": profile["entry_sha256"],
+        "scope_id": profile["scope"],
+        "workload": workload,
         "handling_decision": config["handling_decision"],
         "workflow_commit": control["workflow_commit"],
         "control_files_sha256": control["control_files_sha256"],
@@ -513,12 +653,12 @@ def validate_to_readiness(review, config, current_run, control):
         "skips": 0,
         "failures": 0,
         "errors": 0,
-        "sentinel": TO_SENTINELS["readiness"],
+        "sentinel": profile["sentinels"]["readiness"],
         "cleanup": True,
         "evidence_verified": True,
         "independent_preservation": True,
-        "input_hashes": TO_INPUT_HASHES,
-        "checks": to_expected_checks("readiness"),
+        "input_hashes": profile["input_hashes"],
+        "checks": to_expected_checks("readiness", workload=workload),
     }
     require(
         all(
@@ -610,8 +750,9 @@ def to_profile_exclusion(work):
     }
 
 
-def validate_to_evidence_name(name):
+def validate_to_evidence_name(name, *, workload="to-single"):
     """Admit only existing native diagnostic producers, never input media."""
+    profile = to_profile(workload)
     roots = {
         "prepare.log",
         "install.log",
@@ -635,7 +776,10 @@ def validate_to_evidence_name(name):
         "finalization.json",
         "publication.json",
     }
-    roots.update(f"deployed-{index:02d}.json" for index in range(1, 11))
+    roots.update(
+        f"deployed-{index:02d}.json"
+        for index in range(1, len(profile["input_hashes"]) + 1)
+    )
     groups = {
         "native": {"result.json"},
         "guard": {
@@ -651,6 +795,10 @@ def validate_to_evidence_name(name):
         },
         "finalizer-clearance": {"clearance.json", "deadline-clearance.json"},
     }
+    if workload == "to-crossing":
+        groups["native"].update(
+            ("native-failure.txt", "input-failure.txt", "cleanup-failure.txt")
+        )
     parts = Path(name).parts
     require(
         name in roots
@@ -661,9 +809,9 @@ def validate_to_evidence_name(name):
     )
 
 
-def cleanup_to_staging(work, preserved):
+def cleanup_to_staging(work, preserved, *, workload="to-single"):
     """Remove only owned TO staging after verified primary readback."""
-    return cleanup_staging(work, preserved, profile="to-single")
+    return cleanup_staging(work, preserved, profile=workload)
 
 
 def require(condition, message):
@@ -713,7 +861,8 @@ def child_environment(environ, config, sha256, *, workload="l1"):
     result.update(TRACKTEMPLATE_L1_RUN_CONFIG=str(config),
                   TRACKTEMPLATE_L1_RUN_CONFIG_SHA256=sha256,
                   OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
-    if workload == 'to-single':
+    if workload != 'l1':
+        to_profile(workload)
         result.pop('TRACKTEMPLATE_L1_RUN_CONFIG')
         result.pop('TRACKTEMPLATE_L1_RUN_CONFIG_SHA256')
         result.update(TRACKTEMPLATE_TO_RUN_CONFIG=str(config),
@@ -751,7 +900,7 @@ def validate_readiness(review, config, current_run, control):
 
 
 def qualified_runtime(stdout, *, workload="l1"):
-    selectors = TO_SELECTORS if workload == 'to-single' else SELECTORS
+    selectors = to_profile(workload)['selectors'] if workload != 'l1' else SELECTORS
     prefix = 'TRACKTEMPLATE_B16_FOUNDATION='
     frames = [prefix, *(f'{selector.rsplit(".", 1)[1]} ({selector}) ... {prefix}'
                         for selector in selectors.values())]
@@ -774,7 +923,7 @@ def assess(stage, result, stdout, stderr, samples, clearance, *, workload="l1"):
     Only the authorised entry's runtime record, sentinel and fixed deadline
     differ. Raw evidence and resource assertions are not rewritten.
     """
-    sentinels = TO_SENTINELS if workload == 'to-single' else SENTINELS
+    sentinels = to_profile(workload)['sentinels'] if workload != 'l1' else SENTINELS
     with ExitStack() as stack:
         for name, value in (
             ('LIMITS', limits(stage)), ('GEOMETRY_SENTINEL', sentinels[stage]),
@@ -820,8 +969,8 @@ def command(*args, cwd=ROOT):
 
 def prepare(stage, work):
     """Validate reviewed code and public-input scope before acquisition."""
-    if selected_workload() == 'to-single':
-        return prepare_to(stage, work)
+    if selected_workload() != 'l1':
+        return prepare_to(stage, work, workload=selected_workload())
     require(os.getuid() != 0 and not sys.flags.optimize, 'Unsafe interpreter')
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     admission = validate_host(os.environ, Path('/proc/meminfo').read_text())
@@ -903,11 +1052,12 @@ def download_asset(record, target, *, maximum_bytes=payload.MAX_ARCHIVE_BYTES):
     require(digest(target) == record['sha256'], 'Input archive changed')
 
 
-def validate_input_map(config, manifest):
+def validate_input_map(config, manifest, *, workload="l1"):
     """Reject any changed destination before the first input is deployed."""
+    count = 10 if workload == "l1" else len(to_profile(workload)["input_hashes"])
     records = {row['id']: row for row in manifest['inputs']}
     rows = config['inputs']
-    require(len(rows) == len(records) == 10
+    require(len(rows) == len(records) == count
             and set(records) == {row['id'] for row in rows}, 'Input set differs')
     for row in rows:
         require(all(row[field] == records[row['id']][field]
@@ -987,8 +1137,8 @@ def emergency_cleanup(work, owner, context=None):
 
 
 def acquire(stage, work):
-    if selected_workload() == 'to-single':
-        return acquire_to(stage, work)
+    if selected_workload() != 'l1':
+        return acquire_to(stage, work, workload=selected_workload())
     control = json.loads((work / 'control.json').read_text())
     validate_host(os.environ, Path('/proc/meminfo').read_text())
     validate_input_repository()
@@ -1050,8 +1200,8 @@ def acquire(stage, work):
 
 def run(stage, work):
     workload = selected_workload()
-    source_root = ROOT if workload == 'to-single' else ROOT / 'candidate'
-    selectors = TO_SELECTORS if workload == 'to-single' else SELECTORS
+    source_root = ROOT if workload != 'l1' else ROOT / 'candidate'
+    selectors = to_profile(workload)['selectors'] if workload != 'l1' else SELECTORS
     control = json.loads((work / 'control.json').read_text())
     validate_host(os.environ, Path('/proc/meminfo').read_text())
     require_finalization_time(stage, os.environ, time.time())
@@ -1064,9 +1214,10 @@ def run(stage, work):
     configuration = work / 'run-config.json'
     config = json.loads(configuration.read_text())
     if stage == 'native':
-        validator = validate_to_readiness if workload == 'to-single' else validate_readiness
+        validator = validate_to_readiness if workload != 'l1' else validate_readiness
         validator(json.loads((work / 'unpacked/control/readiness-review.json').read_text()),
-                  config, os.environ['GITHUB_RUN_ID'], control)
+                  config, os.environ['GITHUB_RUN_ID'], control,
+                  **({'workload': workload} if workload != 'l1' else {}))
     samples = []
 
     def observe():
@@ -1096,7 +1247,7 @@ def run(stage, work):
             '--env=OMP_NUM_THREADS=1', '--env=OPENBLAS_NUM_THREADS=1']
     names = (('TRACKTEMPLATE_TO_RUN_CONFIG', 'TRACKTEMPLATE_TO_RUN_CONFIG_SHA256',
               'GITHUB_SHA', 'GITHUB_RUN_ATTEMPT', 'RUNNER_ENVIRONMENT')
-             if workload == 'to-single' else
+             if workload != 'l1' else
              ('TRACKTEMPLATE_L1_RUN_CONFIG', 'TRACKTEMPLATE_L1_RUN_CONFIG_SHA256'))
     for name in (*names, 'GITHUB_ACTIONS', 'GITHUB_RUN_ID'):
         argv.append(f'--env={name}={clean[name]}')
@@ -1119,12 +1270,12 @@ def run(stage, work):
     assessment['initial_mem_available_bytes'] = samples[0].get('MemAvailable', 0)
     if any('error' in row for row in samples):
         assessment.update(status='FAIL', classification='EVIDENCE_INCOMPLETE')
-    receipt_path = (work / 'evidence/native/result.json' if workload == 'to-single'
+    receipt_path = (work / 'evidence/native/result.json' if workload != 'l1'
                     else work / f'evidence/native/{stage}/result.json')
     receipt = json.loads(receipt_path.read_text())
     try:
-        if workload == 'to-single':
-            validate_to_receipt(stage, receipt, config)
+        if workload != 'l1':
+            validate_to_receipt(stage, receipt, config, workload=workload)
         else:
             validate_native_receipt(stage, receipt)
     except (KeyError, TypeError, ValueError):
@@ -1135,7 +1286,7 @@ def run(stage, work):
     return 0 if assessment['status'] == 'PASS' else 1
 
 
-def evidence_archive(work, destination, *, late=False):
+def evidence_archive(work, destination, *, late=False, workload=None):
     """Archive available diagnostics; omit retained input copies and bytes."""
     require(not destination.exists() and not destination.is_symlink(),
             'Evidence archive already exists')
@@ -1144,8 +1295,11 @@ def evidence_archive(work, destination, *, late=False):
     config = json.loads(config_path.read_text()) if config_path.exists() else {}
     input_hashes = {row['sha256'] for row in config.get('inputs', [])}
     records, excluded = {}, []
-    to_profile = selected_workload() == 'to-single'
-    if to_profile:
+    workload = selected_workload() if workload is None else workload
+    is_to = workload != 'l1'
+    if is_to:
+        to_profile(workload)
+    if is_to:
         exclusion = to_profile_exclusion(work)
         if exclusion is not None:
             excluded.append(exclusion)
@@ -1155,12 +1309,12 @@ def evidence_archive(work, destination, *, late=False):
     with tarfile.open(partial, 'x') as archive:
         for path in selected:
             require(not path.is_symlink(), 'Linked evidence refused')
-            if to_profile and path.is_relative_to(work / 'evidence/guard/profile'):
+            if is_to and path.is_relative_to(work / 'evidence/guard/profile'):
                 continue
             if path.is_file():
                 name = path.relative_to(work / 'evidence').as_posix()
-                if to_profile:
-                    validate_to_evidence_name(name)
+                if is_to:
+                    validate_to_evidence_name(name, workload=workload)
                 identity = {'sha256': digest(path), 'bytes': path.stat().st_size}
                 if name in ('native/native/L1-copy.FCStd',
                             'native/native/XO-001-copy.FCStd') or identity['sha256'] in input_hashes:
@@ -1224,6 +1378,7 @@ def cleanup_staging(work, preserved, *, profile="l1"):
     This proves file absence, not secure erasure. Controls and diagnostic
     evidence remain private and are not part of this removal allowlist.
     """
+    descriptor = to_profile(profile) if profile != "l1" else None
     archive = work / 'evidence.tar'
     require(type(preserved.get('asset_id')) is int and preserved['asset_id'] > 0
             and preserved.get('sha256') == digest(archive)
@@ -1236,26 +1391,30 @@ def cleanup_staging(work, preserved, *, profile="l1"):
     targets = [(work / 'inputs.tar', None, False)]
     targets.extend((work / 'unpacked/inputs' / name, None, False)
                    for name in payload.input_ids(profile))
-    if profile == 'to-single':
+    if profile != 'l1':
         targets.extend((work / 'test-data' / name, None, False)
-                       for name in TO_COPY_NAMES)
+                       for name in descriptor["copy_names"])
     else:
         targets.extend((work / 'evidence/native/native' / name, None, False)
                        for name in ('L1-copy.FCStd', 'XO-001-copy.FCStd'))
     try:
         require(process.get('cleanup') is True, 'Process cleanup not proved')
-        if profile == 'to-single':
+        if profile != 'l1':
             directory = work / 'test-data'
             require(not any(p.is_symlink() for p in (directory, *directory.parents)),
                     'Linked TO working directory')
             if directory.exists():
                 require(directory.is_dir() and directory.stat().st_uid == os.getuid()
-                        and set(p.name for p in directory.iterdir()) <= set(TO_COPY_NAMES)
+                        and set(p.name for p in directory.iterdir()) <= set(descriptor["copy_names"])
                         and all(p.is_file() and not p.is_symlink()
                                 and p.stat().st_uid == os.getuid()
                                 for p in directory.iterdir()),
                         'Unknown or linked TO working copy')
-        for index in range(1, 11):
+        if profile == "to-crossing":
+            require({p.name for p in (work / "evidence").glob("deployed-*.json")}
+                    <= {f"deployed-{index:02d}.json" for index in range(1, 7)},
+                    "Unknown crossing deployment receipt")
+        for index in range(1, len(descriptor["input_hashes"]) + 1 if descriptor else 11):
             receipt_path = work / f'evidence/deployed-{index:02d}.json'
             if not receipt_path.exists():
                 continue
@@ -1289,10 +1448,10 @@ def cleanup_staging(work, preserved, *, profile="l1"):
                 result['staging_absence_verified'].append(str(path))
             except (OSError, ValueError, KeyError):
                 result['errors'].append(traceback.format_exc())
-    if profile == 'to-single':
+    if profile != 'l1':
         result['working_copies_absent'] = not any(
             p.exists() or p.is_symlink()
-            for p in (work / 'test-data' / name for name in TO_COPY_NAMES))
+            for p in (work / 'test-data' / name for name in descriptor["copy_names"]))
         if result['errors']:
             result['working_copies_absent'] = False
     result['cleanup'] = process.get('cleanup') is True and not result['errors']
@@ -1343,6 +1502,8 @@ def verify_artifact(source, readback, upload, download, artifact_id):
 
 
 def public_summary(stage, work, evidence, publication_complete):
+    workload = selected_workload()
+    input_count = 10 if workload == "l1" else len(to_profile(workload)["input_hashes"])
     assessment_path = work / 'evidence/assessment.json'
     assessment = json.loads(assessment_path.read_text()) if assessment_path.exists() else {}
     final_path = work / 'evidence/finalization.json'
@@ -1350,9 +1511,9 @@ def public_summary(stage, work, evidence, publication_complete):
     receipt = assessment.get('native_receipt', {})
     cleanup = final.get('cleanup') is True
     passed = (assessment.get('status') == 'PASS' and cleanup
-              and len(final.get('staging_inputs_removed', [])) == 10
+              and len(final.get('staging_inputs_removed', [])) == input_count
               and publication_complete)
-    if selected_workload() == 'to-single':
+    if workload != 'l1':
         passed = passed and final.get('working_copies_absent') is True
     summary = {
         'schema': 1, 'source_commit': CANDIDATE,
@@ -1380,17 +1541,18 @@ def public_summary(stage, work, evidence, publication_complete):
                       'tasks_peak': assessment.get('peak_tasks_observed', 0)},
         'evidence': evidence,
     }
-    if selected_workload() == 'to-single':
-        summary.update(workload='to-single', source_commit=os.environ['GITHUB_SHA'])
+    if workload != 'l1':
+        summary.update(workload=workload, source_commit=os.environ['GITHUB_SHA'])
         checks = receipt.get('checks', {})
+        expected = to_expected_checks(stage, workload=workload)
         summary['counts'].update(
-            expected_frames=59 if stage == 'native' else 0,
+            expected_frames=expected['source_frame_comparisons'],
             observed_frames=checks.get('source_frame_comparisons', 0),
-            expected_components=270 if stage == 'native' else 0,
+            expected_components=expected['component_comparisons'],
             observed_components=checks.get('component_comparisons', 0),
             successful_components=checks.get('successful_components', 0),
             rolled_back_components=checks.get('rolled_back_components', 0))
-        summary['flags']['sentinel'] = receipt.get('sentinel') == TO_SENTINELS[stage]
+        summary['flags']['sentinel'] = receipt.get('sentinel') == to_profile(workload)['sentinels'][stage]
     return payload.validate_public_summary(summary, profile=selected_workload())
 
 

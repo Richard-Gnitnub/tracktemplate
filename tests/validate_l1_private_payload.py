@@ -456,5 +456,106 @@ class ToPayloadTests(unittest.TestCase):
                 )
 
 
+class ToCrossingPayloadTests(unittest.TestCase):
+    INPUTS = (
+        "catalogue", "xa_model", "aa_model", "cd_model", "dd_model",
+        "to_base_fixture",
+    )
+
+    def test_crossing_input_set_and_profile_isolation(self):
+        self.assertEqual(payload.input_ids("to-crossing"), self.INPUTS)
+        for name in ("inventory", "l1_model", "s1_model", "reference_document"):
+            with self.subTest(name=name), self.assertRaises(payload.PayloadError):
+                payload.member_name("inputs", name, profile="to-crossing")
+        for profile in ("l1", "to-single"):
+            with self.subTest(profile=profile):
+                with self.assertRaises(payload.PayloadError):
+                    payload.member_name("inputs", "xa_model", profile=profile)
+
+    def test_six_file_roundtrip_and_missing_duplicate_extra_rejection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = {"schema": 1, "inputs": [], "controls": []}
+            for group, names in (
+                ("inputs", self.INPUTS),
+                ("controls", payload.REQUIRED_CONTROLS),
+            ):
+                for name in names:
+                    path = root / name
+                    path.write_text(name)
+                    manifest[group].append({
+                        "id": name,
+                        "member": ("inputs/" + name if group == "inputs"
+                                   else "control/" + name + ".json"),
+                        "path": str(path), **payload.file_identity(path),
+                    })
+            archive = root / "crossing.tar"
+            payload.create_archive(manifest, archive, profile="to-crossing")
+            self.assertEqual(
+                payload.read_manifest(archive, profile="to-crossing"), manifest,
+            )
+            files = payload.extract_archive(
+                archive, manifest, root / "unpacked", profile="to-crossing",
+            )
+            self.assertEqual(set(files), {*self.INPUTS, "run-config", "recovery"})
+            for name in self.INPUTS:
+                self.assertEqual(files[name].read_text(), name)
+            for profile in ("l1", "to-single"):
+                with self.subTest(profile=profile):
+                    with self.assertRaises(payload.PayloadError):
+                        payload.read_manifest(archive, profile=profile)
+            for edit in (
+                lambda value: value["inputs"].pop(),
+                lambda value: value["inputs"].append(value["inputs"][0]),
+                lambda value: value["inputs"][0].update(
+                    id="inventory", member="inputs/inventory",
+                ),
+            ):
+                changed = copy.deepcopy(manifest)
+                edit(changed)
+                with self.subTest(edit=edit), self.assertRaises(payload.PayloadError):
+                    payload.validate_manifest(changed, profile="to-crossing")
+
+    def summary(self, stage):
+        value = payload.empty_public_summary("a" * 40, "b" * 40, 1, 1, stage)
+        value["workload"] = "to-crossing"
+        value["outcome"] = "PASS"
+        value["flags"] = dict.fromkeys(value["flags"], True)
+        value["evidence"] = {"sha256": "c" * 64, "bytes": 1, "asset_id": 1}
+        value["counts"].update(expected_tests=1, observed_tests=1)
+        if stage == "native":
+            value["counts"].update(
+                expected_frames=50, observed_frames=50,
+                expected_components=135, observed_components=135,
+                successful_components=135, rolled_back_components=135,
+            )
+        return value
+
+    def test_crossing_summary_counts_and_false_pass_rejection(self):
+        for stage in ("readiness", "native"):
+            value = self.summary(stage)
+            self.assertIs(
+                payload.validate_public_summary(value, profile="to-crossing"),
+                value,
+            )
+            for edit in (
+                lambda data: data.update(workload="to-single"),
+                lambda data: data.update(private_path="/private/catalogue"),
+                lambda data: data["counts"].update(observed_components=270),
+                lambda data: data["counts"].update(observed_frames=59),
+                lambda data: data["counts"].update(skips=1),
+                lambda data: data["flags"].update(cleanup=False),
+            ):
+                changed = copy.deepcopy(value)
+                edit(changed)
+                with self.subTest(stage=stage, edit=edit):
+                    with self.assertRaises(payload.PayloadError):
+                        payload.validate_public_summary(
+                            changed, profile="to-crossing",
+                        )
+            with self.assertRaises(payload.PayloadError):
+                payload.validate_public_summary(value, profile="to-single")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

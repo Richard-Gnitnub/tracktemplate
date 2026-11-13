@@ -4467,3 +4467,42 @@ Risk `PR-13` stays open. The project did not complete the restore test that is n
 Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
 This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
 The previous `2/2` repair record stays the same. LMS work stays stopped.
+
+
+## Preparation for four crossing assembly tests — 2026-11-13
+
+<a id="to-crossing-test-preparation-panel"></a>
+
+**Level 2 result for Exit 9B-3:** The crossing reader can use one specified manifest for the four assemblies from the [previous operation](#to-crossing-cohort-source-placement-panel).
+The assemblies are `XA`, `AA`, `CD` and `DD` on TO-001 C10 with `handedness="Left-hand"`.
+Their geometry, source positions and component identities stay the same.
+
+The [new reader tests](../../tests/validate_phase9b_turnout_crossing_profile.py) give `PASS` for sixteen cases, with no skips.
+They check the specified manifest and rejection of incorrect data.
+A comparison with the previous catalogue gives the same data for all 135 components.
+The four previous catalogue results keep the same bytes. All fifteen files used by that comparison keep the same bytes.
+The general catalogue reader stays the same.
+
+The [native test](../../tests/freecad_validate_to_crossing_chairs.py) and [GUI test](../../tests/freecad_validate_to_crossing_chairs_gui.py) are prepared for GitHub execution.
+They use six specified inputs and the previous component geometry.
+The native test compares fifty sets of source position and direction values and all 135 components.
+It checks the stored shapes and the component copies separately. These are two checks of the same components.
+
+The GUI test checks all 137 layers, selection, visible results and rollback.
+The tests keep the existing resource limits and cleanup controls. No FreeCAD test has started for this result.
+Of the four target assemblies, zero have completed these new tests.
+The previous evidence for twelve other TO-001 assemblies stays preserved.
+
+The proposed publication set contains 55 files with 4,928,691 bytes.
+It contains six runtime inputs and 49 source files. The base fixture already has publication authority.
+The project owner must approve the new model files, manifest, source files, images and diagnostic evidence before transfer or execution.
+The proposed images are one readiness image and six images from the GUI test.
+
+The publication manifest has SHA-256 `303135d7f7f6de4bbee5ee8400bf9a9db2b8ab2e687ef3557ef140154c6b737e`.
+This preparation gives no new publication authority.
+
+Risk `PR-13` stays open. The monthly restore test remains overdue.
+Phase 9B stays `Open` at 3/6. Exit 9B-3 stays `Pending`.
+
+This result gives no acceptance for physical fit, rights, production, performance or a phase exit.
+The previous `2/2` repair record stays the same. LMS work stays stopped.

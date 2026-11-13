@@ -319,7 +319,13 @@ def admitted_catalogue(prepared=None):
     if prepared is not None:
         values.update(prepared)
     reader = Mock(side_effect=lambda _path, family, **_kwargs: values[family])
+    digest_reader = Mock()
+    digest_reader.sha256.return_value.hexdigest.return_value = (
+        catalogue.CATALOGUE_SHA256
+    )
     with (
+        patch.object(catalogue, "_read", return_value=b"Legacy catalogue double"),
+        patch.object(catalogue, "hashlib", digest_reader),
         patch.object(chair_catalogue, "prepare_catalogue_chair", reader),
         patch.object(
             catalogue, "prepare_catalogue_chair", reader, create=True

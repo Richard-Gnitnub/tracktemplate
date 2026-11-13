@@ -2538,6 +2538,284 @@ class HostedToSingleGuiControls(unittest.TestCase):
         self.assertIn('retention-days: 30', text)
 
 
+class HostedToCrossingGuiControls(unittest.TestCase):
+    WORKLOAD = 'to-crossing'
+    SCOPE = 'TO-001-fixed-crossing-gui-v1'
+    IMAGES = {
+        'to-crossing-overview.png', 'to-crossing-XA-AA.png',
+        'to-crossing-CD-DD.png', 'to-crossing-selected-chair.png',
+        'to-crossing-layer-hidden.png', 'to-crossing-rollback-restored.png',
+    }
+
+    def crossing_authority(self, stage='gui'):
+        record = HostedToSingleGuiControls().to_authority(stage)
+        profile = gui.native.to_profile(self.WORKLOAD)
+        decision = 'to-crossing-handling-owner-decision.json@sha256:' + '2' * 64
+        manifest = '303135d7f7f6de4bbee5ee8400bf9a9db2b8ab2e687ef3557ef140154c6b737e'
+        record.update(
+            workload=self.WORKLOAD, scope_id=self.SCOPE,
+            source_base_commit='a801f4444bec2f6799e7d2ad1fa2da3aac78db95',
+            input_hashes=profile['input_hashes'],
+            native_entry_sha256=profile['entry_sha256'],
+            handling_decision=decision, publication_manifest_sha256=manifest,
+            control_files_sha256={name: 'c' * 64
+                                  for name in gui.to_control_files(self.WORKLOAD)},
+        )
+        record['handling_review'].update(
+            decision_sha256='2' * 64, publication_manifest_sha256=manifest,
+        )
+        record['publication_review'].update(
+            input_hashes=profile['input_hashes'], handling_decision=decision,
+            publication_manifest_sha256=manifest,
+        )
+        record['native_control'].update(
+            scope_id='TO-001-fixed-crossing-native-v1',
+            input_hashes=profile['input_hashes'], handling_decision=decision,
+            entry_sha256=profile['entry_sha256'],
+            publication_manifest_sha256=manifest,
+        )
+        record['prior_native_evidence'].update(
+            scope_id='TO-001-fixed-crossing-native-v1',
+            input_hashes=profile['input_hashes'],
+            entry_sha256=profile['entry_sha256'],
+            source_frame_comparisons=50, component_comparisons=135,
+            stored_compound_checks=135, stored_child_checks=135,
+            successful_components=135, rolled_back_components=135,
+        )
+        ready = record['gui_readiness_review']
+        for key in (
+            'scope_id', 'workload', 'input_hashes', 'handling_decision',
+            'handling_review', 'publication_review', 'control_files_sha256',
+        ):
+            ready[key] = copy.deepcopy(record[key])
+        ready['sentinel'] = 'Fixed TO crossing GUI readiness passed'
+        return record
+
+    def test_crossing_authority_rejects_missing_or_foreign_proofs(self):
+        for stage in ('readiness', 'gui'):
+            env = dict(environment(), TRACKTEMPLATE_GUI_WORKLOAD=self.WORKLOAD,
+                       L1_GUI_STAGE=stage)
+            good = self.crossing_authority(stage)
+            if stage == 'readiness':
+                good.pop('gui_readiness_review')
+            gui.validate_authority(good, env)
+            for key, value in (
+                ('publication_manifest_sha256', '0' * 64),
+                ('handling_decision', gui.TO_HANDLING_DECISION),
+                ('handling_decision', 'to-crossing-handling-owner-decision.json@sha256:' + '0' * 64),
+                ('publication_review', {}), ('handling_review', {}),
+                ('native_control', {}), ('prior_native_evidence', {}),
+                ('gui_recovery', {}), ('input_hashes', {}),
+                ('automatic_retry', True), ('source_base_commit', 'b' * 40),
+            ):
+                with self.subTest(stage=stage, key=key):
+                    with self.assertRaises(ValueError):
+                        gui.validate_authority(dict(good, **{key: value}), env)
+            for key, value in (
+                ('source_commit', 'b' * 40), ('stored_child_checks', 0),
+                ('stored_compound_checks', 0), ('component_comparisons', 270),
+                ('run_id', 42), ('skips', 1), ('cleanup', False),
+            ):
+                changed = copy.deepcopy(good)
+                changed['prior_native_evidence'][key] = value
+                with self.subTest(stage=stage, proof=key):
+                    with self.assertRaises(ValueError):
+                        gui.validate_authority(changed, env)
+            if stage == 'gui':
+                for key, value in (
+                    ('run_id', 42), ('run_id', 40), ('source_commit', 'b' * 40),
+                    ('result_review_sha256', ''), ('cleanup', False),
+                    ('independent_preservation', False),
+                ):
+                    changed = copy.deepcopy(good)
+                    changed['gui_readiness_review'][key] = value
+                    with self.subTest(readiness=key):
+                        with self.assertRaises(ValueError):
+                            gui.validate_authority(changed, env)
+
+    def test_crossing_controller_matches_real_entry_before_launch(self):
+        with patch.object(sys, 'path', [str(ROOT / 'tests'), *sys.path]):
+            import freecad_validate_to_crossing_chairs_gui as entry
+        for stage in ('readiness', 'gui'):
+            record = self.crossing_authority(stage)
+            env = dict(environment(), L1_GUI_STAGE=stage,
+                       TRACKTEMPLATE_GUI_WORKLOAD=self.WORKLOAD)
+            with patch.dict(os.environ, env, clear=True):
+                entry.validate_authority(
+                    record, SimpleNamespace(source_commit='a' * 40),
+                    record['gui_entry_sha256'],
+                )
+            self.assertEqual(gui.to_counts(stage, workload=self.WORKLOAD),
+                             entry.expected_checks(stage))
+            self.assertEqual(gui.to_images(stage, workload=self.WORKLOAD),
+                             set(entry.image_names(stage)))
+            self.assertEqual(gui.sentinel(stage, self.WORKLOAD),
+                             entry.sentinel(stage))
+
+    def test_crossing_receipt_requires_all_counters_and_exact_images(self):
+        for stage in ('readiness', 'gui'):
+            with tempfile.TemporaryDirectory() as temporary:
+                work = Path(temporary)
+                images = work / 'evidence/gui'
+                images.mkdir(parents=True)
+                control = self.crossing_authority(stage)
+                control['control_files_sha256'] = {}
+                (work / 'control.json').write_text(json.dumps(control))
+                rows = []
+                for name in sorted(gui.to_images(stage, workload=self.WORKLOAD)):
+                    path = images / name
+                    path.write_bytes(b'\x89PNG\r\n\x1a\nsynthetic-offline-fixture')
+                    rows.append({'path': name, 'sha256': gui.digest(path),
+                                 'bytes': path.stat().st_size})
+                timings = {'readiness_seconds', 'cleanup_seconds', 'total_seconds'}
+                if stage == 'gui':
+                    timings.update({'successful_preview_seconds',
+                                    'late_rollback_seconds', 'gui_seconds'})
+                receipt = {
+                    'status': 'PASS', 'stage': stage, 'scope_id': self.SCOPE,
+                    'test_id': ('freecad_validate_to_crossing_chairs_gui.'
+                                'ToCrossingGui.test_authorised_gui_stage'),
+                    'source_commit': 'a' * 40,
+                    'fixture_sha256': (
+                        '3fe86e5e6e0a565e1e151555fb9e1bca7723c176df804281486ec795c10da900'),
+                    'profile': gui.original.EXPECTED_PROFILE, 'gui': True,
+                    'visual_review': 'REQUIRED', 'physical_fit': 'NOT_PROVED',
+                    'native_evidence_reused': {
+                        key: control['prior_native_evidence'][key] for key in (
+                            'run_id', 'source_commit', 'entry_sha256',
+                            'evidence_sha256',
+                        )
+                    },
+                    'input_sha256': control['input_hashes'],
+                    'input_bindings_unchanged': True,
+                    'owned_documents_closed': True, 'remaining_documents': 0,
+                    'cleanup_errors': [], 'failures': [],
+                    'sentinel': gui.sentinel(stage, self.WORKLOAD),
+                    'checks': gui.to_counts(stage, workload=self.WORKLOAD),
+                    'screenshots': rows,
+                    'stage_timings': dict.fromkeys(timings, 1.0),
+                    'renderer': {'platform': 'xcb', 'gui_up': True,
+                                 'widget_valid': True, 'renderer': 'llvmpipe',
+                                 'vendor': 'fixture', 'version': 'fixture'},
+                }
+                gui.validate_to_receipt(receipt, work, stage=stage,
+                                        workload=self.WORKLOAD)
+                for key, value in (
+                    ('remaining_documents', 1), ('remaining_documents', False),
+                    ('owned_documents_closed', False), ('failures', [{}]),
+                    ('screenshots', []), ('input_sha256', {}),
+                    ('stage_timings', {}), ('physical_fit', 'PASS'),
+                    ('source_commit', 'b' * 40),
+                ):
+                    with self.subTest(stage=stage, key=key):
+                        with self.assertRaises(ValueError):
+                            gui.validate_to_receipt(
+                                dict(receipt, **{key: value}), work,
+                                stage=stage, workload=self.WORKLOAD,
+                            )
+                for name in ('unapproved.png', 'operator.FCStd', 'raw-shape.brep'):
+                    extra = images / name
+                    extra.write_bytes(b'not approved')
+                    with self.subTest(name=name), self.assertRaises(ValueError):
+                        gui.validate_to_receipt(receipt, work, stage=stage,
+                                                workload=self.WORKLOAD)
+                    extra.unlink()
+
+    def test_explicit_crossing_workload_and_unchanged_resource_limits(self):
+        self.assertEqual(gui.selected_workload({
+            'TRACKTEMPLATE_GUI_WORKLOAD': self.WORKLOAD,
+        }), self.WORKLOAD)
+        for stage, timeout, display_timeout in (
+            ('readiness', 90, 190), ('gui', 7200, 7300),
+        ):
+            self.assertEqual(vars(gui.limits(stage, self.WORKLOAD)),
+                             vars(gui.limits(stage, 'to-single')))
+            self.assertEqual(gui.limits(stage, self.WORKLOAD).timeout_seconds,
+                             timeout)
+            self.assertEqual(vars(gui.display_limits(stage, self.WORKLOAD)),
+                             vars(gui.display_limits(stage, 'to-single')))
+            self.assertEqual(
+                gui.display_limits(stage, self.WORKLOAD).timeout_seconds,
+                display_timeout,
+            )
+        with self.assertRaises(ValueError):
+            gui.selected_workload({'TRACKTEMPLATE_GUI_WORKLOAD': 'all-chairs'})
+
+    def test_crossing_counts_are_exact_typed_and_separate_from_old_profile(self):
+        counts = gui.to_counts('gui', workload=self.WORKLOAD)
+        for name, expected in (
+            ('catalogue_contracts', 4), ('source_frame_inputs', 50),
+            ('source_frame_comparisons', 50), ('assemblies', 4),
+            ('layers', 137), ('successful_components', 135),
+            ('layer_visibility_checks', 137), ('rolled_back_components', 135),
+            ('viewport_picks', 1), ('screenshots', 6),
+        ):
+            self.assertEqual(counts[name], expected)
+        gui.validate_to_counts(counts, 'gui', workload=self.WORKLOAD)
+        with self.assertRaises(ValueError):
+            gui.validate_to_counts(counts, 'gui')
+        for name, expected in counts.items():
+            for invalid in (True, expected + 1):
+                with self.subTest(name=name, invalid=invalid):
+                    with self.assertRaises(ValueError):
+                        gui.validate_to_counts(
+                            dict(counts, **{name: invalid}), 'gui',
+                            workload=self.WORKLOAD,
+                        )
+        ready = gui.to_counts('readiness', workload=self.WORKLOAD)
+        self.assertEqual(ready['source_frame_inputs'], 50)
+        self.assertEqual(ready['assemblies'], 0)
+        self.assertEqual(ready['screenshots'], 1)
+
+    def test_crossing_images_and_exact_report_parser(self):
+        self.assertEqual(gui.to_images('gui', workload=self.WORKLOAD), self.IMAGES)
+        self.assertEqual(gui.to_images('readiness', workload=self.WORKLOAD),
+                         {'to-crossing-readiness.png'})
+        prefix = 'TRACKTEMPLATE_TO_CROSSING_GUI='
+        self.assertEqual(gui.to_report(prefix + '{"status":"FAIL"}\n',
+                                       workload=self.WORKLOAD), {'status': 'FAIL'})
+        for text in ('', prefix + '{}\n' + prefix + '{}',
+                     prefix + '{"status":"FAIL","status":"PASS"}',
+                     prefix + '{"duration":NaN}', prefix + '[]',
+                     'noise ' + prefix + '{}', prefix + '{broken',
+                     prefix + '{"duration":1e999}',
+                     'TRACKTEMPLATE_TO_SINGLE_GUI={}'):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                gui.to_report(text, workload=self.WORKLOAD)
+
+    def test_crossing_macro_uses_only_its_import_safe_entry(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            (work / 'evidence').mkdir()
+            (work / 'gui-run-config.json').write_text('{}')
+            (work / 'evidence/gui-authority.json').write_text('{}')
+            env = dict(environment(), TRACKTEMPLATE_GUI_WORKLOAD=self.WORKLOAD,
+                       HOME=temporary, PATH='/usr/bin')
+            with patch.dict(os.environ, env, clear=True):
+                macro = gui.write_gui_macro(work)
+                clean = gui.child_environment(work)
+                argv = gui.gui_argv(clean, macro)
+            self.assertIn('import freecad_validate_to_crossing_chairs_gui',
+                          macro.read_text())
+            self.assertIn('freecad_validate_to_crossing_chairs_gui.start()',
+                          macro.read_text())
+            self.assertNotIn('to_single_rail', macro.read_text())
+            self.assertEqual(clean['TRACKTEMPLATE_GUI_WORKLOAD'], self.WORKLOAD)
+            self.assertNotIn('TRACKTEMPLATE_L1_RUN_CONFIG', clean)
+            for name in ('TRACKTEMPLATE_TO_RUN_CONFIG',
+                         'TRACKTEMPLATE_TO_GUI_AUTHORITY'):
+                self.assertIn('--env=' + name + '=' + clean[name], argv)
+
+    def test_crossing_workflow_uses_existing_job_and_separate_control(self):
+        text = (ROOT / '.github/workflows/l1-gui-validation.yml').read_text()
+        self.assertIn("inputs.workload == 'to-crossing'", text)
+        self.assertIn('vars.TO_CROSSING_GUI_CONTROL', text)
+        self.assertEqual(text.count('group: issue230-native-geometry'), 1)
+        self.assertEqual(text.count('timeout-minutes: 140'), 1)
+        self.assertIn('cancel-in-progress: false', text)
+        self.assertIn('retention-days: 30', text)
+
+
 if __name__ == '__main__':
     result = unittest.main(exit=False)
     if not result.result.wasSuccessful():

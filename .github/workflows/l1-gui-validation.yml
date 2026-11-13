@@ -11,6 +11,7 @@ on:
         options:
           - l1
           - to-single
+          - to-crossing
           - rea-bc
           - rea-bc-straight
       stage:
@@ -36,7 +37,7 @@ concurrency:
 jobs:
   l1-gui:
     if: >-
-      (inputs.workload == 'l1' || inputs.workload == 'to-single') &&
+      (inputs.workload == 'l1' || inputs.workload == 'to-single' || inputs.workload == 'to-crossing') &&
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
       github.event.repository.private == false &&
       github.ref == 'refs/heads/main' && github.run_attempt == 1
@@ -65,6 +66,7 @@ jobs:
         env:
           L1_GUI_CONTROL: ${{ vars.L1_GUI_CONTROL }}
           TO_SINGLE_GUI_CONTROL: ${{ vars.TO_SINGLE_GUI_CONTROL }}
+          TO_CROSSING_GUI_CONTROL: ${{ vars.TO_CROSSING_GUI_CONTROL }}
         shell: bash
         run: |
           set +x

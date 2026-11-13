@@ -144,8 +144,57 @@ TO_NATIVE_REUSE_PATHS = frozenset({
 })
 
 
-def to_counts(stage):
-    """Fixed twelve-chair GUI witnesses; native topology is separate."""
+TO_WORKLOADS = ('to-single', 'to-crossing')
+TO_CROSSING_MANIFEST_SHA256 = (
+    '303135d7f7f6de4bbee5ee8400bf9a9db2b8ab2e687ef3557ef140154c6b737e'
+)
+TO_CROSSING_READER = 'tracktemplate/application/chair_crossing_pair_catalogue.py'
+TO_CROSSING_READER_SHA256 = (
+    '71c285a17d4061db624c690ea9f7b5800528fa99483b41f455b480fd411f1872'
+)
+
+
+def to_profile(workload='to-single'):
+    """Select a fixed GUI journey without changing historical defaults."""
+    require(workload in TO_WORKLOADS, 'Unsupported TO GUI workload')
+    if workload == 'to-crossing':
+        return {
+            'scope': 'TO-001-fixed-crossing-gui-v1',
+            'base': 'a801f4444bec2f6799e7d2ad1fa2da3aac78db95',
+            'entry': 'tests/freecad_validate_to_crossing_chairs_gui.py',
+            'entry_test': 'tests/validate_to_crossing_chairs_entries.py',
+            'selector': ('freecad_validate_to_crossing_chairs_gui.'
+                         'ToCrossingGui.test_authorised_gui_stage'),
+            'prefix': 'TRACKTEMPLATE_TO_CROSSING_GUI=',
+        }
+    return {
+        'scope': TO_SCOPE, 'base': TO_BASE, 'entry': TO_ENTRY,
+        'entry_test': 'tests/validate_to_single_rail_gui_entry.py',
+        'selector': ('freecad_validate_to_single_rail_gui.'
+                     'ToSingleRailGui.test_authorised_gui_stage'),
+        'prefix': 'TRACKTEMPLATE_TO_SINGLE_GUI=',
+    }
+
+
+def to_handling_decision(record, workload='to-single'):
+    """Bind the new owner record to the exact reviewed publication manifest."""
+    to_profile(workload)
+    if workload == 'to-single':
+        return TO_HANDLING_DECISION
+    decision = record.get('handling_decision')
+    prefix = 'to-crossing-handling-owner-decision.json@sha256:'
+    require(isinstance(decision, str) and decision.startswith(prefix)
+            and _hash(decision[len(prefix):])
+            and decision[len(prefix):] != '0' * 64
+            and record.get('publication_manifest_sha256')
+            == TO_CROSSING_MANIFEST_SHA256,
+            'TO crossing handling decision or manifest absent')
+    return decision
+
+
+def to_counts(stage, *, workload='to-single'):
+    """Fixed GUI witnesses; native topology qualification stays separate."""
+    to_profile(workload)
     require(stage in ('readiness', 'gui'), 'Unsupported TO GUI stage')
     result = {
         'binding_checks': 1, 'catalogue_contracts': 2,
@@ -157,24 +206,39 @@ def to_counts(stage):
         'preview_disposals': 1, 'screenshots': 6,
         'readiness_empty_documents': 0,
     }
+    if workload == 'to-crossing':
+        result.update(catalogue_contracts=4, source_frame_inputs=50,
+                      source_frame_comparisons=50, assemblies=4, layers=137,
+                      successful_components=135, layer_visibility_checks=137,
+                      rolled_back_components=135)
     if stage == 'readiness':
+        contracts, frames = result['catalogue_contracts'], result['source_frame_inputs']
         result = dict.fromkeys(result, 0)
-        result.update(binding_checks=1, catalogue_contracts=2,
-                      source_frame_inputs=59, screenshots=1,
+        result.update(binding_checks=1, catalogue_contracts=contracts,
+                      source_frame_inputs=frames, screenshots=1,
                       readiness_empty_documents=1)
     return result
 
 
-def validate_to_counts(counts, stage):
-    expected = to_counts(stage)
+def validate_to_counts(counts, stage, *, workload='to-single'):
+    expected = to_counts(stage, workload=workload)
     require(type(counts) is dict and set(counts) == set(expected)
             and all(type(counts[key]) is int and counts[key] == value
                     for key, value in expected.items()),
             'TO GUI operation counts differ')
 
 
-def to_images(stage):
+def to_images(stage, *, workload='to-single'):
+    to_profile(workload)
     require(stage in ('readiness', 'gui'), 'Unsupported TO image stage')
+    if workload == 'to-crossing':
+        if stage == 'readiness':
+            return {'to-crossing-readiness.png'}
+        return {
+            'to-crossing-overview.png', 'to-crossing-XA-AA.png',
+            'to-crossing-CD-DD.png', 'to-crossing-selected-chair.png',
+            'to-crossing-layer-hidden.png', 'to-crossing-rollback-restored.png',
+        }
     if stage == 'readiness':
         return {'to-single-readiness.png'}
     return {
@@ -184,9 +248,9 @@ def to_images(stage):
     }
 
 
-def to_report(stdout):
+def to_report(stdout, *, workload='to-single'):
     """Read one complete report; never accept duplicate or nonfinite JSON."""
-    prefix = 'TRACKTEMPLATE_TO_SINGLE_GUI='
+    prefix = to_profile(workload)['prefix']
     lines = [line[len(prefix):] for line in stdout.splitlines()
              if line.startswith(prefix)]
     require(stdout.count(prefix) == 1 and len(lines) == 1,
@@ -213,17 +277,18 @@ def to_report(stdout):
     return result
 
 
-def to_control_files():
-    return tuple(dict.fromkeys((*native.TO_CONTROL_FILES,
+def to_control_files(workload='to-single'):
+    profile = to_profile(workload)
+    return tuple(dict.fromkeys((*native.to_profile(workload)['control_files'],
         '.github/workflows/l1-gui-validation.yml',
         'tools/hosted_l1_gui_validation.py', 'tools/hosted_l1_gui_install.py',
-        'tests/hosted_l1_gui_suite.py', TO_ENTRY,
-        'tests/validate_to_single_rail_gui_entry.py',
+        'tests/hosted_l1_gui_suite.py', profile['entry'],
+        profile['entry_test'],
         'tests/validate_hosted_l1_gui_controls.py',
         'tests/validate_hosted_l1_gui_install.py')))
 
 
-def validate_to_native_reuse(record):
+def validate_to_native_reuse(record, *, workload='to-single'):
     """Bind unchanged native evidence to one reviewed GUI diagnostic delta."""
     proof = record.get('prior_native_evidence', {})
     source = proof.get('source_commit')
@@ -233,6 +298,8 @@ def validate_to_native_reuse(record):
     if source == record['source_commit']:
         require(reuse is None, 'Unexpected TO native source reuse record')
         return
+    require(workload == 'to-single',
+            'TO crossing requires native evidence for the same source')
     expected = {
         'schema': 1, 'scope_id': TO_NATIVE_REUSE_SCOPE,
         'status': 'PASS', 'independent_review': 'PASS',
@@ -254,9 +321,9 @@ def validate_to_native_reuse(record):
             'TO native source reuse paths differ')
 
 
-def validate_to_native_source(record):
+def validate_to_native_source(record, *, workload='to-single'):
     """Reject every unreviewed tracked delta before input acquisition."""
-    validate_to_native_reuse(record)
+    validate_to_native_reuse(record, workload=workload)
     reuse = record.get('native_source_reuse')
     if reuse is None:
         return
@@ -282,19 +349,23 @@ def validate_to_native_source(record):
 def validate_to_authority(record, environ):
     """Require exact TO input rights, source, recovery and prior proofs."""
     stage = selected_stage(environ)
+    workload = selected_workload(environ)
+    profile = to_profile(workload)
+    native_profile = native.to_profile(workload)
+    decision = to_handling_decision(record, workload)
     expected = {
-        'schema': 1, 'scope_id': TO_SCOPE, 'workload': 'to-single',
+        'schema': 1, 'scope_id': profile['scope'], 'workload': workload,
         'stage': stage, 'source_commit': environ['GITHUB_SHA'],
-        'source_base_commit': TO_BASE, 'owner': 'Richard-Gnitnub',
+        'source_base_commit': profile['base'], 'owner': 'Richard-Gnitnub',
         'execution_authorized': True, 'independent_review': 'PASS',
         'run_attempt': 1, 'initial_reserve_mib': RESERVE_MIB,
         'software_renderer': 'llvmpipe',
         'historical_repair_allowance_consumed': True,
-        'automatic_retry': False, 'handling_decision': TO_HANDLING_DECISION,
-        'freecad_limits': vars(limits(stage, 'to-single')),
-        'display_limits': vars(display_limits(stage, 'to-single')),
-        'input_hashes': native.TO_INPUT_HASHES,
-        'native_entry_sha256': native.TO_ENTRY_SHA256,
+        'automatic_retry': False, 'handling_decision': decision,
+        'freecad_limits': vars(limits(stage, workload)),
+        'display_limits': vars(display_limits(stage, workload)),
+        'input_hashes': native_profile['input_hashes'],
+        'native_entry_sha256': native_profile['entry_sha256'],
     }
     require(type(record) is dict and all(
         type(record.get(key)) is type(value) and record[key] == value
@@ -309,18 +380,20 @@ def validate_to_authority(record, environ):
             and _hash(record.get('gui_entry_sha256')),
             'TO source or decision identity absent')
     hashes = record.get('control_files_sha256')
-    require(type(hashes) is dict and set(hashes) == set(to_control_files())
+    require(type(hashes) is dict and set(hashes) == set(to_control_files(workload))
             and all(_hash(value) for value in hashes.values()),
             'TO control source bindings incomplete')
     handling = record.get('handling_review', {})
     expected_handling = {
-        'decision_sha256': TO_HANDLING_DECISION.rsplit(':', 1)[1],
+        'decision_sha256': decision.rsplit(':', 1)[1],
         'independent_review': 'PASS', 'retention_days': 30,
         'independent_preservation': True, 'readiness_images': 1,
         'gui_images': 6, 'source_archive_upload': False,
         'operator_documents': False, 'exact_exports': False,
         'working_fcstd_upload': False,
     }
+    if workload == 'to-crossing':
+        expected_handling['publication_manifest_sha256'] = TO_CROSSING_MANIFEST_SHA256
     require(type(handling) is dict and set(handling) == set(expected_handling)
             and all(type(handling[key]) is type(value)
                     and handling[key] == value
@@ -328,25 +401,29 @@ def validate_to_authority(record, environ):
             'TO screenshot handling differs')
     publication = record.get('publication_review', {})
     require(publication.get('status') == publication.get('independent_review')
-            == 'PASS' and publication.get('input_hashes') == native.TO_INPUT_HASHES
-            and publication.get('handling_decision') == TO_HANDLING_DECISION
+            == 'PASS' and publication.get('input_hashes') == native_profile['input_hashes']
+            and publication.get('handling_decision') == decision
             and _hash(publication.get('evidence_sha256'))
             and isinstance(publication.get('publication_basis'), str)
             and publication['publication_basis'].strip(),
             'TO input publication basis unproved')
     acquisition = record.get('native_control', {})
     expected_acquisition = {
-        'scope_id': native.TO_SCOPE, 'source_commit': record['source_commit'],
-        'entry_sha256': native.TO_ENTRY_SHA256,
-        'handling_decision': TO_HANDLING_DECISION,
-        'input_hashes': native.TO_INPUT_HASHES,
+        'scope_id': native_profile['scope'], 'source_commit': record['source_commit'],
+        'entry_sha256': native_profile['entry_sha256'],
+        'handling_decision': decision,
+        'input_hashes': native_profile['input_hashes'],
         'input_archive': record.get('input_archive'),
         'publication_review': publication,
     }
     require(all(acquisition.get(key) == value
                 for key, value in expected_acquisition.items()),
             'TO acquisition scope differs')
-    native.validate_to_acquisition(acquisition)
+    if workload == 'to-crossing':
+        require(acquisition.get('publication_manifest_sha256')
+                == TO_CROSSING_MANIFEST_SHA256,
+                'TO crossing acquisition manifest differs')
+    native.validate_to_acquisition(acquisition, workload=workload)
     archive = record.get('input_archive', {})
     require(type(archive) is dict
             and set(archive) == {'asset_id', 'bytes', 'sha256'}
@@ -362,20 +439,26 @@ def validate_to_authority(record, environ):
     proof = record.get('prior_native_evidence', {})
     expected_native = {
         'status': 'PASS', 'independent_review': 'PASS',
-        'entry_sha256': native.TO_ENTRY_SHA256, 'scope_id': native.TO_SCOPE,
-        'input_hashes': native.TO_INPUT_HASHES,
+        'entry_sha256': native_profile['entry_sha256'], 'scope_id': native_profile['scope'],
+        'input_hashes': native_profile['input_hashes'],
         'tests': 1, 'skips': 0, 'run_attempt': 1, 'cleanup': True,
         'evidence_verified': True, 'independent_preservation': True,
         'source_frame_comparisons': 59, 'component_comparisons': 270,
         'successful_components': 270, 'rolled_back_components': 270,
     }
+    if workload == 'to-crossing':
+        expected_native.update(
+            source_frame_comparisons=50, component_comparisons=135,
+            successful_components=135, rolled_back_components=135,
+            stored_compound_checks=135, stored_child_checks=135,
+        )
     require(all(type(proof.get(key)) is type(value) and proof[key] == value
                 for key, value in expected_native.items())
             and type(proof.get('run_id')) is int and proof['run_id'] > 0
             and str(proof['run_id']) != environ['GITHUB_RUN_ID']
             and _hash(proof.get('evidence_sha256')),
             'TO independent native proof absent or differs')
-    validate_to_native_reuse(record)
+    validate_to_native_reuse(record, workload=workload)
     if stage == 'gui':
         ready = record.get('gui_readiness_review', {})
         expected_ready = {key: record[key] for key in (
@@ -385,11 +468,11 @@ def validate_to_authority(record, environ):
         )}
         expected_ready.update(
             status='PASS', independent_review='PASS', stage='readiness',
-            freecad_limits=vars(limits('readiness', 'to-single')),
-            display_limits=vars(display_limits('readiness', 'to-single')),
+            freecad_limits=vars(limits('readiness', workload)),
+            display_limits=vars(display_limits('readiness', workload)),
             tests=1, skips=0, run_attempt=1, cleanup=True,
             evidence_verified=True, independent_preservation=True,
-            sentinel=sentinel('readiness', 'to-single'),
+            sentinel=sentinel('readiness', workload),
         )
         require(all(type(ready.get(key)) is type(value)
                     and ready[key] == value
@@ -414,7 +497,7 @@ def validate_to_authority(record, environ):
 def selected_workload(environ):
     """Preserve L1 as the default; admit only the separate reviewed route."""
     value = environ.get('TRACKTEMPLATE_GUI_WORKLOAD', 'l1')
-    require(value in ('l1', 'rea-bc', 'rea-bc-straight', 'to-single'),
+    require(value in ('l1', 'rea-bc', 'rea-bc-straight', *TO_WORKLOADS),
         'Unsupported GUI workload')
     return value
 
@@ -760,7 +843,7 @@ def validate_rea_evidence(work, *, stage, workload='rea-bc'):
         'installer-samples.jsonl', 'installer-cleanup.json',
         'guard-profile-exclusion.json',
     }
-    images = (to_images(stage) if workload == 'to-single'
+    images = (to_images(stage, workload=workload) if workload in TO_WORKLOADS
               else rea_images(stage, workload))
     groups = {
         'gui': {'result.json', *images},
@@ -770,13 +853,21 @@ def validate_rea_evidence(work, *, stage, workload='rea-bc'):
         'display-preflight': {'clearance.json'},
         'finalizer-clearance': {'clearance.json', 'deadline-clearance.json'},
     }
-    if workload == 'to-single':
+    if workload in TO_WORKLOADS:
         roots.update({
             'run-config.json', 'private-control.json', 'input-manifest.json',
             'recovery.json', 'readiness-review.json',
-            *(f'deployed-{index:02d}.json' for index in range(1, 11)),
+            *(f'deployed-{index:02d}.json' for index in range(
+                1, len(native.to_profile(workload)['input_hashes']) + 1)),
         })
         groups['native'] = {'result.json'}
+        if workload == 'to-crossing':
+            groups['native'].update({
+                'native-failure.txt', 'input-failure.txt', 'cleanup-failure.txt',
+            })
+            groups['gui'].update({
+                'gui-failure.txt', 'input-failure.txt', 'cleanup-failure.txt',
+            })
     require(not evidence.is_symlink() and evidence.is_dir(),
             'B/C evidence directory differs')
     for path in evidence.rglob('*'):
@@ -921,7 +1012,7 @@ def selected_stage(environ):
 
 def limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    require(workload in ('l1', 'rea-bc', 'rea-bc-straight', 'to-single'),
+    require(workload in ('l1', 'rea-bc', 'rea-bc-straight', *TO_WORKLOADS),
         'Unsupported GUI workload')
     full = 900 if workload in ('rea-bc', 'rea-bc-straight') else 7200
     return guard.ValidationLimits(4096, 90 if stage == 'readiness' else full)
@@ -929,7 +1020,7 @@ def limits(stage, workload='l1'):
 
 def display_limits(stage, workload='l1'):
     require(stage in ('readiness', 'gui'), 'Unsupported GUI stage')
-    require(workload in ('l1', 'rea-bc', 'rea-bc-straight', 'to-single'),
+    require(workload in ('l1', 'rea-bc', 'rea-bc-straight', *TO_WORKLOADS),
         'Unsupported GUI workload')
     full = 1000 if workload in ('rea-bc', 'rea-bc-straight') else 7300
     return guard.ValidationLimits(256, 190 if stage == 'readiness' else full,
@@ -937,6 +1028,11 @@ def display_limits(stage, workload='l1'):
 
 
 def sentinel(stage, workload='l1'):
+    if workload == 'to-crossing':
+        require(stage in ('readiness', 'gui'), 'Unsupported TO GUI stage')
+        return ('Fixed TO crossing GUI readiness passed'
+                if stage == 'readiness'
+                else 'Fixed TO crossing GUI validation passed')
     if workload == 'to-single':
         require(stage in ('readiness', 'gui'), 'Unsupported TO GUI stage')
         return ('Fixed TO single-rail hosted GUI readiness passed'
@@ -1001,7 +1097,7 @@ def validate_authority(record, environ):
     """Require a separate explicit GUI scope; native approval is insufficient."""
     if selected_workload(environ) in ('rea-bc', 'rea-bc-straight'):
         return validate_rea_authority(record, environ)
-    if selected_workload(environ) == 'to-single':
+    if selected_workload(environ) in TO_WORKLOADS:
         return validate_to_authority(record, environ)
     stage = selected_stage(environ)
     validate_product_requalification(record, environ)
@@ -1065,9 +1161,9 @@ def prepare(work):
     require(os.getuid() != 0 and not sys.flags.optimize, 'Unsafe interpreter')
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     admission = validate_host(os.environ, Path('/proc/meminfo').read_text())
-    key = ('TO_SINGLE_GUI_CONTROL'
-           if selected_workload(os.environ) == 'to-single'
-           else 'L1_GUI_CONTROL')
+    workload = selected_workload(os.environ)
+    key = {'to-single': 'TO_SINGLE_GUI_CONTROL',
+           'to-crossing': 'TO_CROSSING_GUI_CONTROL'}.get(workload, 'L1_GUI_CONTROL')
     control = json.loads(os.environ[key])
     validate_authority(control, os.environ)
     require(native.command('git', 'rev-parse', 'HEAD') == control['source_commit'],
@@ -1081,15 +1177,23 @@ def prepare(work):
         for name, expected in control['input_hashes'].items():
             require(digest(ROOT / name) == expected,
                 'Reviewed B/C input changed')
-    elif workload == 'to-single':
-        validate_to_native_source(control)
-        require(not native.command('git', 'diff', '--name-only', TO_BASE,
-                                   '--', 'tracktemplate',
-                                   'TrackTemplate.FCMacro',
-                                   'AdvancedTurnout.FCMacro',
-                                   'tests/freecad_validate_to_single_rail.py',
-                                   'tests/fixtures/phase9b-to-single-rail-frames.json'),
+    elif workload in TO_WORKLOADS:
+        validate_to_native_source(control, workload=workload)
+        profile = to_profile(workload)
+        native_profile = native.to_profile(workload)
+        changed = native.command(
+            'git', 'diff', '--name-only', profile['base'], '--',
+            'tracktemplate', 'TrackTemplate.FCMacro', 'AdvancedTurnout.FCMacro',
+            native_profile['entry'], native_profile['fixture'],
+        ).splitlines()
+        allowed = ({TO_CROSSING_READER, native_profile['entry']}
+                   if workload == 'to-crossing' else set())
+        require(set(changed) <= allowed,
                 'Frozen TO product or native preparation differs')
+        if workload == 'to-crossing':
+            require(digest(ROOT / TO_CROSSING_READER)
+                    == TO_CROSSING_READER_SHA256,
+                    'Reviewed crossing reader changed')
     else:
         validate_frozen_source(control)
     for name, expected in control['control_files_sha256'].items():
@@ -1098,8 +1202,8 @@ def prepare(work):
     if diagnostic_enabled(os.environ):
         validate_diagnostic_source(control)
     entry = REA_ENTRY if workload in ('rea-bc', 'rea-bc-straight') else ENTRY
-    if workload == 'to-single':
-        entry = TO_ENTRY
+    if workload in TO_WORKLOADS:
+        entry = to_profile(workload)['entry']
     require(digest(ROOT / entry) == control['gui_entry_sha256'],
             'Reviewed GUI entry changed')
     require(digest(ROOT / 'tools/freecad_validation_guard.py')
@@ -1128,11 +1232,12 @@ def acquire(work):
         write(work / 'gui-run-config.json', config)
         write(work / 'evidence/gui-run-config.json', config)
         return
-    if selected_workload(os.environ) == 'to-single':
+    if selected_workload(os.environ) in TO_WORKLOADS:
         control = json.loads((work / 'control.json').read_text())
         config = native.acquire_to(
             'readiness', work, source_root=ROOT,
             control=control['native_control'],
+            workload=selected_workload(os.environ),
         )
         directory = work / 'evidence/gui'
         directory.mkdir(mode=0o700)
@@ -1357,14 +1462,14 @@ def child_environment(work):
     if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
         clean['TRACKTEMPLATE_GUI_WORKLOAD'] = selected_workload(os.environ)
         clean['GITHUB_REF'] = os.environ['GITHUB_REF']
-    if selected_workload(os.environ) == 'to-single':
+    if selected_workload(os.environ) in TO_WORKLOADS:
         for name in ('TRACKTEMPLATE_L1_RUN_CONFIG',
                      'TRACKTEMPLATE_L1_RUN_CONFIG_SHA256',
                      'TRACKTEMPLATE_L1_GUI_AUTHORITY',
                      'TRACKTEMPLATE_L1_GUI_AUTHORITY_SHA256'):
             clean.pop(name, None)
         clean.update(
-            TRACKTEMPLATE_GUI_WORKLOAD='to-single',
+            TRACKTEMPLATE_GUI_WORKLOAD=selected_workload(os.environ),
             TRACKTEMPLATE_TO_RUN_CONFIG=str(config),
             TRACKTEMPLATE_TO_RUN_CONFIG_SHA256=digest(config),
             TRACKTEMPLATE_TO_GUI_AUTHORITY=str(authority),
@@ -1389,8 +1494,8 @@ def write_gui_macro(work):
     suite = ('hosted_rea_trackwork_gui_suite'
              if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight')
              else 'hosted_l1_gui_suite')
-    if selected_workload(os.environ) == 'to-single':
-        suite = 'freecad_validate_to_single_rail_gui'
+    if selected_workload(os.environ) in TO_WORKLOADS:
+        suite = Path(to_profile(selected_workload(os.environ))['entry']).stem
     content = ('import sys\n'
                'import FreeCAD as App\n'
                'import FreeCADGui as Gui\n'
@@ -1422,7 +1527,7 @@ def gui_argv(clean, macro):
         'rea-bc', 'rea-bc-straight',
     ):
         names += ('TRACKTEMPLATE_GUI_WORKLOAD', 'GITHUB_REF')
-    if clean.get('TRACKTEMPLATE_GUI_WORKLOAD') == 'to-single':
+    if clean.get('TRACKTEMPLATE_GUI_WORKLOAD') in TO_WORKLOADS:
         names = tuple(name for name in names
                       if not name.startswith('TRACKTEMPLATE_L1_'))
         names += ('TRACKTEMPLATE_GUI_WORKLOAD',
@@ -1442,9 +1547,8 @@ def qualified_runtime(stdout):
                     'rea-bc', 'rea-bc-straight',
                 )
                 else 'hosted_l1_gui_suite.L1Gui.test_authorised_gui_stage')
-    if selected_workload(os.environ) == 'to-single':
-        selector = ('freecad_validate_to_single_rail_gui.'
-                    'ToSingleRailGui.test_authorised_gui_stage')
+    if selected_workload(os.environ) in TO_WORKLOADS:
+        selector = to_profile(selected_workload(os.environ))['selector']
     with patch.object(native, 'SELECTORS', {'gui': selector}):
         native.qualified_runtime(stdout)
 
@@ -1564,18 +1668,19 @@ def run(work):
             require(rea_report((guard_dir / 'stdout').read_text()) == receipt,
                     'B/C stdout and retained report differ')
             validate_rea_receipt(receipt, work, stage=stage, workload=workload)
-        elif workload == 'to-single':
-            require(to_report((guard_dir / 'stdout').read_text()) == receipt,
+        elif workload in TO_WORKLOADS:
+            require(to_report((guard_dir / 'stdout').read_text(),
+                              workload=workload) == receipt,
                     'TO stdout and retained report differ')
-            validate_to_receipt(receipt, work, stage=stage)
+            validate_to_receipt(receipt, work, stage=stage, workload=workload)
         else:
             validate_gui_receipt(receipt, work, stage=stage)
         assessment['gui_receipt'] = receipt
         assessment['scope'] = (rea_scope(workload)
                                if workload in ('rea-bc', 'rea-bc-straight')
                                else SCOPE)
-        if workload == 'to-single':
-            assessment['scope'] = TO_SCOPE
+        if workload in TO_WORKLOADS:
+            assessment['scope'] = to_profile(workload)['scope']
         if assessment['status'] == 'PASS':
             assessment['classification'] = 'HOSTED_GUI_PASS'
     except (OSError, ValueError, KeyError, TypeError,
@@ -1597,24 +1702,31 @@ def run(work):
     return 0 if assessment['status'] == 'PASS' else 1
 
 
-def validate_to_receipt(receipt, work, *, stage):
+def validate_to_receipt(receipt, work, *, stage, workload='to-single'):
     """Require the fixed journey, source bindings and exact public images."""
     control = json.loads((work / 'control.json').read_text())
+    profile = to_profile(workload)
+    native_profile = native.to_profile(workload)
     expected = {
-        'status': 'PASS', 'stage': stage, 'scope_id': TO_SCOPE,
-        'test_id': ('freecad_validate_to_single_rail_gui.'
-                    'ToSingleRailGui.test_authorised_gui_stage'),
+        'status': 'PASS', 'stage': stage, 'scope_id': profile['scope'],
+        'test_id': profile['selector'],
         'source_commit': control['source_commit'],
-        'fixture_sha256': (
-            '407040d01dd0f9c8ac275d7e4d40c928ea32a5da0a05c853bf3a1de4221a8d4b'),
+        'fixture_sha256': native_profile['fixture_sha256'],
         'profile': original.EXPECTED_PROFILE, 'gui': True,
         'visual_review': 'REQUIRED', 'physical_fit': 'NOT_PROVED',
         'native_evidence_reused': control['prior_native_evidence'],
-        'input_sha256': native.TO_INPUT_HASHES,
+        'input_sha256': native_profile['input_hashes'],
         'input_bindings_unchanged': True, 'owned_documents_closed': True,
         'remaining_documents': 0, 'cleanup_errors': [],
-        'sentinel': sentinel(stage, 'to-single'),
+        'sentinel': sentinel(stage, workload),
     }
+    if workload == 'to-crossing':
+        expected['failures'] = []
+        expected['native_evidence_reused'] = {
+            key: control['prior_native_evidence'][key] for key in (
+                'run_id', 'source_commit', 'entry_sha256', 'evidence_sha256',
+            )
+        }
     require(type(receipt) is dict
             and set(receipt) == set(expected) | {
                 'checks', 'stage_timings', 'screenshots', 'renderer',
@@ -1623,7 +1735,7 @@ def validate_to_receipt(receipt, work, *, stage):
                     and receipt[key] == value
                     for key, value in expected.items()),
             'TO GUI receipt incomplete')
-    validate_to_counts(receipt['checks'], stage)
+    validate_to_counts(receipt['checks'], stage, workload=workload)
     timings = receipt['stage_timings']
     names = {'readiness_seconds', 'cleanup_seconds', 'total_seconds'}
     if stage == 'gui':
@@ -1631,11 +1743,15 @@ def validate_to_receipt(receipt, work, *, stage):
                       'gui_seconds'})
     require(type(timings) is dict and set(timings) == names
             and all(type(value) in (int, float)
-                    and 0 <= value <= limits(stage, 'to-single').timeout_seconds
+                    and 0 <= value <= limits(stage, workload).timeout_seconds
                     and math.isfinite(value)
                     for value in timings.values()),
             'TO GUI timings incomplete or outside limits')
     renderer = receipt['renderer']
+    if workload == 'to-crossing':
+        require(type(renderer) is dict and set(renderer) == {
+            'platform', 'gui_up', 'widget_valid', 'renderer', 'vendor', 'version',
+        }, 'TO crossing renderer fields differ')
     require(type(renderer) is dict and renderer.get('platform') == 'xcb'
             and renderer.get('gui_up') is True
             and renderer.get('widget_valid') is True
@@ -1646,7 +1762,7 @@ def validate_to_receipt(receipt, work, *, stage):
     require(all(digest(ROOT / name) == value for name, value
                 in control['control_files_sha256'].items()),
             'Reviewed TO source changed during GUI execution')
-    names = to_images(stage)
+    names = to_images(stage, workload=workload)
     images = receipt['screenshots']
     require(type(images) is list and len(images) == len(names),
             'TO screenshot count differs')
@@ -1667,7 +1783,7 @@ def validate_to_receipt(receipt, work, *, stage):
                 and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'),
                 'TO screenshot bytes differ')
     require(observed == names, 'TO screenshot set differs')
-    validate_rea_evidence(work, stage=stage, workload='to-single')
+    validate_rea_evidence(work, stage=stage, workload=workload)
 
 
 def validate_gui_receipt(receipt, work, *, stage='gui'):
@@ -1963,7 +2079,7 @@ def _failed_install_cleanup(work, public):
 def exclude_gui_copy(work):
     """Retain the one copied document outside the diagnostic archive."""
     if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight',
-                                         'to-single'):
+                                         *TO_WORKLOADS):
         _retain_rea_guard_profile(work)
         validate_rea_evidence(work, stage=selected_stage(os.environ),
                               workload=selected_workload(os.environ))
@@ -2024,8 +2140,9 @@ def publish(work):
         })
         if selected_workload(os.environ) in ('rea-bc', 'rea-bc-straight'):
             cleanup_rea_documents(work)
-        cleanup = (native.cleanup_to_staging(work, evidence)
-                   if selected_workload(os.environ) == 'to-single'
+        cleanup = (native.cleanup_to_staging(
+                       work, evidence, workload=selected_workload(os.environ))
+                   if selected_workload(os.environ) in TO_WORKLOADS
                    else native.cleanup_staging(work, evidence))
         require(cleanup['cleanup'], 'Input staging cleanup incomplete')
     except (OSError, ValueError, KeyError, TypeError):
@@ -2050,8 +2167,8 @@ def complete(work, public):
                'source_commit': os.environ['GITHUB_SHA'],
                'stage': selected_stage(os.environ),
                'run_id': int(os.environ['GITHUB_RUN_ID']), 'run_attempt': 1}
-    if workload == 'to-single':
-        summary.update(scope_id=TO_SCOPE, workload=workload)
+    if workload in TO_WORKLOADS:
+        summary.update(scope_id=to_profile(workload)['scope'], workload=workload)
     try:
         evidence = native.verify_artifact(
             work / 'publication.tar', work / 'readback-final/publication.tar',
@@ -2068,7 +2185,9 @@ def complete(work, public):
                 and publication['primary'] and not publication['errors']
                 and assessment['status'] == 'PASS' and cleanup['cleanup']
                 and len(cleanup['staging_inputs_removed'])
-                == (0 if workload in ('rea-bc', 'rea-bc-straight') else 10)
+                == (0 if workload in ('rea-bc', 'rea-bc-straight')
+                    else len(native.to_profile(workload)['input_hashes'])
+                    if workload in TO_WORKLOADS else 10)
                 and display['cleanup'] and staging['copied_input_absent']
                 and staging['display_cookie_absent'], 'GUI proof incomplete')
         if workload in ('rea-bc', 'rea-bc-straight'):
@@ -2076,7 +2195,7 @@ def complete(work, public):
             require(documents['cleanup'] is True,
                     'B/C temporary document cleanup unproved')
             summary['workload'] = workload
-        if workload == 'to-single':
+        if workload in TO_WORKLOADS:
             require(cleanup.get('working_copies_absent') is True,
                     'TO working copy cleanup unproved')
         summary.update(outcome='PASS', tests=1, skips=0, evidence=evidence,
