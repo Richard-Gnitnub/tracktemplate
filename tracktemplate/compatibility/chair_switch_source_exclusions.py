@@ -21,14 +21,15 @@ from tracktemplate.compatibility.chair_source_support import (
 _SOURCE_SIGNATURE = (
     "dad7acd2955b47ec82ad76e3827443eecce54c072c647e5e7e9ba865303b7379"
 )
-_FIXED_CONFIG = {
-    "turnout_id": "TO-001", "size": "REA C10 natural",
-    "handing": "Left-hand", "orientation": "Facing in host travel direction",
-    "track_gauge": 16.5, "flangeway": 1.0,
-    "rail_geometry_revision": 2, "timber_geometry_revision": 2,
-    "toe_chainage": 746.298, "template_width": 32.0,
-    "chair_analysis_signature": _SOURCE_SIGNATURE,
-}
+_FIXED_CONFIG = (
+    ("turnout_id", "TO-001"), ("size", "REA C10 natural"),
+    ("handing", "Left-hand"),
+    ("orientation", "Facing in host travel direction"),
+    ("track_gauge", 16.5), ("flangeway", 1.0),
+    ("rail_geometry_revision", 2), ("timber_geometry_revision", 2),
+    ("toe_chainage", 746.298), ("template_width", 32.0),
+    ("chair_analysis_signature", _SOURCE_SIGNATURE),
+)
 _SIDES = (
     ("main-side stock rail", "curved switch and closure rail", 1, 2),
     ("turnout-side stock rail", "straight switch and closure rail", 4, 3),
@@ -99,7 +100,7 @@ placement or physical plan changes. Unsupported owners remain unresolved.
     analysis = context.get("analysis")
     _require(isinstance(config, dict) and isinstance(analysis, dict)
              and all(config.get(k) == v and type(config.get(k)) is type(v)
-                     for k, v in _FIXED_CONFIG.items())
+                     for k, v in _FIXED_CONFIG)
              and analysis.get("geometry_signature") == _SOURCE_SIGNATURE,
              "only the fixed LH facing TO-001 source is supported")
     _require(family in ("P", "1P-5P"), "unsupported stock-owner route")
