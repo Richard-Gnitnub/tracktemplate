@@ -9795,7 +9795,8 @@ def validate_to_crossing_qualification_mutations() -> None:
             "D-P9-021",
         )
     for name, records in (
-        ("missing-decision", document["decisions"][:15]),
+        ("missing-decision", document["decisions"][:15]
+         + document["decisions"][16:]),
         ("duplicate-decision", [*document["decisions"], record]),
     ):
         altered = copy.deepcopy(document)
@@ -9850,6 +9851,115 @@ def validate_to_crossing_qualification_mutations() -> None:
         )
 
 
+def validate_to_zy_handling_mutations() -> None:
+    """Reject broader ZY handling or invented construction acceptance."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    progress._validate_phase9b_decisions(document)
+    record = document["decisions"][16]
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    progress._validate_dp9_022_handling(evidence, record)
+    for name, field, value in (
+        ("unaccepted", "status", "Proposed"),
+        ("wrong-date", "decided_on", "2026-11-12"),
+        ("missing-panel", "panel_required_under_current_policy", False),
+        ("wrong-evidence", "evidence", record["panel_record"] + "-other"),
+        ("wrong-panel", "panel_record", record["evidence"] + "-other"),
+        ("wider-owner-answer", "authority", replace_once(
+            record["authority"], "exact reviewed ZY handling extension",
+            "unrestricted ZY handling extension",
+        )),
+        ("changed-owner-receipt", "authority", replace_once(
+            record["authority"], "00e91e60", "10e91e60",
+        )),
+        ("changed-manifest", "decision", replace_once(
+            record["decision"], "3ff85154", "4ff85154",
+        )),
+        ("wider-inputs", "decision", replace_once(
+            record["decision"], "71 known inputs", "72 known inputs",
+        )),
+        ("admission-without-review", "decision", replace_once(
+            record["decision"], "measure it and get an independent review",
+            "admit it without measurement or independent review",
+        )),
+        ("successful-raw-output", "exclusions", replace_once(
+            record["exclusions"], "Do not publish raw face files from PASS",
+            "Publish raw face files from PASS",
+        )),
+        ("wider-total-deadline", "exclusions", replace_once(
+            record["exclusions"], "one total 7200-second deadline",
+            "a separate 7200-second deadline per subprocess",
+        )),
+        ("phase-acceptance", "exclusions", replace_once(
+            record["exclusions"], "Phase 9B stays Open at 3/6.",
+            "Phase 9B is complete at 6/6.",
+        )),
+    ):
+        altered = copy.deepcopy(document)
+        altered["decisions"][16][field] = value
+        expect_rejected(
+            "to-zy-handling/" + name,
+            lambda item=altered: progress._validate_phase9b_decisions(item),
+            "D-P9-022",
+        )
+    for name, records in (
+        ("missing-decision", document["decisions"][:16]),
+        ("duplicate-decision", [*document["decisions"], record]),
+    ):
+        altered = copy.deepcopy(document)
+        altered["decisions"] = records
+        expect_rejected(
+            "to-zy-handling/" + name,
+            lambda item=altered: progress._validate_phase9b_decisions(item),
+            "decision chain incomplete or widened",
+        )
+    plan = read("reference/PROJECT_PLAN.md")
+    row = next(line for line in plan.splitlines()
+               if line.startswith("| D-P9-022 |"))
+    for name, changed in (
+        ("missing-dashboard", ""),
+        ("wider-dashboard", row + " All production accepted."),
+        ("duplicate-dashboard", row + "\n" + row),
+    ):
+        changed_plan = replace_once(plan, row, changed)
+        expect_rejected(
+            "to-zy-handling/" + name,
+            lambda item=changed_plan: progress._validate_plan_shape(item),
+            "authorised added dashboard row drifted: D-P9-022",
+        )
+    panel = progress._section(evidence, "D-P9-022 ZY handling — 2026-11-13")
+    anchor = '<a id="to-zy-handling-panel"></a>'
+    for name, old, new in (
+        ("missing-anchor", anchor, ""),
+        ("duplicate-anchor", anchor, anchor + "\n" + anchor),
+        ("wider-memory", "4096 MiB, CPU 100%", "8192 MiB, CPU 100%"),
+        ("wider-readiness", "Checks before this work: 90 seconds.",
+         "Checks before this work: 900 seconds."),
+        ("reset-deadline", "Each subprocess gets only the remaining time.",
+         "Each subprocess gets a new 7200-second deadline."),
+        ("wider-gui-output", "five full-test images", "six full-test images"),
+        ("wider-failure-output", "Only the first such request's original",
+         "Every request's original"),
+        ("lost-source-obligation",
+         "The source obligation does not end after 30 days.",
+         "The source obligation ends after 30 days."),
+        ("invented-source-coverage",
+         "This decision does not increase the total to 128",
+         "This decision increases the total to 128"),
+        ("invented-qualification",
+         "Native tests and GUI tests for this scope also stay `Pending`.",
+         "Native tests and GUI tests for this scope are accepted."),
+    ):
+        changed_panel = replace_once(panel, old, new)
+        changed_evidence = replace_once(evidence, panel, changed_panel)
+        expect_rejected(
+            "to-zy-handling/" + name,
+            lambda item=changed_evidence: (
+                progress._validate_dp9_022_handling(item, record)
+            ),
+            "D-P9-022",
+        )
+
+
 def main() -> None:
     """Run every durable in-memory adversarial mutation."""
     validate_product_vision_mutations()
@@ -9891,6 +10001,7 @@ def main() -> None:
     validate_hosted_policy_acceptance_mutations()
     validate_to_research_publication_mutations()
     validate_to_crossing_qualification_mutations()
+    validate_to_zy_handling_mutations()
     summary = {
         "escaped": 0,
         "independent_protections": len(PROTECTIONS),

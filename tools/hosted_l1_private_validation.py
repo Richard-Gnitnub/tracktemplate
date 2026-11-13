@@ -199,7 +199,8 @@ def selected_workload(environ=None):
     """Select the fixed TO workload or the unchanged default L1 proof."""
     environ = os.environ if environ is None else environ
     value = environ.get("TRACKTEMPLATE_NATIVE_WORKLOAD", "l1")
-    require(value in ("l1", "to-single", "to-crossing"), "Unsupported native workload")
+    require(value in ("l1", "to-single", "to-crossing", "to-zy-generation"),
+            "Unsupported native workload")
     return value
 
 
@@ -1684,6 +1685,9 @@ def main():
     require(len(sys.argv) == 2, 'Expected one fixed operation')
     stage, work, public = paths()
     operation = sys.argv[1]
+    if selected_workload() == 'to-zy-generation':
+        from tools import hosted_to_zy_generation
+        return hosted_to_zy_generation.dispatch(operation, stage, work, public)
     if operation == 'prepare':
         prepare(stage, work)
     elif operation == 'acquire':
