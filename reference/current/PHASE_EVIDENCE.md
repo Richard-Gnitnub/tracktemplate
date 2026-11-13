@@ -4646,21 +4646,21 @@ The historical `2/2` repair record stays the same. D-P9-019 keeps its separate n
 ## Source evidence for two TO-001 positions — 2026-11-13
 
 The `classify_knuckle_exclusions=True` operation gives two TO-001 positions at X3-X the `source-endpoint-exclusion` value.
-It adds no assembly or component. With the default `False`, the previous TO output bytes stay the same. The previous XO output bytes stay the same.
+It adds no assembly or component. If the caller does not supply `classify_knuckle_exclusions`, its value is `False`. With `False`, the previous TO output bytes stay the same. The previous XO output bytes stay the same.
 
-In the fixed left-hand context, Templot 556b `math_unit.pas:29843-29919` selects one XA assembly and no separate XN assembly at X3-X.
-The [source checks](../../tracktemplate/compatibility/chair_crossing_endpoint_exclusions.py) confirm six exact connections between the named centre, gauge and outer rail paths.
-Both canonical position centres equal the rail ends. The raw `XN` labels and all 168 source records stay the same.
-These checks give no evidence that XA holds the curved knuckles.
+For the specified TO-001 inputs with `source_hand="LH"`, Templot 556b `math_unit.pas:29843-29919` selects one XA assembly and no XN assembly at X3-X.
+The [source checks](../../tracktemplate/compatibility/chair_crossing_endpoint_exclusions.py) compare six pairs of rail ends in `points`, `gauge_face_points` and `outer_face_points`. The values in each pair are equal.
+The `centre_point` values of the two canonical records are equal to the rail ends. The `XN` values in `chair_code_label` and all 168 canonical records stay the same.
+These checks give no evidence that XA holds the `main-side wing knuckle` or the `turnout-side wing knuckle`.
 
-Across TO routes, 126 positions are represented, two have source endpoint exclusions and 40 stay unresolved.
-Those 40 contain 24 empty raw labels and sixteen other records.
-This crossing route has four assemblies, eight represented positions, two exclusions and 158 remaining positions.
+Across TO routes, 126 positions have assembly data. Two positions have the `source-endpoint-exclusion` value, and 40 stay Pending.
+Of those 40 positions, 24 have empty `chair_code_label` values. Sixteen have other values.
+This route has four assemblies, eight positions with assembly data, two `source-endpoint-exclusion` values and 158 remaining positions.
 
-Fourteen [new tests](../../tests/validate_phase9b_turnout_crossing_endpoints.py) and fifty previous tests give PASS results, with zero skips.
-Independent source checks confirm both identities and no changes to the records.
-Native run `43369380474` and GUI run `43373643528` supply evidence only for the previous construction and lifecycle operations.
-Those runs did not execute this option.
+The validators completed fourteen [new tests](../../tests/validate_phase9b_turnout_crossing_endpoints.py) and fifty previous tests. Each test gave a PASS result.
+Source checks by an independent reviewer show the two identities and no changes to the canonical records.
+GitHub operations `43369380474` (native) and `43373643528` (GUI) supply evidence only for the previous assembly and document operations.
+Those operations did not use `classify_knuckle_exclusions=True`.
 
-Geometry and tolerances do not change. This result gives no new physical fit, production, rights or phase acceptance.
-The whole BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` record stays the same.
+Geometry and tolerances do not change. This result gives no acceptance for physical fit, production or a phase, and no positive rights claim.
+The full BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` result stays the same.
