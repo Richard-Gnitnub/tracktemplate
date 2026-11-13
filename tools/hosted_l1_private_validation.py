@@ -17,6 +17,8 @@ import resource
 import re
 import shlex
 import shutil
+import socket
+import ssl
 import subprocess
 import sys
 import tarfile
@@ -383,6 +385,8 @@ def prepare_to(stage, work, *, workload="to-single"):
     )
     write(work / "control.json", control)
     write(work / "evidence/admission.json", admission)
+    # Retain verified local authority if the public dependency is unavailable.
+    validate_input_repository()
 
 
 def acquire_to(
@@ -1337,9 +1341,41 @@ def evidence_archive(work, destination, *, late=False, workload=None):
     return {'sha256': digest(destination), 'bytes': destination.stat().st_size}
 
 
+def _installation_was_skipped(work):
+    """Recognise only a preparation failure with no later side effects."""
+    expected = {'L1_PREPARE': 'failure', 'L1_INSTALL': 'skipped',
+                'L1_ACQUIRE': 'skipped', 'L1_RUN': 'skipped'}
+    if any(os.environ.get(name) != value for name, value in expected.items()):
+        return False
+    evidence = work / 'evidence'
+    allowed = {
+        work: {'evidence', 'control.json'},
+        evidence: {'prepare.log', 'admission.json', 'finalizer.log'},
+    }
+    for directory, names in allowed.items():
+        if directory.is_symlink() or not directory.is_dir():
+            return False
+        for path in directory.iterdir():
+            if path.name not in names or path.is_symlink():
+                return False
+            if path != evidence and not path.is_file():
+                return False
+    return True
+
+
 def finalize(stage, work, public):
     """Prove process cleanup; retain staged inputs until evidence readback."""
     started = time.monotonic()
+    if _installation_was_skipped(work):
+        # No runtime was launched; this is cleanup evidence, not test success.
+        write(work / 'evidence/process-finalization.json', {
+            'cleanup': True, 'never_started': True, 'errors': [],
+            'seconds': time.monotonic() - started,
+            'workflow_outcomes': {name: os.environ[name] for name in (
+                'L1_PREPARE', 'L1_INSTALL', 'L1_ACQUIRE', 'L1_RUN',
+            )},
+        })
+        return 0
     cleanup, errors = False, []
     result_path = work / 'evidence/guard/result.json'
     ownership = work / 'evidence/guard/ownership.json'
@@ -1475,8 +1511,38 @@ def api_request(url):
             content = response.read(1024 * 1024 + 1)
             require(len(content) <= 1024 * 1024, 'Oversized GitHub metadata')
             return json.loads(content)
-    except urllib.error.URLError:
-        raise ValueError('Public metadata transport failed') from None
+    except urllib.error.HTTPError as error:
+        # HTTPError is also a URLError. Keep status separate from transport;
+        # neither a status nor these headers alone establishes its cause.
+        headers = {}
+        for name in ('X-RateLimit-Limit', 'X-RateLimit-Remaining',
+                     'X-RateLimit-Reset', 'Retry-After'):
+            value = error.headers.get(name) if error.headers else None
+            if (isinstance(value, str) and 1 <= len(value) <= 20
+                    and value.isascii() and value.isdecimal()):
+                headers[name] = int(value)
+        status = (error.code if type(error.code) is int
+                  and 100 <= error.code <= 599 else None)
+        diagnostic = {'category': 'http', 'status': status, 'headers': headers}
+        raise ValueError('Public metadata request failed: ' + json.dumps(
+            diagnostic, sort_keys=True, separators=(',', ':'))) from None
+    except (urllib.error.URLError, TimeoutError) as error:
+        reason = (error.reason
+                  if isinstance(error, urllib.error.URLError) else error)
+        if isinstance(reason, socket.gaierror):
+            cause = 'dns'
+        elif isinstance(reason, ssl.SSLError):
+            cause = 'tls'
+        elif isinstance(reason, TimeoutError):
+            cause = 'timeout'
+        elif isinstance(reason, ConnectionError):
+            cause = 'connection'
+        else:
+            cause = 'unknown'
+        # Exclude exception text, URLs, bodies and all other headers.
+        raise ValueError('Public metadata request failed: ' + json.dumps(
+            {'category': 'transport', 'cause': cause},
+            sort_keys=True, separators=(',', ':'))) from None
 
 
 def validate_input_repository():
