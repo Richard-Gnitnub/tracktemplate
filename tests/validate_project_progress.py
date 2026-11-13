@@ -1426,7 +1426,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-P9-020',
          '0cd43275768d3c42afe0c6a33e69d6099fd09b7f17c95391f2de7fe6d97e09d9'),
         ('D-P9-021',
-         '70c0ba079ca32232822a6be473032c51c60bc78f4ae6576fe057a8cf734c4067'),
+         '8913a335d220de309e13df1ef728ae910520460fc73cafa9af8207b4cf858714'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -8015,9 +8015,9 @@ def _validate_dp9_021_decision(record, fields):
         "D-P9-021 handling identity or panel authority drifted",
     )
     for field, expected in (
-        ("authority", "f5e35c4469da96666ac127151616bb2e861024478c3ac07cfb622c656d47a1a6"),
-        ("decision", "bcf76dd652a0b82505c5436a8eb6030da6a9887df7005030a92c41303b3348ad"),
-        ("exclusions", "da630cf268af642fda92b19372fe50a4fcaca1defdd1bd51624c7b68eb0ffc81"),
+        ("authority", "25ae2100cc9124bbf71540351e8604eae308384f2340de87b8a011e31b284cb1"),
+        ("decision", "fd2d48e2be4c607a5211278dd82a781d6aea60dd4afc72e8174389b2532f33ad"),
+        ("exclusions", "5d35cca284e51a8d1d0a1f4cdbcba5591714a978150beea9dadcb0bf7b8f8e74"),
     ):
         value = record[field]
         _require(
@@ -8036,7 +8036,7 @@ def _validate_dp9_021_qualification(evidence: str, record: dict) -> None:
         and evidence.count("## " + heading + "\n") == 1
         and evidence.count('<a id="to-crossing-qualification-panel"></a>') == 1
         and hashlib.sha256(_semantic_markdown(panel).encode("utf-8")).hexdigest()
-        == "5821736499f90cbde1f2242d16b1389a5f46474ee3095bda3aa6c7ecd288dc6f",
+        == "2e4a464935b2f643ab912f737ab99eb8fb4a2b0bcf497504340c01990e8ddca7",
         "D-P9-021 handling, result evidence or exclusions drifted",
     )
 
