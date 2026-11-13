@@ -4664,3 +4664,28 @@ Those operations did not use `classify_knuckle_exclusions=True`.
 
 Geometry and tolerances do not change. This result gives no acceptance for physical fit, production or a phase, and no positive rights claim.
 The full BB assembly stays Pending. Phase 9B stays `Open` at 3/6. LMS work stays stopped. The historical `2/2` result stays the same.
+
+## Source evidence for nineteen TO-001 switch positions — 2026-11-13
+
+The `classify_switch_exclusions=True` operation gives nineteen switch positions the `source-switch-omission` value: fourteen on the P route and five on the `1P` to `5P` route.
+Each specified `owner_position_id` must identify a position with assembly data in the same product operation.
+For these positions, Templot 556b `switch_select.pas:1833-1835` and `math_unit.pas:29668-29728` select `null_chair`.
+This selection gives no evidence that an assembly holds a rail or has physical fit.
+
+If the caller does not supply `classify_switch_exclusions`, its value is `False`. With `False`, both routes keep their previous output bytes from `a096c285`.
+The [source checks](../../tracktemplate/compatibility/chair_switch_source_exclusions.py) add no assembly or component.
+All 168 canonical records, their initial values and the initial plan stay the same.
+
+For the TO routes, 126 positions have assembly data, 21 have specified status values and 21 stay Pending.
+Those 21 status values include two previous `source-endpoint-exclusion` values and nineteen `source-switch-omission` values.
+Five Pending records on the `straight switch and closure rail` have empty `chair_code_label` values. Sixteen other Pending records have other values.
+
+The validators completed fourteen [new tests](../../tests/validate_phase9b_turnout_switch_exclusions.py) and 48 previous tests. Each test gave a PASS result.
+An independent reviewer checked the nineteen identities against the initial canonical records and checked that outputs with `False` stayed the same.
+
+The previous P tests with FreeCAD, both with and without its GUI, supply evidence for 308 components. The five `1P` to `5P` assemblies keep source checks of 61 sets of position and direction values, with 427 values in total. Adapter checks are for 161 component copies and 163 entries in `specs`.
+FreeCAD tests with and without its GUI stay Pending for these five assemblies. This result adds no FreeCAD or GUI test, transfers no model and gives no acceptance for physical fit.
+The completed XA/AA/CD/DD tests stay the same.
+
+Shapes, numerical tolerances and rights states do not change.
+Phase 9B stays `Open` at 3/6. LMS work stays stopped. The previous `2/2` result stays the same. Risk `PR-13` stays open. Its deadline has passed.

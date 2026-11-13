@@ -264,6 +264,7 @@ def _select_p_positions(
 
 def preview_private_catalogue_p_chairs(
     module, source_document, turnout_id, catalogue_path, create_preview,
+    *, classify_switch_exclusions=False,
 ):
     """Create a separate private P snapshot; preserve the complete source.
 
@@ -271,9 +272,12 @@ def preview_private_catalogue_p_chairs(
     The adapter checks catalogue bytes and the unchanged source inside its
     transaction. This does not admit P to the inherited physical plan.
     """
+    _require(type(classify_switch_exclusions) is bool,
+             "the source switch exclusion option must be boolean")
     return _preview_private_catalogue_p_chairs(
         module, source_document, turnout_id, catalogue_path, create_preview,
         entity_kind="turnout",
+        classify_switch_exclusions=classify_switch_exclusions,
     )
 
 
@@ -295,7 +299,7 @@ def preview_private_catalogue_p_crossover_chairs(
 
 def _preview_private_catalogue_p_chairs(
     module, source_document, entity_id, catalogue_path, create_preview,
-    *, entity_kind,
+    *, entity_kind, classify_switch_exclusions=False,
 ):
     """Bind unchanged P components to one complete current source snapshot."""
     _require(callable(create_preview), "the native adapter is unavailable")
@@ -316,10 +320,30 @@ def _preview_private_catalogue_p_chairs(
         module, analysis, plan, rails, timbers, entity_id,
         crossover_owners=owners,
     )
+    switch_exclusions = {}
+
+    def qualify_switches():
+        from tracktemplate.compatibility.chair_switch_source_exclusions import (
+            qualify_turnout_switch_exclusions,
+        )
+
+        return qualify_turnout_switch_exclusions(context, selected, family="P")
+
+    if classify_switch_exclusions:
+        switch_exclusions = qualify_switches()
+        remaining = [item for item in remaining
+                     if item["position_id"] not in switch_exclusions]
     context_shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, entity_id, "P", signature_text,
         entity_kind=entity_kind,
     )
+
+    def verify_inputs():
+        verify_source()
+        if classify_switch_exclusions:
+            _require(qualify_switches() == switch_exclusions,
+                     "source switch evidence changed during P preview")
+
     source_receipt = {
         "document_name": source_document.Name, entity_kind + "_id": entity_id,
         "source_context_signature": "sha256:" + hashlib.sha256(
@@ -353,9 +377,16 @@ def _preview_private_catalogue_p_chairs(
     if entity_kind == "crossover":
         source_receipt["source_kind"] = "crossover"
         source_receipt["timber_context"] = "current B4 resolved timbers"
+    if classify_switch_exclusions:
+        source_receipt.update(
+            source_switch_exclusions=copy.deepcopy(switch_exclusions),
+            source_switch_exclusion_count=len(switch_exclusions),
+            represented_source_position_count=len(placements),
+            unresolved_source_position_count=len(remaining),
+        )
     return create_preview(
         catalogue_path, placements, context_shapes, source_receipt,
-        verify_source,
+        verify_inputs if classify_switch_exclusions else verify_source,
     )
 
 
