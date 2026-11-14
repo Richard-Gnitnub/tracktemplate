@@ -1186,6 +1186,346 @@ class ZyGenerationControls(unittest.TestCase):
             (streams / "failed.faces.json").read_bytes(), b"partial original"
         )
 
+    def _entry_import_probe(self, extra):
+        # A separate -I interpreter reproduces ignored PYTHON* settings.
+        script = r'''
+import hashlib
+import importlib
+import json
+import os
+from pathlib import Path
+import sys
+import types
+
+root, work, extra = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3] == '1'
+sys.path.insert(0, str(root))
+sys.dont_write_bytecode = True
+g = importlib.import_module('tools.hosted_to_zy_generation')
+entry = importlib.import_module('tests.hosted_to_zy_generation_suite')
+approved = work / 'approved'
+package = approved / 'source/runtime/tracktemplate'
+package.mkdir(parents=True)
+files = {
+    'source/runtime/tracktemplate/__init__.py': b'',
+    'source/runtime/tracktemplate/bootstrap.py': (
+        'from pathlib import Path\n'
+        'def require_qualified_runtime(path):\n'
+        + ('    Path(__file__).with_name("unexpected.txt").write_text("x")\n'
+           if extra else '')
+        + '    return {"compatibility_evaluation": {"matched_profile_id": '
+        + repr(g.pilot.EXPECTED_PROFILE) + '}}\n'
+    ).encode(),
+}
+rows = []
+for name, raw in files.items():
+    path = approved / name
+    path.write_bytes(raw)
+    path.chmod(0o400)
+    rows.append({'member': name, 'sha256': hashlib.sha256(raw).hexdigest(),
+                 'bytes': len(raw)})
+raw = json.dumps({'files': rows}).encode()
+(approved / g.MANIFEST_MEMBER).write_bytes(raw)
+g.MANIFEST_SHA256 = hashlib.sha256(raw).hexdigest()
+config = {
+    'stage': 'readiness', 'repository_root': str(root),
+    'approved_directory': str(approved),
+    'generated_directory': str(work / 'generated'),
+    'evidence_directory': str(work / 'evidence'),
+    'manifest_sha256': g.MANIFEST_SHA256, 'entry_sha256': g.ENTRY_SHA256,
+    'source_commit': 'a' * 40, 'run_id': 42,
+}
+config_path = work / 'run-config.json'
+raw = json.dumps(config).encode()
+config_path.write_bytes(raw)
+os.environ['TRACKTEMPLATE_ZY_RUN_CONFIG'] = str(config_path)
+os.environ['TRACKTEMPLATE_ZY_RUN_CONFIG_SHA256'] = (
+    hashlib.sha256(raw).hexdigest()
+)
+sys.modules['FreeCAD'] = types.SimpleNamespace(listDocuments=lambda: {})
+sys.dont_write_bytecode = False
+sys.pycache_prefix = None
+assert sys.flags.ignore_environment == 1
+failure = None
+try:
+    entry.ZyGeneration('test_readiness').run_stage('readiness')
+except ValueError as error:
+    failure = str(error)
+result = json.loads((work / 'evidence/native-result.json').read_text())
+assert not list(approved.rglob('*.pyc')), (
+    'Approved source import wrote bytecode'
+)
+assert not list(approved.rglob('__pycache__')), 'Approved source gained cache'
+assert sys.dont_write_bytecode is True
+if extra:
+    assert failure == 'Approved staging membership changed', failure
+    assert result['status'] == 'FAIL'
+    assert 'Approved staging membership changed' in (
+        work / 'evidence/native-failure.txt').read_text()
+else:
+    assert failure is None, failure
+    assert result['status'] == 'PASS'
+    assert result['input_bindings_unchanged'] is True
+assert not (work / 'generated').exists()
+print('INERT_ENTRY_IMPORT_PASS')
+'''
+        result = subprocess.run(
+            [sys.executable, "-I", "-c", script, str(ROOT),
+             str(self.work), str(int(extra))],
+            env={
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONPYCACHEPREFIX": str(self.work / "ignored-cache"),
+            },
+            capture_output=True, text=True, check=False, timeout=20,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("INERT_ENTRY_IMPORT_PASS", result.stdout)
+
+    def test_embedded_entry_preserves_inputs_when_environment_is_ignored(self):
+        self._entry_import_probe(False)
+
+    def test_embedded_entry_still_refuses_unexpected_approved_member(self):
+        self._entry_import_probe(True)
+
+    def _run_finalization_case(self, name, *, stop_code=0, mutation=None,
+                               query_error=None, stop_error=None,
+                               cleanup=True, native_ok=True, fired=False,
+                               intent_change=None, exhausted=False,
+                               loaded_timer=False, post_mutation=None,
+                               stop_stderr=None):
+        from contextlib import ExitStack, contextmanager
+        from types import SimpleNamespace
+
+        g = self.generation
+        work = self.work / name
+        evidence = work / "evidence"
+        evidence.mkdir(parents=True)
+        (work / "control.json").write_bytes(encoded({
+            "stage": "readiness", "source_commit": "a" * 40,
+        }))
+        (evidence / "compiler-readiness.json").write_bytes(encoded({}))
+        native = evidence / "guard"
+        native.mkdir()
+        (native / "result.json").write_bytes(encoded({
+            "cleanup_proved": cleanup,
+        }))
+        timer = "tracktemplate-zy-deadline-42"
+        held = {"value": False}
+        lease = SimpleNamespace(path=work / "lease", lease_id="b" * 32)
+        clock = [100.0]
+        stops, queries = [], []
+
+        @contextmanager
+        def acquire(_directory):
+            held["value"] = True
+            try:
+                yield lease
+            finally:
+                held["value"] = False
+
+        def arm(_work, actual_lease, deadline):
+            self.assertIs(actual_lease, lease)
+            intent = {
+                "run_id": 42, "pid": g.os.getpid(), "process_start": "123",
+                "lease_path": str(lease.path), "lease_id": lease.lease_id,
+                "deadline": deadline, "source_commit": "a" * 40,
+            }
+            if intent_change:
+                intent.update(intent_change)
+            (evidence / "absolute-deadline.json").write_bytes(encoded(intent))
+            (evidence / "absolute-deadline-armed.json").write_bytes(
+                encoded({"unit": timer})
+            )
+            return timer
+
+        def command(*args):
+            if args[:2] == ("flatpak", "info"):
+                if args[-2] == "--show-runtime":
+                    return g.pilot.RUNTIME
+                return (g.pilot.APP_COMMIT if args[-1] == g.guard.APP_ID
+                        else g.pilot.RUNTIME_COMMIT)
+            return ""
+
+        def invoke(arguments, **kwargs):
+            self.assertTrue(
+                held["value"], "Lease released before cancellation"
+            )
+            self.assertGreater(kwargs["timeout"], 0)
+            self.assertLessEqual(kwargs["timeout"], 10)
+            if "stop" in arguments:
+                stops.append(arguments)
+                if stop_error:
+                    raise stop_error
+                stderr = (
+                    f"Failed to stop {timer}.service: Unit {timer}.service "
+                    "not loaded.\n"
+                ) if stop_code else ""
+                return subprocess.CompletedProcess(
+                    arguments, stop_code, "original stop stdout",
+                    stderr if stop_stderr is None else stop_stderr,
+                )
+            self.assertIn("show", arguments)
+            unit = next(value for value in arguments
+                        if value.endswith((".timer", ".service")))
+            queries.append(unit)
+            if query_error:
+                raise query_error
+            values = {
+                "Id": unit, "LoadState": "not-found",
+                "ActiveState": "inactive", "SubState": "dead", "Job": "",
+            }
+            if unit.endswith(".service"):
+                values.update(MainPID="0", ControlPID="0", ControlGroup="",
+                              InvocationID="", ExecMainCode="0",
+                              ExecMainStatus="0")
+            else:
+                values["Unit"] = ""
+                if loaded_timer:
+                    values.update(LoadState="loaded", Unit=timer + ".service")
+                    if not stops:
+                        values.update(ActiveState="active", SubState="waiting")
+            if post_mutation and stops:
+                post_mutation(unit, values)
+            if mutation:
+                mutation(unit, values)
+            fields = []
+            for index, value in enumerate(arguments):
+                if value in ("-p", "--property"):
+                    fields.append(arguments[index + 1])
+                elif value.startswith("--property="):
+                    fields.append(value.split("=", 1)[1])
+            raw = "\n".join(f"{key}={values[key]}" for key in fields
+                            if key in values) + "\n"
+            if name == "duplicate":
+                raw += "Id=" + unit + "\n"
+            if exhausted:
+                clock[0] += 6
+            return subprocess.CompletedProcess(arguments, 0, raw, "")
+
+        def native_run(*_args, **_kwargs):
+            if fired:
+                (evidence / "absolute-deadline-fired.json").write_bytes(b"{}")
+            return {"status": "PASS" if native_ok else "FAIL"}
+
+        with ExitStack() as stack:
+            for owner, attribute, value in (
+                (g, "validate_control", Mock()),
+                (g, "validate_compiler", Mock()),
+                (g, "verify_inputs", Mock()),
+                (g.coordinator, "validate_host", Mock()),
+                (g.coordinator, "require_finalization_time", Mock()),
+                (g.coordinator, "command", command),
+                (g.guard, "acquire_validation_lease", acquire),
+                (g.guard, "_residual", Mock()),
+                (g.guard, "_process_start", lambda _pid: "123"),
+                (g, "deadline_intent", arm),
+                (g, "run_preparation", Mock(return_value={
+                    "status": "PASS", "cleanup": True,
+                })),
+                (g, "run_native", native_run),
+                (g, "source_cleanup", Mock(return_value={
+                    "cleanup": cleanup, "errors": [],
+                })),
+                (g.subprocess, "run", invoke),
+                (g.time, "monotonic", lambda: clock[0]),
+            ):
+                stack.enter_context(patch.object(owner, attribute, value))
+            stack.enter_context(patch.dict(g.os.environ, {
+                "GITHUB_RUN_ID": "42", "GITHUB_SHA": "a" * 40,
+            }))
+            code = g.run("readiness", work)
+        self.assertFalse(held["value"])
+        result = json.loads((evidence / "assessment.json").read_bytes())
+        return code, result, stops, queries
+
+    def test_run_cancels_deadline_with_lease_and_preserves_original_stop(self):
+        for code, loaded in ((0, False), (5, False), (5, True)):
+            with self.subTest(stop_code=code, loaded_timer=loaded):
+                actual, result, stops, queries = self._run_finalization_case(
+                    f"absent-{code}-{loaded}", stop_code=code,
+                    loaded_timer=loaded,
+                )
+                self.assertEqual(actual, 0)
+                self.assertEqual(result["status"], "PASS")
+                self.assertEqual(len(stops), 1)
+                self.assertEqual(set(queries), {
+                    "tracktemplate-zy-deadline-42.timer",
+                    "tracktemplate-zy-deadline-42.service",
+                })
+                proof = result["absolute_timer_stop"]
+                self.assertEqual(proof["returncode"], code)
+                self.assertEqual(proof["stdout"], "original stop stdout")
+                self.assertEqual(proof["stderr"],
+                                 ("Failed to stop tracktemplate-zy-deadline-42"
+                                  ".service: Unit tracktemplate-zy-deadline-42"
+                                  ".service not loaded.\n") if code else "")
+                self.assertIs(proof["proved"], True)
+                self.assertTrue(proof["observations"])
+        actual, result, _, _ = self._run_finalization_case(
+            "native-failed", stop_code=5, native_ok=False,
+        )
+        self.assertEqual(actual, 1)
+        self.assertEqual(result["status"], "FAIL")
+        self.assertTrue(result["errors"])
+        self.assertIs(result["absolute_timer_stop"]["proved"], True)
+
+    def test_run_refuses_uncertain_or_foreign_deadline_cancellation(self):
+        def change(field, value, suffix=None):
+            def mutate(unit, values):
+                if suffix is None or unit.endswith(suffix):
+                    if value is None:
+                        values.pop(field, None)
+                    else:
+                        values[field] = value
+            return mutate
+
+        cases = (
+            ("active", {"mutation": change("ActiveState", "active")}),
+            ("foreign", {"mutation": change("Id", "foreign.timer")}),
+            ("pending", {"mutation": change("Job", "17")}),
+            ("missing", {"mutation": change("LoadState", None)}),
+            ("unknown", {"mutation": change("LoadState", "error")}),
+            ("duplicate", {}),
+            ("live-pid", {"mutation": change("MainPID", "17", ".service")}),
+            ("residue", {"mutation": change(
+                "ControlGroup", "/foreign", ".service")}),
+            ("query-timeout", {"query_error": subprocess.TimeoutExpired(
+                ["systemctl", "show"], 1, output="partial query")}),
+            ("query-error", {"query_error": OSError("query unavailable")}),
+            ("stop-timeout", {"stop_error": subprocess.TimeoutExpired(
+                ["systemctl", "stop"], 1, output="partial stop")}),
+            ("stop-failed", {"stop_code": 1}),
+            ("unrelated-exit5", {"stop_code": 5,
+                                 "stop_stderr": "Permission denied\n"}),
+            ("fired", {"fired": True}),
+            ("cleanup-failed", {"cleanup": False}),
+            ("foreign-intent", {"intent_change": {"run_id": 99}}),
+            ("foreign-lease", {"intent_change": {"lease_id": "c" * 32}}),
+            ("foreign-pid", {"intent_change": {"pid": 99}}),
+            ("changed-start", {"intent_change": {"process_start": "999"}}),
+            ("budget", {"exhausted": True}),
+            ("replacement-after-stop", {"post_mutation": change(
+                "Id", "foreign.service", ".service")}),
+            ("active-after-stop", {"loaded_timer": True,
+                                   "post_mutation": change(
+                                       "ActiveState", "active", ".timer")}),
+        )
+        for name, options in cases:
+            with self.subTest(name=name):
+                code, result, stops, _ = self._run_finalization_case(
+                    name, **options,
+                )
+                self.assertEqual(code, 1)
+                self.assertEqual(result["status"], "FAIL")
+                self.assertFalse(result.get("absolute_timer_stop", {}).get(
+                    "proved", False))
+                if name in ("query-timeout", "stop-timeout"):
+                    self.assertIn("partial " + name.split("-")[0],
+                                  json.dumps(result))
+                if name in ("foreign", "foreign-intent", "foreign-lease",
+                            "foreign-pid", "changed-start", "cleanup-failed",
+                            "fired"):
+                    self.assertEqual(stops, [])
+
     def test_import_safe_native_suite_and_readiness_has_no_construction(self):
         entry = importlib.import_module("tests.hosted_to_zy_generation_suite")
         self.assertTrue(hasattr(entry.ZyGeneration, "test_readiness"))

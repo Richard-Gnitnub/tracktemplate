@@ -17,6 +17,8 @@ import unittest
 class ZyGeneration(unittest.TestCase):
     def run_stage(self, stage):
         """Verify input bytes, then call one already-reviewed operation."""
+        # Embedded FreeCAD can ignore PYTHON* environment settings.
+        sys.dont_write_bytecode = True
         config_path = Path(os.environ["TRACKTEMPLATE_ZY_RUN_CONFIG"])
         raw = config_path.read_bytes()
         self.assertEqual(
