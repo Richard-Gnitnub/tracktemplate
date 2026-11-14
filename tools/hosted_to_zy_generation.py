@@ -1765,6 +1765,97 @@ def interrupt(_signum, _frame):
     raise InterruptedError("Absolute generation deadline or cancellation")
 
 
+def cancel_absolute_deadline(work, unit, lease):
+    """Prove the same-run timer is inert within one cleanup budget."""
+    result = {"proved": False, "observations": [], "errors": []}
+    deadline = time.monotonic() + 10
+
+    def capture(arguments, record):
+        record["command"] = arguments
+        try:
+            completed = bounded_command(arguments, deadline, check=False)
+        except subprocess.TimeoutExpired as error:
+            record.update(timeout_stdout=repr(error.stdout),
+                          timeout_stderr=repr(error.stderr))
+            raise
+        record.update(returncode=completed.returncode,
+                      stdout=completed.stdout, stderr=completed.stderr)
+        require(time.monotonic() < deadline, "Cancellation budget expired")
+        return completed
+
+    def observe(suffix, phase):
+        expected = {
+            "Id": unit + suffix, "LoadState": "not-found",
+            "ActiveState": "inactive", "SubState": "dead", "Job": "",
+        }
+        if suffix == ".service":
+            expected.update(MainPID="0", ControlPID="0", ControlGroup="",
+                            InvocationID="", ExecMainCode="0",
+                            ExecMainStatus="0")
+        else:
+            expected["Unit"] = ""
+        observation = {"phase": phase}
+        result["observations"].append(observation)
+        arguments = ["systemctl", "--user", "show", "--all", unit + suffix]
+        arguments.extend("--property=" + key for key in expected)
+        completed = capture(arguments, observation)
+        require(completed.returncode == 0, "Deadline unit query failed")
+        values = unique_object([
+            line.split("=", 1) for line in completed.stdout.splitlines()
+        ])
+        require(values.get("LoadState") in ("loaded", "not-found"),
+                "Deadline unit availability uncertain")
+        expected["LoadState"] = values["LoadState"]
+        if suffix == ".timer" and values["LoadState"] == "loaded":
+            expected["Unit"] = unit + ".service"
+            if phase == "before" and values.get("ActiveState") == "active":
+                expected.update(ActiveState="active", SubState="waiting")
+        require(values == expected, "Deadline unit identity or state differs")
+        return values
+
+    try:
+        intent = read(work / "evidence/absolute-deadline.json")
+        armed = read(work / "evidence/absolute-deadline-armed.json")
+        result.update(intent=intent, armed=armed)
+        require(
+            re.fullmatch(r"[1-9][0-9]*", os.environ["GITHUB_RUN_ID"])
+            and type(intent["run_id"]) is int
+            and intent["run_id"] == int(os.environ["GITHUB_RUN_ID"])
+            and unit == "tracktemplate-zy-deadline-" + str(intent["run_id"])
+            and armed["unit"] == unit
+            and intent["source_commit"] == os.environ["GITHUB_SHA"]
+            and intent["pid"] == os.getpid()
+            and intent["process_start"] == guard._process_start(os.getpid())
+            and intent["lease_path"] == str(lease.path)
+            and intent["lease_id"] == lease.lease_id,
+            "Deadline cancellation owner differs",
+        )
+        fired = work / "evidence/absolute-deadline-fired.json"
+        require(not fired.exists(), "Absolute deadline fired")
+        for suffix in (".timer", ".service"):
+            observe(suffix, "before")
+        stop = capture([
+            "systemctl", "--user", "stop", unit + ".timer", unit + ".service",
+        ], result)
+        states = [observe(suffix, "after")
+                  for suffix in (".timer", ".service")]
+        if stop.returncode:
+            absent_errors = {
+                f"Failed to stop {row['Id']}: Unit {row['Id']} not loaded."
+                for row in states if row["LoadState"] == "not-found"
+            }
+            errors = stop.stderr.splitlines()
+            require(stop.returncode == 5 and errors
+                    and set(errors) <= absent_errors,
+                    "Deadline cancellation failed")
+        require(not fired.exists(), "Absolute deadline fired during cleanup")
+        result["proved"] = True
+    except (OSError, ValueError, KeyError, TypeError,
+            subprocess.SubprocessError):
+        result["errors"].append(traceback.format_exc())
+    return result
+
+
 def run(stage, work):
     control = read(work / "control.json")
     validate_control(control, stage, os.environ)
@@ -1798,59 +1889,60 @@ def run(stage, work):
         for sig in (signal.SIGTERM, signal.SIGINT)
     }
     timer = None
+    leases = ExitStack()
     try:
-        with guard.acquire_validation_lease(
+        lease = leases.enter_context(guard.acquire_validation_lease(
             guard.GuardContext().runtime_dir
-        ) as lease:
-            guard._residual(lease, guard.GuardContext())
+        ))
+        guard._residual(lease, guard.GuardContext())
+        require(
+            not coordinator.command(
+                "flatpak", "ps", "--columns=application,pid"
+            ),
+            "Foreign Flatpak instance present",
+        )
+        timer = deadline_intent(work, lease, deadline)
+        if stage == "native":
+            validate_compiler(
+                read(work / "evidence/compiler-readiness.json")
+            )
+            result["scopes"] = generation_sequence(
+                work, control, lease, deadline
+            )
+        else:
+            source = run_preparation(work, control, lease, deadline)
             require(
-                not coordinator.command(
-                    "flatpak", "ps", "--columns=application,pid"
+                source.get("status") == "PASS"
+                and source.get("cleanup") is True,
+                "Compiler readiness or source-tree cleanup failed",
+            )
+            result["scopes"] = {
+                "preparation": source,
+                "native": run_native(
+                    work,
+                    control,
+                    lease=lease,
+                    seconds=remaining_seconds(deadline),
+                    stage=stage,
                 ),
-                "Foreign Flatpak instance present",
-            )
-            timer = deadline_intent(work, lease, deadline)
-            if stage == "native":
-                validate_compiler(
-                    read(work / "evidence/compiler-readiness.json")
-                )
-                result["scopes"] = generation_sequence(
-                    work, control, lease, deadline
-                )
-            else:
-                source = run_preparation(work, control, lease, deadline)
-                require(
-                    source.get("status") == "PASS"
-                    and source.get("cleanup") is True,
-                    "Compiler readiness or source-tree cleanup failed",
-                )
-                result["scopes"] = {
-                    "preparation": source,
-                    "native": run_native(
-                        work,
-                        control,
-                        lease=lease,
-                        seconds=remaining_seconds(deadline),
-                        stage=stage,
-                    ),
-                }
-            require(
-                result["scopes"]["native"]["status"] == "PASS",
-                "Qualified native result incomplete",
-            )
-            remaining_seconds(deadline)
-            require(
-                not (work / "evidence/absolute-deadline-fired.json").exists(),
-                "Absolute deadline fired",
-            )
-            compiler = read(work / "evidence/compiler-readiness.json")
-            validate_compiler(compiler)
-            result["compiler"] = identity(
-                work / "evidence/compiler-readiness.json"
-            )
-            verify_inputs(work / "approved")
-            validate_control(control, stage, os.environ)
-            result["status"] = "PASS"
+            }
+        require(
+            result["scopes"]["native"]["status"] == "PASS",
+            "Qualified native result incomplete",
+        )
+        remaining_seconds(deadline)
+        require(
+            not (work / "evidence/absolute-deadline-fired.json").exists(),
+            "Absolute deadline fired",
+        )
+        compiler = read(work / "evidence/compiler-readiness.json")
+        validate_compiler(compiler)
+        result["compiler"] = identity(
+            work / "evidence/compiler-readiness.json"
+        )
+        verify_inputs(work / "approved")
+        validate_control(control, stage, os.environ)
+        result["status"] = "PASS"
     except (
         OSError,
         ValueError,
@@ -1863,54 +1955,43 @@ def run(stage, work):
     finally:
         for sig in old:
             signal.signal(sig, signal.SIG_IGN)
-        result["elapsed_seconds"] = time.monotonic() - started
-        cleanup = source_cleanup(work)
-        native_result = work / "evidence/guard/result.json"
-        native_owner = work / "evidence/guard/ownership.json"
-        native_clean = (
-            read(native_result).get("cleanup_proved") is True
-            if native_result.exists()
-            else not native_owner.exists()
-        )
-        if timer and cleanup["cleanup"] and native_clean:
-            stop = subprocess.run(
-                [
-                    "systemctl",
-                    "--user",
-                    "stop",
-                    timer + ".timer",
-                    timer + ".service",
-                ],
-                capture_output=True,
-                text=True,
-                check=False,
-                timeout=10,
+        try:
+            result["elapsed_seconds"] = time.monotonic() - started
+            cleanup = source_cleanup(work)
+            native_result = work / "evidence/guard/result.json"
+            native_owner = work / "evidence/guard/ownership.json"
+            native_clean = (
+                read(native_result).get("cleanup_proved") is True
+                if native_result.exists()
+                else not native_owner.exists()
             )
-            result["absolute_timer_stop"] = {
-                "returncode": stop.returncode,
-                "stdout": stop.stdout,
-                "stderr": stop.stderr,
-            }
-            if stop.returncode:
-                result["status"] = "FAIL"
-        elif timer:
-            result.update(status="FAIL", absolute_deadline_retained=True)
-        generated = work / "generated"
-        if result["status"] != "PASS" and generated.exists():
-            result["native_failure_records"] = preserve_native_failure(
-                generated, work / "evidence"
-            )
-        for name in ("x2-prepared.json", "x2-native-summary.json"):
-            if (generated / name).exists():
-                preserve_copy(generated / name, work / "evidence" / name)
-        model = generated / "native-x2/ZY/ZY.FCStd"
-        if result["status"] == "PASS" and stage == "native":
-            result["generated_model"] = preserve_copy(
-                model, work / "evidence/ZY-X2-Y.FCStd"
-            )
-        write(work / "evidence/assessment.json", result)
-        for sig, handler in old.items():
-            signal.signal(sig, handler)
+            if timer and cleanup["cleanup"] and native_clean:
+                cancellation = cancel_absolute_deadline(work, timer, lease)
+                result["absolute_timer_stop"] = cancellation
+                if not cancellation["proved"]:
+                    result["status"] = "FAIL"
+            elif timer:
+                result.update(status="FAIL", absolute_deadline_retained=True)
+            generated = work / "generated"
+            if result["status"] != "PASS" and generated.exists():
+                result["native_failure_records"] = preserve_native_failure(
+                    generated, work / "evidence"
+                )
+            for name in ("x2-prepared.json", "x2-native-summary.json"):
+                if (generated / name).exists():
+                    preserve_copy(generated / name, work / "evidence" / name)
+            model = generated / "native-x2/ZY/ZY.FCStd"
+            if result["status"] == "PASS" and stage == "native":
+                result["generated_model"] = preserve_copy(
+                    model, work / "evidence/ZY-X2-Y.FCStd"
+                )
+            write(work / "evidence/assessment.json", result)
+        finally:
+            try:
+                leases.close()
+            finally:
+                for sig, handler in old.items():
+                    signal.signal(sig, handler)
     return 0 if result["status"] == "PASS" else 1
 
 
