@@ -24,6 +24,9 @@ import validate_l1_gui_lifecycle_controls as diagnostic  # noqa: E402
 
 REPAIR_PATH = 'tracktemplate/adapters/freecad/chair_reference_preview.py'
 HISTORICAL_SOURCE = '37012966a66a5b827a01e97604d80a161bbeb2f3'
+HISTORICAL_GUARD_SHA256 = (
+    'b193209f0f21f28c3c17f9c52e509e31dccb32690152c02414769c0f6e49c559'
+)
 REPAIR = {
     'scope_id': 'L1-GUI-PREVIEW-ACTIVATION-001',
     'base_commit': 'ad554906172df31008d3a16672f392cdc6473325',
@@ -96,12 +99,27 @@ def historical_admission(root, command):
         patch.object(gui, 'validate_host', return_value={}),
         patch.object(gui, 'ROOT', root),
         patch.object(gui.native, 'command', new=command),
+        # The historical checkout retains its accepted guard. Do not bind
+        # this immutable fixture to the moving checkout's dependency pin.
+        patch.object(gui.original, 'GUARD_SHA256', HISTORICAL_GUARD_SHA256),
         patch.object(gui, 'write') as write,
     ):
         yield record, write
 
 
 class ProductRequalification(unittest.TestCase):
+    def test_guard_pins_match_current_and_exact_historical_sources(self):
+        current = gui.original.GUARD_SHA256
+        self.assertEqual(current, gui.digest(
+            ROOT / 'tools/freecad_validation_guard.py'))
+        with historical_source() as (root, command):
+            self.assertEqual(HISTORICAL_GUARD_SHA256, gui.digest(
+                root / 'tools/freecad_validation_guard.py'))
+            with historical_admission(root, command):
+                self.assertEqual(gui.original.GUARD_SHA256,
+                                 HISTORICAL_GUARD_SHA256)
+        self.assertEqual(gui.original.GUARD_SHA256, current)
+
     def test_ordinary_source_and_reviewed_repair_keep_stage_limits(self):
         gui.validate_authority(prior.authority(), prior.environment())
         for stage in ('readiness', 'gui'):
@@ -253,6 +271,24 @@ class ProductRequalification(unittest.TestCase):
                     ValueError, 'Product requalification changed other frozen '
                     'source',
                 ):
+                    gui.prepare(root / 'admission')
+                write.assert_not_called()
+
+    def test_prepare_rejects_changed_historical_guard_before_admission(self):
+        with historical_source() as (root, command):
+            guard = root / 'tools/freecad_validation_guard.py'
+            guard.write_text(guard.read_text() + '\n# Unreviewed guard change.\n')
+            command('git', 'add', '--', 'tools/freecad_validation_guard.py')
+            command('git', '-c', 'user.name=Admission fixture',
+                    '-c', 'user.email=fixture@example.invalid',
+                    '-c', 'commit.gpgsign=false',
+                    '-c', 'core.hooksPath=/dev/null', 'commit', '--quiet',
+                    '-m', 'Add guard mutation for admission rejection test')
+            with historical_admission(root, command) as (_, write):
+                # The caller's control hashes bind these changed bytes, but
+                # they cannot override the earlier frozen-source boundary.
+                with self.assertRaisesRegex(ValueError,
+                        'Product requalification changed other frozen source'):
                     gui.prepare(root / 'admission')
                 write.assert_not_called()
 
