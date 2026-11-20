@@ -382,6 +382,53 @@ def _tar(destination, contents):
     return {'bytes': destination.stat().st_size, 'sha256': digest(destination)}
 
 
+def acquisition_diagnostic():
+    """Preserve only admitted acquisition originals in a separate artifact.
+
+    Missing or unsafe originals remain explicit and are never reconstructed
+    or redacted. This artifact records failure, not readiness or cleanup.
+    It does not depend on either readiness archive or their collector.
+    """
+    root = scratch()
+    controls = seeded()
+    require(os.environ.get('L1_ACQUIRE') == 'failure',
+            'Failed acquisition required')
+    paths = {
+        'logs/acquire.log': root / 'compatibility-readiness-logs/acquire.log',
+        'original-diagnostics/acquire.txt': (
+            root / 'compatibility-readiness-private/acquire.txt'),
+    }
+    contents, originals = {}, {}
+    for name, path in paths.items():
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            originals[name] = {'status': 'MISSING'}
+            continue
+        try:
+            data = public_bytes(path)
+        except (OSError, ValueError):
+            originals[name] = {'status': 'WITHHELD'}
+            continue
+        contents[name] = data
+        originals[name] = {
+            'status': 'PRESERVED', 'bytes': len(data),
+            'sha256': hashlib.sha256(data).hexdigest(),
+        }
+    record = {
+        'schema_version': 1, 'status': 'FAIL',
+        'acquisition_outcome': 'failure',
+        'source_commit': os.environ['GITHUB_SHA'],
+        'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': 1,
+        'control_sha256': digest(controls / 'control.json'),
+        'originals': originals,
+    }
+    contents['transport/acquisition-failure.json'] = json.dumps(
+        record, sort_keys=True, indent=2).encode() + b'\n'
+    return _tar(root / 'compatibility-readiness-acquisition-failure.tar',
+                contents)
+
+
 def reseal_payload(work, controls):
     """Repeat the typed seal; an edited inventory alone is not evidence."""
     from tools import compatibility_evidence_output as output
@@ -664,8 +711,18 @@ def complete():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=(
-        'seed', 'acquire', 'finalize', 'archive', 'publish', 'complete'))
+        'seed', 'acquire', 'acquire-diagnostic', 'finalize', 'archive',
+        'publish', 'complete'))
     arguments = parser.parse_args(argv)
+    if arguments.stage == 'acquire-diagnostic':
+        try:
+            acquisition_diagnostic()
+        except (OSError, ValueError, KeyError, TypeError):
+            # Do not echo rejected bytes or depend on the failed collector.
+            print('COMPATIBILITY_READINESS_ACQUISITION_DIAGNOSTIC_REFUSED')
+            return 1
+        print('COMPATIBILITY_READINESS_ACQUISITION_DIAGNOSTIC_PRESERVED')
+        return 0
     try:
         result = globals()[arguments.stage]()
     except (OSError, ValueError, KeyError, TypeError):

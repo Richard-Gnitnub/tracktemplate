@@ -8,10 +8,11 @@ import json
 import linecache
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tarfile
 import traceback
-from contextlib import contextmanager, ExitStack
+from contextlib import contextmanager, ExitStack, redirect_stdout
 from types import CodeType, SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -307,6 +308,275 @@ class TransportTests(unittest.TestCase):
                 self.assertFalse((self.root / 'refused.FCStd').exists())
         with self.assertRaises(ValueError):
             transport.extract_base(archive, self.root / 'refused.FCStd')
+
+    def failed_acquisition(self):
+        """Inject a download refusal after real offline control admission."""
+        transport.seed()
+        controller = transport.readiness
+        with patch.object(controller, 'ROOT', self.fixture.source), \
+                patch.object(controller.pilot, '_command',
+                             side_effect=lambda *args: (
+                                 'a' * 40 if args == (
+                                     'git', 'rev-parse', 'HEAD') else '')):
+            controller.prepare(self.controls / 'control.json', self.controls)
+            save(self.work / 'evidence/installer-result.json', {
+                'status': 'PASS', 'cleanup': True})
+            logs = self.root / 'compatibility-readiness-logs'
+            logs.mkdir()
+            with (logs / 'acquire.log').open('w') as stream, \
+                    redirect_stdout(stream), hosted_tracebacks(), \
+                    patch.object(transport.native, 'download_asset',
+                                 side_effect=ValueError(
+                                     'Injected approved asset refusal')):
+                status = transport.main(['acquire'])
+        self.assertEqual(status, 1)
+        self.assertFalse((self.controls / 'acquisition.json').exists())
+        self.assertFalse((self.work / 'assessment-manifest.json').exists())
+        os.environ['L1_ACQUIRE'] = 'failure'
+        return {
+            'logs/acquire.log': (logs / 'acquire.log').read_bytes(),
+            'original-diagnostics/acquire.txt': (
+                self.root / 'compatibility-readiness-private/acquire.txt'
+            ).read_bytes(),
+        }
+
+    def test_acquisition_failure_survives_both_archive_failures(self):
+        originals = self.failed_acquisition()
+        # An unrelated collector refusal must not hide these closed originals.
+        (self.work / 'evidence/unlisted.txt').write_text('not approved')
+        with hosted_tracebacks(), redirect_stdout(io.StringIO()):
+            self.assertEqual(transport.main(['archive']), 1)
+            self.assertEqual(transport.main(['publish']), 1)
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (
+                'compatibility-readiness-' + kind + '.tar')).exists())
+        transport.acquisition_diagnostic()
+        artifact = self.root / 'compatibility-readiness-acquisition-failure.tar'
+        with tarfile.open(artifact) as bundle:
+            self.assertEqual(set(bundle.getnames()), {
+                *originals, 'transport/acquisition-failure.json'})
+            for name, raw in originals.items():
+                self.assertEqual(bundle.extractfile(name).read(), raw)
+            record = json.loads(bundle.extractfile(
+                'transport/acquisition-failure.json').read())
+        self.assertEqual(record['acquisition_outcome'], 'failure')
+        self.assertEqual(record['source_commit'], 'a' * 40)
+        self.assertEqual(record['run_id'], '123')
+        self.assertEqual(record['run_attempt'], 1)
+        for name, raw in originals.items():
+            self.assertEqual(record['originals'][name], {
+                'status': 'PRESERVED', 'bytes': len(raw),
+                'sha256': hashlib.sha256(raw).hexdigest()})
+        self.assertEqual(os.environ['L1_ACQUIRE'], 'failure')
+        self.assertFalse((self.root /
+                          'compatibility-readiness-completion.json').exists())
+
+    def diagnostic_input(self, raw=b'Original acquisition failure\n'):
+        """Admit controls and one closed synthetic log without acquisition."""
+        transport.seed()
+        os.environ['L1_ACQUIRE'] = 'failure'
+        path = self.root / 'compatibility-readiness-logs/acquire.log'
+        path.parent.mkdir()
+        path.write_bytes(raw)
+        return path
+
+    def diagnostic_members(self):
+        artifact = self.root / 'compatibility-readiness-acquisition-failure.tar'
+        with tarfile.open(artifact) as bundle:
+            members = {name: bundle.extractfile(name).read()
+                       for name in bundle.getnames()}
+        record = json.loads(members.pop('transport/acquisition-failure.json'))
+        self.assertEqual(record['status'], 'FAIL')
+        self.assertEqual(record['acquisition_outcome'], 'failure')
+        self.assertEqual(record['control_sha256'],
+                         transport.digest(self.controls / 'control.json'))
+        return artifact, members, record
+
+    def test_acquisition_second_command_failure_preserves_only_raw_log(self):
+        raw = (b'Traceback (most recent call last):\n'
+               b'  File "/home/runner/work/tracktemplate/tools/'
+               b'hosted_compatibility_readiness.py", line 1, in acquire\n'
+               b'ValueError: Injected assessment copy refusal\n')
+        path = self.diagnostic_input(raw)
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            self.assertEqual(transport.main(['acquire-diagnostic']), 0)
+        _, members, record = self.diagnostic_members()
+        self.assertEqual(members, {'logs/acquire.log': raw})
+        self.assertEqual(record['originals']['original-diagnostics/acquire.txt'],
+                         {'status': 'MISSING'})
+        self.assertEqual(record['originals']['logs/acquire.log'], {
+            'status': 'PRESERVED', 'bytes': len(raw),
+            'sha256': hashlib.sha256(raw).hexdigest()})
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(stdout.getvalue(),
+                         'COMPATIBILITY_READINESS_ACQUISITION_'
+                         'DIAGNOSTIC_PRESERVED\n')
+        self.assertNotIn('Injected assessment', stdout.getvalue())
+
+    def test_acquisition_unsafe_or_invalid_bytes_are_withheld_unchanged(self):
+        path = self.diagnostic_input()
+        cases = (b'/home/private-owner/operator.FCStd\n',
+                 b'Authorization: excluded-credential\n', b'\xff\x00')
+        for index, raw in enumerate(cases):
+            with self.subTest(index=index):
+                path.write_bytes(raw)
+                transport.acquisition_diagnostic()
+                artifact, members, record = self.diagnostic_members()
+                self.assertEqual(members, {})
+                self.assertEqual(record['originals'], {
+                    'logs/acquire.log': {'status': 'WITHHELD'},
+                    'original-diagnostics/acquire.txt': {'status': 'MISSING'},
+                })
+                self.assertNotIn(raw, artifact.read_bytes())
+                self.assertEqual(path.read_bytes(), raw)
+                artifact.rename(self.root / f'withheld-{index}.tar')
+
+    def test_acquisition_missing_originals_are_not_reconstructed(self):
+        path = self.diagnostic_input()
+        path.rename(path.with_name('retained-original.log'))
+        transport.acquisition_diagnostic()
+        _, members, record = self.diagnostic_members()
+        self.assertEqual(members, {})
+        self.assertEqual(record['originals'], {
+            'logs/acquire.log': {'status': 'MISSING'},
+            'original-diagnostics/acquire.txt': {'status': 'MISSING'},
+        })
+        self.assertFalse(path.exists())
+
+    def test_acquisition_link_and_foreign_owner_are_withheld(self):
+        path = self.diagnostic_input()
+        retained = path.with_name('retained-original.log')
+        path.rename(retained)
+        path.symlink_to(retained)
+        transport.acquisition_diagnostic()
+        artifact, members, record = self.diagnostic_members()
+        self.assertEqual(members, {})
+        self.assertEqual(record['originals']['logs/acquire.log'],
+                         {'status': 'WITHHELD'})
+        self.assertTrue(path.is_symlink())
+        self.assertEqual(retained.read_bytes(), b'Original acquisition failure\n')
+        artifact.rename(self.root / 'linked-original.tar')
+        # Keep the symlink as evidence; simulate ownership only on a fresh file.
+        path.rename(path.with_name('retained-link'))
+        path.write_bytes(b'Foreign-owned original\n')
+        original_stat = Path.stat
+
+        def foreign_stat(candidate, *args, **kwargs):
+            result = original_stat(candidate, *args, **kwargs)
+            if candidate == path:
+                fields = list(result)
+                fields[4] = os.getuid() + 1
+                return os.stat_result(fields)
+            return result
+
+        with patch.object(Path, 'stat', foreign_stat):
+            transport.acquisition_diagnostic()
+        _, members, record = self.diagnostic_members()
+        self.assertEqual(members, {})
+        self.assertEqual(record['originals']['logs/acquire.log'],
+                         {'status': 'WITHHELD'})
+        self.assertEqual(path.read_bytes(), b'Foreign-owned original\n')
+
+    def test_acquisition_oversize_original_is_withheld_without_truncation(self):
+        raw = b'x' * (transport.MAX_FILE + 1)
+        path = self.diagnostic_input(raw)
+        transport.acquisition_diagnostic()
+        artifact, members, record = self.diagnostic_members()
+        self.assertEqual(members, {})
+        self.assertEqual(record['originals']['logs/acquire.log'],
+                         {'status': 'WITHHELD'})
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertLess(artifact.stat().st_size, len(raw))
+
+    def test_acquisition_diagnostic_requires_failure_and_bound_source(self):
+        self.diagnostic_input()
+        artifact = self.root / 'compatibility-readiness-acquisition-failure.tar'
+        for outcome in ('success', 'skipped', 'cancelled', ''):
+            with self.subTest(outcome=outcome):
+                os.environ['L1_ACQUIRE'] = outcome
+                with redirect_stdout(io.StringIO()) as stdout:
+                    self.assertEqual(transport.main(['acquire-diagnostic']), 1)
+                self.assertEqual(stdout.getvalue(),
+                                 'COMPATIBILITY_READINESS_ACQUISITION_'
+                                 'DIAGNOSTIC_REFUSED\n')
+                self.assertFalse(artifact.exists())
+        os.environ['L1_ACQUIRE'] = 'failure'
+        source = self.fixture.source / transport.readiness.SUITE
+        source.write_text('changed after independent review')
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(transport.main(['acquire-diagnostic']), 1)
+        self.assertFalse(artifact.exists())
+
+    def test_acquisition_diagnostic_never_overwrites_existing_artifact(self):
+        path = self.diagnostic_input()
+        transport.acquisition_diagnostic()
+        artifact, _, _ = self.diagnostic_members()
+        original = artifact.read_bytes()
+        path.write_bytes(b'Changed later original\n')
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(transport.main(['acquire-diagnostic']), 1)
+        self.assertEqual(artifact.read_bytes(), original)
+        self.assertEqual(path.read_bytes(), b'Changed later original\n')
+
+    def test_acquisition_workflow_keeps_shell_failure_and_independent_upload(self):
+        workflow = (ROOT / '.github/workflows/native-geometry-pilot.yml').read_text()
+        job = workflow.split('  compatibility-readiness:\n', 1)[1].split(
+            '\n  compatibility-matrix:', 1)[0]
+        block = job.split('        id: acquire\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        commands = block.split('        run: |\n', 1)[1]
+        commands = '\n'.join(line[10:] for line in commands.splitlines())
+        stub = '''python3() {
+  if [[ "$1" == tools/compatibility_readiness_transport.py ]]; then
+    printf first > "$RUNNER_TEMP/first-ran"
+    printf 'FIRST_COMMAND_OUTPUT\\n'
+    return "$FIRST_EXIT"
+  fi
+  printf second > "$RUNNER_TEMP/second-ran"
+  printf 'SECOND_COMMAND_OUTPUT\\n'
+  return "$SECOND_EXIT"
+}
+'''
+        logs = self.root / 'compatibility-readiness-logs'
+        logs.mkdir()
+        for first, second, expected in ((17, 0, 17), (0, 23, 23)):
+            with self.subTest(first=first, second=second):
+                completed = subprocess.run(
+                    ['/bin/bash', '--noprofile', '--norc', '-e', '-o',
+                     'pipefail', '-c', stub + commands],
+                    env=dict(self.environment, FIRST_EXIT=str(first),
+                             SECOND_EXIT=str(second)),
+                    capture_output=True, check=False, timeout=5)
+                self.assertEqual(completed.returncode, expected)
+                self.assertEqual(completed.stdout, b'')
+                self.assertEqual(completed.stderr, b'')
+                self.assertTrue((self.root / 'first-ran').exists())
+                self.assertEqual((self.root / 'second-ran').exists(), first == 0)
+                expected_log = b'FIRST_COMMAND_OUTPUT\n'
+                if first == 0:
+                    expected_log += b'SECOND_COMMAND_OUTPUT\n'
+                self.assertEqual((logs / 'acquire.log').read_bytes(), expected_log)
+        capture = job.split('        id: acquire_diagnostic\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        upload = job.split('        id: acquire_diagnostic_upload\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertIn("if: always() && steps.acquire.outcome == 'failure'", capture)
+        self.assertIn('L1_ACQUIRE: ${{ steps.acquire.outcome }}', capture)
+        self.assertIn('compatibility_readiness_transport.py acquire-diagnostic',
+                      capture)
+        self.assertIn("if: always() && steps.acquire.outcome == 'failure' && "
+                      "steps.acquire_diagnostic.outcome == 'success'", upload)
+        self.assertIn('retention-days: 30', upload)
+        self.assertIn('if-no-files-found: error', upload)
+        self.assertIn('path: ${{ runner.temp }}/'
+                      'compatibility-readiness-acquisition-failure.tar', upload)
+        for step in (capture, upload):
+            self.assertNotIn('steps.archive', step)
+            self.assertNotIn('steps.publish', step)
+            self.assertNotIn('continue-on-error', step)
+        self.assertLess(job.index('id: acquire_diagnostic_upload'),
+                        job.index('id: archive\n'))
 
     def test_no_launch_failure_has_no_process_side_effect(self):
         self.outcome()

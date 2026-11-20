@@ -206,6 +206,27 @@ jobs:
             python3 tools/hosted_compatibility_readiness.py acquire --base "$RUNNER_TEMP/compatibility-readiness-control/base.FCStd"
           } > "$RUNNER_TEMP/compatibility-readiness-logs/acquire.log" 2>&1
 
+      - name: Capture permitted acquisition failure originals separately
+        id: acquire_diagnostic
+        if: always() && steps.acquire.outcome == 'failure'
+        timeout-minutes: 1
+        env:
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+        run: |
+          umask 077
+          python3 tools/compatibility_readiness_transport.py acquire-diagnostic
+
+      - name: Preserve acquisition failure evidence for 30 days
+        id: acquire_diagnostic_upload
+        if: always() && steps.acquire.outcome == 'failure' && steps.acquire_diagnostic.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-readiness-acquisition-failure-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-readiness-acquisition-failure.tar
+
       - name: Run the separate 90-second GUI readiness proof
         id: run
         timeout-minutes: 4
