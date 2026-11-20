@@ -503,14 +503,40 @@ class TransportTests(unittest.TestCase):
         original = (self.root / 'compatibility-matrix-primary.tar').read_bytes()
         (self.root / 'compatibility-matrix-primary-readback/'
          'compatibility-matrix-primary.tar').write_bytes(b'corrupt readback')
-        # Local traceback paths are intentionally not public. This differs
-        # from a hosted runner's neutral paths; retain the original refusal.
-        with self.assertRaisesRegex(ValueError, 'Private path'):
-            transport.publish()
+        diagnostic = 'ValueError: Artifact readback differs\n'
+        with patch.object(transport.traceback, 'format_exc',
+                          return_value=diagnostic):
+            result = transport.publish()
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertEqual(result['error'], 'primary-readback-unproved')
         self.assertEqual((self.root / 'compatibility-matrix-primary.tar').read_bytes(),
                          original)
-        self.assertIn(b'Artifact readback differs', (self.root /
-            'compatibility-matrix-private/publish-primary.txt').read_bytes())
+        self.assertEqual((self.root /
+            'compatibility-matrix-private/publish-primary.txt').read_bytes(),
+            diagnostic.encode())
+        with tarfile.open(self.root / 'compatibility-matrix-final.tar') as archive:
+            self.assertEqual(archive.extractfile(
+                'original-diagnostics/publish-primary.txt').read(),
+                diagnostic.encode())
+
+    def test_private_readback_failure_refuses_without_redaction(self):
+        self.prepare()
+        self.finalized(False)
+        transport.archive()
+        self.readback('primary')
+        original = (self.root / 'compatibility-matrix-primary.tar').read_bytes()
+        (self.root / 'compatibility-matrix-primary-readback/'
+         'compatibility-matrix-primary.tar').write_bytes(b'corrupt readback')
+        diagnostic = 'ValueError: /home/private-operator/document.FCStd\n'
+        with patch.object(transport.traceback, 'format_exc',
+                          return_value=diagnostic):
+            with self.assertRaisesRegex(ValueError, 'Private path'):
+                transport.publish()
+        self.assertEqual((self.root / 'compatibility-matrix-primary.tar').read_bytes(),
+                         original)
+        self.assertEqual((self.root /
+            'compatibility-matrix-private/publish-primary.txt').read_bytes(),
+            diagnostic.encode())
         self.assertFalse((self.root / 'compatibility-matrix-final.tar').exists())
 
     def test_raw_matrix_streams_are_original_bytes_in_fixed_instances(self):
