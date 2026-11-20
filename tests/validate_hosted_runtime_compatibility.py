@@ -631,20 +631,25 @@ class MatrixTests(unittest.TestCase):
                 'source_commit': matrix.READINESS_COMMIT,
                 'source_files': before}, pins, self.work)
 
-    def test_only_frozen_sibling_job_and_validator_preserve_readiness(self):
+    def test_frozen_derivatives_reject_current_repaired_readiness(self):
         before = dict(matrix.READINESS_SOURCE_FILES)
         self.assertEqual(set(before), set(matrix.readiness.CONTROL_FILES))
-        pins = {name: matrix.identity(ROOT / name)['sha256'] for name in before}
-        for name in set(before) - set(matrix.READINESS_DERIVATIVES):
-            self.assertEqual(pins[name], before[name])
+        receipt = {'source_commit': matrix.READINESS_COMMIT,
+                   'source_files': before}
+        current = {name: matrix.identity(ROOT / name)['sha256']
+                   for name in before}
+        with self.assertRaisesRegex(ValueError, 'Readiness source differs'):
+            matrix.verify_readiness_sources(receipt, current, self.work)
+        # Reconstruct the historical positive fixture independently of the
+        # later transport repair, which needs its own actual readiness proof.
+        pins = dict(before)
         for name, (original, successor) in matrix.READINESS_DERIVATIVES.items():
+            pins[name] = current[name]
             self.assertEqual(before[name], original)
             self.assertEqual(pins[name], successor)
             path = self.work / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes((ROOT / name).read_bytes())
-        receipt = {'source_commit': matrix.READINESS_COMMIT,
-                   'source_files': before}
         matrix.verify_readiness_sources(receipt, pins, self.work)
         with self.assertRaisesRegex(ValueError, 'Readiness source differs'):
             matrix.verify_readiness_sources(dict(receipt, source_commit='a' * 40),
