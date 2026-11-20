@@ -5056,3 +5056,46 @@ The file `owner-repair-instruction.json` has 1,356 bytes and SHA-256 `b15f392eca
 It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
 The file is in `tmp/runtime-compatibility-qualification/readiness-repair-20261120/` in the task worktree.
 The previous failure records and independent preservation stay in the [stop record](#runtime-compatibility-readiness-stop-panel).
+
+## New compatibility test stopped — 2026-11-20
+
+<a id="runtime-compatibility-fresh-readiness-stop-panel"></a>
+
+This Level 2 record reports a test result. It gives no new authority.
+
+| Item | Result |
+| --- | --- |
+| Current state | The D-P9-025 stop condition applies because mandatory evidence remains unavailable after the new `gui-readiness` test. The full host matrix did not start. |
+| What changed | [Run 44819325835](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44819325835) gives FAIL at commit `ceda757f084bd0d0229e8cff1afb0fe9b50bf4de`, with `attempt` set to `1`. |
+| What now works | [Standalone CI](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44814954553) gives PASS results for all 205 validators at that commit. Three tests in these validators did not run, as expected. This does not qualify the host profile. |
+| Limitations/findings | The `acquire`, `archive` and `publish` steps gave FAIL results. The `run` and `seal` steps did not run. GitHub reports `"artifacts": []`. |
+| Owner decision | The [D-P9-025 stop conditions](#runtime-compatibility-readiness-repair-panel) require an owner decision before further repair or another compatibility test. |
+| Next action | Preserve all available evidence and report the stop to the project owner. Do not repair, repeat the test or start the full host matrix without that decision. |
+
+The review lists 21 mandatory files that are missing from stages that started.
+Original diagnostic output from `acquire`, `archive` and `publish` is unavailable. Their causes are `CANNOT_VERIFY`.
+The final transfer failed because `compatibility-readiness-final.tar` was absent.
+The cleanup step reports `success`, but its original records are missing. This step status does not prove cleanup or resource use within limits.
+
+**Independent review:** `/root/assessment_prepare` reports `STOP_MISSING_MANDATORY_EVIDENCE_AFTER_FRESH_READINESS`.
+That reviewer wrote the software that transfers evidence. `/root/producer_review` separately examined the cause and stop condition.
+The second reviewer wrote unchanged software for the GUI test. These result reviews do not accept either reviewer's own software.
+Both reviewers share the task worktree.
+
+**Independent preservation:** The approved USB holds all available original evidence and both reviews.
+The new snapshot, `fresh-readiness-44819325835`, contains 22 files with 321,156 bytes, plus its manifest.
+An independent reviewer compared the file set, bytes, hashes, types and modes. These checks gave PASS results.
+The missing evidence remains unavailable. This bounded preservation does not complete the monthly restore test.
+
+The [previous test](#runtime-compatibility-readiness-stop-panel) stays FAIL. The previous repair records and `2/2` record stay unchanged.
+The owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval."
+Phase 9B stays `Open` at 3/6. No phase exit, risk status, rights state or product performance status changes.
+
+**Proof/provenance:** Records are in `tmp/runtime-compatibility-qualification/readiness-repair-20261120/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `fresh-readiness-44819325835/actual-independent-review.json` | `00d03e6fc8ed140ad8410d5cb812a029cb96e210e8d7c8039f97afe7106cfd63` |
+| `fresh-readiness-44819325835-cause-stop-independent-review.json` | `2b37540ed0599d357ec43b87b04d82d13be52c518d6a670cb0d0c24bc1216bfd` |
+| `fresh-readiness-stop-preservation-manifest.json` | `90b41a17fb0a111297221995b1345c3353d1394d493607d7c97701bc6ca6948b` |
+| `fresh-readiness-stop-independent-preservation-readback.json` | `1b88f1189ebebe2b85749c158990fbd9e2d34fb334b1c75c6292033b15e7f7d6` |
