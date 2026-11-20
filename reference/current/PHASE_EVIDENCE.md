@@ -4941,41 +4941,42 @@ It preserves the owner's instruction that `/root` supplied. It supplies no API e
 The previous authority for the "bounded runtime-compatibility qualification" and D-P9-023 stay the same.
 The review receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
 
-## Compatibility test stop — 2026-11-20
+## Compatibility tests stopped — 2026-11-20
 
 <a id="runtime-compatibility-readiness-stop-panel"></a>
 
 This Level 2 record reports a test result. It gives no new authority.
 
-| Field | Result |
+| Item | Result |
 | --- | --- |
-| Current state | Compatibility qualification stopped because mandatory evidence is missing. The full host matrix did not start. |
-| What changed | The [first compatibility test on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44783029665) has a FAIL result. It used commit `33d76895d236cded67c302c0b48faebf26c9d238`, attempt 1. |
-| What now works | The [standalone CI test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44779702342) at that commit gives PASS results for all 201 validators. This does not qualify the host. |
-| Limitations/findings | The `seal`, `archive` and `publish` operations failed. GitHub reports no artifact. The original diagnostic from `seal` is unavailable. Its cause stays unresolved. |
-| Owner decision | [D-P9-024](#runtime-compatibility-standing-instruction-panel) requires an owner decision at a repository stop condition. No subsequent decision is recorded. |
-| Next action | Preserve the available evidence and stopped drafts. Return the missing-evidence condition to the owner. Do not start another compatibility test or the full host matrix. |
+| Current state | The "bounded runtime-compatibility qualification" stopped because mandatory evidence is missing. The full host matrix did not start. |
+| What changed | The [first compatibility test on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44783029665) has a FAIL result. It used commit `33d76895d236cded67c302c0b48faebf26c9d238`, with `attempt` set to `1`. |
+| What now works | The [CI test with standalone Python](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44779702342) at that commit gives PASS results for all 201 validators. This does not qualify the host profile. |
+| Limitations/findings | The `seal`, `archive` and `publish` operations gave FAIL results. GitHub reports `"artifacts": []`. The initial diagnostic from `seal` is not available. The cause of the `seal` result is not known. |
+| Owner decision | [D-P9-024](#runtime-compatibility-standing-instruction-panel) makes a decision from the project owner necessary at a "repository stop condition". There is no new decision from the project owner in the decision register. |
+| Next action | Preserve the available evidence and source files for the stopped work. Report the missing evidence to the project owner. Do not start a new compatibility test or the full host matrix. |
 
-The execution and cleanup steps reported success. Their step status does not prove the missing runtime, resource or cleanup results.
-The original image, result records and diagnostics from the runner are unavailable for independent review.
-The [validation instructions](../VALIDATION.md#validation-harness-readiness) require a stop before the full test when necessary evidence is incomplete.
-No retry occurred.
+The `run` and cleanup steps reported `success`. Their step status does not supply the mandatory host profile and cleanup results or measured values against the specified limits.
+The file `readiness-source.png`, result records and diagnostics from the test on GitHub are not available with their initial bytes for independent review.
+The [validation instructions](../VALIDATION.md#validation-harness-readiness) make complete evidence necessary before the full test starts.
+The test did not start again.
 
 **Independent review:** `/root/assessment_prepare` gives `NOT_READY_MISSING_MANDATORY_EVIDENCE`.
-The reviewer did not author the test controller or suite. The reviewer authored the software that transfers the evidence.
-This authorship limits independence for review of that software.
-The implementing agent and reviewers share the workspace.
+The reviewer did not write `tools/hosted_compatibility_readiness.py` or `tests/hosted_compatibility_readiness_suite.py`. The reviewer wrote `tools/compatibility_readiness_transport.py`, which moves the evidence.
+This is not an independent review of that software.
+The implementing agent and reviewers use the same workspace.
 
-`/root/producer_review` reproduced a separate defect in a test without FreeCAD.
-The software that transfers evidence can reject its own failure diagnostic.
-This finding does not establish the cause of the actual `seal` failure. No repair of this failure occurred.
+`/root/producer_review` did a test without FreeCAD and found a different problem.
+The software that moves evidence can reject its own diagnostic for a FAIL result.
+This finding does not show the cause of the `seal` FAIL result. No repair for that FAIL result occurred.
 
-**Preservation:** The USB snapshot `runtime-compatibility-readiness-stop-20261120` contains the available logs, metadata, reviews and stopped source drafts.
-It contains 1,781 files. Its manifest has SHA-256 `97b25460227bc6e509200a7c50e9e9deea471fa9a885246539ba3702a961a5e3`.
-Independent readback verifies the exact file set, bytes, hashes and access modes.
-It does not contain the unavailable runner evidence. The previous repair records remain preserved.
+**Independent preservation:** The snapshot `runtime-compatibility-readiness-stop-20261120` contains the available command output, metadata, reviews and source files for the stopped work.
+It contains 1,781 files plus its manifest. The manifest has SHA-256 `97b25460227bc6e509200a7c50e9e9deea471fa9a885246539ba3702a961a5e3`.
 
-**Proof/provenance:** Records are under `tmp/runtime-compatibility-qualification/autonomous-qualification-20261120/readiness-33d/` in the task worktree.
+The independent reviewer compared the file set, bytes, hashes and file modes in the snapshot with the manifest. These checks gave a PASS result.
+It does not contain the missing evidence from the test on GitHub. The previous repair records stay preserved.
+
+**Proof/provenance:** Records are in `tmp/runtime-compatibility-qualification/autonomous-qualification-20261120/readiness-33d/` in the task worktree.
 
 | Record | SHA-256 |
 | --- | --- |
@@ -4986,6 +4987,6 @@ It does not contain the unavailable runner evidence. The previous repair records
 | `actual-failure-source-audit-01.json` | `5718afd30840632d580a50b0b31d90b89826c7834b822178ebfb8ccea7e7e215` |
 | `stop-preservation-independent-review.json` | `69c88e6c58df464df918c1bb92fcd8c9f32c89ff9fc571b2f9a73badb2ba0bec` |
 
-The full producer review remains incomplete. The stopped drafts are not accepted qualification software.
-Runtime admission and ZY resumption remain blocked. Phase 9B stays Open at 3/6.
-No phase exit, risk, rights or performance status changes.
+Independent review of all source files for the full host matrix is not complete. Those files do not have acceptance for the full host matrix.
+The project owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval." Phase 9B stays `Open` at 3/6.
+The phase exit and risk status, rights state, and product performance status stay the same.
