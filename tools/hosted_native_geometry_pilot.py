@@ -33,7 +33,7 @@ TEST_SHA256 = (
     "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"
 )
 GUARD_SHA256 = (
-    "b193209f0f21f28c3c17f9c52e509e31dccb32690152c02414769c0f6e49c559"
+    "1c8c68350f82133d282e5a79914e44be8b6a5dbf564f7f261448e0e9c66b41f2"
 )
 GEOMETRY_SENTINEL = (
     "Phase 6 transition transient exact geometry validation passed"

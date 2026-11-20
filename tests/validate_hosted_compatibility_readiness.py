@@ -4,6 +4,7 @@
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -11,7 +12,7 @@ import sys
 import tempfile
 from types import ModuleType, SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -213,7 +214,145 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(clean['PYTHONDONTWRITEBYTECODE'], '1')
 
 
+class BridgeAcquisitionTests(unittest.TestCase):
+    def test_checkout_gate_requires_original_count_and_success(self):
+        cases = ((0, b''), (1, b'22 bridge tests passed\n'),
+                 (0, b'22 bridge tests passed\n' * 2))
+        for code, output in cases:
+            with self.subTest(code=code, output=output), \
+                    tempfile.TemporaryDirectory() as directory, \
+                    patch.object(controller.time, 'monotonic', return_value=1), \
+                    patch.object(controller.subprocess, 'run', return_value=(
+                        SimpleNamespace(returncode=code, stdout=output,
+                                        stderr=b'original diagnostic'))), \
+                    patch.object(controller.sys, 'stdout',
+                                 SimpleNamespace(buffer=io.BytesIO())) as out, \
+                    patch.object(controller.sys, 'stderr',
+                                 SimpleNamespace(buffer=io.BytesIO())) as err:
+                root = Path(directory)
+                with self.assertRaisesRegex(ValueError, 'bridge tests failed'):
+                    controller.bridge_checkout_tests(
+                        root, root / 'checkout', root / 'wheel', {}, 20)
+                self.assertEqual(out.buffer.getvalue(), output)
+                self.assertEqual(err.buffer.getvalue(), b'original diagnostic')
+
+    def test_checkout_timeout_preserves_original_partial_output(self):
+        failure = controller.subprocess.TimeoutExpired(
+            ['bridge-tests'], 9, output=b'partial stdout', stderr=b'partial stderr')
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(controller.time, 'monotonic', return_value=1), \
+                patch.object(controller.subprocess, 'run', side_effect=failure), \
+                patch.object(controller.sys, 'stdout',
+                             SimpleNamespace(buffer=io.BytesIO())) as out, \
+                patch.object(controller.sys, 'stderr',
+                             SimpleNamespace(buffer=io.BytesIO())) as err:
+            root = Path(directory)
+            with self.assertRaises(controller.subprocess.TimeoutExpired) as raised:
+                controller.bridge_checkout_tests(
+                    root, root / 'checkout', root / 'wheel', {}, 10)
+            self.assertIs(raised.exception, failure)
+            self.assertEqual(out.buffer.getvalue(), b'partial stdout')
+            self.assertEqual(err.buffer.getvalue(), b'partial stderr')
+
+    def test_expired_allowance_never_starts_acquisition(self):
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(controller.time, 'monotonic', return_value=100), \
+                patch.object(controller.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'deadline expired'):
+                controller.acquire_bridge(Path(directory), 90)
+            run.assert_not_called()
+
+    def test_changed_wheel_refuses_before_staging(self):
+        from tools import compatibility_gui_bridge as bridge
+
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = b'changed'
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(controller.time, 'monotonic', return_value=100), \
+                patch.object(controller.subprocess, 'run', return_value=(
+                    SimpleNamespace(returncode=0, stdout='', stderr=''))), \
+                patch.object(controller.urllib.request, 'urlopen',
+                             return_value=response), \
+                patch.object(bridge, 'prepare_bridge') as prepare:
+            with self.assertRaisesRegex(ValueError, 'Click wheel differs'):
+                controller.acquire_bridge(Path(directory), 540)
+            prepare.assert_not_called()
+
+    def test_acquisition_excludes_credentials_and_keeps_original_allowance(self):
+        from tools import compatibility_gui_bridge as bridge
+
+        content = b'x' * 97909
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = content
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.dict(os.environ, {'GITHUB_TOKEN': 'not-for-child'}), \
+                patch.object(controller.time, 'monotonic', return_value=530), \
+                patch.object(controller, 'CLICK_SHA256',
+                             hashlib.sha256(content).hexdigest()), \
+                patch.object(controller.subprocess, 'run', return_value=(
+                    SimpleNamespace(returncode=0,
+                                    stdout=b'22 bridge tests passed\n',
+                                    stderr=b''))) as run, \
+                patch.object(controller.urllib.request, 'urlopen',
+                             return_value=response) as download, \
+                patch.object(bridge, 'prepare_bridge',
+                             return_value={'status': 'verified'}) as prepare:
+            root = Path(directory)
+            controller.acquire_bridge(root, 540)
+            self.assertEqual(run.call_count, 5)
+            for call in run.call_args_list:
+                self.assertEqual(call.kwargs['timeout'], 10)
+                self.assertNotIn('GITHUB_TOKEN', call.kwargs['env'])
+                self.assertEqual(call.kwargs['env']['GIT_TERMINAL_PROMPT'], '0')
+            for call in run.call_args_list[:4]:
+                self.assertNotIn('capture_output', call.kwargs)
+            self.assertEqual(download.call_args.kwargs['timeout'], 10)
+            self.assertEqual(prepare.call_args.kwargs['click_wheel'].read_bytes(),
+                             content)
+            self.assertTrue((root / 'bridge-preparation.json').is_file())
+            self.assertFalse((root / 'evidence').exists())
+
+
 class SuiteTests(unittest.TestCase):
+    def test_bridge_child_finishes_before_document_proof(self):
+        callbacks, calls = [], []
+        child = SimpleNamespace(returncode=None)
+        child.poll = lambda: child.returncode
+        gui = ModuleType('FreeCADGui')
+        gui.getMainWindow = lambda: SimpleNamespace(
+            close=lambda: calls.append('close'))
+        side = ModuleType('PySide6')
+        side.QtCore = SimpleNamespace(QTimer=SimpleNamespace(
+            singleShot=lambda _, callback: callbacks.append(callback)))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            receipt = root / 'bridge-readiness.json'
+            config = root / 'config.json'
+            save(config, {
+                'entry_sha256': controller.digest(Path(suite.__file__)),
+                'output_root': str(root / 'payload'),
+                'bridge_receipt': str(receipt),
+            })
+            with patch.dict(sys.modules, {
+                'FreeCADGui': gui, 'PySide6': side,
+            }), patch.dict(os.environ, {
+                'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ATTEMPT': '1',
+            }), patch.object(suite, '_begin_bridge', return_value=child), \
+                    patch.object(suite, '_run',
+                                 side_effect=lambda _: calls.append('proof')):
+                suite.start(config, controller.digest(config),
+                            launcher_name='__main__')
+                callbacks.pop(0)()
+                self.assertEqual(calls, [])
+                child.returncode = 0
+                save(receipt, {
+                    'status': 'PASS', 'sentinel': (
+                        'TRACKTEMPLATE_COMPATIBILITY_BRIDGE_READINESS_PASS'),
+                })
+                callbacks.pop(0)()
+                self.assertEqual(calls, ['proof', 'close'])
+                self.assertEqual(callbacks, [])
+
     def test_import_starts_no_freecad_or_qt(self):
         self.assertNotIn('FreeCAD', suite.__dict__)
         self.assertNotIn('PySide6', suite.__dict__)
@@ -252,12 +391,20 @@ class SuiteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             config = root / 'config.json'
+            bridge_receipt = root / 'bridge-readiness.json'
+            save(bridge_receipt, {
+                'status': 'PASS',
+                'sentinel': 'TRACKTEMPLATE_COMPATIBILITY_BRIDGE_READINESS_PASS',
+            })
             save(config, {'entry_sha256': controller.digest(Path(suite.__file__)),
-                          'output_root': str(root / 'payload')})
+                          'output_root': str(root / 'payload'),
+                          'bridge_receipt': str(bridge_receipt)})
             with patch.dict(sys.modules, {'FreeCADGui': gui, 'PySide6': side}), \
                     patch.dict(os.environ, {
                         'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ATTEMPT': '1'}), \
                     patch.object(suite, '_run', side_effect=AssertionError('fixed')), \
+                    patch.object(suite, '_begin_bridge', return_value=(
+                        SimpleNamespace(poll=lambda: 0, returncode=0))), \
                     patch('sys.stderr'):
                 suite.start(config, controller.digest(config), launcher_name='__main__')
             raw = (root / 'payload/gui/readiness/failure.txt').read_text()

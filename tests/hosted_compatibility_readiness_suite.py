@@ -1,12 +1,14 @@
 """Import-safe source-copy readiness for the isolated candidate runtime."""
 
 import hashlib
+import importlib.util
 import linecache
 import json
 import os
 from pathlib import Path
 import shutil
 import sys
+import time
 import traceback
 import types
 
@@ -159,11 +161,31 @@ def start(config_path, config_sha256, *, launcher_name):
         'launcher_name': launcher_name, 'suite_name': __name__,
         'entry_sha256': config['entry_sha256'],
     }, sort_keys=True), flush=True)
+    probe = None
+    # The guard's 90-second allowance starts before this macro. This local
+    # deadline can only stop the client sooner; it cannot extend the guard.
+    probe_deadline = time.monotonic() + 80
 
     def execute():
+        nonlocal probe
+        finished = False
         try:
+            if probe is None:
+                probe = _begin_bridge(config, probe_deadline)
+            if probe.poll() is None:
+                assert time.monotonic() < probe_deadline
+                QtCore.QTimer.singleShot(50, execute)
+                return
+            assert probe.returncode == 0
+            bridge_record = json.loads(
+                Path(config['bridge_receipt']).read_text())
+            assert bridge_record['status'] == 'PASS'
+            assert bridge_record['sentinel'] == (
+                'TRACKTEMPLATE_COMPATIBILITY_BRIDGE_READINESS_PASS')
             _run(config)
+            finished = True
         except BaseException as error:
+            finished = True
             # Retain original bytes; publication may refuse unsafe diagnostics.
             target = Path(config['output_root']) / 'gui/readiness'
             target.mkdir(parents=True, exist_ok=True)
@@ -191,6 +213,21 @@ def start(config_path, config_sha256, *, launcher_name):
             _write(Path(config['output_root']).parent /
                    'readiness-observation.json', observation)
         finally:
-            gui.getMainWindow().close()
+            if finished:
+                if probe is not None and probe.poll() is None:
+                    probe.terminate()
+                gui.getMainWindow().close()
 
     QtCore.QTimer.singleShot(0, execute)
+
+
+def _begin_bridge(config, deadline):
+    """Start the fixed client as a child of the contained GUI process."""
+    path = Path(config['bridge_adapter'])
+    assert digest(path) == config['bridge_adapter_sha256']
+    spec = importlib.util.spec_from_file_location('readiness_bridge', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.launch_readiness_probe(
+        Path(config['bridge_root']), Path(config['bridge_receipt']),
+        deadline=deadline, guard_evidence=Path(config['guard_evidence']))

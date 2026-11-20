@@ -14,8 +14,10 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 import time
+import urllib.request
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +76,21 @@ CONTROL_FILES = (
     'tools/compatibility_readiness_transport.py',
     'tests/validate_compatibility_readiness_transport.py',
     '.github/workflows/native-geometry-pilot.yml',
+    'tools/compatibility_gui_bridge.py',
+    'tests/validate_compatibility_gui_bridge.py',
+    'tools/development_toolchain_preflight.py',
+    'tools/freecad_bridge/freecad-cli-tracktemplate.patch',
+    'tools/freecad_bridge/test_freecad_cli_checkout.py',
+    'tests/validate_bounded_freecad.py',
+    'tests/validate_hosted_native_geometry.py',
+)
+CLICK_URL = (
+    'https://files.pythonhosted.org/packages/1a/70/'
+    'e63223f8116931d365993d4a6b7ef653a4d920b41d03de7c59499962821f/'
+    'click-8.1.6-py3-none-any.whl'
+)
+CLICK_SHA256 = (
+    'fa244bb30b3b5ee2cae3da8f55c9e5e0c0e86093306301fb418eb9dc40fbded5'
 )
 
 
@@ -262,6 +279,7 @@ def installer_source(source):
 def install(work):
     """Run the source-bound installer inside its 540-second outer allowance."""
     prerequisites(work)
+    deadline = time.monotonic() + 540
     path = ROOT / 'tools/hosted_l1_gui_install.py'
     original = path.read_text()
     adapted = installer_source(original)
@@ -278,7 +296,99 @@ def install(work):
     spec = importlib.util.spec_from_file_location('readiness_installer', target)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.run(work)
+    result = module.run(work)
+    if result == 0:
+        acquire_bridge(work, deadline)
+    return result
+
+
+def acquire_bridge(work, deadline):
+    """Acquire the existing pinned bridge within the installation allowance."""
+    from tools import compatibility_gui_bridge as bridge
+
+    def remaining():
+        value = deadline - time.monotonic()
+        require(value > 0, 'Bridge acquisition deadline expired')
+        return value
+
+    source = work / 'bridge-source'
+    source.mkdir(mode=0o700)
+    private_home = work / 'bridge-acquisition-home'
+    private_home.mkdir(mode=0o700)
+    clean = dict(bridge.BASE_ENV, HOME=str(private_home),
+                 GIT_CONFIG_NOSYSTEM='1', GIT_TERMINAL_PROMPT='0')
+    patch_path = ROOT / 'tools/freecad_bridge/freecad-cli-tracktemplate.patch'
+    require(digest(patch_path) == bridge.PATCH_SHA256,
+            'Bridge acquisition patch differs')
+    commands = (
+        ['init', str(source)],
+        ['-C', str(source), 'fetch', '--depth=1', '--no-tags',
+         'https://github.com/yoshikouki/freecad-cli.git',
+         bridge.UPSTREAM_COMMIT],
+        ['-C', str(source), 'checkout', '--detach', 'FETCH_HEAD'],
+        ['-C', str(source), 'apply', str(patch_path)],
+    )
+    for command in commands:
+        # Original diagnostics enter the existing, captured install streams.
+        result = subprocess.run(
+            ['/usr/bin/git', *command], env=clean,
+            timeout=min(30, remaining()), check=False)
+        require(result.returncode == 0, 'Pinned bridge acquisition failed')
+        remaining()
+    wheel = work / 'click-8.1.6-py3-none-any.whl'
+    with urllib.request.urlopen(CLICK_URL, timeout=min(15, remaining())) as response:
+        content = response.read(97910)
+    require(len(content) == 97909
+            and hashlib.sha256(content).hexdigest() == CLICK_SHA256,
+            'Pinned Click wheel differs')
+    with wheel.open('xb') as stream:
+        stream.write(content)
+    remaining()
+    receipt = bridge.prepare_bridge(source, work / 'bridge', click_wheel=wheel)
+    remaining()
+    receipt['checkout_tests'] = bridge_checkout_tests(
+        work, source, wheel, clean, deadline)
+    write(work / 'bridge-preparation.json', receipt)
+
+
+def bridge_checkout_tests(work, checkout, wheel, clean, deadline):
+    """Run the existing 22 assertions with exact hosted path bindings."""
+    original_path = ROOT / 'tools/freecad_bridge/test_freecad_cli_checkout.py'
+    source = original_path.read_text()
+    substitutions = (
+        ('TOOL_ROOT = PROJECT_ROOT / ".devtools" / "freecad-cli"',
+         'TOOL_ROOT = pathlib.Path(' + repr(str(checkout)) + ')'),
+        ('"/usr/lib/python3/dist-packages"', repr(str(wheel))),
+    )
+    for before, after in substitutions:
+        require(source.count(before) == 1, 'Bridge test source differs')
+        source = source.replace(before, after, 1)
+    copied = work / 'bridge-checkout-tests.py'
+    with copied.open('x') as stream:
+        stream.write(source)
+    remaining = deadline - time.monotonic()
+    require(remaining > 0, 'Bridge acquisition deadline expired')
+
+    def preserve(stdout, stderr):
+        for stream, value in ((sys.stdout, stdout), (sys.stderr, stderr)):
+            if value:
+                stream.buffer.write(value)
+                stream.buffer.flush()
+
+    try:
+        result = subprocess.run(
+            ['/usr/bin/python3', '-I', '-S', '-B', str(copied)], env=clean,
+            capture_output=True, timeout=min(30, remaining), check=False)
+    except subprocess.TimeoutExpired as error:
+        preserve(error.stdout, error.stderr)
+        raise
+    preserve(result.stdout, result.stderr)
+    require(result.returncode == 0 and result.stdout.splitlines().count(
+        b'22 bridge tests passed') == 1, 'Existing bridge tests failed')
+    require(time.monotonic() < deadline, 'Bridge acquisition deadline expired')
+    return {'status': 'PASS', 'count': 22,
+            'original_sha256': digest(original_path),
+            'copy_sha256': digest(copied)}
 
 
 def acquire(work, base_fixture):
@@ -334,6 +444,7 @@ def child_environment(work):
 def run(work):
     """Run one source-copy GUI proof with unchanged guard/display controls."""
     from tools.prepare_runtime_assessment import verify_assessment
+    from tools import compatibility_gui_bridge as bridge
 
     control, _ = prerequisites(work)
     manifest = json.loads(regular(work / 'assessment-manifest.json').read_text())
@@ -342,6 +453,7 @@ def run(work):
     require(memory['MemAvailable'] >= (4096 + 256 + 8192) * 1024**2,
             'FreeCAD, display and reserve exceed available memory')
     deployment = candidate_deployment()
+    bridge.verify_bridge(work / 'bridge')
     write(work / 'evidence/deployment.json', deployment)
     output = work / 'payload'
     output.mkdir(mode=0o700)
@@ -352,6 +464,12 @@ def run(work):
         'output_root': str(output), 'source_commit': control['source_commit'],
         'entry_sha256': digest(ROOT / SUITE),
         'app_commit': APP_COMMIT, 'runtime_commit': RUNTIME_COMMIT,
+        'bridge_root': str(work / 'bridge'),
+        'bridge_adapter': str(ROOT / 'tools/compatibility_gui_bridge.py'),
+        'bridge_adapter_sha256': digest(
+            ROOT / 'tools/compatibility_gui_bridge.py'),
+        'guard_evidence': str(work / 'evidence/guard'),
+        'bridge_receipt': str(work / 'bridge-readiness.json'),
     }
     write(work / 'suite-config.json', config)
     macro = work / 'readiness-entry.FCMacro'
@@ -415,12 +533,9 @@ def run(work):
 
         observe()
         clean = child_environment(work)
-        passed = tuple(name for name in clean if name not in (
-            'PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'XDG_RUNTIME_DIR',
-            'DBUS_SESSION_BUS_ADDRESS'))
-        argv = ['flatpak', 'run', '--command=FreeCAD']
-        argv.extend(f'--env={name}={clean[name]}' for name in passed)
-        argv.extend([guard.APP_ID, str(macro)])
+        argv, clean = bridge.session_command(
+            work / 'bridge', work / 'assessment', clean,
+            execution_seconds=LIMITS.timeout_seconds, macro=macro)
         result = guard.run_guarded_flatpak(
             argv, limits=LIMITS, evidence_dir=work / 'evidence/guard',
             lease=lease, context=guard.GuardContext(sleep=sleep),
@@ -454,6 +569,11 @@ def run(work):
                 'Readiness sentinel missing or repeated')
         raw = json.loads((work / 'readiness-observation.json').read_text())
         require(raw.get('status') == 'PASS', 'GUI readiness failed')
+        bridge_record = json.loads(regular(
+            work / 'bridge-readiness.json').read_text())
+        require(bridge_record.get('status') == 'PASS'
+                and bridge_record.get('sentinel') == bridge.SENTINEL,
+                'Bridge readiness failed')
         verify_assessment(work / 'assessment', manifest)
         require(digest(ROOT / 'reference/contracts/'
                        'phase1-compatibility.json') == DEFAULT_SHA256,
@@ -463,7 +583,9 @@ def run(work):
             'Guard resources and runtime observation only. Separate GUI '
             'readiness opens and closes one approved synthetic base copy.')
         assessment.update(status='PASS', resource_assessment=resources,
-                          sentinel=SENTINEL)
+                          sentinel=SENTINEL, bridge=bridge_record)
+        assessment['bridge_checkout_tests'] = json.loads(regular(
+            work / 'bridge-preparation.json').read_text())['checkout_tests']
     finally:
         cleanup = gui.display_cleanup(work)
         ownership.close()
