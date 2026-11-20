@@ -44,7 +44,7 @@ LOGS = ('seed', 'prepare', 'install', 'acquire', 'run', 'seal', 'finalize',
         'archive', 'publish', 'complete')
 FAILURES = ('seed', 'acquire', 'finalize', 'archive', 'publish', 'complete',
             'finalize-installer', 'finalize-runtime', 'finalize-display',
-            'publish-primary')
+            'archive-payload', 'publish-primary')
 EVIDENCE = frozenset({
     'deployment.json', 'macro.json', 'readiness-assessment.json',
     'clearance.json', 'deadline-clearance.json', 'host.jsonl',
@@ -67,6 +67,14 @@ WORK_RECORDS = ('control.json', 'preparation.json', 'base-binding.json',
                 'readiness-payload-inventory.json')
 MAX_FILE = 8 * 1024**2
 MAX_ARCHIVE = 64 * 1024**2
+# Keep refusal traceback source lines free of the patterns they test. The
+# scanner still rejects the same bytes; original tracebacks are never edited.
+PRIVATE_PATH = re.compile(
+    r'/home/(?!runner(?:/|\b))[A-Za-z0-9_.-]+|/Users/|/root/')
+CREDENTIAL = re.compile(
+    r'(?i)authorization\s*[:=]|bearer\s+[A-Za-z0-9]|'
+    r'gh[pousr]_[A-Za-z0-9]{10}|github_pat_|BEGIN [A-Z ]*PRIVATE KEY|'
+    r'X-Amz-(?:Credential|Signature)|[?&](?:sig|token|signature)=')
 
 
 def strict_json(raw):
@@ -318,13 +326,10 @@ def public_bytes(path):
     require(path.stat().st_size <= MAX_FILE, 'Operational file too large')
     content = path.read_bytes()
     text = content.decode('utf-8')
-    require(not re.search(r'/home/(?!runner(?:/|\b))[A-Za-z0-9_.-]+|/Users/|/root/', text),
+    require(not PRIVATE_PATH.search(text),
             'Private path in operational evidence')
-    require(not re.search(
-        r'(?i)authorization\s*[:=]|bearer\s+[A-Za-z0-9]|'
-        r'gh[pousr]_[A-Za-z0-9]{10}|github_pat_|BEGIN [A-Z ]*PRIVATE KEY|'
-        r'X-Amz-(?:Credential|Signature)|[?&](?:sig|token|signature)=', text),
-        'Credential-like operational evidence')
+    require(not CREDENTIAL.search(text),
+            'Credential-like operational evidence')
     return content
 
 
@@ -411,12 +416,18 @@ def reseal_payload(work, controls):
     return inventory, assessment['status']
 
 
-def archive():
-    root = scratch()
-    work = readiness.workspace(os.environ)
+def _operational_contents(root, work, *, through_archive=False):
+    """Collect the same admitted originals for primary and final transport.
+
+    Payload validation is separate. A failed typed seal must not prevent
+    preservation of its original traceback or existing resource evidence.
+    Active logs stay excluded. Every included original is byte-exact.
+    """
     finalization = root / 'compatibility-readiness-finalization.json'
-    summary = strict_json(regular(finalization).read_bytes())
-    contents = {'transport/finalization.json': public_bytes(finalization)}
+    contents, summary = {}, {}
+    if finalization.exists():
+        summary = strict_json(regular(finalization).read_bytes())
+        contents['transport/finalization.json'] = public_bytes(finalization)
     seed_path = root / 'compatibility-readiness-control/seed.json'
     admitted = seed_path.exists()
     if admitted:
@@ -456,42 +467,126 @@ def archive():
         for name, content in _inventory(
                 work / 'evidence', EVIDENCE, excluded=('guard/profile',)).items():
             contents['operational/' + name] = content
-        logs = _inventory(root / 'compatibility-readiness-logs',
-                          {name + '.log' for name in LOGS})
-        for name in LOGS[:7]:
+        closed = 8 if through_archive else 7
+        logroot = root / 'compatibility-readiness-logs'
+        unread = tuple(name + '.log' for name in LOGS[closed:])
+        for name in unread:
+            path = logroot / name
+            if path.exists():
+                regular(path)
+        logs = _inventory(logroot, {name + '.log' for name in LOGS},
+                          excluded=unread)
+        for name in LOGS[:closed]:
             if name + '.log' in logs:
                 contents['logs/' + name + '.log'] = logs[name + '.log']
         for name, content in original_failures(root).items():
             contents['original-diagnostics/' + name] = content
+    return contents, summary, admitted
+
+
+def _preservation(contents, summary, admitted):
+    """Check mandatory instances for the stages the workflow reached.
+
+    These are existing producer outputs, not substitute result assertions.
+    Failed stages keep every existing admitted original; absent mandatory
+    instances remain an explicit incomplete-preservation result.
+    """
+    required = {'transport/finalization.json'}
+    outcomes = summary.get('workflow_outcomes', {})
+    if admitted:
+        required.update('prerequisites/' + name + '.json'
+                        for name in ('control', 'review', 'recovery', 'seed'))
+        required.update(('logs/seed.log', 'logs/finalize.log'))
+        for key, stage in zip(OUTCOMES, ('prepare', 'install', 'acquire', 'run')):
+            if outcomes.get(key) in ('success', 'failure', 'cancelled'):
+                required.add('logs/' + stage + '.log')
+        if outcomes.get('L1_PREPARE') == 'success':
+            required.update('operational/' + name for name in (
+                'control.json', 'preparation.json',
+                'process-finalization.json', 'transport-finalization.json',
+                'transport-installer-finalization.json',
+                'transport-display-finalization.json'))
+        if outcomes.get('L1_INSTALL') == 'success':
+            required.update('operational/' + name for name in (
+                'installer-intent.json', 'installer-ownership.json',
+                'installer-result.json', 'installer-output.log',
+                'installer-derivation.json'))
+        elif 'operational/installer-intent.json' in contents:
+            required.update('operational/' + name for name in (
+                'installer-result.json', 'installer-output.log',
+                'installer-derivation.json'))
+        if outcomes.get('L1_ACQUIRE') == 'success':
+            required.add('prerequisites/acquisition.json')
+            required.update('operational/' + name for name in (
+                'base-binding.json', 'assessment-manifest.json'))
+        if (outcomes.get('L1_PREPARE') == 'success'
+                and outcomes.get('L1_RUN') in ('success', 'failure', 'cancelled')):
+            required.add('logs/seal.log')
+        if outcomes.get('L1_RUN') == 'success':
+            required.update('operational/' + name for name in (
+                'deployment.json', 'macro.json', 'readiness-assessment.json',
+                'clearance.json', 'deadline-clearance.json', 'host.jsonl',
+                'display-start-intent.json', 'display-ownership.json',
+                'display-kernel.json', 'display-samples.jsonl',
+                'display-cleanup.json', 'xvfb.log',
+                'finalizer-clearance/clearance.json',
+                'finalizer-clearance/deadline-clearance.json'))
+        elif 'operational/display-start-intent.json' in contents:
+            required.add('operational/display-cleanup.json')
+        if (outcomes.get('L1_RUN') == 'success'
+                or 'operational/guard/ownership.json' in contents):
+            required.update('operational/guard/' + name for name in (
+                'control.json', 'result.json', 'ownership.json',
+                'measurements.jsonl', 'stdout', 'stderr', 'wrapper.stdout'))
+    missing = sorted(required - contents.keys())
+    return admitted and not missing, missing
+
+
+def archive():
+    root = scratch()
+    work = readiness.workspace(os.environ)
+    contents, summary, admitted = _operational_contents(root, work)
     payload = work / 'public-readiness'
-    sealed = payload.exists()
+    sealed = False
     payload_status = 'FAIL'
-    if sealed:
+    if payload.exists():
         require(admitted, 'Unadmitted readiness payload')
-        inventory, payload_status = reseal_payload(work, controls)
-        allowed = {'gui/readiness/readiness-source.png',
-                   'gui/readiness/result.json', 'gui/readiness/failure.txt'}
-        require(set(inventory) <= allowed
-                and 'gui/readiness/result.json' in inventory,
-                'Payload instance differs')
-        actual = {p.relative_to(payload).as_posix() for p in payload.rglob('*')
-                  if not p.is_dir()}
-        require(actual == set(inventory), 'Sealed payload inventory differs')
-        for name, expected in inventory.items():
-            path = regular(payload / name)
-            require(path.stat().st_size == expected['bytes']
-                    and digest(path) == expected['sha256'],
-                    'Sealed payload changed')
-            contents['payload/' + name] = path.read_bytes()
+        try:
+            controls = root / 'compatibility-readiness-control'
+            inventory, payload_status = reseal_payload(work, controls)
+            allowed = {'gui/readiness/readiness-source.png',
+                       'gui/readiness/result.json', 'gui/readiness/failure.txt'}
+            require(set(inventory) <= allowed
+                    and 'gui/readiness/result.json' in inventory,
+                    'Payload instance differs')
+            actual = {p.relative_to(payload).as_posix()
+                      for p in payload.rglob('*') if not p.is_dir()}
+            require(actual == set(inventory), 'Sealed payload inventory differs')
+            verified = {}
+            for name, expected in inventory.items():
+                path = regular(payload / name)
+                require(path.stat().st_size == expected['bytes']
+                        and digest(path) == expected['sha256'],
+                        'Sealed payload changed')
+                verified['payload/' + name] = path.read_bytes()
+        except (OSError, ValueError, KeyError, TypeError):
+            retain_failure('archive-payload')
+            path = root / 'compatibility-readiness-private/archive-payload.txt'
+            contents['original-diagnostics/archive-payload.txt'] = public_bytes(path)
+        else:
+            contents.update(verified)
+            sealed = True
+    preserved, missing = _preservation(contents, summary, admitted)
     status = ('PASS' if sealed and payload_status == 'PASS'
-              and summary['cleanup'] is True
-              and all(summary['workflow_outcomes'][key] == 'success'
+              and preserved and summary.get('cleanup') is True
+              and all(summary.get('workflow_outcomes', {}).get(key) == 'success'
                       for key in OUTCOMES) else 'FAIL')
     manifest = {
         'schema': 1, 'status': status, 'source_commit': os.environ['GITHUB_SHA'],
         'run_id': int(os.environ['GITHUB_RUN_ID']), 'retention_days': 30,
         'independent_preservation_required': True,
-        'original_diagnostic_preservation_complete': admitted,
+        'original_diagnostic_preservation_complete': preserved,
+        'missing_mandatory_evidence': missing,
         'runtime_admission': False, 'matrix_dispatch': False,
         'zy_execution': False, 'payload_sealed': sealed,
         'files': {name: {'bytes': len(data),
@@ -528,11 +623,14 @@ def publish():
     except (OSError, ValueError, KeyError):
         retain_failure('publish-primary')
         publication['error'] = 'primary-readback-unproved'
-    contents = {}
-    finalization = root / 'compatibility-readiness-finalization.json'
-    if finalization.exists():
-        contents['transport/finalization.json'] = public_bytes(finalization)
-    else:
+    contents, summary, admitted = _operational_contents(
+        root, readiness.workspace(os.environ), through_archive=True)
+    preserved, missing = _preservation(contents, summary, admitted)
+    publication['original_diagnostic_preservation_complete'] = preserved
+    publication['missing_mandatory_evidence'] = missing
+    if not preserved:
+        publication['status'] = 'FAIL'
+    if 'transport/finalization.json' not in contents:
         publication['status'] = 'FAIL'
         publication['finalization_missing'] = True
     write(root / 'compatibility-readiness-publication.json', publication)
@@ -541,14 +639,6 @@ def publish():
     record = root / 'compatibility-readiness-archive.json'
     if record.exists():
         contents['transport/archive.json'] = public_bytes(record)
-    # These are closed before publish starts. Never archive its active log.
-    if (root / 'compatibility-readiness-control/seed.json').exists():
-        seeded()
-        path = root / 'compatibility-readiness-logs/archive.log'
-        if path.exists():
-            contents['logs/archive.log'] = public_bytes(path)
-        for name, content in original_failures(root).items():
-            contents['original-diagnostics/' + name] = content
     _tar(root / 'compatibility-readiness-final.tar', contents)
     return publication
 

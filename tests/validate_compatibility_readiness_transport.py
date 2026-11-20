@@ -5,11 +5,14 @@ import hashlib
 import importlib.util
 import io
 import json
+import linecache
 import os
 from pathlib import Path
 import sys
 import tarfile
-from types import SimpleNamespace
+import traceback
+from contextlib import contextmanager, ExitStack
+from types import CodeType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -32,6 +35,41 @@ spec.loader.exec_module(output_fixtures)
 def save(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value))
+
+
+@contextmanager
+def hosted_tracebacks():
+    """Use hosted source filenames without changing code or traceback bytes."""
+    with ExitStack() as stack:
+        stack.enter_context(patch.dict(linecache.cache))
+        modules = (transport, transport.readiness, output_fixtures.output,
+                   sys.modules[__name__])
+        for module in modules:
+            for function in tuple(vars(module).values()):
+                code = getattr(function, '__code__', None)
+                if not isinstance(code, CodeType):
+                    continue
+                path = Path(code.co_filename)
+                if not path.is_relative_to(ROOT):
+                    continue
+                name = '/home/runner/work/tracktemplate/' + str(path.relative_to(ROOT))
+                source = path.read_text()
+                linecache.cache[name] = (
+                    len(source), None, source.splitlines(True), name)
+                stack.callback(setattr, function, '__code__', code)
+                function.__code__ = code.replace(co_filename=name)
+        yield
+
+
+def capture_refusal(path, receipt):
+    """Retain the actual exception at a neutral, controlled source site."""
+    try:
+        transport.public_bytes(path)
+    except ValueError:
+        raw = traceback.format_exc().encode()
+        receipt.write_bytes(raw)
+        return raw
+    raise AssertionError('Expected unsafe input refusal')
 
 
 class TransportTests(unittest.TestCase):
@@ -142,6 +180,39 @@ class TransportTests(unittest.TestCase):
         save(self.root / 'compatibility-readiness-finalization.json', {
             'cleanup': True,
             'workflow_outcomes': {name: 'success' for name in transport.OUTCOMES}})
+        # Explicit synthetic counterparts of the successful hosted stages.
+        # Their presence tests transport completeness, not runtime validity.
+        for name in ('acquisition.json',):
+            save(self.controls / name, {'synthetic': True})
+        for name in ('base-binding.json', 'assessment-manifest.json'):
+            save(self.work / name, {'synthetic': True})
+        for name in (
+            'installer-intent.json', 'installer-ownership.json',
+            'installer-result.json', 'installer-output.log',
+            'deployment.json', 'macro.json', 'clearance.json',
+            'deadline-clearance.json', 'host.jsonl',
+            'display-start-intent.json', 'display-ownership.json',
+            'display-kernel.json', 'display-samples.jsonl',
+            'display-cleanup.json', 'xvfb.log',
+            'guard/control.json', 'guard/ownership.json',
+            'guard/measurements.jsonl', 'guard/stdout', 'guard/stderr',
+            'guard/wrapper.stdout', 'process-finalization.json',
+            'transport-finalization.json',
+            'transport-installer-finalization.json',
+            'transport-display-finalization.json',
+            'finalizer-clearance/clearance.json',
+            'finalizer-clearance/deadline-clearance.json',
+        ):
+            save(self.work / 'evidence' / name, {'synthetic': True})
+        (self.work / 'readiness_installer.py').write_text(
+            controller.installer_source(
+                (ROOT / 'tools/hosted_l1_gui_install.py').read_text()))
+        save(self.work / 'installer-adaptation.json', {'synthetic': True})
+        for name in ('seed', 'prepare', 'install', 'acquire', 'run',
+                     'seal', 'finalize'):
+            path = self.root / 'compatibility-readiness-logs' / (name + '.log')
+            path.parent.mkdir(exist_ok=True)
+            path.write_bytes(b'SYNTHETIC_CLOSED_STAGE\n')
 
     def readback(self, kind, identity):
         source = self.root / ('compatibility-readiness-' + kind + '.tar')
@@ -321,6 +392,21 @@ class TransportTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             transport.public_bytes(link)
 
+    def test_refusal_traceback_survives_without_editing_original_bytes(self):
+        path = self.root / 'unsafe.txt'
+        for index, value in enumerate((
+                '/home/operator/private.FCStd', '/Users/operator/private',
+                '/root/private', 'Authorization: secret', 'github_pat_secret')):
+            with self.subTest(value=value), hosted_tracebacks():
+                path.write_text(value)
+                receipt = self.root / ('original-' + str(index) + '.txt')
+                original = capture_refusal(path, receipt)
+                self.assertEqual(transport.public_bytes(receipt), original)
+                self.assertEqual(receipt.read_bytes(), original)
+                self.assertEqual(path.read_text(), value)
+                self.assertNotIn(value.encode(), original)
+                self.assertIn(b'ValueError:', original)
+
     def test_archive_is_exact_single_use_and_does_not_follow_paths(self):
         path = self.root / 'transport.tar'
         identity = transport._tar(path, {'guard/result.json': b'{}'})
@@ -374,10 +460,109 @@ class TransportTests(unittest.TestCase):
         save(self.work / 'readiness-payload-inventory.json', {
             'gui/readiness/result.json': {
                 'bytes': path.stat().st_size, 'sha256': transport.digest(path)}})
-        with self.assertRaisesRegex(
-                ValueError, '^stored result differs from projection$'):
-            transport.archive()
-        self.assertFalse((self.root / 'compatibility-readiness-primary.tar').exists())
+        with hosted_tracebacks():
+            self.assertEqual(transport.archive(), 'FAIL')
+        original = (self.root /
+                    'compatibility-readiness-private/archive-payload.txt').read_bytes()
+        self.assertIn(b'EvidenceError: stored result differs from projection', original)
+        with tarfile.open(self.root / 'compatibility-readiness-primary.tar') as bundle:
+            self.assertFalse(any(name.startswith('payload/') for name in bundle.getnames()))
+            self.assertEqual(bundle.extractfile(
+                'original-diagnostics/archive-payload.txt').read(), original)
+            manifest = json.loads(bundle.extractfile('transport/manifest.json').read())
+            self.assertEqual(manifest['status'], 'FAIL')
+            self.assertIs(manifest['payload_sealed'], False)
+
+    def test_final_fallback_preserves_original_seal_run_and_guard_diagnostics(self):
+        self.prepared_payload()
+        logs = self.root / 'compatibility-readiness-logs'
+        expected = {
+            'logs/seal.log': b'Traceback (most recent call last):\nValueError: original seal cause\n',
+            'logs/run.log': b'ORIGINAL_RUN_SENTINEL\n',
+            'operational/guard/stdout': b'ORIGINAL_GUARD_STDOUT\n',
+            'operational/guard/stderr': b'ORIGINAL_GUARD_STDERR\n',
+        }
+        for name, raw in expected.items():
+            path = (logs / Path(name).name if name.startswith('logs/')
+                    else self.work / 'evidence' / name.removeprefix('operational/'))
+            path.write_bytes(raw)
+        # Primary creation/readback was unavailable. Final transport must
+        # preserve originals without attempting another payload seal.
+        with hosted_tracebacks():
+            publication = transport.publish()
+        self.assertEqual(publication['status'], 'FAIL')
+        self.assertIsNone(publication['primary'])
+        with tarfile.open(self.root / 'compatibility-readiness-final.tar') as bundle:
+            for name, raw in expected.items():
+                self.assertEqual(bundle.extractfile(name).read(), raw)
+            self.assertFalse(any(name.startswith('payload/') for name in bundle.getnames()))
+        self.assertFalse((self.work / 'transport-readiness').exists())
+
+    def test_payload_failure_preserves_operational_originals_in_both_archives(self):
+        self.prepared_payload()
+        save(self.work / 'public-readiness/gui/readiness/result.json', {'status': 'PASS'})
+        log = self.root / 'compatibility-readiness-logs/seal.log'
+        original = b'ValueError: original failed seal\n'
+        log.write_bytes(original)
+        with hosted_tracebacks():
+            self.assertEqual(transport.archive(), 'FAIL')
+            self.readback('primary', 123)
+            transport.publish()
+        for kind in ('primary', 'final'):
+            with tarfile.open(self.root / ('compatibility-readiness-' + kind + '.tar')) as bundle:
+                self.assertEqual(bundle.extractfile('logs/seal.log').read(), original)
+                self.assertIn('original-diagnostics/archive-payload.txt', bundle.getnames())
+                self.assertFalse(any(name.startswith('payload/') for name in bundle.getnames()))
+        self.readback('final', 456)
+        self.assertEqual(transport.complete(), 'FAIL')
+
+    def test_missing_mandatory_original_prevents_completeness_and_pass(self):
+        self.prepared_payload()
+        path = self.work / 'evidence/guard/stderr'
+        path.rename(self.work / 'retained-original-stderr')
+        self.assertEqual(transport.archive(), 'FAIL')
+        record = json.loads((self.root / 'compatibility-readiness-archive.json').read_text())
+        self.assertIs(record['manifest']['original_diagnostic_preservation_complete'], False)
+        self.assertIn('operational/guard/stderr', record['manifest']['missing_mandatory_evidence'])
+
+    def test_started_failed_installer_missing_result_is_incomplete(self):
+        self.prepared_payload()
+        contents, summary, admitted = transport._operational_contents(
+            self.root, self.work)
+        contents.pop('operational/installer-result.json')
+        summary['workflow_outcomes'].update(
+            L1_INSTALL='failure', L1_ACQUIRE='skipped', L1_RUN='skipped')
+        preserved, missing = transport._preservation(contents, summary, admitted)
+        self.assertIs(preserved, False)
+        self.assertIn('operational/installer-result.json', missing)
+
+    def test_fallback_still_refuses_unsafe_original_without_modifying_it(self):
+        self.prepared_payload()
+        path = self.root / 'compatibility-readiness-logs/seal.log'
+        raw = b'Authorization: excluded-credential\n'
+        path.write_bytes(raw)
+        with hosted_tracebacks(), self.assertRaisesRegex(
+                ValueError, '^Credential-like operational evidence$'):
+            transport.publish()
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertFalse((self.root / 'compatibility-readiness-final.tar').exists())
+
+    def test_active_logs_are_not_read_but_closed_archive_log_is_preserved(self):
+        self.prepared_payload()
+        logs = self.root / 'compatibility-readiness-logs'
+        active = logs / 'archive.log'
+        active.write_bytes(b'Authorization: active-not-an-original\n')
+        self.assertEqual(transport.archive(), 'PASS')
+        with tarfile.open(self.root / 'compatibility-readiness-primary.tar') as bundle:
+            self.assertNotIn('logs/archive.log', bundle.getnames())
+        closed = b'ORIGINAL_ARCHIVE_LOG\n'
+        active.write_bytes(closed)
+        (logs / 'publish.log').write_bytes(b'Authorization: active-not-an-original\n')
+        self.readback('primary', 123)
+        self.assertEqual(transport.publish()['status'], 'PASS')
+        with tarfile.open(self.root / 'compatibility-readiness-final.tar') as bundle:
+            self.assertEqual(bundle.extractfile('logs/archive.log').read(), closed)
+            self.assertNotIn('logs/publish.log', bundle.getnames())
 
     def test_supported_shutdown_control_survives_exact_archive(self):
         self.prepared_payload()
