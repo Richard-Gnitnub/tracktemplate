@@ -4893,45 +4893,50 @@ The structured decision contains the owner's exact statement.
 <a id="runtime-compatibility-standing-instruction-panel"></a>
 
 **Decision:** D-P9-024 records the owner's "explicit standing request" for the bounded compatibility work.
-This Level 3 decision adds authority for the specified Git operations. It does not change the product or its accepted host profile.
-The [decision register](gate-decisions.json) preserves the exact owner statement.
+This Level 3 decision gives authority for the specified Git operations. It does not change the product or its accepted host profile.
+The [decision register](gate-decisions.json) preserves the owner's instruction.
 
 The owner gives authority for `git commit` and `git push` on `agent/runtime-compatibility-qualification`.
-This authority includes later `git commit` and `git push` operations within the same scope. Create or update the necessary pull requests.
-The owner permits a merge for "eligible Level 1/2 changes" after the necessary reviews and checks give PASS results.
-A pull request that contains Level 3 work still needs the applicable integration authority.
-Do not ask for approval again for routine actions within this owner instruction.
+This authority includes subsequent `git commit` and `git push` operations in the same bounded scope.
+Make the necessary pull requests. When necessary, change them.
 
-Complete the tests on GitHub, starting with `gui-readiness`, under the existing qualification authority and the [D-P9-023 conditions](#runtime-compatibility-output-handling-panel).
-Continue the subsequent steps that have the necessary authority and evidence. Report the qualification outcome after independent review.
-Stop for an owner decision at a repository stop condition or when new authority is necessary.
-Runtime admission and ZY resumption still need explicit owner approval.
+A merge is permitted for "eligible Level 1/2 changes" after the necessary reviews and checks give PASS results.
+For a pull request that contains Level 3 work, the applicable authority for the merge stays necessary.
+The owner's instruction is: "Do not request permission again for routine actions covered by it."
 
-**Panel:** Richard is the project owner and panel chair. `/root` presents the change.
-The independent reviewer, `/root/producer_review`, examined the publication and execution stop conditions.
-The reviewer did not author this decision record.
+With the applicable authority and the [D-P9-023 conditions](#runtime-compatibility-output-handling-panel), start with `gui-readiness` on GitHub.
+Continue the subsequent steps that have the necessary authority and evidence.
+After independent review, report the result from the "bounded runtime-compatibility qualification".
+At a "repository stop condition" or when new authority is necessary, stop for an owner decision.
+The owner's instruction is: "Runtime admission and ZY resumption still require my explicit approval."
 
-The reviewer authored the readiness software and shares the agent environment and filesystem.
-That work needs its separate independent source and result reviews.
+**Panel:** Richard is the project owner and panel chair. `/root` reports the change.
+The independent reviewer, `/root/producer_review`, examined the stop conditions for publication and the tests.
+The reviewer did not author this canonical record.
+
+The reviewer authored the `gui-readiness` software. The reviewer and implementing agent use the same workspace.
+Different independent source and result reviews are necessary for that software.
 The panel recommendation is **Proceed with bounded conditions**. The panel records no unresolved authority finding.
 
-| Due risk | Condition, owner and deadline |
+| Risk | Condition, owner and deadline |
 | --- | --- |
-| PR-06, PR-07, PR-21 | The change owner and independent reviewer must keep the D-P9-023 input and output scope before each transfer. |
-| PR-13 | The change owner must complete independent preservation. An independent reviewer must check it before dependent execution or cleanup. The monthly restore duty stays open. |
+| PR-06, PR-07, PR-21 | Before each data movement, the change owner and independent reviewer must preserve the D-P9-023 input and output scope. |
+| PR-13 | The change owner must complete independent preservation. Before dependent tests or cleanup, an independent reviewer must examine that evidence. The ["Restore drill"](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) condition stays `Open`, with the same deadline. |
 | PR-22 | The change owner must complete the necessary checks. An independent reviewer must examine the frozen source, inputs and limits before tests start. |
 
-No risk closes. The current assessments of control effectiveness stay the same.
-Keep the existing handling, execution, review and recovery conditions.
-Apply the existing repair limits and preserve previous repair history. The historical `2/2` record stays unchanged.
-The D-P9-019 repair authority applies only to its own bounded scope. The finite documentation limits stay unchanged.
+No risk status changes. The assessments of control effectiveness stay the same.
+Keep the "evidence-handling conditions" and "execution limits" from the owner's instruction.
+Keep its review requirements and recovery conditions.
+Apply the same repair limits and preserve the "prior repair history". The previous `2/2` record stays the same.
+Use the D-P9-019 repair authority only in its bounded scope. The limits in the documentation workflow stay the same.
 
 **Programme limits:** Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
-D-P6-008 stays `Deferred — unmet`. LMS stays paused.
-This instruction gives no acceptance for physical fit, production, rights, performance, release or a phase exit.
+D-P6-008 stays `Deferred — unmet`. LMS stays `paused`.
+This instruction gives no acceptance for physical fit, production, product performance, release or a phase exit.
+It does not change the rights state.
 
-**Proof/provenance:** The baseline commit is `5cdcb7f6b9926fe1178de13984ed8a91ec63f6a6`.
-The owner-statement receipt, `owner-standing-instruction.json`, has SHA-256 `d193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a`.
-It contains the exact user statement that `/root` supplied. It claims no independent conversation API retrieval.
-The previous qualification authority and D-P9-023 stay unchanged.
-The panel receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
+**Proof/provenance:** The base commit is `5cdcb7f6b9926fe1178de13984ed8a91ec63f6a6`.
+The file `owner-standing-instruction.json` has SHA-256 `d193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a`.
+It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
+The previous authority for the "bounded runtime-compatibility qualification" and D-P9-023 stay the same.
+The review receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
