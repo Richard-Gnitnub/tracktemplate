@@ -18,6 +18,7 @@ on:
           - rea-bc-straight-native
           - runtime-observation
           - compatibility-readiness
+          - compatibility-qualification
       readiness_control:
         description: Exact reviewed compatibility readiness control JSON
         required: false
@@ -43,7 +44,8 @@ jobs:
     if: >-
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
       github.event.repository.private == false &&
-      inputs.workload != 'compatibility-readiness'
+      inputs.workload != 'compatibility-readiness' &&
+      inputs.workload != 'compatibility-qualification'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -298,3 +300,146 @@ jobs:
           L1_FINAL_ID: ${{ steps.final_upload.outputs.artifact-id }}
         run: |
           python3 tools/compatibility_readiness_transport.py complete 2>&1 | tee "$RUNNER_TEMP/compatibility-readiness-logs/complete.log"
+
+  compatibility-matrix:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      inputs.workload == 'compatibility-qualification' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 140
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out the exact qualification source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate the public review and preservation controls
+        id: seed
+        timeout-minutes: 1
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/compatibility-matrix-logs"
+          python3 tools/runtime_compatibility_transport.py seed > "$RUNNER_TEMP/compatibility-matrix-logs/seed.log" 2>&1
+
+      - name: Prepare the source-bound qualification attempt
+        id: prepare
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py prepare > "$RUNNER_TEMP/compatibility-matrix-logs/prepare.log" 2>&1
+
+      - name: Install the exact candidate within 540 seconds
+        id: install
+        timeout-minutes: 9
+        run: |
+          python3 tools/runtime_compatibility_transport.py install > "$RUNNER_TEMP/compatibility-matrix-logs/install.log" 2>&1
+
+      - name: Acquire only the approved base and make the assessment copy
+        id: acquire
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py acquire > "$RUNNER_TEMP/compatibility-matrix-logs/acquire.log" 2>&1
+
+      - name: Run the serial matrix within one shared 7200-second deadline
+        id: run
+        timeout-minutes: 122
+        run: |
+          python3 tools/runtime_compatibility_transport.py run > "$RUNNER_TEMP/compatibility-matrix-logs/run.log" 2>&1
+
+      - name: Seal only the approved matrix outputs
+        id: seal
+        if: always() && steps.prepare.outcome == 'success' && steps.run.outcome != 'skipped'
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py seal > "$RUNNER_TEMP/compatibility-matrix-logs/seal.log" 2>&1
+
+      - name: Prove owned installer, FreeCAD and display cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: ${{ steps.run.outcome }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py finalize > "$RUNNER_TEMP/compatibility-matrix-logs/finalize.log" 2>&1
+
+      - name: Archive the exact reviewed operational evidence and sealed outputs
+        id: archive
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py archive > "$RUNNER_TEMP/compatibility-matrix-logs/archive.log" 2>&1
+
+      - name: Preserve the primary qualification artifact for 30 days
+        id: primary_upload
+        if: always() && steps.archive.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-matrix-primary-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-matrix-primary.tar
+
+      - name: Read back the same primary artifact
+        id: primary_download
+        if: always() && steps.primary_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.primary_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-matrix-primary-readback
+
+      - name: Verify primary readback and seal the final transport record
+        id: publish
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_upload.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_download.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py publish > "$RUNNER_TEMP/compatibility-matrix-logs/publish.log" 2>&1
+
+      - name: Preserve the final qualification transport artifact for 30 days
+        id: final_upload
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-matrix-final-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-matrix-final.tar
+
+      - name: Read back the same final artifact
+        id: final_download
+        if: always() && steps.final_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-matrix-final-readback
+
+      - name: Require the matrix, cleanup and both exact readbacks
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_FINAL_UPLOAD: ${{ steps.final_upload.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_download.outcome }}
+          L1_FINAL_ID: ${{ steps.final_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py complete 2>&1 | tee "$RUNNER_TEMP/compatibility-matrix-logs/complete.log"
