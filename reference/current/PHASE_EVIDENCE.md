@@ -4887,3 +4887,51 @@ The structured decision contains the owner's exact statement.
 | `matrix-output-scope-independent-review.json` | `1dd7af474a531efadd3224d087f25649337ac73a46f598a9a53efdf4e2b5c739` |
 | `owner-authority.json` | `4df837f868864f616c793ad8c1a2c9e19ea79a842660702c786f833de00be1f3` |
 | `owner-decision.json` | `1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a` |
+
+## Compatibility owner instruction — 2026-11-20
+
+<a id="runtime-compatibility-standing-instruction-panel"></a>
+
+**Decision:** D-P9-024 records the owner's "explicit standing request" for the bounded compatibility work.
+This Level 3 decision adds authority for the specified Git operations. It does not change the product or its accepted host profile.
+The [decision register](gate-decisions.json) preserves the exact owner statement.
+
+The owner gives authority for `git commit` and `git push` on `agent/runtime-compatibility-qualification`.
+This authority includes later `git commit` and `git push` operations within the same scope. Create or update the necessary pull requests.
+The owner permits a merge for "eligible Level 1/2 changes" after the necessary reviews and checks give PASS results.
+A pull request that contains Level 3 work still needs the applicable integration authority.
+Do not ask for approval again for routine actions within this owner instruction.
+
+Complete the tests on GitHub, starting with `gui-readiness`, under the existing qualification authority and the [D-P9-023 conditions](#runtime-compatibility-output-handling-panel).
+Continue the subsequent steps that have the necessary authority and evidence. Report the qualification outcome after independent review.
+Stop for an owner decision at a repository stop condition or when new authority is necessary.
+Runtime admission and ZY resumption still need explicit owner approval.
+
+**Panel:** Richard is the project owner and panel chair. `/root` presents the change.
+The independent reviewer, `/root/producer_review`, examined the publication and execution stop conditions.
+The reviewer did not author this decision record.
+
+The reviewer authored the readiness software and shares the agent environment and filesystem.
+That work needs its separate independent source and result reviews.
+The panel recommendation is **Proceed with bounded conditions**. The panel records no unresolved authority finding.
+
+| Due risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | The change owner and independent reviewer must keep the D-P9-023 input and output scope before each transfer. |
+| PR-13 | The change owner must complete independent preservation. An independent reviewer must check it before dependent execution or cleanup. The monthly restore duty stays open. |
+| PR-22 | The change owner must complete the necessary checks. An independent reviewer must examine the frozen source, inputs and limits before tests start. |
+
+No risk closes. The current assessments of control effectiveness stay the same.
+Keep the existing handling, execution, review and recovery conditions.
+Apply the existing repair limits and preserve previous repair history. The historical `2/2` record stays unchanged.
+The D-P9-019 repair authority applies only to its own bounded scope. The finite documentation limits stay unchanged.
+
+**Programme limits:** Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+This instruction gives no acceptance for physical fit, production, rights, performance, release or a phase exit.
+
+**Proof/provenance:** The baseline commit is `5cdcb7f6b9926fe1178de13984ed8a91ec63f6a6`.
+The owner-statement receipt, `owner-standing-instruction.json`, has SHA-256 `d193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a`.
+It contains the exact user statement that `/root` supplied. It claims no independent conversation API retrieval.
+The previous qualification authority and D-P9-023 stay unchanged.
+The panel receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
