@@ -4814,3 +4814,76 @@ PR-13 stays open and overdue. Copies in this scope do not prove a complete backu
 | `next-x2-zy-generation-successor-independent-review.json` | `d2b75602430c6d3a1e8d79ef5581c484ce8efbcd2b23dfeef22b774c37700fd3` |
 | `independent-source-review.json` | `9e9ffc2a66d92d1480f822e1db7fd89ad6036002f0c55a7d759ab0254af4f3f7` |
 | `source-completion-review.json` | `069107aa90a97b5503e4abc4991667d61f3f768a26469cfc3727e57620a4e405` |
+
+
+## Compatibility output panel — 2026-11-20
+
+<a id="runtime-compatibility-output-handling-panel"></a>
+
+**Decision:** D-P9-023 records the owner's approval for publication of the specified outputs in `Richard-Gnitnub/tracktemplate`.
+This Level 3 decision changes publication authority only.
+The governance work records that authority. It does not change the product.
+
+The manifest with owner approval has 157,516 bytes and SHA-256
+`0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b`.
+Its bounded scope contains 160 "screenshots": one from the `gui-readiness` test and 159 from the host matrix.
+It also contains 24 result records and 24 "conditional safe failure diagnostics".
+These are permitted outputs. Their byte sizes and hashes are not yet known.
+Missing outputs cannot give a `PASS` result.
+
+Keep GitHub Actions evidence for 30 days. Use independent preservation.
+Use only the base with previous owner approval, `b14-default-base-regenerated.FCStd`.
+That base has 636,344 bytes and SHA-256
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+Do not publish "working documents, exports, private data and credentials". Do not publish unlisted outputs.
+This decision gives no third-party permission or `project-cleared` status.
+
+**Panel:** Richard is the project owner and panel chair. `/root` presents the change.
+The independent reviewer, `to001_heel_quality`, examined the host matrix, bounded output scope and resource proposal before the owner decision.
+The reviewer did not author those records. The reviewer shares the agent environment and filesystem.
+The preserved review gives `PASS_PROPOSAL_FOR_OUTPUT_HANDLING_DECISION` and records no findings.
+
+The panel recommendation is **Proceed with bounded conditions**.
+The owner's current statement gives approval for the specified outputs and keeps the conditions below.
+The panel records no unresolved finding.
+
+| Due risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | The change owner and independent reviewer must check exact input and output identities before transfer. Keep source classifications and notices. |
+| PR-13 | The change owner must preserve evidence and failures independently. An independent reviewer must check preservation before dependent execution or cleanup. The monthly restore duty stays open. |
+| PR-22 | The change owner must do checks of the software that makes the evidence. An independent reviewer must examine the frozen source, tests, input scope and limits before execution. |
+
+No risk closes. The current assessments of control effectiveness stay the same.
+
+**Test conditions:** The prior owner instruction gives authority to prepare and do bounded compatibility tests on GitHub for the observed host profile.
+D-P9-023 adds only the specified publication authority.
+Keep the `gui-readiness` test and independent result review before the full host matrix starts.
+The full job has one shared 7200-second deadline for fixture generation, 57 native entries and 22 GUI groups.
+It has no additional deadline for each entry or session.
+The existing 4096 MiB FreeCAD limit, 256 MiB display limit, zero swap, CPU limits and task limits stay the same.
+
+Keep the 8192 MiB host reserve and 540-second installation limit.
+The `gui-readiness` limits stay 90 seconds for FreeCAD and 190 seconds for the display.
+The full display limit stays 7300 seconds. The outer job limit stays 8400 seconds.
+The 7200-second limit does not prove that the complete matrix can finish.
+
+Complete "producer review and readiness" under the current workflow.
+The tests need the applicable authority and conditions before they start.
+The owner decision does not supply missing source, review or test evidence.
+Keep the current compatibility contract unchanged until the owner accepts the host profile.
+The owner's limits stay: "Runtime admission and ZY remain blocked."
+
+**Programme limits:** Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No acceptance for physical fit, production, performance, release or a phase exit follows.
+Keep the historical repair records and finite documentation limits.
+
+**Proof/provenance:** The preserved compatibility records and current decision receipt contain the evidence.
+The structured decision contains the owner's exact statement.
+
+| Record | SHA-256 |
+| --- | --- |
+| `compatibility-gui-output-handling-proposal-v2.json` | `0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b` |
+| `matrix-output-scope-independent-review.json` | `1dd7af474a531efadd3224d087f25649337ac73a46f598a9a53efdf4e2b5c739` |
+| `owner-authority.json` | `4df837f868864f616c793ad8c1a2c9e19ea79a842660702c786f833de00be1f3` |
+| `owner-decision.json` | `1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a` |

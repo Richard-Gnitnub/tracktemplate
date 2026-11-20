@@ -1429,6 +1429,8 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
          '8913a335d220de309e13df1ef728ae910520460fc73cafa9af8207b4cf858714'),
         ('D-P9-022',
          'e8e14822f4599348f82db3fbf220995312894693526a7e7f213fa9da070d0a17'),
+        ('D-P9-023',
+         'a79759c29290646e5874fe857f9527a17e7cb27b58ab0b3cdbae270bf5399933'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -8152,20 +8154,32 @@ def _validate_dp9_019_combinations(evidence: str, record: dict) -> None:
         )
 
 
+def _validate_dp9_023_decision(record: dict[str, object]) -> None:
+    """Preserve the exact output approval and its reserved runtime gates."""
+    encoded = json.dumps(
+        record, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
+    _require(
+        hashlib.sha256(encoded).hexdigest()
+        == "fd4fac789f4dbe5e98ae7318d8696ab8494783fafdb682acd122e8f35a755e48",
+        "D-P9-023 exact output authority or reserved gates drifted",
+    )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep the seventeen accepted decisions and their exact bounded authority."""
+    """Keep the eighteen accepted decisions and their exact bounded authority."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-11-13",
+        and document["updated_on"] == "2026-11-20",
         "Phase 9B current decision header drifted",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 17
+        and len(records) == 18
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -8185,6 +8199,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_020_decision(records[14], set(records[0]))
     _validate_dp9_021_decision(records[15], set(records[0]))
     _validate_dp9_022_decision(records[16], set(records[0]))
+    _validate_dp9_023_decision(records[17])
     for index, identity, expected_digest in (
         (10, 'D-P9-018',
          'be3af2a2720606f2ebc0f48a2ffccd64a0466ea5c9ed022727ba5fbf0aaa5458'),
@@ -9282,7 +9297,7 @@ def _validate_decisions(plan: str) -> None:
         and "history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
         in decision_section
         and "current decision register" in decision_flat
-        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-022, "
+        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-023, "
         "D-GOV-024, D-GOV-025 and D-GOV-026" in decision_flat,
         "Phase 7 closeout or current decision-register ownership is missing",
     )
@@ -9302,7 +9317,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
            "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017", "D-P9-018", "D-P9-019", "D-P9-020",
-           "D-P9-021", "D-P9-022", "D-GOV-023",
+           "D-P9-021", "D-P9-022", "D-P9-023", "D-GOV-023",
            "D-GOV-024", "D-GOV-025", "D-GOV-026"},
         "project-plan decisions differ from the current and frozen registers",
     )

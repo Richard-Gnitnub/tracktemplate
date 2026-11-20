@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 9,
-  "updated_on": "2026-11-13",
+  "updated_on": "2026-11-20",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -189,6 +189,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#to-zy-handling-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#to-zy-handling-panel"
+    },
+    {
+      "id": "D-P9-023",
+      "decided_on": "2026-11-20",
+      "status": "Accepted",
+      "decision": "Authorise publication of GitHub Actions evidence in Richard-Gnitnub/tracktemplate within the bounded scope of the reviewed manifest. The manifest has 157516 bytes and SHA-256 0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b. The bounded scope contains 160 \"screenshots\": one from the gui-readiness test and 159 from the host matrix. It contains 24 result records and 24 \"conditional safe failure diagnostics\". Keep Actions evidence for 30 days. Use independent preservation.\n\nUse the base with previous owner approval again.",
+      "authority": "Owner statement (verbatim), 2026-11-20:\n\nI approve public Actions evidence in \"Richard-Gnitnub/tracktemplate\" within the exact scope manifest: 157,516 bytes, SHA-256:\n\n\"0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b\"\n\nThis covers 160 screenshots (1 readiness, 159 matrix), 24 result records and 24 conditional safe failure diagnostics, with 30-day Actions retention and independent preservation. Reuse the approved base. Exclude working documents, exports, private data and credentials.\n\nRecord this decision and complete producer review and readiness under the existing workflow. Qualification dispatch remains subject to its existing authority and prerequisites. Runtime admission and ZY remain blocked.\n\nThe owner-decision receipt has SHA-256 1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a. It records the owner's message to /root. The receipt does not claim that an API supplied the message.",
+      "exclusions": "Do not publish \"working documents, exports, private data and credentials\". This decision gives no authority for other inputs or outputs. Complete \"producer review and readiness\" under the current workflow. The tests need the applicable authority and conditions before they start. The owner's limits stay: \"Runtime admission and ZY remain blocked.\"\n\nKeep the resource limits, host-profile identities, review of gui-readiness, failure evidence and recovery controls that already apply. Missing evidence cannot give a PASS result. This decision gives no third-party permission, rights clearance, project-cleared status, or acceptance for production, performance, release or a phase exit.\n\nPhase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending. D-P6-008 stays Deferred — unmet. LMS stays paused. PR-13 stays open. Preservation in this bounded scope does not complete the monthly restore test.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-output-handling-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-output-handling-panel"
     }
   ]
 }

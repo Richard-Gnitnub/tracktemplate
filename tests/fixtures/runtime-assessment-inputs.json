@@ -1,0 +1,419 @@
+{
+  "assessment_contract_utf8": "{\n  \"schema_version\": 1,\n  \"contract_id\": \"tracktemplate:phase1:runtime-and-legacy-compatibility:1\",\n  \"recorded_on\": \"2026-07-20\",\n  \"status\": \"phase1-policy-accepted-phase2-development-guard-implemented-five-exact-freecad-profiles-qualified\",\n  \"phase\": 1,\n  \"scope\": {\n    \"release_candidate_intent\": \"Define the initial FreeCAD/Python support promise and the bounded B14/B15 ingress window before modular source or persistence migration starts.\",\n    \"current_effect\": \"Phase 1 accepted the compatibility policy. Phase 2 has a runtime guard. The guard accepts one exact FreeCAD 1.1.1 host profile, three exact FreeCAD 1.1.3 host profiles and one exact FreeCAD 1.1.4 host profile. It changes no B14, B15, FCStd file, configuration, Addon package, or legacy macro behaviour. The runtime guard does not examine or migrate a legacy document. The FreeCAD 1.1.4 profile has bounded functional host authority under D-GOV-023 for the observed exact runtime only.\",\n    \"support_meaning\": \"A release-supported workflow must pass both a qualified-runtime gate and a supported-document/schema gate before the Workbench may mutate, migrate or export.\",\n    \"licensing_separation\": \"Compatibility support does not grant project-cleared output status and does not change any provenance, dependency-manifest or rights gate.\",\n    \"security_boundary\": \"The 1.1.1 host profile has functional compatibility authority only. It has no security endorsement. The FreeCAD 1.1.3 release record records security issues for all releases before 1.1.3. FreeCAD recommends that all users install 1.1.3.\"\n  },\n  \"source_state\": {\n    \"b14\": {\n      \"path\": \"AdvancedTurnout.FCMacro\",\n      \"version_token\": \"10.2A8A7B14\",\n      \"sha256\": \"51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088\",\n      \"role\": \"immutable legacy comparison oracle\"\n    },\n    \"b15\": {\n      \"path\": \"model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro\",\n      \"version_token\": \"10.2A8A7B15\",\n      \"sha256\": \"3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848\",\n      \"role\": \"accepted behavioural reference\"\n    }\n  },\n  \"official_host_metadata\": {\n    \"observed_on\": \"2026-07-20\",\n    \"freecad_release_source\": \"https://github.com/FreeCAD/FreeCAD/releases\",\n    \"observed_current_stable_release\": \"1.1.1\",\n    \"addon_manifest_schema\": {\n      \"repository\": \"https://github.com/FreeCAD/Addon-Manifest-Schema\",\n      \"branch\": \"Stable\",\n      \"observed_tree_sha\": \"90c9b419cdb284130533d472dfdc0b8b03f9176c\",\n      \"example\": \"https://github.com/FreeCAD/Addon-Manifest-Schema/blob/Stable/Assets/Examples/Everything.xml\",\n      \"template\": \"https://github.com/FreeCAD/Addon-Template/blob/main/package.xml\",\n      \"fields\": {\n        \"freecadmin\": \"Required earliest FreeCAD release with which the Addon works.\",\n        \"freecadmax\": \"Optional latest FreeCAD release with which the Addon works.\",\n        \"pythonmin\": \"Required earliest Python version needed by the Addon.\"\n      }\n    },\n    \"initial_package_manifest_intent\": {\n      \"freecadmin\": \"1.1.1\",\n      \"freecadmax\": \"1.1.1\",\n      \"pythonmin\": \"3.12.0\",\n      \"phase_10_rule\": \"Generate the real package.xml only in the Workbench packaging phase and revalidate these values against then-current official schema and qualification evidence.\"\n    }\n  },\n  \"runtime_baseline\": {\n    \"runtime_policy\": \"The Workbench uses the Python, Qt, OpenCASCADE and Coin stack bundled by the supported FreeCAD distribution; users are not asked to install a separate runtime Python.\",\n    \"standalone_development_floor\": {\n      \"pythonmin\": \"3.12.0\",\n      \"observed_python\": \"3.12.3\",\n      \"implementation\": \"CPython\",\n      \"scope\": \"Repository tools, AST/analytical tests and domain-package import checks only; this does not by itself qualify a FreeCAD host.\"\n    },\n    \"qualified_profiles\": [\n      {\n        \"profile_id\": \"linux-x86_64-flatpak-freecad-1.1.4-py3.13.16-qt6.11.3-coin4.0.10\",\n        \"status\": \"assessment-only-owner-admission-pending\",\n        \"host_distribution_evidence\": \"Observed GitHub ubuntu-24.04 x86_64 runner in run44734977880. This candidate has no runtime admission.\",\n        \"exact_match\": {\n          \"freecad.coin_version\": \"SIM Coin 4.0.10\",\n          \"freecad.opencascade_version\": \"7.8.1\",\n          \"freecad.pyside_version\": \"6.11.3\",\n          \"freecad.qt_binding\": \"PySide6\",\n          \"freecad.qt_version\": \"6.11.3\",\n          \"freecad.version_info\": [\n            1,\n            1,\n            4\n          ],\n          \"platform.flatpak_id\": \"org.freecad.FreeCAD\",\n          \"platform.machine\": \"x86_64\",\n          \"platform.packaging\": \"flatpak\",\n          \"platform.system\": \"Linux\",\n          \"python.implementation\": \"CPython\",\n          \"python.version_info\": [\n            3,\n            13,\n            16\n          ]\n        },\n        \"observed_freecad_revision\": \"45039 (Git)\",\n        \"observed_freecad_commit\": \"4fd3bf320d9566a27e60069fc8387448aaa3a094\",\n        \"observed_flatpak_ref\": \"app/org.freecad.FreeCAD/x86_64/stable\",\n        \"observed_flatpak_app_commit\": \"b7e0947f142c4e263d2cf950a7decb5a96f7243b0bf5adc9fda60d8e8d1eb811\",\n        \"observed_flatpak_runtime\": \"org.kde.Platform/x86_64/6.11\",\n        \"observed_flatpak_runtime_commit\": \"2c059c881e5059ea801dc963cc970b83d775de03b98e9f570b31790e1f92ab5d\",\n        \"observed_flatpak_sdk\": \"org.kde.Sdk/x86_64/6.11\",\n        \"observed_flatpak_origin\": \"flathub\",\n        \"observed_flatpak_collection\": \"org.flathub.Stable\",\n        \"observed_flatpak_installation\": \"system\",\n        \"qualification_basis\": [\n          \"The owner authorises bounded hosted qualification of this exact observation; admission is reserved.\",\n          \"Run44734977880 installed the exact app/runtime commits and observed this component tuple.\",\n          \"Native and real-GUI compatibility qualification remains pending.\"\n        ]\n      }\n    ],\n    \"platform_matrix\": [\n      {\n        \"platform\": \"Linux x86_64 stable org.freecad.FreeCAD Flatpak\",\n        \"status\": \"qualified\"\n      },\n      {\n        \"platform\": \"Other Linux packages or architectures\",\n        \"status\": \"qualification-pending\"\n      },\n      {\n        \"platform\": \"Windows\",\n        \"status\": \"qualification-pending\"\n      },\n      {\n        \"platform\": \"macOS\",\n        \"status\": \"qualification-pending\"\n      }\n    ],\n    \"support_rule\": \"The runtime guard accepts a runtime only when its data is equal to the `exact_match` data for one qualified host profile. One exact FreeCAD 1.1.1 profile, three exact FreeCAD 1.1.3 profiles and one exact FreeCAD 1.1.4 profile are qualified. FreeCAD 1.1.2 is not qualified. A different host is not qualified until the host matrix gives the specified results. The project owner must then change this contract.\",\n    \"unqualified_runtime_rule\": \"Report every observed mismatch, preserve the document untouched and disable Track Template mutation, migration and production export; do not guess compatibility from a higher version number.\"\n  },\n  \"legacy_document_window\": {\n    \"current_implementation_status\": \"contract-only-no-successor-document-detector-or-migrator-exists\",\n    \"generator_id\": \"ModelRailwayCurveTemplate.IndependentEasements\",\n    \"supported_ingress_versions\": [\n      \"10.2A8A7B14\",\n      \"10.2A8A7B15\"\n    ],\n    \"accepted_version_sets\": [\n      [\n        \"10.2A8A7B14\"\n      ],\n      [\n        \"10.2A8A7B15\"\n      ],\n      [\n        \"10.2A8A7B14\",\n        \"10.2A8A7B15\"\n      ]\n    ],\n    \"mixed_b14_b15_rule\": \"A B15 action may retain inherited B14 objects and add or retag only changed B15 objects. The exact mixed set is therefore an intended B15 ingress form, not automatically a conflict.\",\n    \"version_detection\": {\n      \"scope\": \"Read-only preflight over objects whose GeneratedBy equals the declared generator_id and over recognised JSON payloads on those objects.\",\n      \"generator_version_rule\": \"GeneratorVersion stores a descriptive string; its first whitespace-delimited token is the macro version token.\",\n      \"json_version_rule\": \"Recognised macro_version and source_macro_version fields carry version tokens and must not contradict object evidence.\",\n      \"schema_rule\": \"Every encountered required payload must have a recognised schema and internally consistent stable identities; derived payloads may be discarded only when canonical inputs are sufficient to regenerate them.\",\n      \"foreign_object_rule\": \"FreeCAD objects not owned by the declared generator_id do not classify the document and must remain untouched.\"\n    },\n    \"classification\": [\n      {\n        \"condition\": \"All owned version evidence is one accepted version set, every required schema is recognised and the entity family has a passing migration fixture.\",\n        \"status\": \"supported-migration-source\",\n        \"write_policy\": \"Migrate only a user-approved copy/new document through the future versioned migrator; never rewrite the source in place.\"\n      },\n      {\n        \"condition\": \"The document is pre-B14, versionless, contains an unknown/future token, lacks sufficient canonical inputs, or contains a family without an accepted migration fixture.\",\n        \"status\": \"inspection-only\",\n        \"write_policy\": \"Allow a compatibility report and ordinary FreeCAD inspection only; no Track Template mutation, migration or production export.\"\n      },\n      {\n        \"condition\": \"Owned version/schema evidence conflicts, is malformed or is corrupt.\",\n        \"status\": \"blocked-corrupt-or-conflicting\",\n        \"write_policy\": \"Stop before a transaction, preserve the document and report exact objects/properties/findings.\"\n      }\n    ],\n    \"migration_invariants\": [\n      \"Open and inspect the source read-only before starting any transaction.\",\n      \"Require an explicit user-selected copy/new target and retain the original byte-for-byte.\",\n      \"Validate the complete target model before one atomic commit; abort and remove the target on failure.\",\n      \"Preserve stable railway identities, ordering, units, coordinate frames, topology intent, production selections and user-authored metadata.\",\n      \"Treat legacy Part shapes as comparison/recovery evidence, not canonical model state; regenerate derived views and exact geometry only when sufficient canonical inputs exist.\",\n      \"Do not silently drop an unsupported entity, property, payload, finding or foreign FreeCAD object.\",\n      \"Save/reopen, undo/redo, failure recovery and legacy-versus-canonical semantic comparison must pass for each supported entity family before RC support is claimed.\"\n    ],\n    \"family_evidence_rule\": \"B14/B15 identify the outer ingress window, not blanket migration coverage. Phase 4 must attach deterministic migration fixtures for every advertised entity family; a document containing any unqualified family remains inspection-only.\",\n    \"successor_target_status\": \"The canonical successor document schema and migration implementation belong to Phase 4; B16 is a development composition checkpoint, not another legacy source generation.\"\n  },\n  \"external_configuration_window\": {\n    \"scope_rule\": \"Configuration, last-input and preset support is content/schema based and is deliberately separate from FCStd document support.\",\n    \"configuration_json\": [\n      {\n        \"input\": \"schema_version 1\",\n        \"disposition\": \"validate-and-normalise-current\"\n      },\n      {\n        \"input\": \"schema_version 0\",\n        \"disposition\": \"deterministically-migrate-to-1\"\n      },\n      {\n        \"input\": \"No configuration root but required transition/radius/angle/main_width fields\",\n        \"disposition\": \"recognised-legacy-saved-dialog-shape-migrate-to-1\"\n      },\n      {\n        \"input\": \"Future, negative, missing, non-integer, unsafe or malformed schema/data\",\n        \"disposition\": \"reject-fail-closed\"\n      }\n    ],\n    \"last_dialog_inputs\": {\n      \"accepted_schema_versions\": [\n        1,\n        2,\n        3\n      ],\n      \"disposition\": \"normalise-to-current-in-memory-shape\",\n      \"other_versions\": \"reject-and-use-no-payload\"\n    },\n    \"named_preset_library\": [\n      {\n        \"input\": \"Legacy root array\",\n        \"disposition\": \"migrate-in-memory-to-library-object\"\n      },\n      {\n        \"input\": \"library_schema_version 1\",\n        \"disposition\": \"validate-current\"\n      },\n      {\n        \"input\": \"Other, missing or malformed library schema/root\",\n        \"disposition\": \"reject-fail-closed\"\n      }\n    ],\n    \"named_preset_records\": {\n      \"current_schema\": 1,\n      \"recognised_legacy_aliases\": [\n        \"payload -> configuration\",\n        \"schema_version -> preset_schema_version\"\n      ],\n      \"other_versions\": \"reject-fail-closed\"\n    }\n  },\n  \"persisted_schema_anchors\": {\n    \"ASSEMBLY_LABEL_SCHEMA_VERSION\": 1,\n    \"CHAIR_ANALYSIS_SCHEMA_VERSION\": 5,\n    \"CHAIR_SOLID_SCHEMA_VERSION\": 2,\n    \"CONFIGURATION_SCHEMA_VERSION\": 1,\n    \"CROSSOVER_B3_SCHEMA_VERSION\": 1,\n    \"CROSSOVER_B4_SCHEMA_VERSION\": 1,\n    \"CROSSOVER_INTEGRATION_SCHEMA_VERSION\": 1,\n    \"CROSSOVER_SCHEMA_VERSION\": 1,\n    \"CROSSOVER_SHARED_TIMBER_SCHEMA_VERSION\": 3,\n    \"CROSSOVER_TIMBER_ANALYSIS_SCHEMA_VERSION\": 1,\n    \"LAST_INPUTS_SCHEMA_VERSION\": 3,\n    \"MATERIAL_REPORT_SCHEMA_VERSION\": 1,\n    \"PLATFORM_DEFAULTS_SCHEMA_VERSION\": 3,\n    \"PRESET_LIBRARY_SCHEMA_VERSION\": 1,\n    \"PRESET_RECORD_SCHEMA_VERSION\": 1,\n    \"PRODUCTION_PREFLIGHT_SCHEMA_VERSION\": 1,\n    \"PRODUCTION_RECORD_SCHEMA_VERSION\": 2,\n    \"PRODUCTION_SCHEDULE_SCHEMA_VERSION\": 1,\n    \"TURNOUT_INTEGRATION_SCHEMA_VERSION\": 1,\n    \"TURNOUT_SCHEMA_VERSION\": 1\n  },\n  \"enforcement_and_requalification\": {\n    \"phase_2\": \"Implemented for the bounded foundation: standalone record/type choices and the development-only runtime guard use this exact baseline without broadening the matrix.\",\n    \"phase_4\": \"Implement the document detector, versioned canonical schema, B14/B15 family migrations, copied-target transaction and migration fixtures.\",\n    \"phase_10\": \"Generate and validate package.xml, requalify the supported platform matrix, publish upgrade/recovery guidance and bind unsupported-host diagnostics into the Workbench.\",\n    \"requalification_triggers\": [\n      \"Any FreeCAD version change, including a patch release\",\n      \"Any bundled Python, Qt/PySide, OpenCASCADE or Coin version change\",\n      \"Another OS, architecture, package channel or FreeCAD distribution\",\n      \"A new runtime dependency or a change to the minimum Python feature set\",\n      \"Any persisted schema, migration rule, entity family or compatibility-launcher change\"\n    ],\n    \"required_matrix\": [\n      \"Standalone domain/API import and analytical tests\",\n      \"FreeCADCmd structural, document and save/reopen tests\",\n      \"Real-GUI create/edit/undo/redo/save/reopen workflows\",\n      \"Validate/Export equivalence, transactional failure and cleanup\",\n      \"B14 and B15 copied-document migrations for every advertised entity family\",\n      \"Unsupported, future, conflicting, corrupt and exact change-back cases\"\n    ]\n  },\n  \"evidence\": {\n    \"probe_tool\": \"tools/runtime_compatibility_probe.py\",\n    \"probe_sentinel\": \"TRACKTEMPLATE_RUNTIME_PROBE=\",\n    \"standalone_probe_command\": \".venv/bin/python tools/runtime_compatibility_probe.py\",\n    \"freecad_probe_command\": \"flatpak run --command=FreeCADCmd org.freecad.FreeCAD tools/runtime_compatibility_probe.py --pass --require-qualified\",\n    \"runtime_probe_observed_on\": \"2026-09-19\",\n    \"baseline\": \"reference/phase-evidence/BASELINE.md\",\n    \"b15_acceptance\": \"reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md\",\n    \"plain_line_save_reopen\": \"reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md\",\n    \"straight_station_save_reopen\": \"reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md\",\n    \"turnout_save_reopen\": \"reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md\",\n    \"phase2_foundation\": \"reference/phase-evidence/PHASE2_FOUNDATION.md\",\n    \"phase2_freecad_smoke\": \"tests/freecad_validate_phase2_foundation.py\",\n    \"freecad_1_1_3_requalification\": \"reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#freecad-1-1-3-compatibility-requalification-panel\",\n    \"freecad_1_1_3_py31313_qt6111_qualification\": \"reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#freecad-1-1-3-py31313-qt6111-qualification-panel\",\n    \"known_evidence_gaps\": [\n      \"No Windows, macOS, non-Flatpak Linux or other architecture is qualified yet.\",\n      \"Only one exact FreeCAD 1.1.1 profile and three exact FreeCAD 1.1.3 profiles are qualified. FreeCAD 1.1.2 and all other releases are not qualified.\",\n      \"No pre-B14 or versionless FCStd is promised as a migration source.\",\n      \"The B14/B15 successor document detector and migrator do not exist yet.\",\n      \"B15 save/reopen evidence is bounded to the accepted crossover chair delta; family-by-family migration fixtures remain Phase 4 work.\"\n    ],\n    \"freecad_1_1_3_py31315_qt6112_qualification\": \"reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel\"\n  },\n  \"assessment_boundary\": {\n    \"status\": \"TEST_ONLY_NO_PRODUCT_ADMISSION\",\n    \"canonical_default_sha256\": \"6539ff066b8abcd81cb111c3127124580e6bca44eb19c09ea8ae93175de7113f\",\n    \"rule\": \"This explicitly selected isolated assessment input must never replace the product default contract. A qualified evaluation here only permits the reviewed qualification tests.\"\n  }\n}\n",
+  "matrix": {
+    "gui_entries": [
+      {
+        "bytes": 17033,
+        "path": "tests/freecad_validate_phase4_plain_line_transition_migration.py",
+        "sha256": "53ab880706f17276aa923dc9cb98550c5e2dc1f167384c60a47cfdf7cf7238fc"
+      },
+      {
+        "bytes": 5827,
+        "path": "tools/freecad_bridge/run_phase3_transition_workflow_series.py",
+        "sha256": "774dbce2abeea7b22f9738f19bf9adb03efb7ae1ec6c4f4383a2265a2e744a9e"
+      },
+      {
+        "bytes": 19332,
+        "path": "tools/freecad_bridge/run_phase5_transition_viewprovider.py",
+        "sha256": "17cc6a0e2db06d849ca5e19de13ac8d48cfc6d21502c572cc17fbc47a4429cbd"
+      },
+      {
+        "bytes": 23737,
+        "path": "tools/freecad_bridge/run_phase7_core_layout_export_workflow.py",
+        "sha256": "b8fc72c5c1e21de5f3423081a9d046b896670ace8988d2a5ac161e997b9ee99c"
+      },
+      {
+        "bytes": 47245,
+        "path": "tools/freecad_bridge/run_phase8_turnout_toe_gui.py",
+        "sha256": "b51686adc67bc2419dd96d2a1fd190e87bb4b22463ce9bd17baacd41b792e052"
+      },
+      {
+        "bytes": 18644,
+        "path": "tools/freecad_bridge/run_phase8_crossover_preflight_gui.py",
+        "sha256": "b0d35344d3d454a5617f5b500e9ab0fe0663761455760e2c78b23d72cd841e09"
+      },
+      {
+        "bytes": 38652,
+        "path": "tools/freecad_bridge/run_phase8_crossover_b4_recovery_gui.py",
+        "sha256": "c87269b7b83cb7547a25e4219e52a36ea15cf9c27be01543eae222fe447f6c98"
+      },
+      {
+        "bytes": 28193,
+        "path": "tools/freecad_bridge/run_phase8_crossover_edit_recovery_gui.py",
+        "sha256": "06ca874aac2b34ba002f4671edc5f86aa78354e30b0644372554e952adee97b3"
+      },
+      {
+        "bytes": 34320,
+        "path": "tools/freecad_bridge/run_phase8_crossover_host_integration_recovery_gui.py",
+        "sha256": "ade8cf56ad1ab15306dee3a3410afe2223fc40b73ae661c794508bf80bc499e1"
+      },
+      {
+        "bytes": 35114,
+        "path": "tools/freecad_bridge/run_phase8_turnout_host_integration_recovery_gui.py",
+        "sha256": "73fd6b082406f18f2fdd1084c886516684571e52e5a4db370fcfbb5168f57539"
+      },
+      {
+        "bytes": 40336,
+        "path": "tools/freecad_bridge/run_phase8_straight_host_turnout_gui.py",
+        "sha256": "538fde1b468909e410599e42c6cdabbb8b48d3e3f75dfad51a6f1196deb4ca1e"
+      },
+      {
+        "bytes": 60131,
+        "path": "tools/freecad_bridge/run_phase8_straight_host_crossover_gui.py",
+        "sha256": "51d9a5b324e24b8998140f8a8c6d10014e767fe298778b828a29af2041e52a87"
+      },
+      {
+        "bytes": 48975,
+        "path": "tools/freecad_bridge/run_phase8_straight_crossover_b4_gui.py",
+        "sha256": "54adc499c654803bd0e69d4b6be6a1a6e4919a34094deab805f4a2c87c474b7d"
+      },
+      {
+        "bytes": 41137,
+        "path": "tools/freecad_bridge/run_phase8_turnout_selected_export_gui.py",
+        "sha256": "809933449d71baa98cad9bdfc77c3e91474fb4799a2aef524d98993ec1509124"
+      },
+      {
+        "bytes": 41137,
+        "path": "tools/freecad_bridge/run_phase8_turnout_selected_export_gui.py",
+        "sha256": "809933449d71baa98cad9bdfc77c3e91474fb4799a2aef524d98993ec1509124"
+      },
+      {
+        "bytes": 45105,
+        "path": "tools/freecad_bridge/run_phase8_crossover_selected_export_gui.py",
+        "sha256": "67338113c1e4df4c4638459073afc9c92d8feefefd32d9df4b3a0b2d6f7a51d7"
+      },
+      {
+        "bytes": 45105,
+        "path": "tools/freecad_bridge/run_phase8_crossover_selected_export_gui.py",
+        "sha256": "67338113c1e4df4c4638459073afc9c92d8feefefd32d9df4b3a0b2d6f7a51d7"
+      },
+      {
+        "bytes": 45105,
+        "path": "tools/freecad_bridge/run_phase8_crossover_selected_export_gui.py",
+        "sha256": "67338113c1e4df4c4638459073afc9c92d8feefefd32d9df4b3a0b2d6f7a51d7"
+      },
+      {
+        "bytes": 45105,
+        "path": "tools/freecad_bridge/run_phase8_crossover_selected_export_gui.py",
+        "sha256": "67338113c1e4df4c4638459073afc9c92d8feefefd32d9df4b3a0b2d6f7a51d7"
+      },
+      {
+        "bytes": 16742,
+        "path": "tools/freecad_bridge/run_selected_export_document_gui.py",
+        "sha256": "ffd8b9e146e9d6517ff8fb679574bd4f2dc22eff0c2ba61f4c02e55194ecb9d8"
+      },
+      {
+        "bytes": 19851,
+        "path": "tools/freecad_bridge/run_selected_export_set_gui.py",
+        "sha256": "cbb63473c73fb325a330c95165a3f6bad66b6c25e93e2eacccecdcfc3c2e87fd"
+      },
+      {
+        "bytes": 12491,
+        "path": "tools/freecad_bridge/run_selected_export_rollback_gui.py",
+        "sha256": "40220fa45cc497f713363e35f971bf4f74a2ef73a725253e19f9c3793a9f3eb6"
+      }
+    ],
+    "native_entries": [
+      {
+        "bytes": 3415,
+        "path": "tests/freecad_validate_b15.py",
+        "sha256": "a52d6db099f35ec8bf037655f0660860eba2baedbae62aa109165aa789523d49"
+      },
+      {
+        "bytes": 18004,
+        "path": "tests/freecad_validate_phase1_chair_analysis_invalidation.py",
+        "sha256": "68497eab17c9c259fc22a5a3d1cbaaeef8af47fbf37f04852462b4d86d1a0f1f"
+      },
+      {
+        "bytes": 11212,
+        "path": "tests/freecad_validate_phase1_chair_analysis_persistence.py",
+        "sha256": "5713e8b4369a7f2706728dc4dfa3e32060c3584f3be0df2b479cb69f6a76e64c"
+      },
+      {
+        "bytes": 5899,
+        "path": "tests/freecad_validate_phase1_crossover_feasibility.py",
+        "sha256": "d133cbb7560ff9cf3d1b5bae196bf9d7230b5e8c0243547a3ec561c9f388b781"
+      },
+      {
+        "bytes": 12789,
+        "path": "tests/freecad_validate_phase1_crossover_timbering.py",
+        "sha256": "b54aebc20828e14ae8819f36e50cdaac21c04fa4797f1e2518cd995a6c66110c"
+      },
+      {
+        "bytes": 1994,
+        "path": "tests/freecad_validate_phase2_foundation.py",
+        "sha256": "4729d4f8bec2614ca38895091dea393929a90b8cda7766902315b533f84ec9dc"
+      },
+      {
+        "bytes": 8187,
+        "path": "tests/freecad_validate_phase3_transition_slice.py",
+        "sha256": "57747dc039214abff14593044a20266ddf0c25f8675c6db7904f10f0e1a5cb5d"
+      },
+      {
+        "bytes": 2325,
+        "path": "tests/freecad_validate_phase4_chair_definition.py",
+        "sha256": "eec0bfb60760a0a695fa701ccd43691f3be8233c1fca2b957fba7eac5fe446ea"
+      },
+      {
+        "bytes": 7248,
+        "path": "tests/freecad_validate_phase4_legacy_document_detection.py",
+        "sha256": "2a62b0ed533c1d1ee1940fc3a0ff173883b43a344123d1e2f1f5545f1bb3d0d9"
+      },
+      {
+        "bytes": 3807,
+        "path": "tests/freecad_validate_phase4_plain_line_transition_assessment.py",
+        "sha256": "d6441b7061b6b36d0e706a6f49d11859ecff8106ca1d971f35ed3bb3ca03d9f5"
+      },
+      {
+        "bytes": 17033,
+        "path": "tests/freecad_validate_phase4_plain_line_transition_migration.py",
+        "sha256": "53ab880706f17276aa923dc9cb98550c5e2dc1f167384c60a47cfdf7cf7238fc"
+      },
+      {
+        "bytes": 22183,
+        "path": "tests/freecad_validate_phase4_transition_persistence.py",
+        "sha256": "3a1e5b1369edf293392692e23e8e8d058ab4657bcfbbd776f916218474537aa7"
+      },
+      {
+        "bytes": 1824,
+        "path": "tests/freecad_validate_phase4_transition_state.py",
+        "sha256": "964dac836a9bd6585efea3195a99676186d165f3812dcf81430234a09d1829c4"
+      },
+      {
+        "bytes": 2304,
+        "path": "tests/freecad_validate_phase5_transition_coin_scene.py",
+        "sha256": "dfe10e8984707d3d8b2ebed5c700d57793053c491db6509bf163bd30850aa167"
+      },
+      {
+        "bytes": 10029,
+        "path": "tests/freecad_validate_phase5_transition_edit.py",
+        "sha256": "6f5e6906bafc12b254b121295086bb78d1c6ed571323c0edcada8e07e3c2521c"
+      },
+      {
+        "bytes": 28657,
+        "path": "tests/freecad_validate_phase6_transition_dxf_export.py",
+        "sha256": "e75c26d40a76b100c4d6cc486bb6279854832cc4b659dea2a1f535b5993063c0"
+      },
+      {
+        "bytes": 2343,
+        "path": "tests/freecad_validate_phase6_transition_exact_contract.py",
+        "sha256": "50d62debc8c1b7f21cf84158b0c4f5ba925d47db916664d4221fcddf950950fc"
+      },
+      {
+        "bytes": 16432,
+        "path": "tests/freecad_validate_phase6_transition_exact_geometry.py",
+        "sha256": "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"
+      },
+      {
+        "bytes": 13726,
+        "path": "tests/freecad_validate_phase6_transition_output_equivalence.py",
+        "sha256": "462bb6fed043b3feabf0cdb2b8df18a14b2d3c93de723b84afafbbd0baeb7d84"
+      },
+      {
+        "bytes": 7471,
+        "path": "tests/freecad_validate_phase7_alignment_handedness.py",
+        "sha256": "78de94592806e0a379081fba49c6588f668984b3bc644563971dabc52a4efcae"
+      },
+      {
+        "bytes": 5434,
+        "path": "tests/freecad_validate_phase7_clothoid_exit.py",
+        "sha256": "c70ab5a572bed5bc597917e19874921a829c2a67521230f4b8a2c3bd37774faa"
+      },
+      {
+        "bytes": 5964,
+        "path": "tests/freecad_validate_phase7_common_straight_extensions.py",
+        "sha256": "575fde15ff2f90e894533c8f1d0ff1f627b3c05a2cb98c946ae12d70a1b50523"
+      },
+      {
+        "bytes": 7088,
+        "path": "tests/freecad_validate_phase7_concentric_core.py",
+        "sha256": "ae6d2f55f6d6db888ba0eaf3cce7e160f87ab01aa8d33fa41e7ab763d398f757"
+      },
+      {
+        "bytes": 9049,
+        "path": "tests/freecad_validate_phase7_connected_straight_validation.py",
+        "sha256": "00aa8f2127b20a63679ffb667fccedb249feaa0072873ff3d4e42489be82b66f"
+      },
+      {
+        "bytes": 8372,
+        "path": "tests/freecad_validate_phase7_core_layout_export.py",
+        "sha256": "30364a56a9105520f74beca788278a7982667dcfadf359cba59ae21c94ba4269"
+      },
+      {
+        "bytes": 3126,
+        "path": "tests/freecad_validate_phase7_main_circle_centre.py",
+        "sha256": "b2262904546a0ed8133448476555001702ac694eef72aabdef0cdf6da55eed3d"
+      },
+      {
+        "bytes": 7411,
+        "path": "tests/freecad_validate_phase7_platform_core.py",
+        "sha256": "633f22b6a541a0462ce54e1fcf007276fb9ade3c1b0776cf37eafeff37fc1c06"
+      },
+      {
+        "bytes": 6494,
+        "path": "tests/freecad_validate_phase7_platform_heading_coverage.py",
+        "sha256": "dc03dc4698b142e345e6fdaca353e60722c8d8e4c60d25f54818673d7f04ae1d"
+      },
+      {
+        "bytes": 9906,
+        "path": "tests/freecad_validate_phase7_platform_input_validation.py",
+        "sha256": "68c5e7e013430775a117cf5ebdb252204403adc4a289490529494e906e125e5e"
+      },
+      {
+        "bytes": 11476,
+        "path": "tests/freecad_validate_phase7_platform_longitudinal_bounds.py",
+        "sha256": "cf0860828bfbd65300d6c22cf6cad7158e91044314cb2fb4b8f610f9b4520fb3"
+      },
+      {
+        "bytes": 10755,
+        "path": "tests/freecad_validate_phase7_platform_top_heights.py",
+        "sha256": "39ea194df400cd7ed0dc30a1cc6f2764a68dc300bc1617274a44440569931b22"
+      },
+      {
+        "bytes": 5326,
+        "path": "tests/freecad_validate_phase7_platform_transitions.py",
+        "sha256": "1332dff68849cf5261e86a81507cca11b12b5c4d85fd9d0dd9b9b78ddbb98926"
+      },
+      {
+        "bytes": 8494,
+        "path": "tests/freecad_validate_phase7_station_mapping.py",
+        "sha256": "9974b95672ba0da328219f30c73a77a6162d3ce3d5a0bf187d67136ffe356cac"
+      },
+      {
+        "bytes": 9803,
+        "path": "tests/freecad_validate_phase7_straight_route.py",
+        "sha256": "2966f6f33811e23effdf76df2c738979f5d1726a39d600c204bf6f161c5923c5"
+      },
+      {
+        "bytes": 7475,
+        "path": "tests/freecad_validate_phase7_track_alignment_preparation.py",
+        "sha256": "2ea63ccfef3610feae74fc0de3ed2d6a131ab9ae58e8d6378225f31533fafab3"
+      },
+      {
+        "bytes": 18341,
+        "path": "tests/freecad_validate_phase8_crossover_b4_recovery.py",
+        "sha256": "670404a948f9bfae8098b63bc19999e4e9766447237ffe7cb259d396b544e9d6"
+      },
+      {
+        "bytes": 12058,
+        "path": "tests/freecad_validate_phase8_crossover_edit_recovery.py",
+        "sha256": "d4c95244c3eb0dbeb53441e9937b2efa584c3fe783fae3f434635fba24e84f17"
+      },
+      {
+        "bytes": 20729,
+        "path": "tests/freecad_validate_phase8_crossover_host_integration_recovery.py",
+        "sha256": "42cc5d577a5e0891ab0f26870683921d31a60f2e518fe3a05dec580db4c1e441"
+      },
+      {
+        "bytes": 19722,
+        "path": "tests/freecad_validate_phase8_crossover_preflight.py",
+        "sha256": "e05b42b69892e5028f349058efb2613607dd782c1bb318ba89b10158c645542f"
+      },
+      {
+        "bytes": 16866,
+        "path": "tests/freecad_validate_phase8_crossover_selected_export.py",
+        "sha256": "dfd2f72262bf438ebd75e1e97aa9fd0c99edb70f7350d6ff944e2697ef6dbc26"
+      },
+      {
+        "bytes": 16523,
+        "path": "tests/freecad_validate_phase8_curved_host_crossover.py",
+        "sha256": "df580546e3fb3a649b7a1f9fe8d601276aaffbe29eb186a923c9912349699af7"
+      },
+      {
+        "bytes": 15451,
+        "path": "tests/freecad_validate_phase8_curved_host_turnout.py",
+        "sha256": "cc6d7b79df6da6843b1d990ead56eec2d26fa3528dc0ddff01f0651004c30ed3"
+      },
+      {
+        "bytes": 15386,
+        "path": "tests/freecad_validate_phase8_straight_crossover_b4.py",
+        "sha256": "b0deac544bd5543c93addd630ce89463d3c4dec235386662c87c1ccca82d340c"
+      },
+      {
+        "bytes": 34115,
+        "path": "tests/freecad_validate_phase8_straight_host_crossover.py",
+        "sha256": "36994938a2b0b1f322da146078799cc877c2a25d1d5d1540fc4e12502e3a64c1"
+      },
+      {
+        "bytes": 23545,
+        "path": "tests/freecad_validate_phase8_straight_host_turnout.py",
+        "sha256": "9a1cd383b7f35cf857c81f3a53ce320db0ee311fe01ceeaaf0dcc5fda77b53aa"
+      },
+      {
+        "bytes": 22950,
+        "path": "tests/freecad_validate_phase8_turnout_host_integration_recovery.py",
+        "sha256": "c3e252d4e017747ca7ebcde9b575732158a523614c4adf579aaabc2e60b5a610"
+      },
+      {
+        "bytes": 20769,
+        "path": "tests/freecad_validate_phase8_turnout_selected_export.py",
+        "sha256": "3d00a5588090f9ddad9bccee8daed5fea736fa35c1b283741eaa0dd3480c5bc8"
+      },
+      {
+        "bytes": 9920,
+        "path": "tests/freecad_validate_phase8_turnout_toe_range.py",
+        "sha256": "f8a2be94d66fc53208296ec13f2a2c1bc9aa07c7a7048be208c23d8b0cf4acec"
+      },
+      {
+        "bytes": 9078,
+        "path": "tests/freecad_validate_phase9a_chair_base.py",
+        "sha256": "02f3acd98d908a56edf32e093eea899d4c13a35cd6821252a9c077d749b3bce2"
+      },
+      {
+        "bytes": 8157,
+        "path": "tests/freecad_validate_phase9a_chair_key.py",
+        "sha256": "3000b120f4dc499619ac9865706177943d241b5818a7df4468d60efcc61a9de4"
+      },
+      {
+        "bytes": 11536,
+        "path": "tests/freecad_validate_phase9a_chair_outer_jaw.py",
+        "sha256": "4107cd11fff3a3aa394f30bd99033d7f9efc73e460cfa45366c0df29c736fe90"
+      },
+      {
+        "bytes": 5803,
+        "path": "tests/freecad_validate_phase9a_chair_seat.py",
+        "sha256": "d922406e093e89a5940472f1ffee03ec08b1911a7c9a58f1c2141a6c26f5e643"
+      },
+      {
+        "bytes": 22483,
+        "path": "tests/freecad_validate_core_export_staging.py",
+        "sha256": "a0650e4ce9719e17cde89d4ac91c4e29c795827132538f4755f8ea48f72bcb2c"
+      },
+      {
+        "bytes": 22544,
+        "path": "tests/freecad_validate_core_export_atomic.py",
+        "sha256": "e3d966dbd04a462e9bc39568a4ecbd822ad00cd97ec715203d073800529c1504"
+      },
+      {
+        "bytes": 13401,
+        "path": "tests/freecad_validate_selected_export_document.py",
+        "sha256": "2013cff56e215bf76adb192971e73c7e43eb1f624ca33e8f0665c89b1ad95315"
+      },
+      {
+        "bytes": 19232,
+        "path": "tests/freecad_validate_selected_export_set.py",
+        "sha256": "82bfc1f1a5ada23203816453b62b9aafdb1e9ca6d89401d0b6c184ada0e35353"
+      },
+      {
+        "bytes": 11012,
+        "path": "tests/freecad_validate_selected_export_rollback.py",
+        "sha256": "8352be0b238a0f3c3f712770fe8c17b87a4ba4727246fd1626e657902b35c37a"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source_identities": {
+    "assessment-compatibility.json": {
+      "bytes": 17402,
+      "sha256": "285192eeb388e0d2d6be64a47170e1cafa9ffb8efbf6ee3b43d51edc3769c7e7"
+    },
+    "compatibility-gui-output-handling-proposal-v2.json": {
+      "bytes": 157516,
+      "sha256": "0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b"
+    },
+    "qualification-matrix-input-map.json": {
+      "bytes": 105804,
+      "sha256": "7da43a08757c529f7a90f7656c109c1b979a956d4a2618241054889f749aabbc"
+    }
+  }
+}

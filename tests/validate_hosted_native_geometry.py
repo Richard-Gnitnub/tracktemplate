@@ -1469,7 +1469,14 @@ class PilotIdentityTests(unittest.TestCase):
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
             "- rea-bc-straight-readiness", "- rea-bc-straight-native",
-            "- runtime-observation",
+            "- runtime-observation", "- compatibility-readiness",
+            "readiness_control:",
+            "description: Exact reviewed compatibility readiness control JSON",
+            "required: false", "type: string", "readiness_review:",
+            "description: Independent readiness review receipt JSON",
+            "required: false", "type: string", "readiness_recovery:",
+            "description: Independent preservation receipt JSON",
+            "required: false", "type: string",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)
