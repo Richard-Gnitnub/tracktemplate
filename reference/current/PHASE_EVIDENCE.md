@@ -4990,3 +4990,64 @@ It does not contain the missing evidence from the test on GitHub. The previous r
 Independent review of all source files for the full host matrix is not complete. Those files do not have acceptance for the full host matrix.
 The project owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval." Phase 9B stays `Open` at 3/6.
 The phase exit and risk status, rights state, and product performance status stay the same.
+
+## Compatibility test repair — 2026-11-20
+
+<a id="runtime-compatibility-readiness-repair-panel"></a>
+
+**Decision:** D-P9-025 records the owner's instruction after the [compatibility test stopped](#runtime-compatibility-readiness-stop-panel).
+This Level 3 decision gives authority for the "bounded investigation and evidence-preservation repair" requested under D-P9-024.
+It then gives authority for "fresh hosted readiness" under the same bounded scope and limits.
+The [decision register](gate-decisions.json) preserves the complete owner statement.
+
+| Owner view | Current information |
+| --- | --- |
+| Current state | The owner gives authority for the specified repair work and a new `gui-readiness` test on GitHub. The previous test stays FAIL. |
+| What changed | The owner supplies the decision that D-P9-024 requires at the recorded stop. |
+| What now works | The instruction gives authority for the specified work. It supplies no result from the repair or a new test. |
+| Limitations/findings | Run `44783029665` has no available initial diagnostic from `seal` or complete mandatory evidence. The instruction does not supply that evidence. |
+| Owner decision | Use the repository skills. Find the cause of the `seal` failure. Make the smallest correction that the findings support. Preserve the original failure and all available evidence. |
+| Next action | Complete the necessary validation and "independent review" before the new `gui-readiness` test. After an independent reviewer gives a PASS result for complete evidence from that test, continue only the "qualification steps already authorised". |
+
+Keep the [D-P9-023 bounded scope](#runtime-compatibility-output-handling-panel), host profile identities and resource limits.
+Keep the mandatory evidence, output restrictions, independent preservation and 30-day Actions retention.
+The authority in D-P9-024 includes the necessary `git commit` and `git push` operations and changes to pull requests.
+Do not request permission for routine actions that the instruction covers.
+
+**Stop conditions:** The owner gives these conditions:
+
+> Stop if the applicable repair allowance is exhausted, mandatory evidence remains unavailable after fresh readiness, or the work requires wider authority.
+
+Keep the previous repair records. The previous `2/2` record stays the same, with no repairs available.
+This decision gives no new repair count. It does not change any previous count.
+Use D-P9-019 only in its bounded scope. The finite documentation limits stay the same.
+
+**Panel:** Richard is the project owner and panel chair. `/root` presents the instruction and owns its technical meaning.
+
+After the owner instruction, `/root/output_producer` examined the applicable authority and repair limits before authoring this record.
+That agent previously wrote the output producer and shares the workspace with the implementing agents.
+Its authority assessment gives no acceptance for repair software or a test result.
+
+An independent reviewer must examine the repair and evidence from the new test.
+The panel recommendation is **Proceed with bounded conditions**. This authority assessment has no unresolved finding.
+
+| Risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | Before transfer, the change owner and independent reviewer must check the unchanged D-P9-023 bounded scope for inputs and outputs. |
+| PR-13 | The change owner must preserve the original failure, all available evidence and previous repair records. Before dependent tests or cleanup, an independent reviewer must check the preserved evidence. |
+| PR-22 | Before the new test, an independent reviewer must examine the exact repair, validation results and execution conditions. Before the "qualification steps" continue, an independent reviewer must examine complete evidence from that test. |
+
+No risk closes. No assessment of control effectiveness changes.
+Preservation in this bounded scope does not complete the monthly restore test.
+The previous failed test does not qualify the host profile. A new test cannot change that previous result.
+
+**Programme limits:** The owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval."
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+This decision gives no other publication authority, rights clearance, or acceptance for physical fit, production, product performance, release or a phase exit.
+
+**Proof/provenance:** The baseline is commit `b08d4d3ceffecd25b3acd0b5964ea9ef20668315`.
+The file `owner-repair-instruction.json` has 1,356 bytes and SHA-256 `b15f392eca38bf1b4f6ecc15947efec41cef2fccbf9b89202b8cb37657f38b21`.
+It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
+The file is in `tmp/runtime-compatibility-qualification/readiness-repair-20261120/` in the task worktree.
+The previous failure records and independent preservation remain in the [stop record](#runtime-compatibility-readiness-stop-panel).
