@@ -4940,3 +4940,52 @@ The file `owner-standing-instruction.json` has SHA-256 `d193c34674fa4eb09de4ccaa
 It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
 The previous authority for the "bounded runtime-compatibility qualification" and D-P9-023 stay the same.
 The review receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
+
+## Compatibility test stop — 2026-11-20
+
+<a id="runtime-compatibility-readiness-stop-panel"></a>
+
+This Level 2 record reports a test result. It gives no new authority.
+
+| Field | Result |
+| --- | --- |
+| Current state | Compatibility qualification stopped because mandatory evidence is missing. The full host matrix did not start. |
+| What changed | The [first compatibility test on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44783029665) has a FAIL result. It used commit `33d76895d236cded67c302c0b48faebf26c9d238`, attempt 1. |
+| What now works | The [standalone CI test](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44779702342) at that commit gives PASS results for all 201 validators. This does not qualify the host. |
+| Limitations/findings | The `seal`, `archive` and `publish` operations failed. GitHub reports no artifact. The original diagnostic from `seal` is unavailable. Its cause stays unresolved. |
+| Owner decision | [D-P9-024](#runtime-compatibility-standing-instruction-panel) requires an owner decision at a repository stop condition. No subsequent decision is recorded. |
+| Next action | Preserve the available evidence and stopped drafts. Return the missing-evidence condition to the owner. Do not start another compatibility test or the full host matrix. |
+
+The execution and cleanup steps reported success. Their step status does not prove the missing runtime, resource or cleanup results.
+The original image, result records and diagnostics from the runner are unavailable for independent review.
+The [validation instructions](../VALIDATION.md#validation-harness-readiness) require a stop before the full test when necessary evidence is incomplete.
+No retry occurred.
+
+**Independent review:** `/root/assessment_prepare` gives `NOT_READY_MISSING_MANDATORY_EVIDENCE`.
+The reviewer did not author the test controller or suite. The reviewer authored the software that transfers the evidence.
+This authorship limits independence for review of that software.
+The implementing agent and reviewers share the workspace.
+
+`/root/producer_review` reproduced a separate defect in a test without FreeCAD.
+The software that transfers evidence can reject its own failure diagnostic.
+This finding does not establish the cause of the actual `seal` failure. No repair of this failure occurred.
+
+**Preservation:** The USB snapshot `runtime-compatibility-readiness-stop-20261120` contains the available logs, metadata, reviews and stopped source drafts.
+It contains 1,781 files. Its manifest has SHA-256 `97b25460227bc6e509200a7c50e9e9deea471fa9a885246539ba3702a961a5e3`.
+Independent readback verifies the exact file set, bytes, hashes and access modes.
+It does not contain the unavailable runner evidence. The previous repair records remain preserved.
+
+**Proof/provenance:** Records are under `tmp/runtime-compatibility-qualification/autonomous-qualification-20261120/readiness-33d/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `actual-run.log` | `64a13197938773f9021cd4f1c08d92a8aee7ca540932b02268270a741c84a514` |
+| `actual-artifact-inventory.json` | `c48cd41fcc3a648f2f4909206bee6e3d3352dc0d2174ba648f2c5f55587ed9eb` |
+| `actual-result-independent-review-01.json` | `6f5e5c6748d457d13bd3f9db821f52e8c5c6141d6a2f9c2a2c73eceb4c60e249` |
+| `actual-result-independent-review-inventory-supplement.json` | `569d976e8537c148154d0c842e373234006d1c53379467239f5e36280446a7e1` |
+| `actual-failure-source-audit-01.json` | `5718afd30840632d580a50b0b31d90b89826c7834b822178ebfb8ccea7e7e215` |
+| `stop-preservation-independent-review.json` | `69c88e6c58df464df918c1bb92fcd8c9f32c89ff9fc571b2f9a73badb2ba0bec` |
+
+The full producer review remains incomplete. The stopped drafts are not accepted qualification software.
+Runtime admission and ZY resumption remain blocked. Phase 9B stays Open at 3/6.
+No phase exit, risk, rights or performance status changes.
