@@ -5065,29 +5065,29 @@ This Level 2 record reports a test result. It gives no new authority.
 
 | Item | Result |
 | --- | --- |
-| Current state | The D-P9-025 stop condition applies because mandatory evidence remains unavailable after the new `gui-readiness` test. The full host matrix did not start. |
+| Current state | The D-P9-025 stop condition applies because mandatory evidence is not available after the new `gui-readiness` test. The full host matrix did not start. |
 | What changed | [Run 44819325835](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44819325835) gives FAIL at commit `ceda757f084bd0d0229e8cff1afb0fe9b50bf4de`, with `attempt` set to `1`. |
-| What now works | [Standalone CI](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44814954553) gives PASS results for all 205 validators at that commit. Three tests in these validators did not run, as expected. This does not qualify the host profile. |
+| What now works | [Standalone CI](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44814954553) gives PASS results for all 205 validators at that commit. Three tests in these validators correctly did not run. This does not qualify the host profile. |
 | Limitations/findings | The `acquire`, `archive` and `publish` steps gave FAIL results. The `run` and `seal` steps did not run. GitHub reports `"artifacts": []`. |
-| Owner decision | The [D-P9-025 stop conditions](#runtime-compatibility-readiness-repair-panel) require an owner decision before further repair or another compatibility test. |
-| Next action | Preserve all available evidence and report the stop to the project owner. Do not repair, repeat the test or start the full host matrix without that decision. |
+| Owner decision | The [D-P9-025 stop conditions](#runtime-compatibility-readiness-repair-panel) show that an owner decision is necessary before more repair or one more compatibility test. |
+| Next action | Preserve all available evidence. Report the stop to the project owner. Without that decision, do not repair. Without that decision, do not do the test again. Without that decision, do not start the full host matrix. |
 
-The review lists 21 mandatory files that are missing from stages that started.
-Original diagnostic output from `acquire`, `archive` and `publish` is unavailable. Their causes are `CANNOT_VERIFY`.
-The final transfer failed because `compatibility-readiness-final.tar` was absent.
-The cleanup step reports `success`, but its original records are missing. This step status does not prove cleanup or resource use within limits.
+The review shows 21 mandatory files that are missing from steps that started.
+Diagnostic output that the `acquire`, `archive` and `publish` steps wrote is not available. Their causes are `CANNOT_VERIFY`.
+The last step to send evidence gave a FAIL result because `compatibility-readiness-final.tar` was missing.
+The cleanup step reports `success`, but its records from the test are missing. This step status does not prove cleanup or resource use in the limits.
 
 **Independent review:** `/root/assessment_prepare` reports `STOP_MISSING_MANDATORY_EVIDENCE_AFTER_FRESH_READINESS`.
-That reviewer wrote the software that transfers evidence. `/root/producer_review` separately examined the cause and stop condition.
-The second reviewer wrote unchanged software for the GUI test. These result reviews do not accept either reviewer's own software.
-Both reviewers share the task worktree.
+That reviewer wrote the software that sends evidence. `/root/producer_review` independently examined the cause and stop condition.
+The second reviewer wrote the GUI test software, and that software did not change. These result reviews do not accept the software that these reviewers wrote.
+The two reviewers use the same task worktree.
 
-**Independent preservation:** The approved USB holds all available original evidence and both reviews.
+**Independent preservation:** The approved USB contains copies of all available evidence and the two reviews.
 The new snapshot, `fresh-readiness-44819325835`, contains 22 files with 321,156 bytes, plus its manifest.
-An independent reviewer compared the file set, bytes, hashes, types and modes. These checks gave PASS results.
-The missing evidence remains unavailable. This bounded preservation does not complete the monthly restore test.
+An independent reviewer compared the file set, bytes, hashes, file types and file modes. These checks gave PASS results.
+The missing evidence is not available. This bounded preservation does not complete the restore test that is necessary each month.
 
-The [previous test](#runtime-compatibility-readiness-stop-panel) stays FAIL. The previous repair records and `2/2` record stay unchanged.
+The [previous test](#runtime-compatibility-readiness-stop-panel) stays FAIL. The previous repair records and `2/2` record do not change.
 The owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval."
 Phase 9B stays `Open` at 3/6. No phase exit, risk status, rights state or product performance status changes.
 
