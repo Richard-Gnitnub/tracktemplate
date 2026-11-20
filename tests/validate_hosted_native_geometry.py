@@ -1469,6 +1469,7 @@ class PilotIdentityTests(unittest.TestCase):
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
             "- rea-bc-straight-readiness", "- rea-bc-straight-native",
+            "- runtime-observation",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)
@@ -1523,6 +1524,8 @@ elif command[:2] == ["sudo", "apt-get"]:
     ), command
 elif command[:2] == ["sudo", "flatpak"]:
     assert command[2] in ("remote-add", "install", "update"), command
+    if command[2] == "update" and command[-1] == fixture.get("fail_update"):
+        sys.exit(47)
 elif command == ["sudo", "loginctl", "enable-linger", "runner"]:
     pass
 elif command == ["sudo", "systemctl", "start", manager]:
@@ -1571,7 +1574,8 @@ class HostedSetupTests(unittest.TestCase):
         return "\n".join(line[10:] for line in lines) + "\n"
 
     def execute_setup(self, *, properties=None, kernel_controllers=None,
-                      failed_property=None, unreadable_kernel=False):
+                      failed_property=None, unreadable_kernel=False,
+                      workload="transition", fail_update=None):
         fixture = {
             "properties": {
                 "ActiveState": "active",
@@ -1583,6 +1587,7 @@ class HostedSetupTests(unittest.TestCase):
             },
             "kernel_controllers": "cpuset cpu io memory pids",
             "failed_property": failed_property,
+            "fail_update": fail_update,
         }
         fixture["properties"].update(properties or {})
         if kernel_controllers is not None:
@@ -1609,6 +1614,7 @@ class HostedSetupTests(unittest.TestCase):
                 env={
                     "PATH": str(binary),
                     "GITHUB_RUN_ATTEMPT": "1",
+                    "TRACKTEMPLATE_HOSTED_WORKLOAD": workload,
                     "GITHUB_ENV": str(environment_file),
                     "SETUP_FIXTURE": str(inputs),
                     "SETUP_CALLS": str(calls),
@@ -1627,6 +1633,64 @@ class HostedSetupTests(unittest.TestCase):
         self.assertTrue(any(command[:2] == ["systemctl", "show"]
                             for command in calls), calls)
         self.assertEqual(exported, "")
+
+    def test_observation_setup_pins_timeout_and_failure_stop(self):
+        workflow = (
+            ROOT / ".github/workflows/native-geometry-pilot.yml"
+        ).read_text()
+        self.assertIn(
+            "timeout-minutes: ${{ inputs.workload == 'runtime-observation' && 9 || 10 }}",
+            workflow,
+        )
+        refs = (
+            "app/org.freecad.FreeCAD/x86_64/stable",
+            "runtime/org.kde.Platform/x86_64/6.11",
+        )
+        for workload, pins in (
+            ("transition", (pilot.APP_COMMIT, pilot.RUNTIME_COMMIT)),
+            (
+                "runtime-observation",
+                (
+                    RuntimeObservationTests.app_pin,
+                    RuntimeObservationTests.runtime_pin,
+                ),
+            ),
+        ):
+            result, calls, _exported = self.execute_setup(workload=workload)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                [c for c in calls if c[:3] == ["sudo", "flatpak", "update"]],
+                [
+                    [
+                        "sudo",
+                        "flatpak",
+                        "update",
+                        "--system",
+                        "--noninteractive",
+                        "-y",
+                        "--no-related",
+                        "--no-deps",
+                        "--commit=" + pin,
+                        ref,
+                    ]
+                    for pin, ref in zip(pins, refs)
+                ],
+            )
+        for index, ref in enumerate(refs):
+            result, calls, exported = self.execute_setup(
+                workload="runtime-observation",
+                fail_update=ref,
+            )
+            self.assertEqual(result.returncode, 47)
+            updates = [c for c in calls if c[:3] == ["sudo", "flatpak", "update"]]
+            self.assertEqual(len(updates), index + 1)
+            self.assertEqual(exported, "")
+            self.assertFalse(
+                any(
+                    "FreeCADCmd" in c or c[:2] == ["systemctl", "show"]
+                    for c in calls
+                )
+            )
 
     def test_existing_delegation_admits_without_runtime_mutation(self):
         result, calls, exported = self.execute_setup()
@@ -1865,6 +1929,374 @@ class HostObservationTests(unittest.TestCase):
             summary = json.loads((output / "summary.json").read_text())
             self.assertEqual(summary["status"], "FAIL")
             self.assertEqual(summary["classification"], "EVIDENCE_INCOMPLETE")
+
+
+class RuntimeObservationTests(unittest.TestCase):
+    """Observe the real metadata producer with inert native-module doubles."""
+
+    app_pin = (
+        "b7e0947f142c4e263d2cf950a7decb5a96f7243b0bf5adc9fda60d8e8d1eb811"
+    )
+    runtime_pin = (
+        "2c059c881e5059ea801dc963cc970b83d775de03b98e9f570b31790e1f92ab5d"
+    )
+    probe_path = "tools/runtime_compatibility_probe.py"
+
+    def produced(self, *, qt_version="6.11.2", metadata=None):
+        from types import SimpleNamespace
+        from tracktemplate import bootstrap
+
+        modules = {
+            "FreeCAD": SimpleNamespace(
+                Version=lambda: ["1", "1", "4"] + (
+                    ["45039 (Git)", "https://github.com/FreeCAD/FreeCAD.git",
+                     "2026/09/28 13:46:34", "(HEAD detached at 1.1.4)",
+                     "4fd3bf320d9566a27e60069fc8387448aaa3a094"]
+                    if metadata is None else metadata
+                )
+            ),
+            "Part": SimpleNamespace(OCC_VERSION_STRING="7.8.1"),
+            "PySide6": SimpleNamespace(__version__=qt_version),
+            "PySide6.QtCore": SimpleNamespace(qVersion=lambda: qt_version),
+            "pivy.coin": SimpleNamespace(
+                SoDB=SimpleNamespace(
+                    getVersion=lambda: "SIM Coin 4.0.10",
+                )
+            ),
+        }
+        spec = importlib.util.spec_from_file_location(
+            "runtime_compatibility_probe",
+            ROOT / self.probe_path,
+        )
+        module = importlib.util.module_from_spec(spec)
+        output = io.StringIO()
+        with (
+            patch.dict(sys.modules, modules),
+            patch.dict(
+                pilot.os.environ, {"FLATPAK_ID": "org.freecad.FreeCAD"}
+            ),
+            patch.object(sys, "argv", [str(ROOT / self.probe_path)]),
+            patch.object(
+                bootstrap.platform,
+                "python_implementation",
+                return_value="CPython",
+            ),
+            patch.object(
+                bootstrap.platform, "python_version", return_value="3.13.15"
+            ),
+            patch.object(bootstrap.platform, "system", return_value="Linux"),
+            patch.object(bootstrap.platform, "machine", return_value="x86_64"),
+            patch.object(sys, "version_info", (3, 13, 15)),
+            contextlib.redirect_stdout(output),
+        ):
+            spec.loader.exec_module(module)
+        return output.getvalue()
+
+    def assess(
+        self,
+        *,
+        stdout=None,
+        result=None,
+        samples=None,
+        clearance=True,
+        deadline_clearance=False,
+    ):
+        guard = good_guard() if result is None else result
+        if result is None:
+            guard["limits"]["timeout_seconds"] = 90
+        return pilot.assess_result(
+            guard,
+            self.produced() if stdout is None else stdout,
+            "",
+            [live_sample()] if samples is None else samples,
+            clearance,
+            deadline_clearance=deadline_clearance,
+            workload="runtime-observation",
+        )
+
+    def test_fixed_direct_probe_command_and_selected_limits(self):
+        self.assertEqual(
+            pilot._native_command("runtime-observation"),
+            [
+                "flatpak",
+                "run",
+                "--command=FreeCADCmd",
+                "--env=OMP_NUM_THREADS=1",
+                "--env=OPENBLAS_NUM_THREADS=1",
+                "org.freecad.FreeCAD",
+                str(ROOT / self.probe_path),
+            ],
+        )
+        self.assertEqual(pilot.LIMITS.timeout_seconds, 900)
+        self.assertEqual(self.assess()["status"], "PASS")
+        self.assertEqual(self.assess(result=good_guard())["status"], "FAIL")
+
+    def test_actual_probe_qualified_and_unqualified_are_observations_only(
+        self,
+    ):
+        for qt, expected in (
+            ("6.11.2", "qualified"),
+            ("6.11.3", "unqualified"),
+        ):
+            with self.subTest(qt=qt):
+                output = self.produced(qt_version=qt)
+                record = json.loads(output.split("=", 1)[1])
+                self.assertEqual(
+                    record["compatibility_evaluation"]["status"], expected
+                )
+                result = self.assess(stdout=output)
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(
+                    result["classification"], "RUNTIME_OBSERVATION_COMPLETE"
+                )
+                self.assertEqual(result["runtime_observation"], record)
+                self.assertIs(result["runtime_admission_granted"], False)
+                self.assertFalse(
+                    {
+                        "completed_native_tests",
+                        "expected_native_tests",
+                        "native_test_seconds",
+                        "skips",
+                    }
+                    & result.keys()
+                )
+                self.assertEqual(
+                    result["resource_accounting"], "sampled-lower-bound"
+                )
+
+    def test_optional_version_metadata_is_preserved_as_opaque_strings(self):
+        for metadata in (["", ""], ["Git build", "", "branch – local"],
+                         ["line one\nline two"]):
+            with self.subTest(metadata=metadata):
+                result = self.assess(stdout=self.produced(metadata=metadata))
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(
+                    result["runtime_observation"]["freecad"]["version"][3:],
+                    metadata,
+                )
+                self.assertIs(result["runtime_admission_granted"], False)
+
+    def test_missing_duplicate_malformed_and_forged_probe_records_refused(
+        self,
+    ):
+        output = self.produced()
+        record = json.loads(output.split("=", 1)[1])
+        variants = [
+            "",
+            output + output,
+            "TRACKTEMPLATE_RUNTIME_PROBE={}\n",
+            output.replace(
+                '"schema_version":1', '"schema_version":1,"schema_version":1'
+            ),
+            "TRACKTEMPLATE_RUNTIME_PROBE={broken}\n",
+            qualified_output() + native_report(),
+        ]
+        for path, value in (
+            (("schema_version",), True),
+            (("extra",), 1),
+            (("freecad", "available"), False),
+            (("freecad", "qt_version"), "unavailable"),
+            (("freecad", "version_info"), [True, 1, 4]),
+            (("freecad", "version"), ["1", "2", "4"]),
+            (("python", "version"), "3.12.0"),
+            (("platform", "packaging"), "native-or-unknown"),
+            (("platform", "flatpak_id"), "foreign"),
+            (("compatibility_evaluation", "status"), "unqualified"),
+            (("compatibility_evaluation", "mismatches"), ["forged"]),
+            (("freecad", "coin_version"), "x" * 17000),
+        ):
+            changed = copy.deepcopy(record)
+            target = changed
+            for key in path[:-1]:
+                target = target[key]
+            target[path[-1]] = value
+            variants.append(
+                "TRACKTEMPLATE_RUNTIME_PROBE=" + json.dumps(changed) + "\n"
+            )
+        for key in record:
+            changed = dict(record)
+            del changed[key]
+            variants.append(
+                "TRACKTEMPLATE_RUNTIME_PROBE=" + json.dumps(changed) + "\n"
+            )
+        for stdout in variants:
+            with self.subTest(stdout=stdout[:100]):
+                result = self.assess(stdout=stdout)
+                self.assertEqual(result["status"], "FAIL", result)
+                self.assertNotIn("completed_native_tests", result)
+
+    def test_observation_preserves_exit_cleanup_limits_and_telemetry_refusals(
+        self,
+    ):
+        for changes in (
+            {"process_exit": 1},
+            {"status": "refused"},
+            {"cleanup_proved": False},
+            {"deadline_cancellation_exit": 1},
+            {"failure_reason": "deadline-exceeded"},
+            {"failure_reason": "memory-limit"},
+            {"kernel_limits": {}},
+        ):
+            guard = good_guard()
+            guard["limits"]["timeout_seconds"] = 90
+            guard.update(changes)
+            with self.subTest(changes=changes):
+                result = self.assess(result=guard)
+                self.assertEqual(result["status"], "FAIL", result)
+                self.assertNotIn("expected_native_tests", result)
+        for samples in (
+            [],
+            [{}],
+            [dict(live_sample(), **{"cpu.stat": None})],
+            [dict(live_sample(), **{"memory.swap.current": "1"})],
+        ):
+            self.assertEqual(self.assess(samples=samples)["status"], "FAIL")
+        self.assertEqual(self.assess(clearance=False)["status"], "FAIL")
+        guard = good_guard()
+        guard["limits"]["timeout_seconds"] = 90
+        guard["deadline_cancellation_exit"] = 5
+        self.assertEqual(self.assess(result=guard)["status"], "FAIL")
+        self.assertEqual(
+            self.assess(result=guard, deadline_clearance=True)["status"],
+            "PASS",
+        )
+
+    def test_candidate_identity_checks_all_frozen_inputs_and_deployments(self):
+        commit = "1" * 40
+        calls = []
+        deployment = {
+            "app": self.app_pin,
+            "runtime": pilot.RUNTIME,
+            "runtime_commit": self.runtime_pin,
+        }
+
+        def command(*args):
+            calls.append(args)
+            if args[:2] == ("git", "rev-parse"):
+                return commit
+            if args[:2] == ("git", "status"):
+                return ""
+            if args == (
+                "flatpak",
+                "info",
+                "--system",
+                "--show-runtime",
+                "org.freecad.FreeCAD",
+            ):
+                return deployment["runtime"]
+            if args[:4] == ("flatpak", "info", "--system", "--show-commit"):
+                return deployment[
+                    "app"
+                    if args[4] == "org.freecad.FreeCAD"
+                    else "runtime_commit"
+                ]
+            return "inert version/environment"
+
+        with (
+            patch.object(pilot, "_command", side_effect=command),
+            patch.object(pilot.os, "getuid", return_value=1000),
+            patch.dict(pilot.os.environ, {"GITHUB_SHA": commit}),
+        ):
+            identity = pilot._identity("runtime-observation")
+            self.assertEqual(identity["app_commit"], self.app_pin)
+            self.assertEqual(identity["runtime_commit"], self.runtime_pin)
+            self.assertEqual(identity["limits"]["timeout_seconds"], 90)
+            self.assertNotIn(
+                "tests/hosted_transition_geometry_suite.py",
+                identity["files_sha256"],
+            )
+            for key, wrong in (
+                ("app", pilot.APP_COMMIT),
+                ("runtime", "foreign"),
+                ("runtime_commit", pilot.RUNTIME_COMMIT),
+            ):
+                before = deployment[key]
+                deployment[key] = wrong
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    pilot._identity("runtime-observation")
+                deployment[key] = before
+            read_bytes = Path.read_bytes
+            for name in (
+                self.probe_path,
+                "tracktemplate/bootstrap.py",
+                "reference/contracts/phase1-compatibility.json",
+                "tools/freecad_validation_guard.py",
+            ):
+                calls.clear()
+
+                def changed(path):
+                    return read_bytes(path) + (
+                        b"\n" if path == ROOT / name else b""
+                    )
+
+                with (
+                    patch.object(Path, "read_bytes", changed),
+                    self.assertRaises(ValueError),
+                ):
+                    pilot._identity("runtime-observation")
+                self.assertFalse(any(call[0] == "flatpak" for call in calls))
+
+    def test_main_uses_one_90_second_probe_and_never_claims_native_tests(self):
+        output_text = self.produced(qt_version="6.11.3")
+        original_read = Path.read_text
+
+        def read(path, *args, **kwargs):
+            if path == Path("/proc/meminfo"):
+                return meminfo()
+            if path == Path("/proc/pressure/memory"):
+                return "observed pressure"
+            return original_read(path, *args, **kwargs)
+
+        def guarded(argv, *, evidence_dir, limits, **kwargs):
+            self.assertEqual(
+                argv, pilot._native_command("runtime-observation")
+            )
+            self.assertEqual(
+                vars(limits), dict(good_guard()["limits"], timeout_seconds=90)
+            )
+            self.assertIs(kwargs["isolate_profile"], True)
+            evidence_dir.mkdir()
+            (evidence_dir / "stdout").write_text(output_text)
+            (evidence_dir / "stderr").write_text("")
+            (evidence_dir / "measurements.jsonl").write_text(
+                json.dumps(live_sample()) + "\n"
+            )
+            result = good_guard()
+            result["limits"]["timeout_seconds"] = 90
+            return result
+
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "evidence"
+            with (
+                patch.object(pilot, "OUTPUT", destination),
+                patch.object(
+                    pilot,
+                    "_identity",
+                    return_value={"source_commit": "1" * 40},
+                ),
+                patch.dict(
+                    pilot.os.environ,
+                    {
+                        **hosted_environment(),
+                        "TRACKTEMPLATE_HOSTED_WORKLOAD": "runtime-observation",
+                    },
+                ),
+                patch.object(Path, "read_text", read),
+                patch.object(
+                    pilot.guard, "run_guarded_flatpak", side_effect=guarded
+                ) as run,
+                patch.object(pilot, "_clearance", return_value=True),
+                patch.object(pilot, "_deadline_clearance", return_value=True),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                self.assertEqual(pilot.main(), 0)
+                self.assertEqual(run.call_count, 1)
+            summary = json.loads((destination / "summary.json").read_text())
+            self.assertEqual(
+                summary["classification"], "RUNTIME_OBSERVATION_COMPLETE"
+            )
+            self.assertNotIn("expected_native_tests", summary)
+            self.assertNotIn("completed_native_tests", summary)
 
 
 if __name__ == "__main__":
