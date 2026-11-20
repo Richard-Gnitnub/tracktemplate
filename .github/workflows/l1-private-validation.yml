@@ -99,8 +99,20 @@ jobs:
           fi
           sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
+          if [ "$TRACKTEMPLATE_NATIVE_WORKLOAD" = to-zy-generation ]; then
+            zy_download_start="$(date +%s%6N)"
+            trap 'zy_download_status=$?; trap - ERR; python3 tools/hosted_to_zy_generation.py runtime-download-failure "$l1_work" "$zy_download_start" || :; exit "$zy_download_status"' ERR
+          fi
           sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
+          if [ "$TRACKTEMPLATE_NATIVE_WORKLOAD" = to-zy-generation ]; then
+            trap - ERR
+            zy_download_start="$(date +%s%6N)"
+            trap 'zy_download_status=$?; trap - ERR; python3 tools/hosted_to_zy_generation.py runtime-download-failure "$l1_work" "$zy_download_start" || :; exit "$zy_download_status"' ERR
+          fi
           sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
+          if [ "$TRACKTEMPLATE_NATIVE_WORKLOAD" = to-zy-generation ]; then
+            trap - ERR
+          fi
           pilot_uid="$(id -u)"
           test "$pilot_uid" -ne 0
           pilot_manager="user@${pilot_uid}.service"

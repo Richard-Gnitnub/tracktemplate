@@ -1934,6 +1934,217 @@ print('INERT_ENTRY_IMPORT_PASS')
         self.assertNotIn("PySide6", sys.modules)
 
 
+class RuntimeDownloadDiagnostics(unittest.TestCase):
+    """Read producer-shaped journal doubles; never install a runtime."""
+
+    def setUp(self):
+        self.generation = importlib.import_module(
+            "tools.hosted_to_zy_generation"
+        )
+        self.boot = "a" * 32
+        self.start, self.end = 1795160000000000, 1795160001000000
+        self.url = "https://dl.flathub.org/repo/objects/ab/" + "c" * 62 + ".filez"
+        self.row = {
+            "MESSAGE_ID": "f02bce89a54e4efab3a94a797d26204a",
+            "OSTREE_REMOTE": "flathub", "OSTREE_URL": self.url,
+            "MESSAGE": self.message(self.url), "_BOOT_ID": self.boot,
+            "_UID": "0", "_EXE": "/usr/bin/flatpak", "_PID": "1234",
+            "__REALTIME_TIMESTAMP": str(self.start + 123),
+        }
+
+    @staticmethod
+    def message(url, status=404):
+        return (f"libostree HTTP error from remote flathub for <{url}>: "
+                f"Server returned HTTP {status}")
+
+    def project(self, rows):
+        raw = b"".join(json.dumps(row).encode() + b"\n" for row in rows)
+        return self.generation._runtime_download_projection(
+            raw, self.boot, self.start, self.end
+        )
+
+    def test_scoped_producer_record_projects_url_status_without_message(self):
+        result = self.project([self.row])
+        self.assertEqual(result, {
+            "available": True, "correlation": "boot-time-executable",
+            "boot_id": self.boot, "start_us": self.start, "end_us": self.end,
+            "pid": 1234, "records": [{
+                "url": self.url, "status": 404,
+                "timestamp_us": self.start + 123,
+            }],
+        })
+        for suffix in ("commit", "commitmeta", "dirtree", "dirmeta",
+                       "tombstone-commit"):
+            row = deepcopy(self.row)
+            row["OSTREE_URL"] = self.url.replace("filez", suffix)
+            row["MESSAGE"] = self.message(row["OSTREE_URL"], 503)
+            self.assertEqual(self.project([row])["records"][0]["status"], 503)
+        delta = "https://dl.flathub.org/repo/deltas/ab/" + "A" * 41 + "/0"
+        row = {**self.row, "OSTREE_URL": delta, "MESSAGE": self.message(delta)}
+        self.assertEqual(self.project([row])["records"][0]["url"], delta)
+        for ending in ("superblock", "meta", "4294967295"):
+            url = delta.rsplit("/", 1)[0] + "-" + "b_+" * 14 + "A/" + ending
+            row = {**self.row, "OSTREE_URL": url, "MESSAGE": self.message(url)}
+            self.assertEqual(self.project([row])["records"][0]["url"], url)
+        self.assertNotIn("MESSAGE", json.dumps(result))
+
+    def test_public_url_rejects_credentials_queries_traversal_and_controls(self):
+        urls = (
+            self.url.replace("https:", "http:"),
+            self.url.replace("dl.flathub.org", "evil.example"),
+            self.url.replace("dl.flathub.org", "dl.flathub.org.evil.example"),
+            self.url.replace("dl.flathub.org", "SECRET@dl.flathub.org"),
+            self.url + "?SECRET", self.url + "#SECRET", self.url + "\nSECRET",
+            self.url.replace("/objects/", "/../objects/"),
+            self.url.replace("/objects/", "/%2e%2e/objects/"),
+            self.url.replace("/objects/", "//objects/"),
+            self.url.replace(".filez", ".unknown"),
+            "https://dl.flathub.org/repo/deltas/ab/../../SECRET",
+            "https://dl.flathub.org/repo/" + "A" * 4096,
+        )
+        for url in urls:
+            with self.subTest(url=url):
+                row = {**self.row, "OSTREE_URL": url,
+                       "MESSAGE": self.message(url)}
+                with self.assertRaises(ValueError):
+                    self.project([row])
+
+    def test_scope_status_types_and_duplicate_fields_fail_closed(self):
+        changes = {
+            "MESSAGE_ID": "b" * 32, "OSTREE_REMOTE": "other",
+            "_BOOT_ID": "b" * 32, "_UID": "1000", "_PID": "0",
+            "_EXE": "/tmp/flatpak", "__REALTIME_TIMESTAMP": str(self.end + 1),
+            "MESSAGE": self.message(self.url, 200),
+        }
+        for key, value in changes.items():
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.project([{**self.row, key: value}])
+        for key in self.row:
+            for value in (None, True, 123, [self.row[key]]):
+                with self.subTest(key=key, value=value):
+                    with self.assertRaises(ValueError):
+                        self.project([{**self.row, key: value}])
+            row = deepcopy(self.row)
+            del row[key]
+            with self.assertRaises(ValueError):
+                self.project([row])
+        for message in (self.message(self.url) + " SECRET",
+                        self.message(self.url.replace("filez", "commit")),
+                        self.message(self.url, "４０４")):
+            with self.assertRaises(ValueError):
+                self.project([{**self.row, "MESSAGE": message}])
+        raw = json.dumps(self.row).encode().replace(
+            b'"_UID": "0"', b'"_UID": "0", "_UID": "0"'
+        )
+        for bad in (raw, b"not-json", b"[]", b"x" * 65537):
+            with self.assertRaises(ValueError):
+                self.generation._runtime_download_projection(
+                    bad, self.boot, self.start, self.end
+                )
+
+    def test_empty_overflow_and_multiple_processes_are_unavailable(self):
+        for rows in ([], [self.row] * 17,
+                     [self.row, {**self.row, "_PID": "1235"}]):
+            with self.subTest(count=len(rows)), self.assertRaises(ValueError):
+                self.project(rows)
+
+    def test_query_is_bounded_and_never_returns_raw_errors(self):
+        g = self.generation
+        with patch.object(g.Path, "read_text", return_value=self.boot), \
+             patch.object(g.time, "time_ns", return_value=self.end * 1000), \
+             patch.object(g, "_runtime_download_journal",
+                          return_value=json.dumps(self.row).encode()) as query:
+            result = g.runtime_download_failure(str(self.start))
+        self.assertTrue(result["available"])
+        command = query.call_args.args[0]
+        self.assertEqual(command[:6],
+                         ["sudo", "-n", "timeout", "--signal=KILL", "5s", "journalctl"])
+        for item in ("--no-pager", "--boot=" + self.boot,
+                     "--lines=17", "--output=json", "_UID=0",
+                     "_EXE=/usr/bin/flatpak", "OSTREE_REMOTE=flathub",
+                     "MESSAGE_ID=f02bce89a54e4efab3a94a797d26204a",
+                     "--since=@1795160000.000000",
+                     "--until=@1795160001.000000"):
+            self.assertIn(item, command)
+        self.assertNotIn("--all", command)
+        for error in (OSError("SECRET"), ValueError("SECRET"),
+                      subprocess.TimeoutExpired("SECRET", 5),
+                      subprocess.CalledProcessError(1, "SECRET")):
+            with patch.object(g.Path, "read_text", return_value=self.boot), \
+                 patch.object(g.time, "time_ns", return_value=self.end * 1000), \
+                 patch.object(g, "_runtime_download_journal", side_effect=error):
+                result = g.runtime_download_failure(str(self.start))
+            self.assertEqual(result, {"available": False,
+                                      "reason": "journal-unavailable-or-invalid"})
+            self.assertNotIn("SECRET", json.dumps(result))
+
+    def test_journal_reader_caps_bytes_and_refuses_failed_command(self):
+        g = self.generation
+        original_popen = subprocess.Popen
+        for script, accepted in (
+            ("import sys; sys.stdout.buffer.write(b'{}')", True),
+            ("import sys; sys.stdout.buffer.write(b'x'*65537)", False),
+            ("import sys; sys.stderr.write('SECRET'); sys.exit(2)", False),
+        ):
+            def inert_process(*args, **kwargs):
+                return original_popen([sys.executable, "-c", script], **kwargs)
+            with patch.object(g.subprocess, "Popen", side_effect=inert_process):
+                if accepted:
+                    self.assertEqual(g._runtime_download_journal(["inert"]), b"{}")
+                else:
+                    with self.assertRaises((ValueError, subprocess.SubprocessError)):
+                        g._runtime_download_journal(["inert"])
+
+    def test_workflow_preserves_failure_and_queries_only_failed_zy_updates(self):
+        text = (ROOT / ".github/workflows/l1-private-validation.yml").read_text()
+        section = text.split("          sudo flatpak install", 1)[1].split(
+            '          pilot_uid=', 1
+        )[0]
+        section = section.split("\n", 1)[1]
+        shell = "\n".join(line[10:] for line in section.splitlines())
+        self.assertIn("runtime-download-failure", shell)
+        self.assertEqual(shell.count('zy_download_start="$(date +%s%6N)"'), 2)
+        self.assertNotIn("remote-add", shell)
+        self.assertNotIn("apt-get", shell)
+        for workload in ("to-zy-generation", "to-single"):
+            for fail_at in (0, 1, 2):
+                for diagnostic_exit in (0, 9):
+                    script = f'''set -euo pipefail
+TRACKTEMPLATE_NATIVE_WORKLOAD={workload}
+l1_work=/inert
+calls=0
+sudo() {{ calls=$((calls+1)); echo UPDATE-$calls; [ "$calls" != {fail_at} ] || return 47; }}
+python3() {{ echo DIAGNOSTIC; return {diagnostic_exit}; }}
+date() {{ echo 1795160000000000; }}
+{shell}
+echo SUCCESS
+'''
+                    result = subprocess.run(["bash", "-c", script],
+                                            capture_output=True, text=True)
+                    expected = 47 if fail_at else 0
+                    self.assertEqual(result.returncode, expected, result.stderr)
+                    self.assertEqual(result.stdout.count("DIAGNOSTIC"),
+                                     int(bool(fail_at) and workload == "to-zy-generation"))
+                    self.assertEqual(result.stdout.count("UPDATE-"),
+                                     1 if fail_at == 1 else 2)
+                    self.assertEqual("SUCCESS" in result.stdout, not fail_at)
+        script = f'''set -euo pipefail
+TRACKTEMPLATE_NATIVE_WORKLOAD=to-zy-generation
+l1_work=/inert
+calls=0
+sudo() {{ calls=$((calls+1)); echo UPDATE-$calls; }}
+python3() {{ echo DIAGNOSTIC; }}
+date() {{ [ "$calls" != 1 ] || return 23; echo 1795160000000000; }}
+{shell}
+echo SUCCESS
+'''
+        result = subprocess.run(["bash", "-c", script],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 23)
+        self.assertNotIn("DIAGNOSTIC", result.stdout)
+        self.assertEqual(result.stdout.count("UPDATE-"), 1)
+
+
 if __name__ == "__main__":
     result = unittest.main(verbosity=2, exit=False).result
     if not result.wasSuccessful():
