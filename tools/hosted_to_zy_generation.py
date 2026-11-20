@@ -14,6 +14,7 @@ import math
 import os
 from pathlib import Path, PurePosixPath
 import re
+import select
 import shutil
 import signal
 import subprocess
@@ -118,6 +119,116 @@ def valid_hash(value):
         and re.fullmatch(r"[0-9a-f]{64}", value)
         and value != "0" * 64
     )
+
+
+def _runtime_download_projection(raw, boot, start, end):
+    """Project correlated OSTree HTTP failures, not process ownership."""
+    require(len(raw) <= 65536, "Journal byte limit exceeded")
+    rows = [json.loads(line, object_pairs_hook=unique_object)
+            for line in raw.splitlines() if line.strip()]
+    require(0 < len(rows) <= 16, "Journal count absent or excessive")
+    fixed = {
+        "MESSAGE_ID": "f02bce89a54e4efab3a94a797d26204a",
+        "OSTREE_REMOTE": "flathub", "_BOOT_ID": boot,
+        "_UID": "0", "_EXE": "/usr/bin/flatpak",
+    }
+    pids, records = set(), []
+    # libostree v2024.5 ostree-core.c: loose objects and static delta paths.
+    public_url = (
+        r"https://dl\.flathub\.org/repo/(?:"
+        r"objects/[0-9a-f]{2}/[0-9a-f]{62}\."
+        r"(?:filez|dirtree|dirmeta|commit|commitmeta|tombstone-commit)|"
+        r"deltas/[A-Za-z0-9+_]{2}/[A-Za-z0-9+_]{41}"
+        r"(?:-[A-Za-z0-9+_]{43})?/(?:superblock|meta|[0-9]{1,10}))"
+    )
+    fields = {*fixed, "_PID", "__REALTIME_TIMESTAMP", "OSTREE_URL", "MESSAGE"}
+    for row in rows:
+        require(type(row) is dict and fields <= row.keys()
+                and all(type(row[key]) is str for key in fields),
+                "Journal fields absent or non-string")
+        require(all(row[key] == value for key, value in fixed.items()),
+                "Journal scope differs")
+        require(re.fullmatch(r"[1-9][0-9]{0,9}", row["_PID"])
+                and re.fullmatch(r"[0-9]{1,20}", row["__REALTIME_TIMESTAMP"]),
+                "Journal process or time invalid")
+        timestamp = int(row["__REALTIME_TIMESTAMP"])
+        require(start <= timestamp <= end, "Journal outside command window")
+        url = row["OSTREE_URL"]
+        require(re.fullmatch(public_url, url),
+                "Journal URL outside public scope")
+        prefix = f"libostree HTTP error from remote flathub for <{url}>: "
+        status = re.fullmatch(
+            re.escape(prefix) + r"Server returned HTTP ([345][0-9]{2})",
+            row["MESSAGE"],
+        )
+        require(status is not None and status[1] != "304",
+                "Journal HTTP failure message differs")
+        pids.add(int(row["_PID"]))
+        records.append({"url": url, "status": int(status[1]),
+                        "timestamp_us": timestamp})
+    require(len(pids) == 1, "Journal process correlation ambiguous")
+    return {"available": True, "correlation": "boot-time-executable",
+            "boot_id": boot, "start_us": start, "end_us": end,
+            "pid": pids.pop(), "records": records}
+
+
+def _runtime_download_journal(arguments):
+    """Read at most 64 KiB from the fixed, five-second journal query."""
+    process = subprocess.Popen(arguments, stdout=subprocess.PIPE,
+                               stderr=subprocess.DEVNULL)
+    deadline = time.monotonic() + 6
+    raw = bytearray()
+    try:
+        while True:
+            remaining = deadline - time.monotonic()
+            require(remaining > 0, "Journal query deadline exceeded")
+            ready, _, _ = select.select([process.stdout], [], [], remaining)
+            require(ready, "Journal query deadline exceeded")
+            chunk = os.read(process.stdout.fileno(), 65537 - len(raw))
+            if not chunk:
+                break
+            raw.extend(chunk)
+            require(len(raw) <= 65536, "Journal query byte limit exceeded")
+        returncode = process.wait(
+            timeout=max(0.01, deadline - time.monotonic())
+        )
+        require(returncode == 0,
+                "Journal query failed")
+        return bytes(raw)
+    finally:
+        process.stdout.close()
+        # The root-owned system timeout kills the query after five seconds.
+        # Never retain a raw journal file or retry a failed query.
+        process.wait(timeout=max(0.01, deadline - time.monotonic()))
+
+
+def runtime_download_failure(start_us):
+    """Return only safe diagnostics; the workflow keeps its original exit."""
+    try:
+        require(type(start_us) is str
+                and re.fullmatch(r"[0-9]{1,20}", start_us),
+                "Invalid update start")
+        start, end = int(start_us), time.time_ns() // 1000
+        require(0 <= end - start <= 540_000_000, "Invalid update window")
+        boot = Path("/proc/sys/kernel/random/boot_id").read_text()
+        boot = boot.strip().replace("-", "")
+        require(re.fullmatch(r"[0-9a-f]{32}", boot), "Invalid boot identity")
+        fields = ("MESSAGE_ID,OSTREE_REMOTE,OSTREE_URL,MESSAGE,_BOOT_ID,"
+                  "_UID,_EXE,_PID,__REALTIME_TIMESTAMP")
+        arguments = [
+            "sudo", "-n", "timeout", "--signal=KILL", "5s", "journalctl",
+            "--no-pager", "--boot=" + boot, "--lines=17", "--output=json",
+            "--output-fields=" + fields,
+            f"--since=@{start // 1000000}.{start % 1000000:06d}",
+            f"--until=@{end // 1000000}.{end % 1000000:06d}",
+            "_UID=0", "_EXE=/usr/bin/flatpak", "OSTREE_REMOTE=flathub",
+            "MESSAGE_ID=f02bce89a54e4efab3a94a797d26204a",
+        ]
+        return _runtime_download_projection(
+            _runtime_download_journal(arguments), boot, start, end
+        )
+    except (OSError, ValueError, TypeError, subprocess.SubprocessError):
+        return {"available": False, "reason": "journal-unavailable-or-invalid"}
 
 
 def safe_member(name):
@@ -2485,12 +2596,20 @@ def dispatch(operation, stage, work, public):
 
 if __name__ == "__main__":
     require(
-        len(sys.argv) == 3, "Expected fixed internal operation and workspace"
+        len(sys.argv) in (3, 4)
+        and len(sys.argv) == (
+            4 if sys.argv[1] == "runtime-download-failure" else 3
+        ),
+        "Expected fixed internal operation and workspace"
     )
     internal, workspace = sys.argv[1], Path(sys.argv[2])
     payload._regular(workspace / "control.json")
     if internal == "compiler-config-prepare":
         prepare_compiler_config(workspace)
+    elif internal == "runtime-download-failure":
+        print("ZY_RUNTIME_DOWNLOAD_DIAGNOSTIC=" + json.dumps(
+            runtime_download_failure(sys.argv[3]), sort_keys=True
+        ), flush=True)
     elif internal == "compiler-config-verify":
         print("ZY_COMPILER_CONFIG_VERIFIED=" + json.dumps(
             verify_compiler_config(workspace), sort_keys=True
