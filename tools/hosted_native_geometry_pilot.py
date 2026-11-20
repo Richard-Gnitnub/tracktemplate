@@ -71,6 +71,25 @@ REA_INPUT_PATHS = (
 )
 OUTPUT = ROOT / "benchmark-output/hosted-native-geometry"
 LIMITS = guard.ValidationLimits(memory_max_mib=4096, timeout_seconds=900)
+OBSERVATION_LIMITS = guard.ValidationLimits(
+    memory_max_mib=4096, timeout_seconds=90,
+)
+OBSERVATION_APP_COMMIT = (
+    "b7e0947f142c4e263d2cf950a7decb5a96f7243b0bf5adc9fda60d8e8d1eb811"
+)
+OBSERVATION_RUNTIME_COMMIT = (
+    "2c059c881e5059ea801dc963cc970b83d775de03b98e9f570b31790e1f92ab5d"
+)
+PROBE_PATH = "tools/runtime_compatibility_probe.py"
+PROBE_SENTINEL = "TRACKTEMPLATE_RUNTIME_PROBE="
+OBSERVATION_INPUTS = {
+    PROBE_PATH:
+        "16856756594834cf2a44aed64f4b7c08c4ce83570dddf8f2fd19f9ba0ebaf71e",
+    "tracktemplate/bootstrap.py":
+        "1a1adef5dcab8bf121f43960f9652ac06acee0d835ca2089e5908de32d04a910",
+    "reference/contracts/phase1-compatibility.json":
+        "6539ff066b8abcd81cb111c3127124580e6bca44eb19c09ea8ae93175de7113f",
+}
 SAMPLE_FIELDS = (
     "memory.current", "memory.peak", "memory.events", "memory.swap.current",
     "memory.pressure", "cpu.stat", "pids.current", "cgroup.events",
@@ -79,6 +98,12 @@ SAMPLE_FIELDS = (
 
 
 def _workload(name):
+    if name == "runtime-observation":
+        return {
+            "test_path": PROBE_PATH,
+            "test_sha256": OBSERVATION_INPUTS[PROBE_PATH],
+            "selector": None, "mode": None,
+        }
     if name == "transition":
         return {
             "test_path": TEST_PATH, "test_sha256": TEST_SHA256,
@@ -116,6 +141,8 @@ def _native_command(workload="transition"):
     selected = _workload(workload)
     command = ["flatpak", "run", "--command=FreeCADCmd",
                "--env=OMP_NUM_THREADS=1", "--env=OPENBLAS_NUM_THREADS=1"]
+    if workload == "runtime-observation":
+        return command + [guard.APP_ID, str(ROOT / PROBE_PATH)]
     if selected["mode"]:
         command.append("--env=TRACKTEMPLATE_REA_MODE=" + selected["mode"])
     return command + [guard.APP_ID, "-P", str(ROOT / "tests"), "-t",
@@ -346,14 +373,87 @@ def _qualified_runtime(stdout):
         raise ValueError("Qualified runtime mismatch")
 
 
+def _observed_runtime(stdout):
+    """Validate the unchanged probe's record without granting admission."""
+    from tracktemplate.bootstrap import evaluate_runtime
+
+    lines = [line[len(PROBE_SENTINEL):] for line in stdout.splitlines()
+             if line.startswith(PROBE_SENTINEL)]
+    if len(lines) != 1 or len(lines[0]) > 16384:
+        raise ValueError("Expected one bounded runtime probe record")
+    record = json.loads(lines[0], object_pairs_hook=_unique_object)
+    schemas = {
+        "python": {"implementation", "version", "version_info"},
+        "platform": {"system", "machine", "packaging", "flatpak_id"},
+        "freecad": {"available", "version", "version_info",
+                    "opencascade_version", "qt_binding", "qt_version",
+                    "pyside_version", "coin_version"},
+        "compatibility_evaluation": {"status", "matched_profile_id",
+                                     "mismatches"},
+    }
+    if (not isinstance(record, dict)
+            or set(record) != {"schema_version", *schemas}
+            or type(record["schema_version"]) is not int
+            or record["schema_version"] != 1):
+        raise ValueError("Unexpected runtime probe schema")
+    for section, keys in schemas.items():
+        if not isinstance(record[section], dict) or set(record[section]) != keys:
+            raise ValueError("Incomplete runtime probe section: " + section)
+
+    def text(value):
+        return (isinstance(value, str) and 0 < len(value) <= 256
+                and value.isascii() and value.isprintable()
+                and value not in ("unknown", "unavailable"))
+
+    python = record["python"]
+    freecad = record["freecad"]
+    for section in (python, freecad):
+        version = section["version_info"]
+        if (not isinstance(version, list) or len(version) != 3
+                or any(type(value) is not int or not 0 <= value <= 9999
+                       for value in version)):
+            raise ValueError("Malformed runtime version")
+    if (not text(python["implementation"])
+            or python["version"] != ".".join(map(str, python["version_info"]))
+            or freecad["available"] is not True
+            or not isinstance(freecad["version"], list)
+            or len(freecad["version"]) < 3
+            or not all(isinstance(value, str) for value in freecad["version"])
+            or freecad["version"][:3] != list(map(str, freecad["version_info"]))
+            or not all(text(freecad[key]) for key in (
+                "opencascade_version", "qt_binding", "qt_version",
+                "pyside_version", "coin_version",
+            ))):
+        raise ValueError("Actual FreeCAD runtime metadata is incomplete")
+    if record["platform"] != {
+        "system": "Linux", "machine": "x86_64", "packaging": "flatpak",
+        "flatpak_id": guard.APP_ID,
+    }:
+        raise ValueError("Runtime observation is not the fixed Flatpak host")
+    contract_path = "reference/contracts/phase1-compatibility.json"
+    data = (ROOT / contract_path).read_bytes()
+    if hashlib.sha256(data).hexdigest() != OBSERVATION_INPUTS[contract_path]:
+        raise ValueError("Observation compatibility contract identity changed")
+    evaluation = evaluate_runtime(record, json.loads(data))
+    if (evaluation["status"] not in ("qualified", "unqualified")
+            or record["compatibility_evaluation"] != evaluation):
+        raise ValueError("Probe compatibility evaluation is not reproducible")
+    return record
+
+
 def assess_result(result, stdout, stderr, samples, clearance, *,
                   deadline_clearance=False, workload="transition"):
     """Require native assertions, contained execution and complete evidence."""
     selected = _workload(workload)
-    expected_tests = selected["expected_native_tests"]
+    observation = workload == "runtime-observation"
+    limits = OBSERVATION_LIMITS if observation else LIMITS
+    expected_tests = selected.get("expected_native_tests")
 
     def failed(classification, detail):
         failure = _failure(classification, detail)
+        if observation:
+            failure.pop("expected_native_tests")
+            failure.update(workload=workload, runtime_admission_granted=False)
         if selected["mode"]:
             failure.update(workload=workload,
                            expected_native_tests=expected_tests)
@@ -375,6 +475,8 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
     if reason == "memory-limit":
         return failed("MEMORY_LIMIT", reason)
     if result.get("process_exit") != 0 or reason == "payload-nonzero":
+        if observation:
+            return failed("RUNTIME_OBSERVATION_FAILURE", "Nonzero probe exit")
         try:
             _qualified_runtime(stdout)
         except (KeyError, TypeError, ValueError) as error:
@@ -393,7 +495,7 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
         "cpu.max": "100000 100000", "pids.max": "128",
     }
     if (result.get("kernel_limits") != expected_kernel
-            or result.get("limits") != vars(LIMITS)):
+            or result.get("limits") != vars(limits)):
         return failed("SETUP_FAILURE", "Unexpected kernel limits")
     try:
         live = []
@@ -439,6 +541,23 @@ def assess_result(result, stdout, stderr, samples, clearance, *,
                 final_accounting = True
         if not live:
             raise ValueError("No complete owned cgroup sample")
+        if observation:
+            return {
+                "status": "PASS",
+                "classification": "RUNTIME_OBSERVATION_COMPLETE",
+                "workload": workload,
+                "runtime_observation": _observed_runtime(stdout),
+                "runtime_admission_granted": False,
+                "peak_cgroup_memory_bytes": max(x["memory.peak"] for x in live),
+                "peak_tasks_observed": max(x["pids.current"] for x in live),
+                "cpu_usage_usec": max(x["cpu_usage_usec"] for x in live),
+                "complete_resource_samples": len(live),
+                "resource_accounting": (
+                    "final" if final_accounting else "sampled-lower-bound"
+                ),
+                "scope": "One runtime metadata observation; no admission, "
+                         "documents, geometry, chairs or GUI qualification",
+            }
         _qualified_runtime(stdout)
         combined = stdout + "\n" + stderr
         counts = re.findall(r"^Ran (\d+) tests? in ([0-9.]+)s$",
@@ -517,6 +636,7 @@ def _command(*args):
 
 def _identity(workload="transition"):
     selected = _workload(workload)
+    observation = workload == "runtime-observation"
     if os.getuid() == 0 or sys.flags.optimize:
         raise ValueError("Non-root execution with assertions is required")
     sha = _command("git", "rev-parse", "HEAD")
@@ -534,6 +654,10 @@ def _identity(workload="transition"):
              "tools/hosted_native_geometry_pilot.py",
              ".github/workflows/native-geometry-pilot.yml",
              "reference/contracts/phase1-compatibility.json")
+    if observation:
+        paths = (*OBSERVATION_INPUTS, "tools/freecad_validation_guard.py",
+                 "tools/hosted_native_geometry_pilot.py",
+                 ".github/workflows/native-geometry-pilot.yml")
     if selected["mode"]:
         paths += REA_INPUT_PATHS
     if selected["test_path"] in (REA_EXIT_TEST_PATH, REA_STRAIGHT_TEST_PATH):
@@ -545,6 +669,9 @@ def _identity(workload="transition"):
     if (hashes[selected["test_path"]] != selected["test_sha256"]
             or hashes["tools/freecad_validation_guard.py"] != GUARD_SHA256):
         raise ValueError("Frozen validator or guard identity changed")
+    if observation and any(hashes[name] != digest
+                           for name, digest in OBSERVATION_INPUTS.items()):
+        raise ValueError("Frozen runtime probe input identity changed")
     if (selected["test_path"] in (REA_EXIT_TEST_PATH, REA_STRAIGHT_TEST_PATH)
             and hashes[REA_TEST_PATH] != REA_TEST_SHA256):
         raise ValueError("Frozen inherited native entry identity changed")
@@ -560,14 +687,17 @@ def _identity(workload="transition"):
     runtime_commit = _command(
         "flatpak", "info", "--system", "--show-commit", RUNTIME,
     )
-    if (app, runtime, runtime_commit) != (APP_COMMIT, RUNTIME, RUNTIME_COMMIT):
+    expected = ((OBSERVATION_APP_COMMIT, RUNTIME, OBSERVATION_RUNTIME_COMMIT)
+                if observation else (APP_COMMIT, RUNTIME, RUNTIME_COMMIT))
+    if (app, runtime, runtime_commit) != expected:
         raise ValueError("Deployed Flatpak build differs from qualified pins")
     _command("systemctl", "--user", "show-environment")
     return {
         "source_commit": sha, "files_sha256": hashes,
         "workload": workload, "native_entry": selected,
         "app_commit": app, "runtime": runtime,
-        "runtime_commit": runtime_commit, "limits": vars(LIMITS),
+        "runtime_commit": runtime_commit,
+        "limits": vars(OBSERVATION_LIMITS if observation else LIMITS),
         "runner": {key: os.environ.get(key) for key in (
             "ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH",
             "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
@@ -651,6 +781,7 @@ def main():
         raise ValueError("Evidence already exists; no automatic retry")
     summary = _failure("SETUP_FAILURE", "Preparation did not complete")
     workload = os.environ.get("TRACKTEMPLATE_HOSTED_WORKLOAD", "transition")
+    observation = workload == "runtime-observation"
     started = time.monotonic()
     host_observations = []
 
@@ -678,7 +809,8 @@ def main():
 
     try:
         selected = _workload(workload)
-        summary["expected_native_tests"] = selected["expected_native_tests"]
+        if not observation:
+            summary["expected_native_tests"] = selected["expected_native_tests"]
         identity = _identity(workload)
         identity["host_admission"] = validate_admission(
             os.environ, Path("/proc/meminfo").read_text(),
@@ -691,7 +823,8 @@ def main():
         children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         result = guard.run_guarded_flatpak(
             _native_command(workload),
-            limits=LIMITS, evidence_dir=OUTPUT / "guard",
+            limits=OBSERVATION_LIMITS if observation else LIMITS,
+            evidence_dir=OUTPUT / "guard",
             context=guard.GuardContext(sleep=observed_sleep),
             cwd=ROOT, isolate_profile=True,
         )
@@ -716,7 +849,8 @@ def main():
             summary = _failure(
                 "EVIDENCE_INCOMPLETE", "Host telemetry unavailable",
             )
-            summary["expected_native_tests"] = selected["expected_native_tests"]
+            if not observation:
+                summary["expected_native_tests"] = selected["expected_native_tests"]
             summary["host_telemetry_errors"] = [
                 row["error"] for row in host_observations if "error" in row
             ]
@@ -746,6 +880,9 @@ def main():
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         summary["detail"] = repr(error)
     finally:
+        if observation:
+            summary.pop("expected_native_tests", None)
+            summary["runtime_admission_granted"] = False
         summary["workload"] = workload
         summary["pilot_elapsed_seconds"] = time.monotonic() - started
         summary["local_pressure_guard_qualification"] = False

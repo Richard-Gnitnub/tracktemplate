@@ -16,6 +16,7 @@ on:
           - rea-bc-exit-native
           - rea-bc-straight-readiness
           - rea-bc-straight-native
+          - runtime-observation
 
 permissions:
   contents: read
@@ -40,8 +41,10 @@ jobs:
 
       - name: Install the pinned FreeCAD build without launching it
         id: setup
-        timeout-minutes: 10
+        timeout-minutes: ${{ inputs.workload == 'runtime-observation' && 9 || 10 }}
         shell: bash
+        env:
+          TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}
         run: |
           set -euo pipefail
           mkdir -p benchmark-output/hosted-native-geometry
@@ -51,8 +54,13 @@ jobs:
           sudo apt-get install --no-install-recommends -y flatpak dbus-user-session
           sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
-          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
-          sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
+          if [[ "${TRACKTEMPLATE_HOSTED_WORKLOAD:-transition}" == "runtime-observation" ]]; then
+            sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=b7e0947f142c4e263d2cf950a7decb5a96f7243b0bf5adc9fda60d8e8d1eb811 app/org.freecad.FreeCAD/x86_64/stable
+            sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=2c059c881e5059ea801dc963cc970b83d775de03b98e9f570b31790e1f92ab5d runtime/org.kde.Platform/x86_64/6.11
+          else
+            sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4 app/org.freecad.FreeCAD/x86_64/stable
+            sudo flatpak update --system --noninteractive -y --no-related --no-deps --commit=fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa runtime/org.kde.Platform/x86_64/6.11
+          fi
           pilot_uid="$(id -u)"
           test "$pilot_uid" -ne 0
           pilot_manager="user@${pilot_uid}.service"
