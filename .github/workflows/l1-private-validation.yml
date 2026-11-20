@@ -85,12 +85,17 @@ jobs:
           set -euo pipefail
           umask 077
           ulimit -c 0
-          exec >> "$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE/evidence/install.log" 2>&1
+          l1_work="$RUNNER_TEMP/l1-private-$GITHUB_RUN_ID-$L1_STAGE"
+          exec >> "$l1_work/evidence/install.log" 2>&1
           test "$GITHUB_RUN_ATTEMPT" = 1
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y flatpak dbus-user-session
           if [ "$TRACKTEMPLATE_NATIVE_WORKLOAD" = to-zy-generation ]; then
             sudo apt-get install --no-install-recommends -y fp-compiler-3.2.2=3.2.2+dfsg-32 fp-units-rtl-3.2.2=3.2.2+dfsg-32
+            python3 tools/hosted_to_zy_generation.py compiler-config-prepare "$l1_work"
+            test ! -L /etc/fpc-3.2.2.cfg
+            sudo install -T -o root -g root -m 644 -- "$l1_work/compiler-config/fpc.cfg" /etc/fpc-3.2.2.cfg
+            python3 tools/hosted_to_zy_generation.py compiler-config-verify "$l1_work"
           fi
           sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install --system --noninteractive -y flathub app/org.freecad.FreeCAD/x86_64/stable runtime/org.kde.Platform/x86_64/6.11
