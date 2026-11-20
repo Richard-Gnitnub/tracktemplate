@@ -644,12 +644,22 @@ class MatrixTests(unittest.TestCase):
         # later transport repair, which needs its own actual readiness proof.
         pins = dict(before)
         for name, (original, successor) in matrix.READINESS_DERIVATIVES.items():
-            pins[name] = current[name]
+            raw = (ROOT / name).read_bytes()
+            if name.endswith('.yml'):
+                start = (b'      - name: Capture permitted acquisition '
+                         b'failure originals separately\n')
+                end = (b'      - name: Run the separate 90-second GUI '
+                       b'readiness proof\n')
+                self.assertEqual(raw.count(start), 1)
+                self.assertEqual(raw.count(end), 1)
+                prefix, diagnostic = raw.split(start, 1)
+                raw = prefix + end + diagnostic.split(end, 1)[1]
+            pins[name] = hashlib.sha256(raw).hexdigest()
             self.assertEqual(before[name], original)
             self.assertEqual(pins[name], successor)
             path = self.work / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes((ROOT / name).read_bytes())
+            path.write_bytes(raw)
         matrix.verify_readiness_sources(receipt, pins, self.work)
         with self.assertRaisesRegex(ValueError, 'Readiness source differs'):
             matrix.verify_readiness_sources(dict(receipt, source_commit='a' * 40),
