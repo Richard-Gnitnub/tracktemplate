@@ -5250,28 +5250,28 @@ It has 119 bytes and SHA-256 `f4f3e129f36b1544ace05dcfbeb8cb53e453462e43df422fb8
 `approved-proposal-context.json` in that directory records the controlled meaning that `/root` supplied.
 This canonical record supplies no API evidence for independent review of the instruction.
 
-## Compatibility diagnostic evidence preservation — 2026-11-21
+## Preservation of compatibility diagnostic evidence — 2026-11-21
 
 <a id="runtime-compatibility-partial-preservation-panel"></a>
 
-**Level 2 result:** Permitted original files now stay available when a content check rejects another file.
+**Level 2 result:** Permitted initial files now stay available when a content check rejects a different file.
 Rejected bytes stay private. The repair does not change them.
-`transport/member-refusals.json` gives only permitted filenames and specified reason values.
-Every rejected file keeps evidence status `FAIL`. Mandatory evidence checks do not change.
+`transport/member-refusals.json` gives only permitted filenames and specified values for each content check with a FAIL result.
+If a content check rejects a file, evidence status stays `FAIL`. Mandatory evidence checks do not change.
 
-The same standalone proof fails before the repair and passes after it.
-The proof uses a simulated private path. Both diagnostic files preserve permitted bytes.
-The final diagnostic stays `FAIL`.
+The same proof in standalone Python gives a FAIL result before the repair and a PASS result after it.
+The proof uses a simulated private path. The two diagnostic files preserve permitted bytes.
+The last diagnostic stays `FAIL`.
 Independent quality review and security/recovery review give PASS results.
 The 62 tests in standalone Python also give PASS results.
 
 [Test 44903313796](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44903313796) keeps its FAIL result. Twenty-four mandatory files stay missing.
-Its rejected filename stays unknown. This repair supports later diagnosis. It does not qualify a host profile.
+Its rejected filename stays unknown. This repair supplies evidence for subsequent diagnosis. It does not qualify a host profile.
 
 The latest project owner instruction is: "Codex lets go and get over this problem, you're doing great".
 
-This record covers repair preparation under the [standing Git authority](#runtime-compatibility-standing-instruction-panel).
-Another test on GitHub needs a project owner decision. PR #288 stays a draft pull request.
+This record is for work to prepare the repair. The [recorded Git authority](#runtime-compatibility-standing-instruction-panel) applies.
+A project owner decision is necessary before one more test on GitHub. PR #288 stays a draft pull request.
 
 The previous `2/2` repair history, D-P9-026 `1/1` and D-P9-027 `1/1` do not change.
 Phase 9B stays `Open` at 3/6. "Runtime admission and ZY remain blocked."
