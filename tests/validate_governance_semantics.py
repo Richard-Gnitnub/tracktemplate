@@ -10045,7 +10045,10 @@ def validate_acquisition_diagnostic_decision() -> None:
     diagnostic = "authorised added dashboard row drifted: D-P9-026"
     progress._validate_plan_shape(plan)
     for label, changed in (
-        ("additional-run", replace_once(row, "exactly one", "exactly two")),
+        (
+            "additional-run",
+            replace_once(row, "one test on GitHub only", "two tests on GitHub"),
+        ),
         ("duplicate-row", row + "\n" + row),
         ("removed-row", ""),
     ):
