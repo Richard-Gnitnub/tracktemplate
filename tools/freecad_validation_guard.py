@@ -7,9 +7,11 @@ import argparse
 from contextlib import contextmanager
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import replace
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -313,8 +315,8 @@ def _set_limits(context, records, scope, group, limits):
     return actual
 
 
-def _arm(context, records, scope, invocation, limits, output):
-    name = "tracktemplate-validation-" + uuid.uuid4().hex
+def _arm(context, records, scope, invocation, limits, output, *, name=None):
+    name = name or "tracktemplate-validation-" + uuid.uuid4().hex
     result = _command(context, records, [
         "systemd-run", "--user", f"--unit={name}",
         f"--on-active={limits.timeout_seconds}s",
@@ -440,11 +442,41 @@ def _host_memory_admission(context, limits, result):
         raise GuardFailure("containment-unproved", str(error)) from error
 
 
+def _deadline_context(context, deadline):
+    """Bound startup and payload operations; cleanup keeps its own context."""
+    def remaining():
+        seconds = deadline - context.monotonic()
+        if seconds <= 0:
+            raise GuardFailure("deadline-exceeded")
+        return seconds
+
+    def run(*args, **kwargs):
+        kwargs["timeout"] = min(kwargs.get("timeout", 5), remaining())
+        # Let _command preserve the complete returned stdout/stderr/exit.
+        # The next operation and final result still check the same deadline.
+        return context.run(*args, **kwargs)
+
+    def popen(*args, **kwargs):
+        remaining()
+        return context.popen(*args, **kwargs)
+
+    def sleep(seconds):
+        context.sleep(min(seconds, remaining()))
+        remaining()
+
+    return replace(context, run=run, popen=popen, sleep=sleep)
+
+
 def run_guarded_flatpak(
     argv, *, limits, evidence_dir, lease=None, context=None,
     cwd=None, env=None, pass_fds=(), isolate_profile=False,
+    absolute_deadline=None,
 ):
-    """Run one explicit FreeCAD workload; preserve payload and cleanup facts."""
+    """Contain one workload, optionally within a shared monotonic deadline.
+
+    The shared deadline includes startup and cleanup. Cleanup still runs
+    after expiry, but such an attempt cannot return a completed status.
+    """
     if not isinstance(limits, ValidationLimits):
         raise ValueError("Explicit validation limits are required")
     argv = [str(item) for item in argv]
@@ -452,6 +484,12 @@ def run_guarded_flatpak(
     if type(isolate_profile) is not bool:
         raise ValueError("isolate_profile must be boolean")
     context = context or GuardContext()
+    if absolute_deadline is not None and (
+        type(absolute_deadline) not in (int, float)
+        or not math.isfinite(absolute_deadline) or absolute_deadline <= 0
+    ):
+        raise ValueError("Finite positive absolute deadline required")
+    cleanup_context = context
     if lease is not None:
         if not isinstance(lease, ValidationLease):
             raise ValueError("Invalid validation lease")
@@ -469,6 +507,8 @@ def run_guarded_flatpak(
         "guarded_argv": command, "limits": vars(limits),
         "diagnostic_safety_limits_only": True,
     }
+    if absolute_deadline is not None:
+        result["absolute_deadline"] = absolute_deadline
     records = []
     manager = None
     process = None
@@ -483,6 +523,10 @@ def run_guarded_flatpak(
     raw.touch()
     stderr.touch()
     try:
+        if absolute_deadline is not None:
+            if context.monotonic() >= absolute_deadline:
+                raise GuardFailure("deadline-exceeded")
+            context = _deadline_context(context, absolute_deadline)
         if lease is None:
             manager = acquire_validation_lease(context.runtime_dir)
             try:
@@ -537,9 +581,24 @@ def run_guarded_flatpak(
             except (OSError, subprocess.SubprocessError) as error:
                 raise GuardFailure("containment-unproved") from error
             deadline = context.monotonic() + limits.timeout_seconds
+            timer_limits = limits
+            if absolute_deadline is not None:
+                deadline = min(deadline, absolute_deadline)
+                # Reserve the maximum systemd-run command duration. The
+                # independent timer must not extend the shared deadline.
+                seconds = min(limits.timeout_seconds, math.floor(
+                    absolute_deadline - context.monotonic()) - 5)
+                if seconds < 1:
+                    raise GuardFailure("deadline-exceeded")
+                timer_limits = replace(limits, timeout_seconds=seconds)
+                result["watchdog_timeout_seconds"] = seconds
+                # Retain ownership even if verification fails after systemd
+                # creates the timer. Cleanup can then cancel that exact name.
+                timer = "tracktemplate-validation-" + uuid.uuid4().hex
             try:
                 timer = _arm(
-                    context, records, scope, invocation, limits, output,
+                    context, records, scope, invocation, timer_limits, output,
+                    name=timer,
                 )
             except (OSError, subprocess.SubprocessError) as error:
                 raise GuardFailure("deadline-unarmed") from error
@@ -590,6 +649,7 @@ def run_guarded_flatpak(
         result["failure_reason"] = "scope-gate-unproved"
         result["error"] = repr(error)
     finally:
+        context = cleanup_context
         for signum in old_handlers:
             signal.signal(signum, signal.SIG_IGN)
         observed_exit = process.poll() if process is not None else None
@@ -687,6 +747,11 @@ def run_guarded_flatpak(
             result["private_profile"]["config_after"] = _config_evidence(
                 result["private_profile"],
             )
+        if (absolute_deadline is not None
+                and context.monotonic() >= absolute_deadline
+                and result["failure_reason"] not in (
+                    "memory-limit", "cleanup-unproved")):
+            result["failure_reason"] = "deadline-exceeded"
         if (
             released and result["process_exit"] == 0
             and result["cleanup_proved"] and not result["failure_reason"]

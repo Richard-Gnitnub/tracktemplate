@@ -4814,3 +4814,438 @@ PR-13 stays open and overdue. Copies in this scope do not prove a complete backu
 | `next-x2-zy-generation-successor-independent-review.json` | `d2b75602430c6d3a1e8d79ef5581c484ce8efbcd2b23dfeef22b774c37700fd3` |
 | `independent-source-review.json` | `9e9ffc2a66d92d1480f822e1db7fd89ad6036002f0c55a7d759ab0254af4f3f7` |
 | `source-completion-review.json` | `069107aa90a97b5503e4abc4991667d61f3f768a26469cfc3727e57620a4e405` |
+
+
+## Compatibility output panel — 2026-11-20
+
+<a id="runtime-compatibility-output-handling-panel"></a>
+
+**Decision:** D-P9-023 records the owner's approval for publication of the specified outputs in `Richard-Gnitnub/tracktemplate`.
+This Level 3 decision changes publication authority only.
+The governance work records that authority. It does not change the product.
+
+The manifest with owner approval has 157,516 bytes and SHA-256
+`0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b`.
+Its bounded scope contains 160 "screenshots": one from the `gui-readiness` test and 159 from the host matrix.
+It also contains 24 result records and 24 "conditional safe failure diagnostics".
+These are permitted outputs. Their byte sizes and hashes are not yet known.
+Missing outputs cannot give a `PASS` result.
+
+Keep GitHub Actions evidence for 30 days. Use independent preservation.
+Use only the base with previous owner approval, `b14-default-base-regenerated.FCStd`.
+That base has 636,344 bytes and SHA-256
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+Do not publish "working documents, exports, private data and credentials". Do not publish unlisted outputs.
+This decision gives no third-party permission or `project-cleared` status.
+
+**Panel:** Richard is the project owner and panel chair. `/root` presents the change.
+The independent reviewer, `to001_heel_quality`, examined the host matrix, bounded output scope and resource proposal before the owner decision.
+The reviewer did not author those records. The reviewer shares the agent environment and filesystem.
+The preserved review gives `PASS_PROPOSAL_FOR_OUTPUT_HANDLING_DECISION` and records no findings.
+
+The panel recommendation is **Proceed with bounded conditions**.
+The owner's current statement gives approval for the specified outputs and keeps the conditions below.
+The panel records no unresolved finding.
+
+| Due risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | The change owner and independent reviewer must check exact input and output identities before transfer. Keep source classifications and notices. |
+| PR-13 | The change owner must preserve evidence and failures independently. An independent reviewer must check preservation before dependent execution or cleanup. The monthly restore duty stays open. |
+| PR-22 | The change owner must do checks of the software that makes the evidence. An independent reviewer must examine the frozen source, tests, input scope and limits before execution. |
+
+No risk closes. The current assessments of control effectiveness stay the same.
+
+**Test conditions:** The prior owner instruction gives authority to prepare and do bounded compatibility tests on GitHub for the observed host profile.
+D-P9-023 adds only the specified publication authority.
+Keep the `gui-readiness` test and independent result review before the full host matrix starts.
+The full job has one shared 7200-second deadline for fixture generation, 57 native entries and 22 GUI groups.
+It has no additional deadline for each entry or session.
+The existing 4096 MiB FreeCAD limit, 256 MiB display limit, zero swap, CPU limits and task limits stay the same.
+
+Keep the 8192 MiB host reserve and 540-second installation limit.
+The `gui-readiness` limits stay 90 seconds for FreeCAD and 190 seconds for the display.
+The full display limit stays 7300 seconds. The outer job limit stays 8400 seconds.
+The 7200-second limit does not prove that the complete matrix can finish.
+
+Complete "producer review and readiness" under the current workflow.
+The tests need the applicable authority and conditions before they start.
+The owner decision does not supply missing source, review or test evidence.
+Keep the current compatibility contract unchanged until the owner accepts the host profile.
+The owner's limits stay: "Runtime admission and ZY remain blocked."
+
+**Programme limits:** Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No acceptance for physical fit, production, performance, release or a phase exit follows.
+Keep the historical repair records and finite documentation limits.
+
+**Proof/provenance:** The preserved compatibility records and current decision receipt contain the evidence.
+The structured decision contains the owner's exact statement.
+
+| Record | SHA-256 |
+| --- | --- |
+| `compatibility-gui-output-handling-proposal-v2.json` | `0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b` |
+| `matrix-output-scope-independent-review.json` | `1dd7af474a531efadd3224d087f25649337ac73a46f598a9a53efdf4e2b5c739` |
+| `owner-authority.json` | `4df837f868864f616c793ad8c1a2c9e19ea79a842660702c786f833de00be1f3` |
+| `owner-decision.json` | `1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a` |
+
+## Compatibility owner instruction — 2026-11-20
+
+<a id="runtime-compatibility-standing-instruction-panel"></a>
+
+**Decision:** D-P9-024 records the owner's "explicit standing request" for the bounded compatibility work.
+This Level 3 decision gives authority for the specified Git operations. It does not change the product or its accepted host profile.
+The [decision register](gate-decisions.json) preserves the owner's instruction.
+
+The owner gives authority for `git commit` and `git push` on `agent/runtime-compatibility-qualification`.
+This authority includes subsequent `git commit` and `git push` operations in the same bounded scope.
+Make the necessary pull requests. When necessary, change them.
+
+A merge is permitted for "eligible Level 1/2 changes" after the necessary reviews and checks give PASS results.
+For a pull request that contains Level 3 work, the applicable authority for the merge stays necessary.
+The owner's instruction is: "Do not request permission again for routine actions covered by it."
+
+With the applicable authority and the [D-P9-023 conditions](#runtime-compatibility-output-handling-panel), start with `gui-readiness` on GitHub.
+Continue the subsequent steps that have the necessary authority and evidence.
+After independent review, report the result from the "bounded runtime-compatibility qualification".
+At a "repository stop condition" or when new authority is necessary, stop for an owner decision.
+The owner's instruction is: "Runtime admission and ZY resumption still require my explicit approval."
+
+**Panel:** Richard is the project owner and panel chair. `/root` reports the change.
+The independent reviewer, `/root/producer_review`, examined the stop conditions for publication and the tests.
+The reviewer did not author this canonical record.
+
+The reviewer authored the `gui-readiness` software. The reviewer and implementing agent use the same workspace.
+Different independent source and result reviews are necessary for that software.
+The panel recommendation is **Proceed with bounded conditions**. The panel records no unresolved authority finding.
+
+| Risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | Before each data movement, the change owner and independent reviewer must preserve the D-P9-023 input and output scope. |
+| PR-13 | The change owner must complete independent preservation. Before dependent tests or cleanup, an independent reviewer must examine that evidence. The ["Restore drill"](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance) condition stays `Open`, with the same deadline. |
+| PR-22 | The change owner must complete the necessary checks. An independent reviewer must examine the frozen source, inputs and limits before tests start. |
+
+No risk status changes. The assessments of control effectiveness stay the same.
+Keep the "evidence-handling conditions" and "execution limits" from the owner's instruction.
+Keep its review requirements and recovery conditions.
+Apply the same repair limits and preserve the "prior repair history". The previous `2/2` record stays the same.
+Use the D-P9-019 repair authority only in its bounded scope. The limits in the documentation workflow stay the same.
+
+**Programme limits:** Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays `paused`.
+This instruction gives no acceptance for physical fit, production, product performance, release or a phase exit.
+It does not change the rights state.
+
+**Proof/provenance:** The base commit is `5cdcb7f6b9926fe1178de13984ed8a91ec63f6a6`.
+The file `owner-standing-instruction.json` has SHA-256 `d193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a`.
+It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
+The previous authority for the "bounded runtime-compatibility qualification" and D-P9-023 stay the same.
+The review receipt, `execution-stop-condition-independent-review.json`, has SHA-256 `53a53d6967574d4b22bcc0208e6abecc67c9e0b7d58411a5dd9ac14a65492661`.
+
+## Compatibility tests stopped — 2026-11-20
+
+<a id="runtime-compatibility-readiness-stop-panel"></a>
+
+This Level 2 record reports a test result. It gives no new authority.
+
+| Item | Result |
+| --- | --- |
+| Current state | The "bounded runtime-compatibility qualification" stopped because mandatory evidence is missing. The full host matrix did not start. |
+| What changed | The [first compatibility test on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44783029665) has a FAIL result. It used commit `33d76895d236cded67c302c0b48faebf26c9d238`, with `attempt` set to `1`. |
+| What now works | The [CI test with standalone Python](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44779702342) at that commit gives PASS results for all 201 validators. This does not qualify the host profile. |
+| Limitations/findings | The `seal`, `archive` and `publish` operations gave FAIL results. GitHub reports `"artifacts": []`. The initial diagnostic from `seal` is not available. The cause of the `seal` result is not known. |
+| Owner decision | [D-P9-024](#runtime-compatibility-standing-instruction-panel) makes a decision from the project owner necessary at a "repository stop condition". There is no new decision from the project owner in the decision register. |
+| Next action | Preserve the available evidence and source files for the stopped work. Report the missing evidence to the project owner. Do not start a new compatibility test or the full host matrix. |
+
+The `run` and cleanup steps reported `success`. Their step status does not supply the mandatory host profile and cleanup results or measured values against the specified limits.
+The file `readiness-source.png`, result records and diagnostics from the test on GitHub are not available with their initial bytes for independent review.
+The [validation instructions](../VALIDATION.md#validation-harness-readiness) make complete evidence necessary before the full test starts.
+The test did not start again.
+
+**Independent review:** `/root/assessment_prepare` gives `NOT_READY_MISSING_MANDATORY_EVIDENCE`.
+The reviewer did not write `tools/hosted_compatibility_readiness.py` or `tests/hosted_compatibility_readiness_suite.py`. The reviewer wrote `tools/compatibility_readiness_transport.py`, which moves the evidence.
+This is not an independent review of that software.
+The implementing agent and reviewers use the same workspace.
+
+`/root/producer_review` did a test without FreeCAD and found a different problem.
+The software that moves evidence can reject its own diagnostic for a FAIL result.
+This finding does not show the cause of the `seal` FAIL result. No repair for that FAIL result occurred.
+
+**Independent preservation:** The snapshot `runtime-compatibility-readiness-stop-20261120` contains the available command output, metadata, reviews and source files for the stopped work.
+It contains 1,781 files plus its manifest. The manifest has SHA-256 `97b25460227bc6e509200a7c50e9e9deea471fa9a885246539ba3702a961a5e3`.
+
+The independent reviewer compared the file set, bytes, hashes and file modes in the snapshot with the manifest. These checks gave a PASS result.
+It does not contain the missing evidence from the test on GitHub. The previous repair records stay preserved.
+
+**Proof/provenance:** Records are in `tmp/runtime-compatibility-qualification/autonomous-qualification-20261120/readiness-33d/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `actual-run.log` | `64a13197938773f9021cd4f1c08d92a8aee7ca540932b02268270a741c84a514` |
+| `actual-artifact-inventory.json` | `c48cd41fcc3a648f2f4909206bee6e3d3352dc0d2174ba648f2c5f55587ed9eb` |
+| `actual-result-independent-review-01.json` | `6f5e5c6748d457d13bd3f9db821f52e8c5c6141d6a2f9c2a2c73eceb4c60e249` |
+| `actual-result-independent-review-inventory-supplement.json` | `569d976e8537c148154d0c842e373234006d1c53379467239f5e36280446a7e1` |
+| `actual-failure-source-audit-01.json` | `5718afd30840632d580a50b0b31d90b89826c7834b822178ebfb8ccea7e7e215` |
+| `stop-preservation-independent-review.json` | `69c88e6c58df464df918c1bb92fcd8c9f32c89ff9fc571b2f9a73badb2ba0bec` |
+
+Independent review of all source files for the full host matrix is not complete. Those files do not have acceptance for the full host matrix.
+The project owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval." Phase 9B stays `Open` at 3/6.
+The phase exit and risk status, rights state, and product performance status stay the same.
+
+## Compatibility test repair — 2026-11-20
+
+<a id="runtime-compatibility-readiness-repair-panel"></a>
+
+**Decision:** D-P9-025 records the owner's instruction after the [compatibility test stopped](#runtime-compatibility-readiness-stop-panel).
+This Level 3 decision authorises the "bounded investigation and evidence-preservation repair" specified in D-P9-024.
+It then authorises "fresh hosted readiness" with the same bounded scope and limits.
+The [decision register](gate-decisions.json) preserves the complete owner statement.
+
+| Owner view | Current information |
+| --- | --- |
+| Current state | The owner authorises the specified repair work and a new `gui-readiness` test on GitHub. The previous test stays FAIL. |
+| What changed | The owner supplies the decision necessary at the recorded D-P9-024 stop. |
+| What now works | The instruction authorises the specified work. It supplies no result from the repair or a new test. |
+| Limitations/findings | Run `44783029665` has no available initial diagnostic from `seal` or complete mandatory evidence. The instruction does not supply that evidence. |
+| Owner decision | Use the repository skills. Find the cause of the `seal` failure. Make the smallest correction that the findings show is necessary. Preserve the original failure and all available evidence. |
+| Next action | Complete the necessary validation and "independent review" before the new `gui-readiness` test. After an independent reviewer gives a PASS result for complete evidence from that test, continue only the "qualification steps already authorised". |
+
+Keep the [D-P9-023 bounded scope](#runtime-compatibility-output-handling-panel), identities of the host profiles and limits.
+Keep the mandatory evidence, the requirements for output and independent preservation.
+Keep the evidence from GitHub for 30 days.
+The project authority in D-P9-024 includes the necessary `git commit` and `git push` operations and changes to pull requests.
+The owner's instruction is: "Continue without routine permission requests."
+
+**Stop conditions:** The owner gives these conditions:
+
+> Stop if the applicable repair allowance is exhausted, mandatory evidence remains unavailable after fresh readiness, or the work requires wider authority.
+
+Keep the previous repair records. The previous `2/2` record stays the same, with no repairs available.
+This decision gives no new repair count. It does not change any previous count.
+Use D-P9-019 only in its bounded scope. The same requirements limit the number of reviews and corrections to technical documents.
+
+**Panel:** Richard is the project owner and panel chair. `/root` supplies the instruction and owns its technical meaning.
+
+After the owner instruction, `/root/output_producer` examined the applicable project authority and repair limits.
+Then it wrote this record.
+That agent previously wrote the software that produces the output.
+It uses the same worktree as the implementing agents.
+Its assessment of project authority gives no acceptance for repair software or a test result.
+
+An independent reviewer must examine the repair and evidence from the new test.
+The panel recommendation is **Proceed with bounded conditions**. This assessment of project authority has no unresolved finding.
+
+| Risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | Before inputs or outputs move, the change owner and independent reviewer must check the unchanged D-P9-023 bounded scope. |
+| PR-13 | The change owner must preserve the original failure, all available evidence and previous repair records. Before tests that use this evidence or cleanup, an independent reviewer must check the preserved evidence. |
+| PR-22 | Before the new test, an independent reviewer must examine the repair's exact candidate, validation results and conditions for the test. Before the "qualification steps" continue, an independent reviewer must examine complete evidence from that test. |
+
+No risk closes. No assessment of control effectiveness changes.
+Preservation in this bounded scope does not complete the monthly restore test.
+The previous test with a FAIL result does not qualify the host profile. A new test cannot change that previous result.
+
+**Programme limits:** The owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval."
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+This decision gives no other project authority for publication.
+It does not change the rights state.
+It gives no acceptance for physical fit, production, product performance, release or a phase exit.
+
+**Proof/provenance:** The base commit is `b08d4d3ceffecd25b3acd0b5964ea9ef20668315`.
+The file `owner-repair-instruction.json` has 1,356 bytes and SHA-256 `b15f392eca38bf1b4f6ecc15947efec41cef2fccbf9b89202b8cb37657f38b21`.
+It preserves the owner's instruction that `/root` supplied. It supplies no API evidence for independent review of the instruction.
+The file is in `tmp/runtime-compatibility-qualification/readiness-repair-20261120/` in the task worktree.
+The previous failure records and independent preservation stay in the [stop record](#runtime-compatibility-readiness-stop-panel).
+
+## New compatibility test stopped — 2026-11-20
+
+<a id="runtime-compatibility-fresh-readiness-stop-panel"></a>
+
+This Level 2 record reports a test result. It gives no new authority.
+
+| Item | Result |
+| --- | --- |
+| Current state | The D-P9-025 stop condition applies because mandatory evidence is not available after the new `gui-readiness` test. The full host matrix did not start. |
+| What changed | [Run 44819325835](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44819325835) gives FAIL at commit `ceda757f084bd0d0229e8cff1afb0fe9b50bf4de`, with `attempt` set to `1`. |
+| What now works | [Standalone CI](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44814954553) gives PASS results for all 205 validators at that commit. Three tests in these validators correctly did not run. This does not qualify the host profile. |
+| Limitations/findings | The `acquire`, `archive` and `publish` steps gave FAIL results. The `run` and `seal` steps did not run. GitHub reports `"artifacts": []`. |
+| Owner decision | The [D-P9-025 stop conditions](#runtime-compatibility-readiness-repair-panel) show that an owner decision is necessary before more repair or one more compatibility test. |
+| Next action | Preserve all available evidence. Report the stop to the project owner. Without that decision, do not repair. Without that decision, do not do the test again. Without that decision, do not start the full host matrix. |
+
+The review shows 21 mandatory files that are missing from steps that started.
+Diagnostic output that the `acquire`, `archive` and `publish` steps wrote is not available. Their causes are `CANNOT_VERIFY`.
+The last step to send evidence gave a FAIL result because `compatibility-readiness-final.tar` was missing.
+The cleanup step reports `success`, but its records from the test are missing. This step status does not prove cleanup or resource use in the limits.
+
+**Independent review:** `/root/assessment_prepare` reports `STOP_MISSING_MANDATORY_EVIDENCE_AFTER_FRESH_READINESS`.
+That reviewer wrote the software that sends evidence. `/root/producer_review` independently examined the cause and stop condition.
+The second reviewer wrote the GUI test software, and that software did not change. These result reviews do not accept the software that these reviewers wrote.
+The two reviewers use the same task worktree.
+
+**Independent preservation:** The approved USB contains copies of all available evidence and the two reviews.
+The new snapshot, `fresh-readiness-44819325835`, contains 22 files with 321,156 bytes, plus its manifest.
+An independent reviewer compared the file set, bytes, hashes, file types and file modes. These checks gave PASS results.
+The missing evidence is not available. This bounded preservation does not complete the restore test that is necessary each month.
+
+The [previous test](#runtime-compatibility-readiness-stop-panel) stays FAIL. The previous repair records and `2/2` record do not change.
+The owner's instruction stays: "Runtime admission and ZY resumption still require my explicit approval."
+Phase 9B stays `Open` at 3/6. No phase exit, risk status, rights state or product performance status changes.
+
+**Proof/provenance:** Records are in `tmp/runtime-compatibility-qualification/readiness-repair-20261120/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `fresh-readiness-44819325835/actual-independent-review.json` | `00d03e6fc8ed140ad8410d5cb812a029cb96e210e8d7c8039f97afe7106cfd63` |
+| `fresh-readiness-44819325835-cause-stop-independent-review.json` | `2b37540ed0599d357ec43b87b04d82d13be52c518d6a670cb0d0c24bc1216bfd` |
+| `fresh-readiness-stop-preservation-manifest.json` | `90b41a17fb0a111297221995b1345c3353d1394d493607d7c97701bc6ca6948b` |
+| `fresh-readiness-stop-independent-preservation-readback.json` | `1b88f1189ebebe2b85749c158990fbd9e2d34fb334b1c75c6292033b15e7f7d6` |
+
+## One compatibility test on GitHub — 2026-11-21
+
+<a id="runtime-compatibility-acquisition-diagnostic-panel"></a>
+
+**Decision:** D-P9-026 records project authority for the "separate acquisition-only entry" and one test on GitHub only.
+The [decision register](gate-decisions.json) preserves the full project owner instruction.
+This Level 3 change adds project authority for that test after the [stopped test](#runtime-compatibility-fresh-readiness-stop-panel).
+It does not authorise the stopped tests to qualify the host profile to start again.
+
+| Item | Result |
+| --- | --- |
+| Current state | The project owner authorises work to prepare the diagnostic. The new test has no result. |
+| What changed | After the necessary independent reviews, CI and checks of independent preservation give PASS results, `/root` can start the single test. No new approval from the project owner is necessary. |
+| What now works | For the previous work to prepare the diagnostic, independent reviews and CI for standalone Python have PASS results. These results do not qualify a host profile. |
+| Limitations/findings | Tests 44783029665 and 44819325835 keep their FAIL results. The 21 missing items of initial evidence stay missing. The previous `2/2` repair evidence does not change. |
+| Owner decision | Prepare the "separate acquisition-only entry". Get an independent review. Then freeze the exact candidate. Before the test starts, record its full commit SHA. Keep PR #288 as a draft pull request. |
+| Next action | Complete the necessary independent reviews, CI and independent preservation for the exact candidate. Then do the one test. Then get an independent review of its evidence. |
+
+**Conditions:** Use one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+The limits are 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
+Keep the "approved base", input identities, ["handling scope"](#runtime-compatibility-output-handling-panel) and "resource limits".
+
+Keep the "separate diagnostic artifact" for 30 days. Complete "cleanup". Get an independent review of the evidence. Use independent preservation for the evidence.
+If you cannot obey a necessary condition or more project authority is necessary, stop before the test.
+
+The project owner's instruction is: "Stop before GUI execution, sealing, fixture generation or matrix execution, regardless of the acquisition result."
+The project owner's instruction is: "Successful acquisition establishes non-reproduction only; it does not explain the earlier failures or qualify the runtime."
+
+The new test cannot supply the missing initial evidence. It does not change the recorded number of repairs.
+The project owner's instruction is: "Runtime admission and ZY remain blocked."
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
+`/root/diagnostic_authority_author` examined the project owner instruction, previous independent reviews, preserved evidence and applicable project authority before it wrote this canonical record.
+That agent wrote no software or tests. The agents use the same worktree.
+The independent reviewers for this assessment are in the same agent group.
+
+Independent quality review and security/recovery review of the new software are necessary.
+The panel recommendation is **Proceed with bounded conditions**. The panel gives no different recommendation about this project authority.
+The causes of the previous FAIL results stay unknown because the initial diagnostics are missing.
+
+| Risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | Before data move, `/root` and the independent reviewer must validate that the input identities did not change. They must also validate that the "handling scope" did not change. |
+| PR-13 | Before the test starts, `/root` must preserve the exact candidate and evidence. An independent reviewer must validate that independent preservation. After the test, get an independent review of its evidence. Then use independent preservation for that evidence. |
+| PR-22 | Before the test starts, `/root` must get the necessary independent reviews and CI results. Record the full commit SHA for the test. After the test, an independent reviewer must examine the result and its limitations. |
+
+All risks keep their recorded status. No assessment of control effectiveness changes.
+Bounded independent preservation does not complete the test in [Backup and restore acceptance](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance).
+[The recorded project authority for Git](#runtime-compatibility-standing-instruction-panel) applies. PR #288 stays a draft pull request. Do not merge it.
+
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No rights state changes. The project owner accepts no production, product performance, release or phase result.
+
+**Proof/provenance:** The base commit for this work is `3474c3b1a649a2a5158b8811a7e5a92ff2ac081a`.
+The project owner instruction is in `owner-instruction.txt` in `tmp/runtime-compatibility-qualification/acquisition-diagnostic-20261121/` in the task worktree.
+
+It has 1245 bytes and SHA-256 `71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33`.
+`/root` supplied this instruction. This canonical record supplies no API evidence for independent review of that instruction.
+
+Independent reviews of the previous work to prepare the diagnostic are in `tmp/runtime-compatibility-qualification/diagnostic-preparation-20261120/`.
+They give PASS results for commits `8d83e99a3687d65a81a30ee3f0d22cc3c8558987` and `3474c3b1a649a2a5158b8811a7e5a92ff2ac081a`.
+[CI evidence for 44840687278](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44840687278) gives PASS results for all 205 validators at the second commit.
+Three tests correctly did not run. Their diagnostics give "private 556b archive unavailable".
+The independent preservation evidence and `usb-unmount.json` are in `tmp/runtime-compatibility-qualification/diagnostic-closeout-20261121/`.
+
+These previous results are not sufficient for the necessary independent reviews, CI or independent preservation of the new exact candidate.
+
+## Compatibility decision D-P9-027 — 2026-11-21
+
+<a id="runtime-compatibility-transport-refusal-panel"></a>
+
+This Level 3 decision authorises the reviewed repair and one more test on GitHub.
+The [decision register](gate-decisions.json) preserves the exact project owner instruction.
+The new authority is different from [D-P9-026](#runtime-compatibility-acquisition-diagnostic-panel).
+
+| Item | Result |
+| --- | --- |
+| Current state | [Test 44889308906](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44889308906) gives FAIL. Its independent review gives `STOP_EVIDENCE_INCOMPLETE`. The test's GitHub API record has no items in `artifacts`. Twenty-four mandatory files from the test are missing. |
+| What changed | The project owner authorises the reviewed repair and only one more test with the "separate acquisition-only entry". The previous `2/2` repair evidence does not change. D-P9-026 used its one permitted test. |
+| What now works | Tests in standalone Python show that a different diagnostic can stay available when `archive` and `publish` give FAIL results. Independent review of the repair gives PASS. These results apply to the reviewed `proposal.patch` only. |
+| Limitations/findings | The cause of the previous test's FAIL result stays unknown. The repair gives a `reason_code` from a specified set. It does not supply missing initial evidence. The initial diagnostic keeps its FAIL result. |
+| Owner decision | Apply the reviewed repair. Use D-P9-027 and the new project owner instruction for the new test. Keep the conditions below. |
+| Next action | Get independent review, CI and independent preservation for the exact candidate. When these checks give PASS results, record its full commit SHA. Then do the one more test. |
+
+The `acquire` step of test 44889308906 reports `success`.
+The `archive` and `publish` steps give FAIL results.
+The step status does not give complete evidence for "non-reproduction".
+The initial evidence for "cleanup", use within the "resource limits" and records kept for 30 days is missing.
+The independent review and independent preservation of all available evidence give PASS results for their bounded scope.
+These results do not change the FAIL result of the test.
+
+**Conditions:** Keep the [D-P9-026 test conditions](#runtime-compatibility-acquisition-diagnostic-panel).
+Use one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+The limits stay 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
+Keep the "approved base", exact input identities, "handling scope" and "resource limits".
+
+Keep the diagnostic evidence for 30 days. Complete "cleanup".
+Get an independent review of the result. Use independent preservation for the evidence.
+
+This decision adds one test only. It does not authorise any previous test to start again.
+Keep the previous FAIL results, 21 missing items of initial evidence and `2/2` repair evidence.
+Keep the D-P9-026 result. Its one permitted test is complete (`1/1`).
+
+After the new test, stop. Do not do the test again. This decision authorises no more repairs.
+If you cannot obey a condition, stop before the test.
+
+The D-P9-026 owner instruction applies: "Stop before GUI execution, sealing, fixture generation or matrix execution, regardless of the acquisition result."
+"Runtime admission and ZY remain blocked."
+The [recorded project authority for Git](#runtime-compatibility-standing-instruction-panel) applies.
+Keep PR #288 as a draft pull request. Do not merge it.
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
+`/root/diagnostic_preservation_plan` wrote `proposal.patch`.
+`/root/diagnostic_authority_author/sole_documentation_review` gave independent quality review and security/recovery review before it wrote this canonical record.
+`/root/final_source_rebind` gave PASS for independent preservation of the result and reviewed repair.
+
+The agents use the same worktree. The panel recommendation is **Proceed with bounded conditions**.
+
+The PR-06, PR-07, PR-13, PR-21 and PR-22 conditions in D-P9-026 apply to the new candidate and result.
+The named owners and deadlines stay. All 24 risk duties stay. No risk status or assessment of control effectiveness changes.
+This independent preservation does not complete the test in [Backup and restore acceptance](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance).
+
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No rights state changes. The project owner accepts no production, product performance, release or phase result.
+
+**Proof/provenance:** The previous test used commit `a05049ba3e3ab9b34ed907039d4e73547689e6e4`, with `attempt` set to `1`.
+The records below are in `tmp/runtime-compatibility-qualification/acquisition-diagnostic-20261121/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `hosted-diagnostic/independent-outcome-review.json` | `3386b414e51692fc62be91b1fa14ad3de74047499640176d86e92410fde901fe` |
+| `result-preservation-review/independent-result-preservation-readback.json` | `f8f0c816cf1ce13104515c5594e20011659a8d61e26fd1a5ebc08e3c0aef39fe` |
+| `transport-refusal-proposal-20261121/proposal.patch` | `4d10d7716acbc98f5fd5271fe97a8794d91a52f23847672ed3706620a45b4715` |
+| `transport-refusal-independent-review/independent-source-review.json` | `4becd329b728d5048cb3e811893412a1dd40384ce442546b921cb5d1e00a7146` |
+| `offline-proposal-independent-readback-corrected.json` | `0d4023d2586b42dac3710ec3d59d9e81c54b9ad605b3ab36b9ae2ec669fb697a` |
+
+The review records 11 tests in `focused` and 50 regression tests. The independent reviewer also did a test of the `private-path` diagnostic. These tests give PASS results.
+The baseline test correctly gives FAIL.
+The review also preserves a `fixture-or-harness-defect` from its first regression test. The corrected regression test gives PASS.
+
+The tests use local copies and simulated GitHub step results. They do not show that GitHub can send and receive the diagnostic evidence. They do not identify the previous test's cause.
+The checks cannot show whether software with the same access changed a permitted value before the tool made the diagnostic file.
+
+The new project owner instruction is in `owner-instruction.txt` in `tmp/runtime-compatibility-qualification/transport-refusal-repair-20261121/`.
+It has 119 bytes and SHA-256 `f4f3e129f36b1544ace05dcfbeb8cb53e453462e43df422fb8adb9da0b217a74`.
+`approved-proposal-context.json` in that directory records the controlled meaning that `/root` supplied.
+This canonical record supplies no API evidence for independent review of the instruction.

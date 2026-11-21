@@ -1404,7 +1404,7 @@ class PilotIdentityTests(unittest.TestCase):
                 "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"
             ),
             "tools/freecad_validation_guard.py": (
-                "b193209f0f21f28c3c17f9c52e509e31dccb32690152c02414769c0f6e49c559"
+                "1c8c68350f82133d282e5a79914e44be8b6a5dbf564f7f261448e0e9c66b41f2"
             ),
         }
         self.assertEqual(pilot.TEST_SHA256, expected[pilot.TEST_PATH])
@@ -1469,7 +1469,16 @@ class PilotIdentityTests(unittest.TestCase):
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
             "- rea-bc-straight-readiness", "- rea-bc-straight-native",
-            "- runtime-observation",
+            "- runtime-observation", "- compatibility-readiness",
+            "- compatibility-acquisition-diagnostic",
+            "- compatibility-qualification",
+            "readiness_control:",
+            "description: Exact reviewed compatibility readiness control JSON",
+            "required: false", "type: string", "readiness_review:",
+            "description: Independent readiness review receipt JSON",
+            "required: false", "type: string", "readiness_recovery:",
+            "description: Independent preservation receipt JSON",
+            "required: false", "type: string",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)
