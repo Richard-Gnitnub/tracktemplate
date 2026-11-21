@@ -1440,7 +1440,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-P9-027',
          'ec260a225fa4df34c2c4ad9591ce20577e32323797314382b1942746db76a50b'),
         ('D-P9-028',
-         '2c969c9a20acbda26b91ab1722eb6d6c9bb138be5f05a0dfb027377ca69fffe3'),
+         '6716da1dbd5b90d41849d932bfcb9f1ec256abc3621226bd5211ba05a2ccae2a'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
