@@ -418,7 +418,33 @@ def public_bytes(path):
     return content
 
 
-def _inventory(directory, allowed, *, excluded=()):
+def _collect_member(contents, name, path, refusals=None):
+    """Keep safe original bytes; diagnostic mode records content refusals.
+
+    Callers supply only fixed, admitted member names. Structural and I/O
+    errors still abort. No rejected bytes or exception text are published.
+    """
+    try:
+        contents[name] = public_bytes(path)
+    except ValueError as error:
+        if refusals is None:
+            raise
+        reason = None
+        if isinstance(error, UnicodeDecodeError):
+            reason = 'invalid-utf8'
+        elif type(error) is ValueError and len(error.args) == 1:
+            if type(error.args[0]) is str:
+                reason = {
+                    'Private path in operational evidence': 'private-path',
+                    'Credential-like operational evidence': 'credential-pattern',
+                    'Operational file too large': 'oversize',
+                }.get(error.args[0])
+        if reason is None:
+            raise
+        refusals[name] = reason
+
+
+def _inventory(directory, allowed, *, excluded=(), refusals=None, prefix=''):
     """Reject unexpected files, links and special nodes before any upload."""
     if not directory.exists():
         return {}
@@ -438,7 +464,7 @@ def _inventory(directory, allowed, *, excluded=()):
             continue
         require(name in allowed and path.is_file(),
                 'Unlisted operational evidence')
-        contents[name] = public_bytes(path)
+        _collect_member(contents, prefix + name, path, refusals)
     return contents
 
 
@@ -550,7 +576,7 @@ def reseal_payload(work, controls):
     return inventory, assessment['status']
 
 
-def _operational_contents(root, work, *, through_archive=False):
+def _operational_contents(root, work, *, through_archive=False, refusals=None):
     """Collect the same admitted originals for primary and final transport.
 
     Payload validation is separate. A failed typed seal must not prevent
@@ -583,7 +609,8 @@ def _operational_contents(root, work, *, through_archive=False):
         for name in WORK_RECORDS:
             path = work / name
             if path.exists():
-                contents['operational/' + name] = public_bytes(path)
+                _collect_member(contents, 'operational/' + name, path,
+                                None if name == 'control.json' else refusals)
         adaptation = work / 'installer-adaptation.json'
         if adaptation.exists():
             original = regular(ROOT / 'tools/hosted_l1_gui_install.py')
@@ -598,9 +625,9 @@ def _operational_contents(root, work, *, through_archive=False):
                 'derivation_receipt_sha256': digest(regular(adaptation)),
                 'adaptation': 'source-bound-readiness-installer-v1',
             }, sort_keys=True).encode() + b'\n'
-        for name, content in _inventory(
-                work / 'evidence', EVIDENCE, excluded=('guard/profile',)).items():
-            contents['operational/' + name] = content
+        contents.update(_inventory(
+            work / 'evidence', EVIDENCE, excluded=('guard/profile',),
+            refusals=refusals, prefix='operational/'))
         closed = 8 if through_archive else 7
         logroot = root / 'compatibility-readiness-logs'
         unread = tuple(name + '.log' for name in LOGS[closed:])
@@ -608,13 +635,13 @@ def _operational_contents(root, work, *, through_archive=False):
             path = logroot / name
             if path.exists():
                 regular(path)
-        logs = _inventory(logroot, {name + '.log' for name in LOGS},
-                          excluded=unread)
-        for name in LOGS[:closed]:
-            if name + '.log' in logs:
-                contents['logs/' + name + '.log'] = logs[name + '.log']
-        for name, content in original_failures(root).items():
-            contents['original-diagnostics/' + name] = content
+        contents.update(_inventory(
+            logroot, {name + '.log' for name in LOGS}, excluded=unread,
+            refusals=refusals, prefix='logs/'))
+        contents.update(_inventory(
+            root / 'compatibility-readiness-private',
+            {name + '.txt' for name in FAILURES},
+            refusals=refusals, prefix='original-diagnostics/'))
     return contents, summary, admitted
 
 
@@ -814,16 +841,31 @@ def _diagnostic_controls():
     return controls
 
 
+def _member_refusals(contents, refusals, stage):
+    """Bind finite rejected-member identities without changing originals."""
+    if refusals:
+        contents['transport/member-refusals.json'] = json.dumps({
+            'schema_version': 1, 'status': 'FAIL',
+            'stage': stage,
+            'source_commit': os.environ['GITHUB_SHA'],
+            'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': 1,
+            'members': refusals,
+        }, sort_keys=True, indent=2).encode() + b'\n'
+
+
 def diagnostic_archive():
     """Preserve operational originals without invoking a payload producer."""
     root = scratch()
     _diagnostic_controls()
+    refusals = {}
     contents, summary, admitted = _operational_contents(
-        root, readiness.workspace(os.environ))
+        root, readiness.workspace(os.environ), refusals=refusals)
     outcomes = summary.get('workflow_outcomes', {})
     require(outcomes.get('L1_RUN') == 'skipped',
             'Acquisition diagnostic must stop before runtime')
     preserved, missing = _preservation(contents, summary, admitted)
+    preserved = preserved and not refusals
+    _member_refusals(contents, refusals, 'diagnostic-archive')
     complete = (preserved and summary.get('cleanup') is True
                 and outcomes.get('L1_PREPARE') == 'success'
                 and outcomes.get('L1_INSTALL') == 'success'
@@ -883,9 +925,12 @@ def diagnostic_publish():
     """Bind both diagnostic readbacks and retain final operational evidence."""
     root = scratch()
     controls = _diagnostic_controls()
+    refusals = {}
     contents, summary, admitted = _operational_contents(
-        root, readiness.workspace(os.environ), through_archive=True)
+        root, readiness.workspace(os.environ), through_archive=True,
+        refusals=refusals)
     preserved, missing = _preservation(contents, summary, admitted)
+    preserved = preserved and not refusals
     publication = {
         'status': 'FAIL', 'primary': None, 'acquisition_failure': None,
         'independent_preservation_required': True,
@@ -907,7 +952,11 @@ def diagnostic_publish():
         retain_failure('publish-primary')
         publication['error'] = 'diagnostic-readback-unproved'
         path = root / 'compatibility-readiness-private/publish-primary.txt'
-        contents['original-diagnostics/publish-primary.txt'] = public_bytes(path)
+        _collect_member(contents, 'original-diagnostics/publish-primary.txt',
+                        path, refusals)
+        if refusals:
+            publication['original_diagnostic_preservation_complete'] = False
+    _member_refusals(contents, refusals, 'diagnostic-publish')
     target = root / (DIAGNOSTIC_PREFIX + '-publication.json')
     write(target, publication)
     contents['transport/publication.json'] = public_bytes(target)

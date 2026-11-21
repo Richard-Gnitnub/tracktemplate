@@ -318,6 +318,223 @@ class TransportTests(unittest.TestCase):
                            environment + '_ID': '123'})
         return destination / source.name
 
+    def assert_partial_diagnostic(self, originals, rejected, missing):
+        """Prove safe byte preservation without accepting incomplete evidence."""
+        with patch.object(transport, 'reseal_payload') as seal, \
+                patch.object(transport.readiness, 'run') as run:
+            self.assertEqual(transport.diagnostic_archive(), 'FAIL')
+            primary = self.diagnostic_readback('primary')
+            publication = transport.diagnostic_publish()
+            self.assertEqual(publication['status'], 'FAIL')
+            self.assertIs(
+                publication['original_diagnostic_preservation_complete'], False)
+            self.assertEqual(publication['missing_mandatory_evidence'], missing)
+            final = self.diagnostic_readback('final')
+            with redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(transport.main(['diagnostic-complete']), 1)
+            seal.assert_not_called()
+            run.assert_not_called()
+        self.assertEqual(output.getvalue(),
+                         'COMPATIBILITY_ACQUISITION_DIAGNOSTIC_FAIL\n')
+        completion = json.loads((self.root / (transport.DIAGNOSTIC_PREFIX
+                                + '-completion.json')).read_bytes())
+        self.assertEqual(completion['status'], 'FAIL')
+        self.assertEqual(completion['evidence_status'], 'FAIL')
+        self.assertEqual(completion['acquisition_outcome'], 'success')
+        for name in ('runtime_admission', 'matrix_dispatch', 'zy_execution',
+                     'readiness_dispatch'):
+            self.assertIs(completion[name], False)
+        for kind, readback in (('primary', primary), ('final', final)):
+            artifact = self.root / (transport.DIAGNOSTIC_PREFIX
+                                    + '-' + kind + '.tar')
+            self.assertEqual(readback.read_bytes(), artifact.read_bytes())
+            with tarfile.open(readback, 'r:') as bundle:
+                names = set(bundle.getnames())
+                self.assertTrue(set(originals) <= names)
+                for name, raw in originals.items():
+                    self.assertEqual(bundle.extractfile(name).read(), raw)
+                self.assertFalse(set(rejected) & names)
+                self.assertFalse(any(name.startswith('payload/')
+                                     for name in names))
+                refusal_raw = bundle.extractfile(
+                    'transport/member-refusals.json').read()
+                refusal = json.loads(refusal_raw)
+                self.assertEqual(refusal, {
+                    'schema_version': 1, 'status': 'FAIL',
+                    'source_commit': os.environ['GITHUB_SHA'],
+                    'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': 1,
+                    'stage': ('diagnostic-archive' if kind == 'primary'
+                              else 'diagnostic-publish'),
+                    'members': {name: reason for name, (_, _, reason)
+                                in rejected.items()},
+                })
+                if kind == 'primary':
+                    manifest = json.loads(bundle.extractfile(
+                        'transport/manifest.json').read())
+                    self.assertEqual(manifest['evidence_status'], 'FAIL')
+                    self.assertIs(manifest[
+                        'original_diagnostic_preservation_complete'], False)
+                    self.assertEqual(manifest['missing_mandatory_evidence'],
+                                     missing)
+                    self.assertEqual(manifest['files'], {
+                        name: {'bytes': len(raw),
+                               'sha256': hashlib.sha256(raw).hexdigest()}
+                        for name, raw in dict(originals, **{
+                            'transport/member-refusals.json': refusal_raw,
+                        }).items()})
+            for path, raw, _ in rejected.values():
+                self.assertEqual(path.read_bytes(), raw)
+                self.assertNotIn(raw, artifact.read_bytes())
+
+    def test_diagnostic_rejected_mandatory_member_keeps_all_safe_originals(self):
+        self.prepared_diagnostic()
+        diagnostic = self.root / 'compatibility-readiness-private/acquire.txt'
+        diagnostic.parent.mkdir()
+        diagnostic.write_bytes(b'Original safe diagnostic\n')
+        originals, _, _ = transport._operational_contents(self.root, self.work)
+        self.assertGreaterEqual(len(originals), 24)
+        name = 'operational/installer-output.log'
+        rejected = self.work / 'evidence/installer-output.log'
+        raw = b'/root/.local/share/flatpak/exports/share\n'
+        rejected.write_bytes(raw)
+        originals.pop(name)
+        self.assert_partial_diagnostic(
+            originals, {name: (rejected, raw, 'private-path')}, [name])
+
+    def test_diagnostic_multiple_content_refusals_remain_finite_and_exact(self):
+        self.prepared_diagnostic()
+        diagnostic = self.root / 'compatibility-readiness-private/acquire.txt'
+        diagnostic.parent.mkdir()
+        diagnostic.write_bytes(b'Original safe diagnostic\n')
+        samples = self.work / 'evidence/installer-samples.jsonl'
+        samples.write_bytes(b'Original safe samples\n')
+        originals, _, _ = transport._operational_contents(self.root, self.work)
+        rejected = {
+            'operational/installer-output.log': (
+                self.work / 'evidence/installer-output.log',
+                b'/home/operator/private-original\n', 'private-path'),
+            'logs/install.log': (
+                self.root / 'compatibility-readiness-logs/install.log',
+                b'Authorization: synthetic-excluded-value\n',
+                'credential-pattern'),
+            'original-diagnostics/acquire.txt': (
+                diagnostic, b'\xff\x00', 'invalid-utf8'),
+            'operational/installer-samples.jsonl': (
+                samples, b'x' * (transport.MAX_FILE + 1), 'oversize'),
+        }
+        for name, (path, raw, _) in rejected.items():
+            path.write_bytes(raw)
+            originals.pop(name)
+        self.assert_partial_diagnostic(originals, rejected, [
+            'logs/install.log', 'operational/installer-output.log'])
+
+    def test_diagnostic_optional_refusal_cannot_claim_complete_evidence(self):
+        self.prepared_diagnostic()
+        originals, _, _ = transport._operational_contents(self.root, self.work)
+        rejected = self.work / 'evidence/installer-samples.jsonl'
+        raw = b'/home/operator/private-optional-original\n'
+        rejected.write_bytes(raw)
+        self.assert_partial_diagnostic(originals, {
+            'operational/installer-samples.jsonl': (
+                rejected, raw, 'private-path'),
+        }, [])
+
+    def test_diagnostic_rejected_readback_traceback_keeps_final_failure(self):
+        self.prepared_diagnostic()
+        originals, _, _ = transport._operational_contents(self.root, self.work)
+        self.assertEqual(transport.diagnostic_archive(), 'PASS')
+        hostile = '/home/operator/private-readback-detail'
+        with patch.object(transport, '_readback',
+                          side_effect=ValueError(hostile)):
+            publication = transport.diagnostic_publish()
+        self.assertEqual(publication['status'], 'FAIL')
+        self.assertIsNone(publication['primary'])
+        self.assertEqual(publication['missing_mandatory_evidence'], [])
+        self.assertIs(publication[
+            'original_diagnostic_preservation_complete'], False)
+        original = self.root / 'compatibility-readiness-private/publish-primary.txt'
+        raw = original.read_bytes()
+        self.assertIn(hostile.encode(), raw)
+        final = self.diagnostic_readback('final')
+        with tarfile.open(final, 'r:') as bundle:
+            for name, safe_raw in originals.items():
+                self.assertEqual(bundle.extractfile(name).read(), safe_raw)
+            self.assertNotIn('original-diagnostics/publish-primary.txt',
+                             bundle.getnames())
+            ledger = json.loads(bundle.extractfile(
+                'transport/member-refusals.json').read())
+            self.assertEqual(ledger['members'], {
+                'original-diagnostics/publish-primary.txt': 'private-path'})
+            self.assertEqual(ledger['status'], 'FAIL')
+        self.assertNotIn(hostile.encode(), final.read_bytes())
+        self.assertEqual(original.read_bytes(), raw)
+        self.assertEqual(transport.diagnostic_complete(), 'FAIL')
+
+    def test_diagnostic_link_refuses_before_partial_artifact(self):
+        self.prepared_diagnostic()
+        original = self.work / 'evidence/installer-output.log'
+        retained = self.work / 'retained-installer-output.log'
+        original.rename(retained)
+        original.symlink_to(retained)
+        for operation in (transport.diagnostic_archive,
+                          transport.diagnostic_publish):
+            with self.subTest(operation=operation.__name__):
+                with self.assertRaisesRegex(ValueError, 'Linked evidence member'):
+                    operation()
+        self.assertTrue(original.is_symlink())
+        self.assertEqual(retained.read_bytes(), b'{"synthetic": true}')
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
+                                          + '-' + kind + '.tar')).exists())
+
+    def test_diagnostic_foreign_owner_and_io_error_are_not_content_refusals(self):
+        self.prepared_diagnostic()
+        original = self.work / 'evidence/installer-output.log'
+        raw = original.read_bytes()
+        original_stat = Path.stat
+        original_read = Path.read_bytes
+
+        def foreign_stat(candidate, *args, **kwargs):
+            result = original_stat(candidate, *args, **kwargs)
+            if candidate == original:
+                fields = list(result)
+                fields[4] = os.getuid() + 1
+                return os.stat_result(fields)
+            return result
+
+        def refused_read(candidate):
+            if candidate == original:
+                raise PermissionError('Injected unreadable original')
+            return original_read(candidate)
+
+        for operation in (transport.diagnostic_archive,
+                          transport.diagnostic_publish):
+            with self.subTest(operation=operation.__name__):
+                with patch.object(Path, 'stat', foreign_stat), \
+                        self.assertRaisesRegex(ValueError, 'Foreign evidence owner'):
+                    operation()
+                with patch.object(Path, 'read_bytes', refused_read), \
+                        self.assertRaises(PermissionError):
+                    operation()
+        self.assertEqual(original.read_bytes(), raw)
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
+                                          + '-' + kind + '.tar')).exists())
+
+    def test_readiness_content_refusal_still_rejects_whole_archive(self):
+        self.prepared_payload()
+        original = self.work / 'evidence/installer-output.log'
+        raw = b'/home/operator/private-readiness-original\n'
+        original.write_bytes(raw)
+        for operation in (transport.archive, transport.publish):
+            with self.subTest(operation=operation.__name__):
+                with self.assertRaisesRegex(ValueError, 'Private path'):
+                    operation()
+        self.assertEqual(original.read_bytes(), raw)
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (
+                'compatibility-readiness-' + kind + '.tar')).exists())
+
     def test_diagnostic_control_is_distinct_and_cannot_run_or_seal(self):
         control = self.acquisition_only_control()
         transport.seed()
@@ -448,7 +665,7 @@ class TransportTests(unittest.TestCase):
     def test_transport_refusal_after_successful_acquisition_is_independent(self):
         self.prepared_diagnostic()
         os.environ['GITHUB_JOB'] = transport.DIAGNOSTIC_PREFIX
-        rejected = self.work / 'evidence/installer-output.log'
+        rejected = self.work / 'evidence/unlisted.txt'
         original = b'/home/operator/private-input\n'
         rejected.write_bytes(original)
         for stage in ('archive', 'publish'):
@@ -477,7 +694,7 @@ class TransportTests(unittest.TestCase):
                 raw = bundle.extractfile(
                     'transport/' + stage + '-refusal.json').read()
                 record = json.loads(raw)
-                self.assertEqual(record['reason_code'], 'private-path')
+                self.assertEqual(record['reason_code'], 'unlisted-member')
                 self.assertEqual(record['status'], 'FAIL')
                 self.assertEqual(record['stage'], 'diagnostic-' + stage)
                 self.assertEqual(record['source_commit'],
