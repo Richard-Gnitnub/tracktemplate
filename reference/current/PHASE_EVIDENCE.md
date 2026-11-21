@@ -5333,34 +5333,34 @@ The [decision register](gate-decisions.json) owns the complete bounded authority
 
 | Item | Result |
 | --- | --- |
-| Current state | [Test 44921692213](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44921692213) stays FAIL. It preserved 23 of 24 mandatory files. `operational/installer-output.log` was rejected with `private-path`. |
-| What changed | D-P9-029 permits the necessary repairs to the installation commands and their tests. No fixed repair count applies before the one permitted test on GitHub. Each repair needs evidence. Documentation keeps its finite limits. |
-| What now works | The retained files show successful acquisition and cleanup. An earlier installation output contains a warning from `flatpak`. |
-| Limitations/findings | The rejected file stays unavailable. The earlier warning does not prove its contents or the causes of previous failures. |
-| Owner decision | Correct the installation commands that produce the warning. Preserve complete permitted initial output. Then do one test with the "separate acquisition-only entry". |
-| Next action | Demonstrate the repair with retained output and simulated commands in standalone Python. Complete independent review, CI and independent preservation for the exact candidate. Record its full commit SHA before the test. |
+| Current state | [Test 44921692213](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44921692213) stays FAIL. It preserved 23 of 24 mandatory files. The checks rejected `operational/installer-output.log` with `private-path`. |
+| What changed | D-P9-029 authorises the necessary repairs to the installation commands and their tests. No maximum number of repairs applies before the one permitted test on GitHub. Each repair needs evidence. The documentation profile does not change. |
+| What now works | The preserved files give PASS results for "acquisition" and "cleanup". Output from a previous installation contains a diagnostic from `flatpak`. |
+| Limitations/findings | The rejected file is not available. The previous diagnostic does not show the contents of the rejected file or the causes of previous FAIL results. |
+| Owner decision | Correct the installation commands that cause the diagnostic. Preserve the complete permitted output without changes. Then do one test with the "separate acquisition-only entry". |
+| Next action | Show the repair with preserved output and simulated commands in standalone Python. Complete independent review, CI and independent preservation for the exact candidate. Record its full commit SHA before the test. |
 
 Keep the [D-P9-026 conditions](#runtime-compatibility-acquisition-diagnostic-panel): one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
 Keep the limits of 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
-Keep all input identities, [public handling limits](#runtime-compatibility-output-handling-panel), mandatory evidence and "resource limits".
-Do not buy computer services. Do not weaken content checks or replace mandatory initial output with changed text.
+Keep all input identities, [D-P9-023 limits](#runtime-compatibility-output-handling-panel), mandatory evidence and "resource limits".
+Keep this condition from the controlled meaning: "do not purchase new paid compute, hosting or storage services/subscriptions for this task". Do not weaken the checks of output. Do not replace mandatory initial output with changed text.
 
-The test must stop before GUI execution, sealing, fixture generation, readiness or matrix execution.
+The test must stop before "GUI execution", "sealing", "fixture generation", "readiness" or "matrix execution".
 
-Keep its evidence for 30 days. Complete "cleanup", independent result review and independent preservation.
+Keep its evidence for 30 days. Complete "cleanup". Complete independent review of the result. Complete independent preservation.
 
-If the result is FAIL or incomplete, stop after preservation and review. Do not repeat the test or make more repairs under this decision.
+If the result is FAIL or not complete, stop after independent preservation and independent review. Do not do the test again. Do not make more repairs with this authority.
 
-If independent review gives PASS for complete evidence, return only to the steps that [D-P9-024](#runtime-compatibility-standing-instruction-panel) already authorises.
-Each step still needs its applicable conditions. Successful "acquisition" shows "non-reproduction" only.
+If independent review gives PASS for complete evidence, continue only with the steps that [D-P9-024](#runtime-compatibility-standing-instruction-panel) authorises.
+Each step needs its applicable conditions. A PASS result for "acquisition" shows "non-reproduction" only.
 
 **Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and controlled meaning.
-`/root/partial_evidence_author` supplied independent programme advice and did not make the proposed product change.
-The agents share one team and worktree. The recommendation is **Proceed with bounded conditions**.
+`/root/partial_evidence_author` supplied programme advice independently and did not make the proposed product change.
+The agents are in the same team and worktree. The panel recommendation is **Proceed with bounded conditions**.
 
-The D-P9-026 risk conditions, owners and deadlines apply. All 24 risk duties and recorded risk statuses stay.
+The D-P9-026 risk conditions, risk owners and deadlines apply. All conditions and recorded statuses for the 24 risks stay.
 
-Preserve all previous failures, the `2/2` repair record and D-P9-026, D-P9-027 and D-P9-028 `1/1` results.
+Preserve all previous FAIL results, the `2/2` repair record and D-P9-026, D-P9-027 and D-P9-028 `1/1` results.
 The recorded Git authority applies. Keep PR #288 as a draft pull request. Do not merge it.
 "Runtime admission and ZY remain blocked." Phase 9B stays `Open` at 3/6. All previous acceptance exclusions stay.
 
