@@ -5167,3 +5167,85 @@ Three tests correctly did not run. Their diagnostics give "private 556b archive 
 The independent preservation evidence and `usb-unmount.json` are in `tmp/runtime-compatibility-qualification/diagnostic-closeout-20261121/`.
 
 These previous results are not sufficient for the necessary independent reviews, CI or independent preservation of the new exact candidate.
+
+## Compatibility decision D-P9-027 — 2026-11-21
+
+<a id="runtime-compatibility-transport-refusal-panel"></a>
+
+This Level 3 decision authorises the reviewed repair and one more test on GitHub.
+The [decision register](gate-decisions.json) preserves the exact project owner instruction.
+The new authority is separate from [D-P9-026](#runtime-compatibility-acquisition-diagnostic-panel).
+
+| Item | Result |
+| --- | --- |
+| Current state | [Test 44889308906](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44889308906) gives FAIL. Its independent review gives `STOP_EVIDENCE_INCOMPLETE`. GitHub has no artifacts from the test. Twenty-four mandatory files from the test are missing. |
+| What changed | The project owner authorises the reviewed repair and exactly one more test through the "separate acquisition-only entry". The previous `2/2` repair evidence does not change. D-P9-026 used its one permitted test. |
+| What now works | Tests in standalone Python show that a separate diagnostic can stay available when `archive` and `publish` give FAIL results. Independent review of the repair gives PASS. These results apply to the reviewed `proposal.patch` only. |
+| Limitations/findings | The cause of the previous test's FAIL result stays unknown. The repair gives a fixed `reason_code`. It does not recover missing initial evidence. The original diagnostic keeps its FAIL result. |
+| Owner decision | Apply the reviewed repair. Use D-P9-027 and the new project owner instruction for the additional test. Keep the conditions below. |
+| Next action | Get independent review, CI and independent preservation for the exact candidate. When these checks give PASS results, record its full commit SHA. Then do the one additional test. |
+
+The `acquire` step of test 44889308906 reports `success`.
+The `archive` and `publish` steps give FAIL results.
+The step status does not establish complete evidence for "non-reproduction".
+The initial evidence for "cleanup", resource use and 30-day retention is missing.
+The independent review and independent preservation of all available evidence give PASS results for their stated scope.
+These results do not change the FAIL result of the test.
+
+**Conditions:** Keep the [D-P9-026 test conditions](#runtime-compatibility-acquisition-diagnostic-panel).
+Use one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+The limits stay 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
+Keep the "approved base", exact input identities, "handling scope" and "resource limits".
+
+Keep the diagnostic evidence for 30 days. Complete "cleanup".
+Get an independent review of the result. Use independent preservation for the evidence.
+
+This decision adds one test only. It does not authorise any previous test to start again.
+Keep the previous FAIL results, 21 missing items of initial evidence and `2/2` repair evidence.
+Keep the D-P9-026 result. Its one permitted test is complete (`1/1`).
+
+After the additional test, stop. Do not repeat it or repair further under this decision.
+If a condition cannot be met, stop before the test.
+
+Stop before GUI execution, sealing, fixture generation or matrix execution, regardless of the result.
+"Runtime admission and ZY remain blocked."
+The [recorded project authority for Git](#runtime-compatibility-standing-instruction-panel) applies.
+Keep PR #288 as a draft pull request. Do not merge it.
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
+`/root/diagnostic_preservation_plan` wrote `proposal.patch`.
+`/root/diagnostic_authority_author/sole_documentation_review` gave independent quality review and security/recovery review before it wrote this canonical record.
+`/root/final_source_rebind` independently verified preservation of the result and reviewed repair.
+
+The agents use the same worktree. The panel recommendation is **Proceed with bounded conditions**.
+
+The PR-06, PR-07, PR-13, PR-21 and PR-22 conditions in D-P9-026 apply to the new candidate and result.
+The named owners and deadlines stay. All 24 risk duties stay. No risk status or assessment of control effectiveness changes.
+This bounded preservation does not complete the monthly restore test.
+
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No rights state changes. The project owner accepts no production, product performance, release or phase result.
+
+**Proof/provenance:** The previous test used commit `a05049ba3e3ab9b34ed907039d4e73547689e6e4`, with `attempt` set to `1`.
+The records below are in `tmp/runtime-compatibility-qualification/acquisition-diagnostic-20261121/` in the task worktree.
+
+| Record | SHA-256 |
+| --- | --- |
+| `hosted-diagnostic/independent-outcome-review.json` | `3386b414e51692fc62be91b1fa14ad3de74047499640176d86e92410fde901fe` |
+| `result-preservation-review/independent-result-preservation-readback.json` | `f8f0c816cf1ce13104515c5594e20011659a8d61e26fd1a5ebc08e3c0aef39fe` |
+| `transport-refusal-proposal-20261121/proposal.patch` | `4d10d7716acbc98f5fd5271fe97a8794d91a52f23847672ed3706620a45b4715` |
+| `transport-refusal-independent-review/independent-source-review.json` | `4becd329b728d5048cb3e811893412a1dd40384ce442546b921cb5d1e00a7146` |
+| `offline-proposal-independent-readback-corrected.json` | `0d4023d2586b42dac3710ec3d59d9e81c54b9ad605b3ab36b9ae2ec669fb697a` |
+
+The review contains 11 focused tests, 50 regression tests and an independent test with a private path. These tests give PASS results.
+The baseline test gives the expected FAIL result.
+The review also preserves a `fixture-or-harness-defect` from its first regression test. The corrected regression test gives PASS.
+
+The tests use local copies and synthetic GitHub step results. They do not prove transport on GitHub or identify the previous test's cause.
+The checks cannot prove that another process with the same access did not change a permitted value before the diagnostic file was made.
+
+The new project owner instruction is in `owner-instruction.txt` in `tmp/runtime-compatibility-qualification/transport-refusal-repair-20261121/`.
+It has 119 bytes and SHA-256 `f4f3e129f36b1544ace05dcfbeb8cb53e453462e43df422fb8adb9da0b217a74`.
+`approved-proposal-context.json` in that directory records the bounded interpretation that `/root` supplied.
+This canonical record supplies no API evidence for independent review of the instruction.

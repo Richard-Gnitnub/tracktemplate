@@ -460,6 +460,48 @@ jobs:
         run: |
           python3 tools/compatibility_readiness_transport.py diagnostic-publish > "$RUNNER_TEMP/compatibility-readiness-logs/publish.log" 2>&1
 
+      - name: Pack safe diagnostic transport refusal records independently
+        id: transport_failure
+        if: always() && (steps.archive.outcome == 'failure' || steps.publish.outcome == 'failure')
+        timeout-minutes: 1
+        env:
+          L1_ARCHIVE: ${{ steps.archive.outcome }}
+          L1_PUBLISH: ${{ steps.publish.outcome }}
+        run: |
+          umask 077
+          python3 tools/compatibility_readiness_transport.py diagnostic-failure
+
+      - name: Preserve safe transport refusal records for 30 days
+        id: transport_failure_upload
+        if: always() && steps.transport_failure.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-acquisition-diagnostic-transport-failure-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-transport-failure.tar
+
+      - name: Read back the same transport refusal artifact
+        id: transport_failure_download
+        if: always() && steps.transport_failure_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.transport_failure_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-transport-failure-readback
+
+      - name: Verify the exact transport refusal artifact bytes
+        if: always() && steps.transport_failure_upload.outcome == 'success'
+        timeout-minutes: 1
+        env:
+          L1_TRANSPORT_FAILURE_UPLOAD: ${{ steps.transport_failure_upload.outcome }}
+          L1_TRANSPORT_FAILURE_DOWNLOAD: ${{ steps.transport_failure_download.outcome }}
+          L1_TRANSPORT_FAILURE_ID: ${{ steps.transport_failure_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py diagnostic-failure-readback
+
       - name: Preserve the final diagnostic transport artifact for 30 days
         id: final_upload
         if: always()

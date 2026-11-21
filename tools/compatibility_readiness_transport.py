@@ -68,6 +68,15 @@ WORK_RECORDS = ('control.json', 'preparation.json', 'base-binding.json',
 MAX_FILE = 8 * 1024**2
 MAX_ARCHIVE = 64 * 1024**2
 DIAGNOSTIC_PREFIX = 'compatibility-acquisition-diagnostic'
+REFUSAL_REASONS = {
+    'Private path in operational evidence': 'private-path',
+    'Credential-like operational evidence': 'credential-pattern',
+    'Unlisted operational evidence': 'unlisted-member',
+    'Unexpected evidence directory': 'unlisted-member',
+    'Operational file too large': 'oversize',
+    'Operational archive too large': 'oversize',
+    'Archive bound exceeded': 'oversize',
+}
 # Keep refusal traceback source lines free of the patterns they test. The
 # scanner still rejects the same bytes; original tracebacks are never edited.
 PRIVATE_PATH = re.compile(
@@ -127,6 +136,78 @@ def retain_failure(stage):
             'Private failure directory differs')
     with (parent / (stage + '.txt')).open('x', encoding='utf-8') as stream:
         stream.write(traceback.format_exc())
+
+
+def _diagnostic_transport_context():
+    """Bind minimal refusal reporting to this acquisition-only attempt."""
+    root = scratch()
+    require(os.environ.get('GITHUB_JOB') == DIAGNOSTIC_PREFIX,
+            'Acquisition-only job required')
+    run_id = os.environ.get('GITHUB_RUN_ID', '')
+    require(re.fullmatch('[1-9][0-9]*', run_id), 'Run identity absent')
+    return root, {
+        'schema_version': 1, 'status': 'FAIL',
+        'source_commit': os.environ['GITHUB_SHA'],
+        'run_id': run_id, 'run_attempt': 1,
+    }
+
+
+def _diagnostic_refusal_record(stage, error):
+    """Write only finite failure facts before retaining private traceback."""
+    root, record = _diagnostic_transport_context()
+    require(stage in ('diagnostic-archive', 'diagnostic-publish'),
+            'Unknown diagnostic refusal stage')
+    reason = 'operation-refused'
+    if isinstance(error, UnicodeDecodeError):
+        reason = 'invalid-utf8'
+    elif type(error) is ValueError and len(error.args) == 1:
+        if type(error.args[0]) is str:
+            reason = REFUSAL_REASONS.get(error.args[0], reason)
+    category = next(kind.__name__ for kind in (
+        OSError, ValueError, KeyError, TypeError) if isinstance(error, kind))
+    record.update(stage=stage, reason_code=reason, exception_category=category)
+    target = root / (DIAGNOSTIC_PREFIX + '-' + stage.removeprefix(
+        'diagnostic-') + '-refusal.json')
+    write(target, record)
+
+
+def diagnostic_failure():
+    """Pack finite refusal records without reading operational contents."""
+    root, identity = _diagnostic_transport_context()
+    contents = {}
+    for stage in ('archive', 'publish'):
+        outcome = os.environ.get('L1_' + stage.upper())
+        require(outcome in ('success', 'failure', 'skipped', 'cancelled'),
+                'Diagnostic step outcome absent')
+        path = root / (DIAGNOSTIC_PREFIX + '-' + stage + '-refusal.json')
+        if outcome != 'failure':
+            require(not path.exists(), 'Unexpected diagnostic refusal')
+            continue
+        raw = public_bytes(path)
+        record = strict_json(raw)
+        require(type(record) is dict and set(record) == set(identity) | {
+            'stage', 'reason_code', 'exception_category'},
+            'Diagnostic refusal fields differ')
+        require(all(record[key] == value for key, value in identity.items())
+                and type(record['schema_version']) is int
+                and type(record['run_attempt']) is int
+                and record['stage'] == 'diagnostic-' + stage
+                and record['reason_code'] in {
+                    *REFUSAL_REASONS.values(), 'invalid-utf8',
+                    'operation-refused'}
+                and record['exception_category'] in (
+                    'OSError', 'ValueError', 'KeyError', 'TypeError'),
+                'Diagnostic refusal identity or category differs')
+        contents['transport/' + stage + '-refusal.json'] = raw
+    require(contents, 'No diagnostic refusal to preserve')
+    return _tar(root / (DIAGNOSTIC_PREFIX + '-transport-failure.tar'),
+                contents)
+
+
+def diagnostic_failure_readback():
+    """Verify exact refusal bytes without reopening operational evidence."""
+    root, _ = _diagnostic_transport_context()
+    return _readback(root, 'transport-failure', namespace=DIAGNOSTIC_PREFIX)
 
 
 def seed():
@@ -659,7 +740,8 @@ def _readback(root, kind, *, namespace='compatibility-readiness'):
     readback = regular(root / (namespace + '-' + kind + '-readback')
                        / source.name)
     prefix = {'primary': 'L1_PRIMARY', 'final': 'L1_FINAL',
-              'acquisition-failure': 'L1_DIAGNOSTIC'}[kind]
+              'acquisition-failure': 'L1_DIAGNOSTIC',
+              'transport-failure': 'L1_TRANSPORT_FAILURE'}[kind]
     return native.verify_artifact(source, readback,
                                   os.environ.get(prefix + '_UPLOAD', ''),
                                   os.environ.get(prefix + '_DOWNLOAD', ''),
@@ -869,7 +951,8 @@ def main(argv=None):
     parser.add_argument('stage', choices=(
         'seed', 'acquire', 'acquire-diagnostic', 'finalize', 'archive',
         'publish', 'complete', 'diagnostic-archive', 'diagnostic-publish',
-        'diagnostic-complete'))
+        'diagnostic-complete', 'diagnostic-failure',
+        'diagnostic-failure-readback'))
     arguments = parser.parse_args(argv)
     if arguments.stage == 'acquire-diagnostic':
         try:
@@ -880,11 +963,28 @@ def main(argv=None):
             return 1
         print('COMPATIBILITY_READINESS_ACQUISITION_DIAGNOSTIC_PRESERVED')
         return 0
+    if arguments.stage in ('diagnostic-failure', 'diagnostic-failure-readback'):
+        try:
+            globals()[arguments.stage.replace('-', '_')]()
+        except (OSError, ValueError, KeyError, TypeError):
+            print('COMPATIBILITY_DIAGNOSTIC_REFUSAL_PRESERVATION_FAIL')
+            return 1
+        print('COMPATIBILITY_DIAGNOSTIC_REFUSAL_PRESERVATION_PASS')
+        return 0
     try:
         result = globals()[arguments.stage.replace('-', '_')]()
-    except (OSError, ValueError, KeyError, TypeError):
-        # Keep raw input and originals on disk; do not echo their contents.
-        retain_failure(arguments.stage.removeprefix('diagnostic-'))
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        if arguments.stage in ('diagnostic-archive', 'diagnostic-publish'):
+            try:
+                _diagnostic_refusal_record(arguments.stage, error)
+            except (OSError, ValueError, KeyError, TypeError):
+                print('COMPATIBILITY_DIAGNOSTIC_REFUSAL_RECORD_FAIL')
+            try:
+                retain_failure(arguments.stage.removeprefix('diagnostic-'))
+            except (OSError, ValueError, KeyError, TypeError):
+                print('COMPATIBILITY_DIAGNOSTIC_PRIVATE_RETENTION_FAIL')
+        else:
+            retain_failure(arguments.stage.removeprefix('diagnostic-'))
         print('COMPATIBILITY_READINESS_TRANSPORT_FAIL=' + arguments.stage)
         return 1
     if arguments.stage == 'diagnostic-complete':

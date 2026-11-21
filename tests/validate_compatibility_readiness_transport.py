@@ -231,7 +231,7 @@ class TransportTests(unittest.TestCase):
         """Use distinct diagnostic authority without a readiness receipt."""
         control = copy.deepcopy(self.fixture.control)
         control.update(
-            stage='acquisition-diagnostic', owner_decision='D-P9-026',
+            stage='acquisition-diagnostic', owner_decision='D-P9-027',
             owner_decision_sha256=(
                 transport.readiness.DIAGNOSTIC_DECISION_SHA256),
             acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
@@ -307,6 +307,8 @@ class TransportTests(unittest.TestCase):
         if kind == 'acquisition-failure':
             prefix = 'compatibility-readiness'
             environment = 'L1_DIAGNOSTIC'
+        elif kind == 'transport-failure':
+            environment = 'L1_TRANSPORT_FAILURE'
         source = self.root / (prefix + '-' + kind + '.tar')
         destination = self.root / (prefix + '-' + kind + '-readback')
         destination.mkdir()
@@ -338,7 +340,10 @@ class TransportTests(unittest.TestCase):
             self.fixture.decisions / 'review.json')
         for key, value in (
             ('owner_decision', 'D-P9-023'),
+            ('owner_decision', 'D-P9-026'),
             ('owner_decision_sha256', transport.readiness.DECISION_SHA256),
+            ('owner_decision_sha256',
+             '71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33'),
             ('acquisition_seconds', 61), ('job_seconds', 1801),
             ('maximum_attempts', 2), ('gui_execution', True),
             ('sealing', True), ('fixture_generation', True),
@@ -440,6 +445,154 @@ class TransportTests(unittest.TestCase):
             self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
                                           + '-' + kind + '.tar')).exists())
 
+    def test_transport_refusal_after_successful_acquisition_is_independent(self):
+        self.prepared_diagnostic()
+        os.environ['GITHUB_JOB'] = transport.DIAGNOSTIC_PREFIX
+        rejected = self.work / 'evidence/installer-output.log'
+        original = b'/home/operator/private-input\n'
+        rejected.write_bytes(original)
+        for stage in ('archive', 'publish'):
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(transport.main(['diagnostic-' + stage]), 1)
+        os.environ.update(L1_ARCHIVE='failure', L1_PUBLISH='failure')
+        with ExitStack() as stack:
+            operations = [stack.enter_context(patch.object(
+                transport, name, side_effect=AssertionError('Collector reused')))
+                for name in ('_operational_contents', 'diagnostic_archive',
+                             'diagnostic_publish')]
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(transport.main(['diagnostic-failure']), 0)
+                self.diagnostic_readback('transport-failure')
+                self.assertEqual(transport.main([
+                    'diagnostic-failure-readback']), 0)
+            for operation in operations:
+                operation.assert_not_called()
+        artifact = self.root / (transport.DIAGNOSTIC_PREFIX
+                                + '-transport-failure.tar')
+        with tarfile.open(artifact, 'r:') as bundle:
+            self.assertEqual(set(bundle.getnames()), {
+                'transport/archive-refusal.json',
+                'transport/publish-refusal.json'})
+            for stage in ('archive', 'publish'):
+                raw = bundle.extractfile(
+                    'transport/' + stage + '-refusal.json').read()
+                record = json.loads(raw)
+                self.assertEqual(record['reason_code'], 'private-path')
+                self.assertEqual(record['status'], 'FAIL')
+                self.assertEqual(record['stage'], 'diagnostic-' + stage)
+                self.assertEqual(record['source_commit'],
+                                 os.environ['GITHUB_SHA'])
+                self.assertEqual(record['run_id'], os.environ['GITHUB_RUN_ID'])
+                self.assertNotIn(original.strip(), raw)
+        self.assertEqual(rejected.read_bytes(), original)
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
+                                          + '-' + kind + '.tar')).exists())
+        with redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(transport.main(['diagnostic-complete']), 1)
+        self.assertNotIn('PASS_NON_REPRODUCTION', output.getvalue())
+
+    def test_transport_refusal_categories_are_finite(self):
+        os.environ['GITHUB_JOB'] = transport.DIAGNOSTIC_PREFIX
+        cases = (
+            (ValueError('Private path in operational evidence'), 'private-path'),
+            (ValueError('Credential-like operational evidence'),
+             'credential-pattern'),
+            (ValueError('Unlisted operational evidence'), 'unlisted-member'),
+            (ValueError('Unexpected evidence directory'), 'unlisted-member'),
+            (ValueError('Operational file too large'), 'oversize'),
+            (ValueError('Operational archive too large'), 'oversize'),
+            (ValueError('Archive bound exceeded'), 'oversize'),
+            (UnicodeDecodeError('utf-8', b'\xff', 0, 1, 'bad'), 'invalid-utf8'),
+            (OSError('unknown private cause'), 'operation-refused'),
+            (KeyError('unknown private field'), 'operation-refused'),
+            (TypeError('unknown private type'), 'operation-refused'),
+        )
+        for error, expected in cases:
+            with self.subTest(reason=expected), patch.object(
+                    transport, 'write') as writer:
+                transport._diagnostic_refusal_record('diagnostic-archive', error)
+                record = writer.call_args.args[1]
+                self.assertEqual(record['reason_code'], expected)
+                self.assertEqual(set(record), {
+                    'schema_version', 'status', 'source_commit', 'run_id',
+                    'run_attempt', 'stage', 'reason_code', 'exception_category'})
+
+    def test_transport_refusal_survives_private_retention_failure(self):
+        self.prepared_diagnostic()
+        os.environ['GITHUB_JOB'] = transport.DIAGNOSTIC_PREFIX
+        hostile = '/home/operator/secret github_pat_SYNTHETIC_ONLY rejected-data'
+        with patch.object(transport, '_operational_contents',
+                          side_effect=ValueError(hostile)):
+            with redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(transport.main(['diagnostic-archive']), 1)
+            self.assertNotIn(hostile, output.getvalue())
+            private = self.root / 'compatibility-readiness-private/archive.txt'
+            self.assertIn(hostile, private.read_text())
+            receipt = self.root / (transport.DIAGNOSTIC_PREFIX
+                                   + '-publish-refusal.json')
+
+            def unavailable(_stage):
+                self.assertTrue(receipt.is_file())
+                raise OSError(hostile)
+
+            with patch.object(transport, 'retain_failure',
+                              side_effect=unavailable), \
+                    redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(transport.main(['diagnostic-publish']), 1)
+            self.assertIn('COMPATIBILITY_DIAGNOSTIC_PRIVATE_RETENTION_FAIL',
+                          output.getvalue())
+            self.assertNotIn(hostile, output.getvalue())
+        os.environ.update(L1_ARCHIVE='failure', L1_PUBLISH='failure')
+        transport.diagnostic_failure()
+        artifact = self.root / (transport.DIAGNOSTIC_PREFIX
+                                + '-transport-failure.tar')
+        self.assertNotIn(hostile.encode(), artifact.read_bytes())
+        self.assertEqual(json.loads(receipt.read_bytes())['reason_code'],
+                         'operation-refused')
+        self.diagnostic_readback('transport-failure')
+        self.assertEqual(transport.diagnostic_failure_readback()['asset_id'], 123)
+
+    def test_transport_refusal_missing_changed_receipt_and_readback_refuse(self):
+        os.environ.update(GITHUB_JOB=transport.DIAGNOSTIC_PREFIX,
+                          L1_ARCHIVE='failure', L1_PUBLISH='success')
+        with self.assertRaises((OSError, ValueError)):
+            transport.diagnostic_failure()
+        transport._diagnostic_refusal_record(
+            'diagnostic-archive', ValueError('Unlisted operational evidence'))
+        receipt = self.root / (transport.DIAGNOSTIC_PREFIX
+                               + '-archive-refusal.json')
+        original = receipt.read_bytes()
+        record = json.loads(original)
+        changes = (('source_commit', 'b' * 40), ('run_id', '999'),
+                   ('run_attempt', True), ('schema_version', True),
+                   ('status', 'PASS'), ('stage', 'diagnostic-publish'),
+                   ('reason_code', 'unknown'), ('exception_category', 'Secret'),
+                   ('extra', 'unapproved'))
+        for key, value in changes:
+            with self.subTest(field=key):
+                receipt.write_text(json.dumps(dict(record, **{key: value})))
+                with self.assertRaises(ValueError):
+                    transport.diagnostic_failure()
+        receipt.write_bytes(original)
+        transport.diagnostic_failure()
+        readback = self.diagnostic_readback('transport-failure')
+        self.assertEqual(transport.diagnostic_failure_readback()['asset_id'], 123)
+        changed = bytearray(readback.read_bytes())
+        changed[-1] ^= 1
+        readback.write_bytes(changed)
+        with self.assertRaisesRegex(ValueError, 'Artifact readback differs'):
+            transport.diagnostic_failure_readback()
+
+    def test_transport_refusal_requires_acquisition_job_and_step_outcomes(self):
+        for job in ('compatibility-readiness', 'compatibility-matrix', ''):
+            with self.subTest(job=job), patch.dict(os.environ, GITHUB_JOB=job):
+                with self.assertRaises(ValueError):
+                    transport.diagnostic_failure()
+        os.environ['GITHUB_JOB'] = transport.DIAGNOSTIC_PREFIX
+        with self.assertRaises(ValueError):
+            transport.diagnostic_failure()
+
     def test_diagnostic_missing_mandatory_original_is_incomplete(self):
         self.prepared_diagnostic()
         original = self.work / 'evidence/installer-output.log'
@@ -524,6 +677,25 @@ class TransportTests(unittest.TestCase):
                           'hosted_compatibility_readiness.py seal'):
             self.assertNotIn(forbidden, job)
         self.assertIn('L1_RUN: skipped', job)
+        refusal = job.split('        id: transport_failure\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        upload = job.split('        id: transport_failure_upload\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        download = job.split('        id: transport_failure_download\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertIn("steps.archive.outcome == 'failure' || "
+                      "steps.publish.outcome == 'failure'", refusal)
+        self.assertIn('L1_ARCHIVE: ${{ steps.archive.outcome }}', refusal)
+        self.assertIn('L1_PUBLISH: ${{ steps.publish.outcome }}', refusal)
+        self.assertIn('compatibility_readiness_transport.py diagnostic-failure',
+                      refusal)
+        self.assertIn("steps.transport_failure.outcome == 'success'", upload)
+        self.assertIn('retention-days: 30', upload)
+        self.assertIn('if-no-files-found: error', upload)
+        self.assertIn('artifact-ids: ${{ steps.transport_failure_upload.outputs.'
+                      'artifact-id }}', download)
+        self.assertIn('compatibility_readiness_transport.py '
+                      'diagnostic-failure-readback', job)
         install = job.split('        id: install\n', 1)[1].split(
             '\n      - name:', 1)[0]
         self.assertIn('timeout-minutes: 9', install)

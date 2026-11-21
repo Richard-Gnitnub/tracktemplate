@@ -45,7 +45,7 @@ DECISION_SHA256 = (
     '1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a'
 )
 DIAGNOSTIC_DECISION_SHA256 = (
-    '71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33'
+    'f4f3e129f36b1544ace05dcfbeb8cb53e453462e43df422fb8adb9da0b217a74'
 )
 SCOPE_SHA256 = (
     '0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b'
@@ -137,7 +137,7 @@ def validate_control(control, environ, source_root, decisions):
     }
     if type(control) is dict and control.get('stage') == 'acquisition-diagnostic':
         expected.update(
-            stage='acquisition-diagnostic', owner_decision='D-P9-026',
+            stage='acquisition-diagnostic', owner_decision='D-P9-027',
             owner_decision_sha256=DIAGNOSTIC_DECISION_SHA256,
             acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
             gui_execution=False, sealing=False, fixture_generation=False,
