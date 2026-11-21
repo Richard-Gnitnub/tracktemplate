@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline tests for finite readiness transport and failed-stage preservation."""
 
+import copy
 import hashlib
 import importlib.util
 import io
@@ -43,7 +44,8 @@ def hosted_tracebacks():
     """Use hosted source filenames without changing code or traceback bytes."""
     with ExitStack() as stack:
         stack.enter_context(patch.dict(linecache.cache))
-        modules = (transport, transport.readiness, output_fixtures.output,
+        modules = (transport, transport.readiness, transport.native,
+                   output_fixtures.output,
                    sys.modules[__name__])
         for module in modules:
             for function in tuple(vars(module).values()):
@@ -224,6 +226,353 @@ class TransportTests(unittest.TestCase):
         os.environ.update({prefix + '_UPLOAD': 'success',
                            prefix + '_DOWNLOAD': 'success',
                            prefix + '_ID': str(identity)})
+
+    def acquisition_only_control(self):
+        """Use distinct diagnostic authority without a readiness receipt."""
+        control = copy.deepcopy(self.fixture.control)
+        control.update(
+            stage='acquisition-diagnostic', owner_decision='D-P9-026',
+            owner_decision_sha256=(
+                transport.readiness.DIAGNOSTIC_DECISION_SHA256),
+            acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
+            gui_execution=False, sealing=False, fixture_generation=False,
+            readiness_dispatch=False)
+        receipt = json.loads(self.inputs['readiness_review'])
+        receipt['stage'] = 'acquisition-diagnostic'
+        raw = json.dumps(receipt)
+        self.inputs['readiness_review'] = raw
+        control['review']['sha256'] = hashlib.sha256(raw.encode()).hexdigest()
+        self.inputs['readiness_control'] = json.dumps(control)
+        self.inputs['workload'] = 'compatibility-acquisition-diagnostic'
+        self.save_event()
+        return control
+
+    def prepared_diagnostic(self, *, acquisition='success', cleanup=True):
+        """Compose admission and transport with explicit offline receipts.
+
+        Installer process observations are synthetic. No installer, network,
+        FreeCAD or display is started. Actual finalization still proves that
+        neither runtime nor display state was created.
+        """
+        self.acquisition_only_control()
+        controller = transport.readiness
+        installer = self.fixture.source / 'tools/hosted_l1_gui_install.py'
+        installer.write_bytes((ROOT / 'tools/hosted_l1_gui_install.py').read_bytes())
+        control = json.loads(self.inputs['readiness_control'])
+        control['source_files']['tools/hosted_l1_gui_install.py'] = (
+            transport.digest(installer))
+        for name in ('review', 'recovery'):
+            receipt = json.loads(self.inputs['readiness_' + name])
+            receipt['source_files'] = control['source_files']
+            raw = json.dumps(receipt)
+            self.inputs['readiness_' + name] = raw
+            control[name]['sha256'] = hashlib.sha256(raw.encode()).hexdigest()
+        self.inputs['readiness_control'] = json.dumps(control)
+        self.save_event()
+        transport.seed()
+        with patch.object(controller, 'ROOT', self.fixture.source), \
+                patch.object(controller.pilot, '_command',
+                             side_effect=lambda *args: (
+                                 'a' * 40 if args == (
+                                     'git', 'rev-parse', 'HEAD') else '')):
+            controller.prepare(self.controls / 'control.json', self.controls)
+        (self.work / 'readiness_installer.py').write_text(
+            controller.installer_source(installer.read_text()))
+        save(self.work / 'installer-adaptation.json', {'synthetic': True})
+        for name in ('installer-intent.json', 'installer-ownership.json',
+                     'installer-output.log'):
+            save(self.work / 'evidence' / name, {'synthetic': True})
+        save(self.work / 'evidence/installer-result.json', {
+            'status': 'PASS', 'cleanup': True, 'synthetic': True})
+        if acquisition == 'success':
+            save(self.controls / 'acquisition.json', {'synthetic': True})
+            for name in ('base-binding.json', 'assessment-manifest.json'):
+                save(self.work / name, {'synthetic': True})
+        logs = self.root / 'compatibility-readiness-logs'
+        logs.mkdir()
+        for name in ('seed', 'prepare', 'install', 'acquire', 'finalize'):
+            (logs / (name + '.log')).write_bytes(b'SYNTHETIC_CLOSED_STAGE\n')
+        self.outcome(prepare='success', install='success', acquire=acquisition)
+        with patch.object(transport, 'installer_cleanup',
+                          return_value={'cleanup': cleanup, 'synthetic': True}):
+            result = transport.finalize()
+        self.assertEqual(result['cleanup'], cleanup)
+        self.assertTrue(result['runtime'])
+        self.assertTrue(result['display'])
+        return control
+
+    def diagnostic_readback(self, kind):
+        prefix = transport.DIAGNOSTIC_PREFIX
+        environment = 'L1_' + kind.upper()
+        if kind == 'acquisition-failure':
+            prefix = 'compatibility-readiness'
+            environment = 'L1_DIAGNOSTIC'
+        source = self.root / (prefix + '-' + kind + '.tar')
+        destination = self.root / (prefix + '-' + kind + '-readback')
+        destination.mkdir()
+        (destination / source.name).write_bytes(source.read_bytes())
+        os.environ.update({environment + '_UPLOAD': 'success',
+                           environment + '_DOWNLOAD': 'success',
+                           environment + '_ID': '123'})
+        return destination / source.name
+
+    def test_diagnostic_control_is_distinct_and_cannot_run_or_seal(self):
+        control = self.acquisition_only_control()
+        transport.seed()
+        self.assertEqual(transport._diagnostic_controls(), self.controls)
+        with patch.object(transport.readiness, 'prerequisites',
+                          return_value=(control, self.controls)), \
+                patch.object(transport.readiness.gui, 'start_display') as display:
+            for action in (transport.readiness.run, transport.readiness.seal):
+                with self.subTest(action=action.__name__), self.assertRaisesRegex(
+                        ValueError, 'Acquisition diagnostic cannot'):
+                    action(self.work)
+            display.assert_not_called()
+        self.assertFalse(self.work.exists())
+
+    def test_diagnostic_control_rejects_authority_limits_and_scope_drift(self):
+        control = self.acquisition_only_control()
+        save(self.fixture.decisions / 'review.json', json.loads(
+            self.inputs['readiness_review']))
+        control['review']['sha256'] = transport.digest(
+            self.fixture.decisions / 'review.json')
+        for key, value in (
+            ('owner_decision', 'D-P9-023'),
+            ('owner_decision_sha256', transport.readiness.DECISION_SHA256),
+            ('acquisition_seconds', 61), ('job_seconds', 1801),
+            ('maximum_attempts', 2), ('gui_execution', True),
+            ('sealing', True), ('fixture_generation', True),
+            ('readiness_dispatch', True), ('source_commit', 'b' * 40),
+        ):
+            changed = dict(control, **{key: value})
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.fixture.validate(changed)
+        for key, value in (('GITHUB_RUN_ATTEMPT', '2'),
+                           ('RUNNER_ARCH', 'ARM64')):
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.fixture.validate(control, dict(self.environment, **{key: value}))
+
+    def test_diagnostic_receipt_and_dispatch_cannot_claim_readiness(self):
+        self.acquisition_only_control()
+        self.inputs['workload'] = 'compatibility-readiness'
+        self.save_event()
+        with self.assertRaisesRegex(ValueError, 'Dispatch stage differs'):
+            transport.seed()
+        self.assertFalse(self.controls.exists())
+
+    def test_readiness_receipt_cannot_authorize_diagnostic_entry(self):
+        control = self.acquisition_only_control()
+        self.inputs['readiness_review'] = (
+            self.fixture.decisions / 'review.json').read_text()
+        control['review'] = self.fixture.control['review']
+        self.inputs['readiness_control'] = json.dumps(control)
+        self.save_event()
+        with self.assertRaisesRegex(ValueError, 'Independent readiness review missing'):
+            transport.seed()
+        self.assertFalse((self.controls / 'seed.json').exists())
+
+    def test_diagnostic_success_stops_before_gui_and_means_nonreproduction(self):
+        self.prepared_diagnostic()
+        with patch.object(transport, 'reseal_payload') as seal, \
+                patch.object(transport.readiness, 'run') as run:
+            self.assertEqual(transport.diagnostic_archive(), 'PASS')
+            self.diagnostic_readback('primary')
+            self.assertEqual(transport.diagnostic_publish()['status'], 'PASS')
+            self.diagnostic_readback('final')
+            output = io.StringIO()
+            with redirect_stdout(output):
+                self.assertEqual(transport.main(['diagnostic-complete']), 0)
+            seal.assert_not_called()
+            run.assert_not_called()
+        self.assertEqual(output.getvalue(),
+                         'COMPATIBILITY_ACQUISITION_DIAGNOSTIC_'
+                         'PASS_NON_REPRODUCTION\n')
+        record = json.loads((self.root / (transport.DIAGNOSTIC_PREFIX
+                            + '-completion.json')).read_bytes())
+        self.assertEqual(record['interpretation'], 'non-reproduction-only')
+        self.assertEqual(record['evidence_status'], 'PASS')
+        self.assertEqual(record['acquisition_outcome'], 'success')
+        self.assertIsNone(record['acquisition_failure_readback'])
+        for name in ('runtime_admission', 'matrix_dispatch', 'zy_execution',
+                     'readiness_dispatch'):
+            self.assertIs(record[name], False)
+        self.assertFalse((self.work / 'evidence/guard').exists())
+        self.assertFalse((self.work / 'payload').exists())
+        self.assertFalse((self.root /
+                          'compatibility-readiness-completion.json').exists())
+
+    def test_diagnostic_failure_retains_failure_after_all_exact_readbacks(self):
+        self.prepared_diagnostic(acquisition='failure')
+        original = b'ValueError: injected second acquisition command failure\n'
+        (self.root / 'compatibility-readiness-logs/acquire.log').write_bytes(original)
+        transport.acquisition_diagnostic()
+        self.diagnostic_readback('acquisition-failure')
+        self.assertEqual(transport.diagnostic_archive(), 'FAIL')
+        self.diagnostic_readback('primary')
+        self.assertEqual(transport.diagnostic_publish()['status'], 'PASS')
+        self.diagnostic_readback('final')
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(transport.main(['diagnostic-complete']), 1)
+        record = json.loads((self.root / (transport.DIAGNOSTIC_PREFIX
+                            + '-completion.json')).read_bytes())
+        self.assertEqual(record['status'], 'FAIL')
+        self.assertEqual(record['evidence_status'], 'PASS')
+        self.assertEqual(record['acquisition_outcome'], 'failure')
+        for kind in ('primary', 'final'):
+            with tarfile.open(self.root / (transport.DIAGNOSTIC_PREFIX
+                                           + '-' + kind + '.tar')) as bundle:
+                self.assertEqual(bundle.extractfile('logs/acquire.log').read(),
+                                 original)
+                self.assertFalse(any(name.startswith('payload/')
+                                     for name in bundle.getnames()))
+
+    def test_diagnostic_capture_survives_both_diagnostic_archive_refusals(self):
+        self.acquisition_only_control()
+        originals = self.failed_acquisition()
+        (self.work / 'evidence/unlisted.txt').write_text('not approved')
+        with hosted_tracebacks(), redirect_stdout(io.StringIO()):
+            self.assertEqual(transport.main(['diagnostic-archive']), 1)
+            self.assertEqual(transport.main(['diagnostic-publish']), 1)
+        transport.acquisition_diagnostic()
+        _, members, _ = self.diagnostic_members()
+        self.assertEqual(members, originals)
+        for kind in ('primary', 'final'):
+            self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
+                                          + '-' + kind + '.tar')).exists())
+
+    def test_diagnostic_missing_mandatory_original_is_incomplete(self):
+        self.prepared_diagnostic()
+        original = self.work / 'evidence/installer-output.log'
+        original.rename(self.work / 'retained-installer-output.log')
+        self.assertEqual(transport.diagnostic_archive(), 'FAIL')
+        record = json.loads((self.root / (transport.DIAGNOSTIC_PREFIX
+                            + '-archive.json')).read_bytes())
+        self.assertIn('operational/installer-output.log',
+                      record['manifest']['missing_mandatory_evidence'])
+        self.assertEqual(record['manifest']['evidence_status'], 'FAIL')
+
+    def test_diagnostic_unproved_cleanup_cannot_report_nonreproduction(self):
+        self.prepared_diagnostic(cleanup=False)
+        self.assertEqual(transport.diagnostic_archive(), 'FAIL')
+        self.diagnostic_readback('primary')
+        self.assertEqual(transport.diagnostic_publish()['status'], 'FAIL')
+        self.diagnostic_readback('final')
+        self.assertEqual(transport.diagnostic_complete(), 'FAIL')
+
+    def test_diagnostic_missing_separate_readback_prevents_completion(self):
+        self.prepared_diagnostic(acquisition='failure')
+        transport.acquisition_diagnostic()
+        transport.diagnostic_archive()
+        self.diagnostic_readback('primary')
+        with hosted_tracebacks():
+            self.assertEqual(transport.diagnostic_publish()['status'], 'FAIL')
+        self.diagnostic_readback('final')
+        self.assertEqual(transport.diagnostic_complete(), 'FAIL')
+        record = json.loads((self.root / (transport.DIAGNOSTIC_PREFIX
+                            + '-completion.json')).read_bytes())
+        self.assertEqual(record['evidence_status'], 'FAIL')
+
+    def test_diagnostic_changed_final_readback_refuses(self):
+        self.prepared_diagnostic()
+        transport.diagnostic_archive()
+        self.diagnostic_readback('primary')
+        transport.diagnostic_publish()
+        path = self.diagnostic_readback('final')
+        path.write_bytes(b'changed artifact')
+        with self.assertRaises(ValueError):
+            transport.diagnostic_complete()
+
+    def test_diagnostic_forbidden_runtime_state_refuses_before_archiving(self):
+        self.prepared_diagnostic()
+        (self.work / 'readiness-entry.FCMacro').write_text('not executed')
+        with self.assertRaisesRegex(ValueError, 'Acquisition-only boundary exceeded'):
+            transport.diagnostic_archive()
+        self.assertFalse((self.root / (transport.DIAGNOSTIC_PREFIX
+                                      + '-primary.tar')).exists())
+
+    def test_diagnostic_changed_separate_readback_prevents_evidence_pass(self):
+        self.prepared_diagnostic(acquisition='failure')
+        transport.acquisition_diagnostic()
+        path = self.diagnostic_readback('acquisition-failure')
+        path.write_bytes(b'changed separate artifact')
+        transport.diagnostic_archive()
+        self.diagnostic_readback('primary')
+        with hosted_tracebacks():
+            publication = transport.diagnostic_publish()
+        self.assertEqual(publication['status'], 'FAIL')
+        self.assertIsNone(publication['acquisition_failure'])
+
+    def test_diagnostic_workflow_is_one_serial_first_attempt_without_runtime(self):
+        workflow = (ROOT / '.github/workflows/native-geometry-pilot.yml').read_text()
+        job = workflow.split('  compatibility-acquisition-diagnostic:\n', 1)[1].split(
+            '\n  compatibility-matrix:', 1)[0]
+        self.assertIn("inputs.workload == 'compatibility-acquisition-diagnostic'", job)
+        self.assertIn('github.run_attempt == 1', job)
+        self.assertIn('runs-on: ubuntu-24.04', job)
+        self.assertIn('timeout-minutes: 30', job)
+        self.assertIn('group: issue230-native-geometry', workflow)
+        self.assertIn('cancel-in-progress: false', workflow)
+        native = workflow.split('  native-geometry:\n', 1)[1].split(
+            '\n  compatibility-readiness:', 1)[0]
+        self.assertIn("inputs.workload != 'compatibility-acquisition-diagnostic'", native)
+        self.assertEqual(job.count('id: install\n'), 1)
+        self.assertEqual(job.count('id: acquire\n'), 1)
+        self.assertNotIn('continue-on-error', job)
+        for forbidden in ('id: run\n', 'id: seal\n', 'strategy:',
+                          'runtime_compatibility_transport.py',
+                          'hosted_compatibility_readiness.py run',
+                          'hosted_compatibility_readiness.py seal'):
+            self.assertNotIn(forbidden, job)
+        self.assertIn('L1_RUN: skipped', job)
+        install = job.split('        id: install\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertIn('timeout-minutes: 9', install)
+        acquisition = job.split('        id: acquire\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertIn('timeout-minutes: 1', acquisition)
+        readiness = workflow.split('  compatibility-readiness:\n', 1)[1].split(
+            '\n  compatibility-acquisition-diagnostic:', 1)[0]
+        original = readiness.split('        id: acquire\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertEqual(acquisition, original)
+        commands = acquisition.split('        run: |\n', 1)[1]
+        commands = '\n'.join(line[10:] for line in commands.splitlines())
+        stub = '''python3() {
+  printf '%s\\n' "$1" >> "$RUNNER_TEMP/invocations.log"
+  if [[ "$1" == tools/compatibility_readiness_transport.py ]]; then
+    return "$FIRST_EXIT"
+  fi
+  return "$SECOND_EXIT"
+}
+'''
+        logs = self.root / 'compatibility-readiness-logs'
+        logs.mkdir()
+        for first, second, expected, count in (
+            (17, 0, 17, 1), (0, 23, 23, 2), (0, 0, 0, 2),
+        ):
+            with self.subTest(first=first, second=second):
+                result = subprocess.run(
+                    ['/bin/bash', '--noprofile', '--norc', '-e', '-o',
+                     'pipefail', '-c', stub + commands],
+                    env=dict(self.environment, FIRST_EXIT=str(first),
+                             SECOND_EXIT=str(second)),
+                    capture_output=True, check=False, timeout=5)
+                self.assertEqual(result.returncode, expected)
+                calls = self.root / 'invocations.log'
+                self.assertEqual(len(calls.read_text().splitlines()), count)
+                calls.rename(self.root / f'invocations-{first}-{second}.log')
+        for step in ('acquire_diagnostic_upload', 'primary_upload', 'final_upload'):
+            block = job.split('        id: ' + step + '\n', 1)[1].split(
+                '\n      - name:', 1)[0]
+            self.assertIn('retention-days: 30', block)
+            self.assertIn('if-no-files-found: error', block)
+            self.assertNotIn('*', block)
+        self.assertIn('id: acquire_diagnostic_download', job)
+        self.assertIn('id: primary_download', job)
+        self.assertIn('id: final_download', job)
+        self.assertIn('compatibility_readiness_transport.py diagnostic-complete', job)
+        self.assertLess(job.index('id: acquire_diagnostic_upload'),
+                        job.index('id: archive\n'))
 
     def test_seed_preserves_exact_receipt_bytes_and_binds_sources(self):
         self.assertEqual(transport.seed(), self.controls)

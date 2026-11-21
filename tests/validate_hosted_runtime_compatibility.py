@@ -646,6 +646,20 @@ class MatrixTests(unittest.TestCase):
         for name, (original, successor) in matrix.READINESS_DERIVATIVES.items():
             raw = (ROOT / name).read_bytes()
             if name.endswith('.yml'):
+                # The separate diagnostic job was not in the historical
+                # readiness derivative. Its current source is rejected above.
+                diagnostic_job = b'  compatibility-acquisition-diagnostic:\n'
+                matrix_job = b'  compatibility-matrix:\n'
+                self.assertEqual(raw.count(diagnostic_job), 1)
+                self.assertEqual(raw.count(matrix_job), 1)
+                prefix, diagnostic = raw.split(diagnostic_job, 1)
+                raw = prefix + matrix_job + diagnostic.split(matrix_job, 1)[1]
+                for added in (
+                    b'          - compatibility-acquisition-diagnostic\n',
+                    b"      inputs.workload != 'compatibility-acquisition-diagnostic' &&\n",
+                ):
+                    self.assertEqual(raw.count(added), 1)
+                    raw = raw.replace(added, b'', 1)
                 start = (b'      - name: Capture permitted acquisition '
                          b'failure originals separately\n')
                 end = (b'      - name: Run the separate 90-second GUI '
@@ -654,6 +668,10 @@ class MatrixTests(unittest.TestCase):
                 self.assertEqual(raw.count(end), 1)
                 prefix, diagnostic = raw.split(start, 1)
                 raw = prefix + end + diagnostic.split(end, 1)[1]
+            else:
+                added = b'            "- compatibility-acquisition-diagnostic",\n'
+                self.assertEqual(raw.count(added), 1)
+                raw = raw.replace(added, b'', 1)
             pins[name] = hashlib.sha256(raw).hexdigest()
             self.assertEqual(before[name], original)
             self.assertEqual(pins[name], successor)

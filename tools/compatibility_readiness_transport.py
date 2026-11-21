@@ -67,6 +67,7 @@ WORK_RECORDS = ('control.json', 'preparation.json', 'base-binding.json',
                 'readiness-payload-inventory.json')
 MAX_FILE = 8 * 1024**2
 MAX_ARCHIVE = 64 * 1024**2
+DIAGNOSTIC_PREFIX = 'compatibility-acquisition-diagnostic'
 # Keep refusal traceback source lines free of the patterns they test. The
 # scanner still rejects the same bytes; original tracebacks are never edited.
 PRIVATE_PATH = re.compile(
@@ -141,8 +142,9 @@ def seed():
     require(type(inputs) is dict and set(inputs) == {
         'workload', 'readiness_control', 'readiness_review',
         'readiness_recovery'}, 'Dispatch inputs differ')
-    require(inputs['workload'] == 'compatibility-readiness',
-            'Readiness dispatch required')
+    stages = {'compatibility-readiness': 'readiness',
+              'compatibility-acquisition-diagnostic': 'acquisition-diagnostic'}
+    require(inputs['workload'] in stages, 'Reviewed dispatch required')
     raw = {}
     for name in ('control', 'review', 'recovery'):
         value = inputs['readiness_' + name]
@@ -150,6 +152,8 @@ def seed():
                 'Prerequisite input bound differs')
         strict_json(value)
         raw[name] = value.encode()
+    require(strict_json(raw['control']).get('stage')
+            == stages[inputs['workload']], 'Dispatch stage differs')
     destination = root / 'compatibility-readiness-control'
     destination.mkdir(mode=0o700)
     for name, value in raw.items():
@@ -434,6 +438,8 @@ def reseal_payload(work, controls):
     from tools import compatibility_evidence_output as output
 
     control = strict_json(regular(controls / 'control.json').read_bytes())
+    require(control['stage'] == 'readiness',
+            'Acquisition diagnostic cannot seal readiness outputs')
     assessment = strict_json(regular(
         work / 'evidence/readiness-assessment.json').read_bytes())
     require(assessment.get('status') in ('PASS', 'FAIL')
@@ -648,11 +654,12 @@ def archive():
     return status
 
 
-def _readback(root, kind):
-    source = regular(root / ('compatibility-readiness-' + kind + '.tar'))
-    readback = regular(root / ('compatibility-readiness-' + kind + '-readback')
+def _readback(root, kind, *, namespace='compatibility-readiness'):
+    source = regular(root / (namespace + '-' + kind + '.tar'))
+    readback = regular(root / (namespace + '-' + kind + '-readback')
                        / source.name)
-    prefix = 'L1_PRIMARY' if kind == 'primary' else 'L1_FINAL'
+    prefix = {'primary': 'L1_PRIMARY', 'final': 'L1_FINAL',
+              'acquisition-failure': 'L1_DIAGNOSTIC'}[kind]
     return native.verify_artifact(source, readback,
                                   os.environ.get(prefix + '_UPLOAD', ''),
                                   os.environ.get(prefix + '_DOWNLOAD', ''),
@@ -708,11 +715,161 @@ def complete():
     return status
 
 
+def _diagnostic_controls():
+    """Require diagnostic authority and refuse any runtime execution state."""
+    controls = seeded()
+    control = strict_json(regular(controls / 'control.json').read_bytes())
+    require(control['stage'] == 'acquisition-diagnostic',
+            'Acquisition-only authority required')
+    work = readiness.workspace(os.environ)
+    forbidden = (
+        'evidence/guard', 'evidence/display-start-intent.json',
+        'readiness-entry.FCMacro', 'readiness-observation.json',
+        'payload', 'public-readiness', 'transport-readiness',
+    )
+    require(not any((work / name).exists() for name in forbidden),
+            'Acquisition-only boundary exceeded')
+    return controls
+
+
+def diagnostic_archive():
+    """Preserve operational originals without invoking a payload producer."""
+    root = scratch()
+    _diagnostic_controls()
+    contents, summary, admitted = _operational_contents(
+        root, readiness.workspace(os.environ))
+    outcomes = summary.get('workflow_outcomes', {})
+    require(outcomes.get('L1_RUN') == 'skipped',
+            'Acquisition diagnostic must stop before runtime')
+    preserved, missing = _preservation(contents, summary, admitted)
+    complete = (preserved and summary.get('cleanup') is True
+                and outcomes.get('L1_PREPARE') == 'success'
+                and outcomes.get('L1_INSTALL') == 'success'
+                and outcomes.get('L1_ACQUIRE') in ('success', 'failure'))
+    status = ('PASS' if complete and outcomes['L1_ACQUIRE'] == 'success'
+              else 'FAIL')
+    manifest = {
+        'schema': 1, 'stage': 'acquisition-diagnostic', 'status': status,
+        'evidence_status': 'PASS' if complete else 'FAIL',
+        'acquisition_outcome': outcomes.get('L1_ACQUIRE'),
+        'interpretation': ('non-reproduction-only' if status == 'PASS'
+                           else 'acquisition-or-evidence-failed'),
+        'source_commit': os.environ['GITHUB_SHA'],
+        'run_id': int(os.environ['GITHUB_RUN_ID']), 'run_attempt': 1,
+        'retention_days': 30, 'independent_preservation_required': True,
+        'original_diagnostic_preservation_complete': preserved,
+        'missing_mandatory_evidence': missing,
+        'runtime_admission': False, 'matrix_dispatch': False,
+        'zy_execution': False, 'gui_execution': False, 'sealing': False,
+        'fixture_generation': False, 'readiness_dispatch': False,
+        'files': {name: {'bytes': len(data),
+                         'sha256': hashlib.sha256(data).hexdigest()}
+                  for name, data in contents.items()},
+    }
+    contents['transport/manifest.json'] = json.dumps(
+        manifest, sort_keys=True, indent=2).encode() + b'\n'
+    identity = _tar(root / (DIAGNOSTIC_PREFIX + '-primary.tar'), contents)
+    write(root / (DIAGNOSTIC_PREFIX + '-archive.json'),
+          {'status': status, 'archive': identity, 'manifest': manifest})
+    return status
+
+
+def _diagnostic_failure_readback(root, control):
+    """Require exact separate readback and every available safe original."""
+    identity = _readback(root, 'acquisition-failure')
+    source = root / 'compatibility-readiness-acquisition-failure.tar'
+    with tarfile.open(source, 'r:') as bundle:
+        stream = bundle.extractfile('transport/acquisition-failure.json')
+        record = strict_json(stream.read())
+    require(record.get('status') == 'FAIL'
+            and record.get('acquisition_outcome') == 'failure'
+            and record.get('source_commit') == os.environ['GITHUB_SHA']
+            and record.get('run_id') == os.environ['GITHUB_RUN_ID']
+            and record.get('run_attempt') == 1
+            and record.get('control_sha256') == digest(control),
+            'Acquisition failure identity differs')
+    originals = record.get('originals', {})
+    require(set(originals) == {
+        'logs/acquire.log', 'original-diagnostics/acquire.txt'}
+        and originals['logs/acquire.log'].get('status') == 'PRESERVED'
+        and originals['original-diagnostics/acquire.txt'].get('status')
+        in ('PRESERVED', 'MISSING'), 'Acquisition originals incomplete')
+    return identity
+
+
+def diagnostic_publish():
+    """Bind both diagnostic readbacks and retain final operational evidence."""
+    root = scratch()
+    controls = _diagnostic_controls()
+    contents, summary, admitted = _operational_contents(
+        root, readiness.workspace(os.environ), through_archive=True)
+    preserved, missing = _preservation(contents, summary, admitted)
+    publication = {
+        'status': 'FAIL', 'primary': None, 'acquisition_failure': None,
+        'independent_preservation_required': True,
+        'original_diagnostic_preservation_complete': preserved,
+        'missing_mandatory_evidence': missing,
+    }
+    try:
+        publication['primary'] = _readback(
+            root, 'primary', namespace=DIAGNOSTIC_PREFIX)
+        outcome = summary.get('workflow_outcomes', {}).get('L1_ACQUIRE')
+        if outcome == 'failure':
+            publication['acquisition_failure'] = _diagnostic_failure_readback(
+                root, controls / 'control.json')
+        require(outcome in ('success', 'failure'),
+                'Acquisition did not reach a diagnostic result')
+        if preserved and summary.get('cleanup') is True:
+            publication['status'] = 'PASS'
+    except (OSError, ValueError, KeyError, tarfile.TarError):
+        retain_failure('publish-primary')
+        publication['error'] = 'diagnostic-readback-unproved'
+        path = root / 'compatibility-readiness-private/publish-primary.txt'
+        contents['original-diagnostics/publish-primary.txt'] = public_bytes(path)
+    target = root / (DIAGNOSTIC_PREFIX + '-publication.json')
+    write(target, publication)
+    contents['transport/publication.json'] = public_bytes(target)
+    record = root / (DIAGNOSTIC_PREFIX + '-archive.json')
+    if record.exists():
+        contents['transport/archive.json'] = public_bytes(record)
+    _tar(root / (DIAGNOSTIC_PREFIX + '-final.tar'), contents)
+    return publication
+
+
+def diagnostic_complete():
+    """Report non-reproduction only after complete evidence and readbacks."""
+    root = scratch()
+    _diagnostic_controls()
+    final = _readback(root, 'final', namespace=DIAGNOSTIC_PREFIX)
+    publication = strict_json(regular(
+        root / (DIAGNOSTIC_PREFIX + '-publication.json')).read_bytes())
+    archive_record = strict_json(regular(
+        root / (DIAGNOSTIC_PREFIX + '-archive.json')).read_bytes())
+    manifest = archive_record['manifest']
+    status = ('PASS' if publication['status'] == archive_record['status'] == 'PASS'
+              else 'FAIL')
+    record = {
+        'stage': 'acquisition-diagnostic', 'status': status,
+        'evidence_status': ('PASS' if publication['status']
+                            == manifest['evidence_status'] == 'PASS' else 'FAIL'),
+        'acquisition_outcome': manifest['acquisition_outcome'],
+        'interpretation': manifest['interpretation'],
+        'final_readback': final, 'primary_readback': publication['primary'],
+        'acquisition_failure_readback': publication['acquisition_failure'],
+        'independent_preservation_required': True,
+        'runtime_admission': False, 'matrix_dispatch': False,
+        'zy_execution': False, 'readiness_dispatch': False,
+    }
+    write(root / (DIAGNOSTIC_PREFIX + '-completion.json'), record)
+    return status
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=(
         'seed', 'acquire', 'acquire-diagnostic', 'finalize', 'archive',
-        'publish', 'complete'))
+        'publish', 'complete', 'diagnostic-archive', 'diagnostic-publish',
+        'diagnostic-complete'))
     arguments = parser.parse_args(argv)
     if arguments.stage == 'acquire-diagnostic':
         try:
@@ -724,12 +881,16 @@ def main(argv=None):
         print('COMPATIBILITY_READINESS_ACQUISITION_DIAGNOSTIC_PRESERVED')
         return 0
     try:
-        result = globals()[arguments.stage]()
+        result = globals()[arguments.stage.replace('-', '_')]()
     except (OSError, ValueError, KeyError, TypeError):
         # Keep raw input and originals on disk; do not echo their contents.
-        retain_failure(arguments.stage)
+        retain_failure(arguments.stage.removeprefix('diagnostic-'))
         print('COMPATIBILITY_READINESS_TRANSPORT_FAIL=' + arguments.stage)
         return 1
+    if arguments.stage == 'diagnostic-complete':
+        print('COMPATIBILITY_ACQUISITION_DIAGNOSTIC_' + (
+            'PASS_NON_REPRODUCTION' if result == 'PASS' else 'FAIL'))
+        return 0 if result == 'PASS' else 1
     if arguments.stage == 'complete':
         print('COMPATIBILITY_READINESS_TRANSPORT_' + result)
         return 0 if result == 'PASS' else 1

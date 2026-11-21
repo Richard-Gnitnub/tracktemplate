@@ -44,6 +44,9 @@ DEFAULT_SHA256 = (
 DECISION_SHA256 = (
     '1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a'
 )
+DIAGNOSTIC_DECISION_SHA256 = (
+    '71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33'
+)
 SCOPE_SHA256 = (
     '0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b'
 )
@@ -132,6 +135,13 @@ def validate_control(control, environ, source_root, decisions):
         'reserve_mib': 8192, 'runtime_admission': False,
         'matrix_dispatch': False, 'zy_execution': False,
     }
+    if type(control) is dict and control.get('stage') == 'acquisition-diagnostic':
+        expected.update(
+            stage='acquisition-diagnostic', owner_decision='D-P9-026',
+            owner_decision_sha256=DIAGNOSTIC_DECISION_SHA256,
+            acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
+            gui_execution=False, sealing=False, fixture_generation=False,
+            readiness_dispatch=False)
     require(type(control) is dict and set(control) == set(expected) | {
         'source_commit', 'source_files', 'review', 'recovery'},
         'Exact readiness control fields required')
@@ -199,7 +209,7 @@ def validate_control(control, environ, source_root, decisions):
                 'Review or recovery is incomplete for this source')
         if key == 'review':
             require(receipt.get('independent') is True
-                    and receipt.get('stage') == 'readiness'
+                    and receipt.get('stage') == expected['stage']
                     and receipt.get('output_scope_sha256') == SCOPE_SHA256,
                     'Independent readiness review missing')
         else:
@@ -447,6 +457,8 @@ def run(work):
     from tools import compatibility_gui_bridge as bridge
 
     control, _ = prerequisites(work)
+    require(control['stage'] == 'readiness',
+            'Acquisition diagnostic cannot execute a GUI proof')
     manifest = json.loads(regular(work / 'assessment-manifest.json').read_text())
     verify_assessment(work / 'assessment', manifest)
     memory = pilot.validate_admission(os.environ, Path('/proc/meminfo').read_text())
@@ -606,6 +618,8 @@ def seal(work):
     from tools import compatibility_evidence_output as output
 
     control, decisions = prerequisites(work)
+    require(control['stage'] == 'readiness',
+            'Acquisition diagnostic cannot seal readiness outputs')
     assessment = json.loads(regular(
         work / 'evidence/readiness-assessment.json').read_text())
     require(assessment.get('status') in ('PASS', 'FAIL')

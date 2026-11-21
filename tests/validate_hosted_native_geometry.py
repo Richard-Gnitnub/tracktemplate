@@ -1470,6 +1470,7 @@ class PilotIdentityTests(unittest.TestCase):
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
             "- rea-bc-straight-readiness", "- rea-bc-straight-native",
             "- runtime-observation", "- compatibility-readiness",
+            "- compatibility-acquisition-diagnostic",
             "- compatibility-qualification",
             "readiness_control:",
             "description: Exact reviewed compatibility readiness control JSON",

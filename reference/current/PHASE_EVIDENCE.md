@@ -5099,3 +5099,68 @@ Phase 9B stays `Open` at 3/6. No phase exit, risk status, rights state or produc
 | `fresh-readiness-44819325835-cause-stop-independent-review.json` | `2b37540ed0599d357ec43b87b04d82d13be52c518d6a670cb0d0c24bc1216bfd` |
 | `fresh-readiness-stop-preservation-manifest.json` | `90b41a17fb0a111297221995b1345c3353d1394d493607d7c97701bc6ca6948b` |
 | `fresh-readiness-stop-independent-preservation-readback.json` | `1b88f1189ebebe2b85749c158990fbd9e2d34fb334b1c75c6292033b15e7f7d6` |
+
+## One compatibility test on GitHub — 2026-11-21
+
+<a id="runtime-compatibility-acquisition-diagnostic-panel"></a>
+
+**Decision:** D-P9-026 records the owner's authority for a separate "acquisition-only entry" and exactly one test on GitHub.
+The [decision register](gate-decisions.json) preserves the complete owner statement.
+This Level 3 change adds only that test authority after the [stopped test](#runtime-compatibility-fresh-readiness-stop-panel).
+It does not resume the stopped qualification.
+
+| Item | Result |
+| --- | --- |
+| Current state | Preparation is authorised. The new test has no result. |
+| What changed | After the necessary reviews, CI and preservation checks give PASS results, the change owner can start the single test without another permission request. |
+| What now works | The previous diagnostic preparation has independent reviews and standalone CI with PASS results. These results do not qualify a host profile. |
+| Limitations/findings | Runs 44783029665 and 44819325835 stay FAIL. The 21 missing original evidence instances and previous `2/2` repair record stay unchanged. |
+| Owner decision | Prepare, independently review and freeze the separate entry. Record the exact commit for the test before the test starts. Keep PR #288 draft. |
+| Next action | Complete the necessary reviews, CI and independent preservation for the exact candidate. Then do the one test and independently review its evidence. |
+
+**Conditions:** Use one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+The limits are 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the complete job.
+Keep the approved base, exact input identities, [handling scope](#runtime-compatibility-output-handling-panel) and "resource limits".
+Keep the "separate diagnostic artifact" for 30 days. Complete cleanup. Independently verify and preserve the evidence.
+If a necessary condition cannot be satisfied or more authority is necessary, stop before the test.
+
+The owner instructs: "Stop before GUI execution, sealing, fixture generation or matrix execution, regardless of the acquisition result."
+The owner specifies: "Successful acquisition establishes non-reproduction only; it does not explain the earlier failures or qualify the runtime."
+
+The new test cannot supply the missing original evidence. It gives no new repair count.
+The owner specifies: "Runtime admission and ZY remain blocked."
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
+`/root/diagnostic_authority_author` examined the owner statement, previous reviews, preserved evidence and applicable authority before it wrote this record.
+That agent wrote no implementation or test code. The agents share one team and worktree; this is not external independence.
+
+The independent source and security review of the new entry is still necessary.
+The panel recommendation is **Proceed with bounded conditions**. There is no unresolved dissent about this authority.
+The earlier failures still have unknown causes because their original diagnostics are missing.
+
+| Risk | Condition, owner and deadline |
+| --- | --- |
+| PR-06, PR-07, PR-21 | Before data move, the change owner and independent reviewer must verify the unchanged input identities and handling scope. |
+| PR-13 | Before the test starts, the change owner must preserve the exact candidate and evidence. An independent reviewer must verify preservation. After the test, independently verify and preserve its evidence. |
+| PR-22 | Before the test starts, the change owner must obtain the necessary independent reviews and CI results. Record the exact commit for the test. After the test, an independent reviewer must examine the result and its limits. |
+
+No risk closes. No assessment of control effectiveness changes. Bounded preservation does not complete the monthly restore test.
+[Existing Git authority](#runtime-compatibility-standing-instruction-panel) applies; PR #288 stays draft and must not merge.
+
+Phase 9B stays `Open` at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay `Pending`.
+D-P6-008 stays `Deferred — unmet`. LMS stays paused.
+No rights state changes. No production, product performance, release or phase result is accepted.
+
+**Proof/provenance:** The preparation baseline is `3474c3b1a649a2a5158b8811a7e5a92ff2ac081a`.
+The owner statement is `owner-instruction.txt` in `tmp/runtime-compatibility-qualification/acquisition-diagnostic-20261121/` in the task worktree.
+
+It has 1245 bytes and SHA-256 `71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33`.
+`/root` supplied this statement; no independent conversation API retrieval is claimed.
+
+Previous preparation reviews are in `tmp/runtime-compatibility-qualification/diagnostic-preparation-20261120/`.
+They give PASS results for commits `8d83e99a3687d65a81a30ee3f0d22cc3c8558987` and `3474c3b1a649a2a5158b8811a7e5a92ff2ac081a`.
+[CI run 44840687278](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44840687278) gives PASS results for all 205 validators at the latter commit.
+Three tests correctly did not run because the private source archive was absent.
+The preservation and unmount records are in `tmp/runtime-compatibility-qualification/diagnostic-closeout-20261121/`.
+
+These previous results do not satisfy the new candidate's review, CI or preservation conditions.
