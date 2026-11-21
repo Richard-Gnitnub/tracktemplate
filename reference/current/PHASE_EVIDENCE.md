@@ -5284,7 +5284,7 @@ Phase 9B stays `Open` at 3/6. "Runtime admission and ZY remain blocked."
 
 This Level 3 decision authorises one more test with the "separate acquisition-only entry".
 The [decision register](gate-decisions.json) preserves the project owner instruction: "I agree Codex, whatever resource nessecary to overcome this issue".
-The owner accepts the reviewed proposal below. No increase in the "resource limits" is necessary.
+The owner accepts the reviewed test below. No increase in the "resource limits" is necessary.
 
 | Item | Result |
 | --- | --- |
@@ -5292,7 +5292,7 @@ The owner accepts the reviewed proposal below. No increase in the "resource limi
 | What changed | D-P9-028 authorises one new test. The previous `2/2` repair history and D-P9-026 and D-P9-027 `1/1` results do not change. |
 | What now works | Tests in standalone Python show that the [repair](#runtime-compatibility-partial-preservation-panel) preserves permitted initial files when a content check rejects another file. Independent review, CI and independent preservation give PASS results for the prepared commit below. |
 | Limitations/findings | The previous rejected filename and cause stay unknown. The new test has no result. |
-| Owner decision | Apply the reviewed proposal once, with the conditions below. Keep PR #288 as a draft pull request. Do not merge it. |
+| Owner decision | Do the reviewed test once, with the conditions below. Keep PR #288 as a draft pull request. Do not merge it. |
 | Next action | Complete the necessary reviews, CI and independent preservation for the exact candidate. Record its full commit SHA. Then do the one test. |
 
 Keep the [D-P9-026 conditions](#runtime-compatibility-acquisition-diagnostic-panel): one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
@@ -5307,7 +5307,7 @@ Successful "acquisition" shows "non-reproduction" only. It does not explain prev
 "Runtime admission and ZY remain blocked."
 
 **Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
-`/root/partial_evidence_author` completed independent quality review and security/recovery review of the prepared change. This agent wrote no software or tests.
+`/root/partial_evidence_author` completed independent quality review and security/recovery review of the prepared change. This agent did not write the reviewed software or tests.
 The agents share one team and worktree. The recommendation is **Proceed with bounded conditions**.
 
 The PR-06, PR-07, PR-13, PR-21 and PR-22 conditions, owners and deadlines in D-P9-026 apply to the new exact candidate and result.
