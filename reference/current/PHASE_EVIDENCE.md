@@ -5322,3 +5322,49 @@ These previous PASS results do not replace the necessary checks of the new exact
 The new `owner-instruction.txt` is in `tmp/runtime-compatibility-qualification/partial-preservation-diagnostic-20261121/`.
 It has 66 bytes and SHA-256 `e52cf467250d8a8c7e43742c2066760e565e22f906890d4ba8776e352dfb30db`.
 `approved-proposal-context.json` in that directory records the controlled meaning from `/root`.
+
+
+## Compatibility decision D-P9-029 — 2026-11-21
+
+<a id="runtime-compatibility-installer-repair-panel"></a>
+
+This Level 3 decision records the project owner instruction: "excellent, please carry that out, unlimited repair resource granted".
+The [decision register](gate-decisions.json) owns the complete bounded authority.
+
+| Item | Result |
+| --- | --- |
+| Current state | [Test 44921692213](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44921692213) stays FAIL. It preserved 23 of 24 mandatory files. `operational/installer-output.log` was rejected with `private-path`. |
+| What changed | D-P9-029 permits the necessary repairs to the installation commands and their tests. No fixed repair count applies before the one permitted test on GitHub. Each repair needs evidence. Documentation keeps its finite limits. |
+| What now works | The retained files show successful acquisition and cleanup. An earlier installation output contains a warning from `flatpak`. |
+| Limitations/findings | The rejected file stays unavailable. The earlier warning does not prove its contents or the causes of previous failures. |
+| Owner decision | Correct the installation commands that produce the warning. Preserve complete permitted initial output. Then do one test with the "separate acquisition-only entry". |
+| Next action | Demonstrate the repair with retained output and simulated commands in standalone Python. Complete independent review, CI and independent preservation for the exact candidate. Record its full commit SHA before the test. |
+
+Keep the [D-P9-026 conditions](#runtime-compatibility-acquisition-diagnostic-panel): one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+Keep the limits of 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
+Keep all input identities, [public handling limits](#runtime-compatibility-output-handling-panel), mandatory evidence and "resource limits".
+Do not buy computer services. Do not weaken content checks or replace mandatory initial output with changed text.
+
+The test must stop before GUI execution, sealing, fixture generation, readiness or matrix execution.
+
+Keep its evidence for 30 days. Complete "cleanup", independent result review and independent preservation.
+
+If the result is FAIL or incomplete, stop after preservation and review. Do not repeat the test or make more repairs under this decision.
+
+If independent review gives PASS for complete evidence, return only to the steps that [D-P9-024](#runtime-compatibility-standing-instruction-panel) already authorises.
+Each step still needs its applicable conditions. Successful "acquisition" shows "non-reproduction" only.
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and controlled meaning.
+`/root/partial_evidence_author` supplied independent programme advice and did not make the proposed product change.
+The agents share one team and worktree. The recommendation is **Proceed with bounded conditions**.
+
+The D-P9-026 risk conditions, owners and deadlines apply. All 24 risk duties and recorded risk statuses stay.
+
+Preserve all previous failures, the `2/2` repair record and D-P9-026, D-P9-027 and D-P9-028 `1/1` results.
+The recorded Git authority applies. Keep PR #288 as a draft pull request. Do not merge it.
+"Runtime admission and ZY remain blocked." Phase 9B stays `Open` at 3/6. All previous acceptance exclusions stay.
+
+**Proof/provenance:** The records are in `tmp/runtime-compatibility-qualification/installer-environment-repair-20261121/`.
+`owner-instruction.txt` has 68 bytes and SHA-256 `7220f8f3cca48e3bfaa3dcf1e908139b04674d90016d003ec67e609c09aeaff5`.
+`approved-proposal-context.json` records the controlled meaning from `/root`.
+The accepted `proposed-hosted-scope.json` has 4489 bytes and SHA-256 `1daa6a9548ad90125e613dcdc49ea0a5627ecdb812254d0a56bc3deb2281a604`.

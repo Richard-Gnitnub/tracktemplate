@@ -45,7 +45,7 @@ DECISION_SHA256 = (
     '1ae5142f40708bc01b00bf1232e6360e1a43121a62faec4cca7f48eeceb87e6a'
 )
 DIAGNOSTIC_DECISION_SHA256 = (
-    'e52cf467250d8a8c7e43742c2066760e565e22f906890d4ba8776e352dfb30db'
+    '7220f8f3cca48e3bfaa3dcf1e908139b04674d90016d003ec67e609c09aeaff5'
 )
 SCOPE_SHA256 = (
     '0dc9d0d13eeb9722e6d3e9e9d4c7ecdf14131fe1e8724be65bfd2ab726a2930b'
@@ -137,7 +137,7 @@ def validate_control(control, environ, source_root, decisions):
     }
     if type(control) is dict and control.get('stage') == 'acquisition-diagnostic':
         expected.update(
-            stage='acquisition-diagnostic', owner_decision='D-P9-028',
+            stage='acquisition-diagnostic', owner_decision='D-P9-029',
             owner_decision_sha256=DIAGNOSTIC_DECISION_SHA256,
             acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
             gui_execution=False, sealing=False, fixture_generation=False,
@@ -283,6 +283,13 @@ def installer_source(source):
         require(source.count(before) == 1,
                 'Frozen installer adaptation differs')
         source = source.replace(before, after, 1)
+    flatpak = 'sudo -n flatpak '
+    require(source.count(flatpak) == 4,
+            'Frozen installer Flatpak command count differs')
+    # Set the system export lookup after sudo resets the environment.
+    source = source.replace(
+        flatpak, 'sudo -n env XDG_DATA_DIRS=/var/lib/flatpak/exports/share:'
+        '/usr/local/share:/usr/share flatpak ')
     return source
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline refusal, containment-binding and source-copy readiness checks."""
 
+import ast
 import copy
 import hashlib
 import importlib.util
@@ -8,6 +9,8 @@ import io
 import json
 import os
 from pathlib import Path
+import shlex
+import subprocess
 import sys
 import tempfile
 from types import ModuleType, SimpleNamespace
@@ -190,6 +193,108 @@ class ControlTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             controller.installer_source(original.replace(
                 'RUNTIME_SECONDS = 570', 'RUNTIME_SECONDS = 571'))
+
+    @staticmethod
+    def installer_script(source):
+        for node in ast.parse(source).body:
+            if isinstance(node, ast.Assign) and any(
+                    isinstance(target, ast.Name)
+                    and target.id == 'INSTALL_SCRIPT'
+                    for target in node.targets):
+                return ast.literal_eval(node.value)
+        raise AssertionError('Installer script absent')
+
+    def run_flatpak_commands(self, fail_at=0):
+        original = (ROOT / 'tools/hosted_l1_gui_install.py').read_text()
+        adapted = controller.installer_source(original)
+        script = self.installer_script(adapted)
+        commands = [line for line in script.splitlines() if line.startswith((
+            'sudo -n flatpak ', 'sudo -n env XDG_DATA_DIRS='))]
+        self.assertEqual(len(commands), 4)
+        self.assertIn('set -euo pipefail', script.splitlines())
+        stubs = self.root / ('stubs-' + str(fail_at))
+        stubs.mkdir()
+        record = stubs / 'calls.jsonl'
+        stub = stubs / 'flatpak'
+        stub.write_text('#!' + sys.executable + '\n' + '''\
+import json
+import os
+from pathlib import Path
+import sys
+
+record = Path(os.environ['TT_RECORD'])
+index = len(record.read_text().splitlines()) + 1 if record.exists() else 1
+with record.open('a') as stream:
+    stream.write(json.dumps({'argv': sys.argv[1:],
+                             'xdg': os.environ.get('XDG_DATA_DIRS')}) + '\\n')
+print('original stdout ' + str(index), flush=True)
+print('original stderr ' + str(index), file=sys.stderr, flush=True)
+sys.exit(37 if index == int(os.environ['TT_FAIL_AT']) else 0)
+''')
+        stub.chmod(0o700)
+        # Emulate sudo's environment reset; never invoke real sudo or Flatpak.
+        shell = '''\
+set -euo pipefail
+sudo() {
+    test "$1" = -n
+    shift
+    /usr/bin/env -i PATH="$TT_STUB_PATH" TT_RECORD="$TT_RECORD" \\
+        TT_FAIL_AT="$TT_FAIL_AT" "$@"
+}
+'''
+        result = subprocess.run(
+            ['/bin/bash', '--noprofile', '--norc', '-c',
+             shell + '\n'.join(commands)],
+            env={'PATH': '/usr/bin:/bin',
+                 'TT_STUB_PATH': str(stubs) + ':/usr/bin:/bin',
+                 'TT_RECORD': str(record), 'TT_FAIL_AT': str(fail_at),
+                 'XDG_DATA_DIRS': '/untrusted-inherited-directory'},
+            capture_output=True, text=True, check=False, timeout=10)
+        calls = [json.loads(line) for line in record.read_text().splitlines()]
+        original_commands = [shlex.split(line)[3:]
+                             for line in self.installer_script(original)
+                             .splitlines() if line.startswith(
+                                 'sudo -n flatpak ')]
+        expected = [[argument.replace(
+            controller.pilot.APP_COMMIT, controller.APP_COMMIT).replace(
+                controller.pilot.RUNTIME_COMMIT, controller.RUNTIME_COMMIT)
+                     for argument in command] for command in original_commands]
+        return result, calls, expected
+
+    def test_installer_sets_system_export_lookup_after_sudo_reset(self):
+        result, calls, expected = self.run_flatpak_commands()
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual([call['argv'] for call in calls], expected)
+        self.assertEqual([call['xdg'] for call in calls], [
+            '/var/lib/flatpak/exports/share:/usr/local/share:/usr/share'] * 4)
+        self.assertEqual(result.stdout, ''.join(
+            'original stdout ' + str(index) + '\n' for index in range(1, 5)))
+        self.assertEqual(result.stderr, ''.join(
+            'original stderr ' + str(index) + '\n' for index in range(1, 5)))
+
+    def test_installer_preserves_flatpak_failure_and_short_circuit(self):
+        for fail_at in range(1, 5):
+            with self.subTest(fail_at=fail_at):
+                result, calls, expected = self.run_flatpak_commands(fail_at)
+                self.assertEqual(result.returncode, 37)
+                self.assertEqual([call['argv'] for call in calls],
+                                 expected[:fail_at])
+                self.assertEqual(result.stdout, ''.join(
+                    'original stdout ' + str(index) + '\n'
+                    for index in range(1, fail_at + 1)))
+                self.assertEqual(result.stderr, ''.join(
+                    'original stderr ' + str(index) + '\n'
+                    for index in range(1, fail_at + 1)))
+
+    def test_installer_flatpak_command_count_drift_refuses(self):
+        original = (ROOT / 'tools/hosted_l1_gui_install.py').read_text()
+        for count, changed in (
+                (3, original.replace('sudo -n flatpak ', 'flatpak ', 1)),
+                (5, original.replace('sudo -n flatpak remote-add',
+                                     'sudo -n flatpak --version\n'
+                                     'sudo -n flatpak remote-add', 1))):
+            with self.subTest(count=count), self.assertRaises(ValueError):
+                controller.installer_source(changed)
 
     def test_deployed_pin_drift_refuses(self):
         values = iter((controller.APP_COMMIT, controller.pilot.RUNTIME,

@@ -231,7 +231,7 @@ class TransportTests(unittest.TestCase):
         """Use distinct diagnostic authority without a readiness receipt."""
         control = copy.deepcopy(self.fixture.control)
         control.update(
-            stage='acquisition-diagnostic', owner_decision='D-P9-028',
+            stage='acquisition-diagnostic', owner_decision='D-P9-029',
             owner_decision_sha256=(
                 transport.readiness.DIAGNOSTIC_DECISION_SHA256),
             acquisition_seconds=60, job_seconds=1800, maximum_attempts=1,
@@ -559,11 +559,14 @@ class TransportTests(unittest.TestCase):
             ('owner_decision', 'D-P9-023'),
             ('owner_decision', 'D-P9-026'),
             ('owner_decision', 'D-P9-027'),
+            ('owner_decision', 'D-P9-028'),
             ('owner_decision_sha256', transport.readiness.DECISION_SHA256),
             ('owner_decision_sha256',
              '71b317be170dd7541f8a4deea759182ca6cecf6ff693a1c79d363dda4bc96b33'),
             ('owner_decision_sha256',
              'f4f3e129f36b1544ace05dcfbeb8cb53e453462e43df422fb8adb9da0b217a74'),
+            ('owner_decision_sha256',
+             'e52cf467250d8a8c7e43742c2066760e565e22f906890d4ba8776e352dfb30db'),
             ('acquisition_seconds', 61), ('job_seconds', 1801),
             ('maximum_attempts', 2), ('gui_execution', True),
             ('sealing', True), ('fixture_generation', True),
