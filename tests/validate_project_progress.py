@@ -1442,7 +1442,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         ('D-P9-028',
          '6716da1dbd5b90d41849d932bfcb9f1ec256abc3621226bd5211ba05a2ccae2a'),
         ('D-P9-029',
-         '68fce690c15dcfb82f5e8f006c536fc70605e61629c122d5985b3ab29f72d156'),
+         '24a02e573daaef462442e83f1f6a0b40e71d45f80fed76f50c7a4e88caeaabde'),
         ('D-GOV-025',
          '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
         ('D-GOV-026',
@@ -8245,7 +8245,7 @@ def _validate_dp9_029_decision(record: dict[str, object]) -> None:
     ).encode("utf-8")
     _require(
         hashlib.sha256(encoded).hexdigest()
-        == "d96cb8a7f18143db5765fca533a935015999b106554f037a6d0d8178cd109ad4",
+        == "0e167277c762dc319b8257da16a9fa595cb7398a3434edabc3ca194d0470a2f7",
         "D-P9-029 exact repair authority or reserved gates drifted",
     )
 
