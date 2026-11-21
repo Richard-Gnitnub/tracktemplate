@@ -244,6 +244,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-transport-refusal-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-transport-refusal-panel"
+    },
+    {
+      "id": "D-P9-028",
+      "decided_on": "2026-11-21",
+      "status": "Accepted",
+      "decision": "Authorise one more test with the \"separate acquisition-only entry\" under the reviewed proposed-hosted-scope.json. That file has 3912 bytes and SHA-256 70701dbf1c16df9f79df30a154d5dd2e60fe94e03313bd602116cfa38fe362cd. The prepared commit is b14b0454a90809274d9c170dc3c20defca220ed1.\n\nBefore the test, complete the necessary independent reviews, CI and independent preservation for the exact candidate. Record its full commit SHA. Then do the one test without another request for approval. If a necessary condition cannot be met, stop before the test.\n\nKeep the D-P9-026 conditions: one \"first-attempt Ubuntu 24.04 X64 job, serial and without retry\". Keep limits of 540 seconds for installation, 60 seconds for \"acquisition\" and 1800 seconds for the full \"job\". Keep the approved base, exact input identities, handling scope, mandatory evidence and \"resource limits\". No increase in those limits is necessary.\n\nKeep the diagnostic evidence for 30 days. Complete \"cleanup\". Get an independent review of the result and use independent preservation. Stop after the one test, regardless of its result. Do not do it again or make more repairs under this decision.",
+      "authority": "I agree Codex, whatever resource nessecary to overcome this issue",
+      "exclusions": "Test 44903313796 stays FAIL with 24 mandatory files missing. Its rejected filename and cause stay unknown. Keep all previous failures and evidence. The previous 2/2 repair history and D-P9-026 and D-P9-027 1/1 results do not change.\n\nStop before GUI execution, sealing, fixture generation, readiness or matrix execution. Successful \"acquisition\" shows \"non-reproduction\" only. It does not explain previous failures or qualify the host profile. \"Runtime admission and ZY remain blocked.\"\n\nThe recorded Git authority applies. Keep PR #288 as a draft pull request. Do not merge it. All previous input, output, publication, resource and mandatory evidence limits stay. All 24 risk duties and recorded risk statuses stay. No rights state changes. The project owner accepts no production, product performance, release or phase result.\n\nPhase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending. D-P6-008 stays Deferred — unmet. LMS stays paused.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-partial-diagnostic-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#runtime-compatibility-partial-diagnostic-panel"
     }
   ]
 }

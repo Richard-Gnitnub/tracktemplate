@@ -5277,3 +5277,48 @@ The previous `2/2` repair history, D-P9-026 `1/1` and D-P9-027 `1/1` do not chan
 Phase 9B stays `Open` at 3/6. "Runtime admission and ZY remain blocked."
 
 **Proof/provenance:** The proof and independent review are in `tmp/runtime-compatibility-qualification/private-path-resolution-20261121/` in the task worktree.
+
+## Compatibility decision D-P9-028 — 2026-11-21
+
+<a id="runtime-compatibility-partial-diagnostic-panel"></a>
+
+This Level 3 decision authorises one more test with the "separate acquisition-only entry".
+The [decision register](gate-decisions.json) preserves the project owner instruction: "I agree Codex, whatever resource nessecary to overcome this issue".
+The owner accepts the reviewed proposal below. No increase in the "resource limits" is necessary.
+
+| Item | Result |
+| --- | --- |
+| Current state | [Test 44903313796](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44903313796) stays FAIL with 24 mandatory files missing. D-P9-027 used its one permitted test. |
+| What changed | D-P9-028 authorises one new test. The previous `2/2` repair history and D-P9-026 and D-P9-027 `1/1` results do not change. |
+| What now works | Tests in standalone Python show that the [repair](#runtime-compatibility-partial-preservation-panel) preserves permitted initial files when a content check rejects another file. Independent review, CI and independent preservation give PASS results for the prepared commit below. |
+| Limitations/findings | The previous rejected filename and cause stay unknown. The new test has no result. |
+| Owner decision | Apply the reviewed proposal once, with the conditions below. Keep PR #288 as a draft pull request. Do not merge it. |
+| Next action | Complete the necessary reviews, CI and independent preservation for the exact candidate. Record its full commit SHA. Then do the one test. |
+
+Keep the [D-P9-026 conditions](#runtime-compatibility-acquisition-diagnostic-panel): one "first-attempt Ubuntu 24.04 X64 job, serial and without retry".
+Keep the limits of 540 seconds for installation, 60 seconds for "acquisition" and 1800 seconds for the full "job".
+Keep the approved base, exact input identities, [handling scope](#runtime-compatibility-output-handling-panel), mandatory evidence and "resource limits".
+Keep the diagnostic evidence for 30 days. Complete "cleanup". Get an independent review of the result and use independent preservation.
+
+Stop after the one test, regardless of its result. Do not do it again or make more repairs under this decision.
+Stop before GUI execution, sealing, fixture generation, readiness or matrix execution.
+If a necessary condition cannot be met, stop before the test.
+Successful "acquisition" shows "non-reproduction" only. It does not explain previous failures or qualify the host profile.
+"Runtime admission and ZY remain blocked."
+
+**Safety/risk panel:** Richard is the project owner and panel chair. `/root` owns the change and supplies the controlled meaning.
+`/root/partial_evidence_author` completed independent quality review and security/recovery review of the prepared change. This agent wrote no software or tests.
+The agents share one team and worktree. The recommendation is **Proceed with bounded conditions**.
+
+The PR-06, PR-07, PR-13, PR-21 and PR-22 conditions, owners and deadlines in D-P9-026 apply to the new exact candidate and result.
+All 24 risk duties and recorded risk statuses stay. The [recorded Git authority](#runtime-compatibility-standing-instruction-panel) applies.
+Phase 9B stays `Open` at 3/6. All previous exclusions stay. This decision accepts no host profile or phase result.
+
+**Proof/provenance:** The prepared commit is `b14b0454a90809274d9c170dc3c20defca220ed1`.
+The accepted `proposed-hosted-scope.json` has 3912 bytes and SHA-256 `70701dbf1c16df9f79df30a154d5dd2e60fe94e03313bd602116cfa38fe362cd`.
+It is in `tmp/runtime-compatibility-qualification/private-path-resolution-20261121/` with its reviews and evidence.
+These previous PASS results do not replace the necessary checks of the new exact candidate.
+
+The new `owner-instruction.txt` is in `tmp/runtime-compatibility-qualification/partial-preservation-diagnostic-20261121/`.
+It has 66 bytes and SHA-256 `e52cf467250d8a8c7e43742c2066760e565e22f906890d4ba8776e352dfb30db`.
+`approved-proposal-context.json` in that directory records the controlled meaning from `/root`.
