@@ -5407,24 +5407,25 @@ The files for the independent review and independent preservation are in
 The file for the independent review is `hosted-readiness/independent-outcome-review.json`.
 Its SHA-256 is `3a5a67dc598037f3897c6c28f0ebf9b44f0cf35376efcd3e10f92c964a26db8a`.
 
-## `gui-readiness` Mesa version check — 2026-11-27
+## Version check for `gui-readiness` — 2026-11-27
 
 [Test 46063204234](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46063204234) used commit `93baaaf4561b807a21057e33da1bd9d2f98c6128`.
 The independent review gave a `PASS` result for the diagnostic.
 The `gui-readiness` result stays `FAIL`.
 The two files from GitHub contain all 47 necessary files from the test.
-The independent reviewer verified the copy on USB.
+The independent reviewer compared the copies on a separate device with the files from GitHub.
+The files and the copies were the same.
 
 The `seal` command rejected `4.6 (Compatibility Profile) Mesa 26.2.7 (git-b69adc2adf)`.
-The version check accepts the value without ` (git-b69adc2adf)`.
+In a separate check, the same rule accepted the value without ` (git-b69adc2adf)`.
 The value from test `44932059978` is unknown.
 
-The version check now accepts ` (git-[0-9a-f]{10})` after the `Mesa` version.
+The new version check accepts ` (git-[0-9a-f]{10})` after the `Mesa` version.
 This part of the value is optional.
 The other checks stay the same.
 
-A test in standalone Python confirmed that the change accepts the exact value.
-The test confirmed that the change rejects incorrect values.
+In a test in standalone Python, the new version check accepted the value from test `46063204234`.
+The check rejected incorrect values in the test in standalone Python.
 
 The project owner gave this instruction.
 
