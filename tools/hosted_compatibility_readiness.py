@@ -653,7 +653,25 @@ def seal(work):
         'owned_pids': [], 'remaining_pids': [], 'complete': True,
     }
     payload = work / 'payload'
-    record = output.build_result(scope, 'readiness', observation, payload)
+    try:
+        record = output.build_result(scope, 'readiness', observation, payload)
+    except output.EvidenceError as error:
+        if error.args == ('renderer version differs',):
+            # The seal log is public evidence. Admit only fixed Mesa version
+            # forms, including the optional profile and build hash. This
+            # diagnostic does not affect the result validator.
+            version = observation['renderer']['version']
+            if type(version) is str and re.fullmatch(
+                r'[0-9]{1,2}\.[0-9]{1,2}'
+                r'(?: \((?:Core|Compatibility) Profile\))? Mesa '
+                r'[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}'
+                r'(?: \(git-[0-9a-f]{10}\))?',
+                version,
+            ):
+                error.add_note(f'Readiness rejected GL_VERSION: {version}')
+            else:
+                error.add_note('Readiness rejected GL_VERSION: withheld')
+        raise
     write(payload / 'gui/readiness/result.json', record)
     inventory = output.seal_outputs(
         scope, payload, work / 'public-readiness', ['readiness'],

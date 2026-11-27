@@ -5368,3 +5368,39 @@ The recorded Git authority applies. Keep PR #288 as a draft pull request. Do not
 `owner-instruction.txt` has 68 bytes and SHA-256 `7220f8f3cca48e3bfaa3dcf1e908139b04674d90016d003ec67e609c09aeaff5`.
 `approved-proposal-context.json` records the controlled meaning from `/root`.
 The accepted `proposed-hosted-scope.json` has 4489 bytes and SHA-256 `1daa6a9548ad90125e613dcdc49ea0a5627ecdb812254d0a56bc3deb2281a604`.
+
+## `gui-readiness` version diagnostic — 2026-11-27
+
+[Run 44932059978](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44932059978) gave a `FAIL` result.
+Its `run_attempt` was `1`.
+Its source commit was `31bb9d34544f53d2f3e8275b1df851f063658fab`.
+The GUI test and cleanup gave `PASS` results.
+The `seal` command gave `EvidenceError: renderer version differs`.
+
+The independent reviewer validated the two files from GitHub.
+Each file contains the 47 necessary files from the test operations.
+These files include `logs/seal.log` with the error.
+The rejected `GL_VERSION` value, `readiness-source.png`, and `result.json` are not available.
+The cause of the version difference is unknown.
+
+The change adds a diagnostic to `logs/seal.log`.
+The diagnostic records the rejected `GL_VERSION` value only if its format is correct for the diagnostic.
+The `seal` command continues to reject that value.
+For other values, the diagnostic gives `withheld`.
+A test in standalone Python used sample values.
+The test validated the diagnostic in the two files.
+The result stayed `FAIL`.
+
+The project owner gave this instruction.
+
+> I authorise bounded renderer diagnosis and safe capture of the rejected OpenGL version. Make the smallest repair the evidence supports and get independent review. Keep existing limits. Runtime admission and ZY stay blocked.
+
+The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) apply.
+The previous `FAIL` results and the `2/2` repair record stay.
+The [stop condition](#runtime-compatibility-readiness-repair-panel) applies to a new test.
+The full host matrix stays `Blocked`.
+
+The independent result and preservation records are in
+`tmp/runtime-compatibility-qualification/post-d29-readiness-preparation-20261121/`.
+The result file is `hosted-readiness/independent-outcome-review.json`.
+Its SHA-256 is `3a5a67dc598037f3897c6c28f0ebf9b44f0cf35376efcd3e10f92c964a26db8a`.

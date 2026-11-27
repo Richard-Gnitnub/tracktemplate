@@ -118,7 +118,7 @@ class TransportTests(unittest.TestCase):
         os.environ.update(dict(zip(transport.OUTCOMES,
                                    (prepare, install, acquire, run))))
 
-    def prepared_payload(self):
+    def prepared_payload(self, *, seal=True):
         """Compose real admission and sealing with synthetic GUI observations.
 
         No test opens FreeCAD, starts a process or downloads anything. Only
@@ -179,7 +179,8 @@ class TransportTests(unittest.TestCase):
         image = self.work / 'payload/gui/readiness/readiness-source.png'
         image.parent.mkdir(parents=True)
         image.write_bytes(output_fixtures.png())
-        controller.seal(self.work)
+        if seal:
+            controller.seal(self.work)
         save(self.root / 'compatibility-readiness-finalization.json', {
             'cleanup': True,
             'workflow_outcomes': {name: 'success' for name in transport.OUTCOMES}})
@@ -1529,6 +1530,79 @@ class TransportTests(unittest.TestCase):
                 self.assertFalse(any(name.startswith('payload/') for name in bundle.getnames()))
         self.readback('final', 456)
         self.assertEqual(transport.complete(), 'FAIL')
+
+    def test_rejected_safe_opengl_version_survives_both_readbacks(self):
+        self.prepared_payload(seal=False)
+        controller = transport.readiness
+        evidence_error = output_fixtures.output.EvidenceError
+        observation_path = self.work / 'readiness-observation.json'
+        observation = json.loads(observation_path.read_bytes())
+        log = self.root / 'compatibility-readiness-logs/seal.log'
+        for version in (
+            '4.5 Mesa 25.2.8',
+            '4.5 (Compatibility Profile) Mesa 25.2.8 (git-0123456789)',
+        ):
+            observation['renderer']['version'] = version
+            save(observation_path, observation)
+            before = observation_path.read_bytes()
+            with self.subTest(version=version), hosted_tracebacks():
+                try:
+                    controller.seal(self.work)
+                except evidence_error as error:
+                    self.assertEqual(str(error), 'renderer version differs')
+                    original = ''.join(traceback.format_exception(
+                        type(error), error, error.__traceback__.tb_next
+                    )).encode()
+                else:
+                    self.fail('Expected renderer version refusal')
+                self.assertEqual(original.count(
+                    f'Readiness rejected GL_VERSION: {version}\n'.encode()), 1)
+                self.assertEqual(observation_path.read_bytes(), before)
+                self.assertFalse((self.work / 'public-readiness').exists())
+                self.assertFalse((self.work /
+                                  'payload/gui/readiness/result.json').exists())
+        log.write_bytes(original)
+        self.assertEqual(transport.archive(), 'FAIL')
+        self.readback('primary', 123)
+        self.assertEqual(transport.publish()['status'], 'PASS')
+        for kind in ('primary', 'final'):
+            path = self.root / ('compatibility-readiness-' + kind + '.tar')
+            with tarfile.open(path) as bundle:
+                self.assertEqual(bundle.extractfile('logs/seal.log').read(),
+                                 original)
+                self.assertFalse(any(name.startswith('payload/')
+                                     for name in bundle.getnames()))
+        self.readback('final', 456)
+        self.assertEqual(transport.complete(), 'FAIL')
+
+    def test_rejected_opengl_version_withholds_unapproved_values(self):
+        self.prepared_payload(seal=False)
+        controller = transport.readiness
+        evidence_error = output_fixtures.output.EvidenceError
+        path = self.work / 'readiness-observation.json'
+        observation = json.loads(path.read_bytes())
+        renderer = observation['renderer']
+        prefix = '4.5 (Compatibility Profile) Mesa 25.2.8'
+        for version in (
+            None, prefix + '\nextra', prefix + '\x1b[31m',
+            prefix + ' /home/operator/private', prefix + ' token=secret',
+            prefix + ' (git-' + 'a' * 65 + ')',
+            prefix.replace('25.2.8', '２５.２.８'),
+        ):
+            with self.subTest(version=version):
+                renderer['version'] = version
+                save(path, observation)
+                with self.assertRaisesRegex(evidence_error,
+                                            '^renderer version differs$') as result:
+                    controller.seal(self.work)
+                self.assertEqual(getattr(result.exception, '__notes__', []),
+                                 ['Readiness rejected GL_VERSION: withheld'])
+        renderer.update(version='4.5 Mesa 25.2.8', vendor='unsupported')
+        save(path, observation)
+        with self.assertRaisesRegex(evidence_error,
+                                    '^renderer identity differs$') as result:
+            controller.seal(self.work)
+        self.assertFalse(getattr(result.exception, '__notes__', []))
 
     def test_missing_mandatory_original_prevents_completeness_and_pass(self):
         self.prepared_payload()
