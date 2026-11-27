@@ -970,6 +970,53 @@ class TransportTests(unittest.TestCase):
         self.assertLess(job.index('id: acquire_diagnostic_upload'),
                         job.index('id: archive\n'))
 
+    def test_primary_readback_waits_before_one_exact_download(self):
+        workflow = (ROOT / '.github/workflows/native-geometry-pilot.yml').read_text()
+        job = workflow.split('  compatibility-readiness:\n', 1)[1].split(
+            '\n  compatibility-acquisition-diagnostic:', 1)[0]
+        step = job.split('        id: primary_download\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        action_dir = '.github/actions/readiness-primary-readback'
+        self.assertIn('uses: ./' + action_dir, step)
+        self.assertIn('timeout-minutes: 1', step)
+        self.assertIn('artifact-id: ${{ steps.primary_upload.outputs.artifact-id }}',
+                      step)
+        action = ROOT / action_dir / 'action.yml'
+        action_hash = hashlib.sha256(action.read_bytes()).hexdigest()
+        seed = job.split('        id: seed\n', 1)[1].split(
+            '\n      - name:', 1)[0]
+        self.assertIn(
+            f"'{action_hash}  {action.relative_to(ROOT)}' | sha256sum --check --status",
+            seed,
+        )
+        steps = action.read_text().split('  steps:\n', 1)[1].split('    - ')[1:]
+        self.assertEqual(len(steps), 2)
+        delay, download = steps
+        self.assertIn('PRIMARY_ARTIFACT_ID: ${{ inputs.artifact-id }}', delay)
+        delay_commands = delay.split('      run: |\n', 1)[1]
+        for artifact_id, expected_status, expected_wait in (
+            ('15230414815', 0, '2\n'),
+            ('', 1, ''),
+            ('15230414815,15231710482', 1, ''),
+        ):
+            with self.subTest(artifact_id=artifact_id):
+                stub = 'sleep() { printf "%s\\n" "$@"; }\n'
+                result = subprocess.run(
+                    ['/bin/bash', '--noprofile', '--norc', '-e', '-o', 'pipefail',
+                     '-c', stub + delay_commands],
+                    env=dict(self.environment, PRIMARY_ARTIFACT_ID=artifact_id),
+                    capture_output=True, text=True, check=False, timeout=5)
+                self.assertEqual(result.returncode, expected_status)
+                self.assertEqual(result.stdout, expected_wait)
+        self.assertIn('uses: actions/download-artifact@'
+                      'd3f86a106a0bac45b974a628896c90dbdf5c8093', download)
+        self.assertIn('artifact-ids: ${{ inputs.artifact-id }}', download)
+        self.assertIn('merge-multiple: true', download)
+        self.assertIn('path: ${{ runner.temp }}/compatibility-readiness-primary-readback',
+                      download)
+        self.assertNotIn('continue-on-error', step + delay + download)
+        self.assertNotIn('github-token:', download)
+
     def test_seed_preserves_exact_receipt_bytes_and_binds_sources(self):
         self.assertEqual(transport.seed(), self.controls)
         for name in ('control', 'review', 'recovery'):

@@ -185,6 +185,7 @@ jobs:
         run: |
           umask 077
           mkdir -m 700 "$RUNNER_TEMP/compatibility-readiness-logs"
+          printf '%s\n' '2c1824d6846a53154f9e61d276e5ab42aa9707bb7864b53a67984ac21ca9c767  .github/actions/readiness-primary-readback/action.yml' | sha256sum --check --status
           python3 tools/compatibility_readiness_transport.py seed > "$RUNNER_TEMP/compatibility-readiness-logs/seed.log" 2>&1
 
       - name: Prepare the source-bound readiness attempt
@@ -276,11 +277,9 @@ jobs:
         id: primary_download
         if: always() && steps.primary_upload.outcome == 'success'
         timeout-minutes: 1
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: ./.github/actions/readiness-primary-readback
         with:
-          artifact-ids: ${{ steps.primary_upload.outputs.artifact-id }}
-          merge-multiple: true
-          path: ${{ runner.temp }}/compatibility-readiness-primary-readback
+          artifact-id: ${{ steps.primary_upload.outputs.artifact-id }}
 
       - name: Verify primary readback and seal the final transport record
         id: publish

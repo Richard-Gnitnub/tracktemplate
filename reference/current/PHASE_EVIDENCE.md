@@ -5438,3 +5438,27 @@ The full host matrix stays `Blocked`.
 The file for the independent review is
 `tmp/runtime-compatibility-qualification/renderer-hosted-diagnostic-93baaaf/hosted-readiness/independent-outcome-review.json`.
 Its SHA-256 is `016bf7ebdf5f1bc29522ff01eda2078c4ec9f2eeedde77baac4f6992165e6204`.
+
+## Change to `primary_download` — 2026-11-27
+
+The `gui-readiness` result from commit `c0e82cec038dd363e92bf0ae10c071841f89e326` is `FAIL`.
+The GUI, `seal` and cleanup checks gave `PASS` results.
+The `primary_download` step gave `Found 0 artifact(s)` 0.22 seconds after GitHub gave the file its ID.
+The cause is unknown. [Test 46066942635](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46066942635)
+
+Independent reviewers compared each file from GitHub with its copy.
+The SHA-256 values were the same.
+The independent review file is `tmp/runtime-compatibility-qualification/mesa-suffix-readiness/hosted-readiness/independent-outcome-review.json`.
+Its SHA-256 is `e29e2e17251df763bdb3bea63bdc197777696781e6b50a309fccfed50e02766d`.
+
+The project owner gave this instruction for the repair to `primary_download`.
+
+> cool, I authorise the repair
+
+The step waits for two seconds. The wait is part of the time limit of 60 seconds.
+Then it uses `actions/download-artifact` one time with the ID from `primary_upload`.
+The job checks the byte size and SHA-256 of the two files that it gets from GitHub.
+
+The previous `FAIL` results, the `2/2` repair record and the [D-P9-023 limits](#runtime-compatibility-output-handling-panel) apply.
+A new test can start only after a [project owner decision](#runtime-compatibility-readiness-repair-panel).
+The full host matrix, runtime admission and ZY stay `Blocked`.
