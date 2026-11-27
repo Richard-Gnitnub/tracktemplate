@@ -5371,36 +5371,38 @@ The accepted `proposed-hosted-scope.json` has 4489 bytes and SHA-256 `1daa6a9548
 
 ## `gui-readiness` version diagnostic — 2026-11-27
 
-[Run 44932059978](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44932059978) gave a `FAIL` result.
+[Test 44932059978](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/44932059978) gave a `FAIL` result.
 Its `run_attempt` was `1`.
 Its source commit was `31bb9d34544f53d2f3e8275b1df851f063658fab`.
 The GUI test and cleanup gave `PASS` results.
 The `seal` command gave `EvidenceError: renderer version differs`.
 
 The independent reviewer validated the two files from GitHub.
-Each file contains the 47 necessary files from the test operations.
-These files include `logs/seal.log` with the error.
+Each of these files contains the 47 necessary files from the test.
+The 47 files include `logs/seal.log`. This file contains the error.
 The rejected `GL_VERSION` value, `readiness-source.png`, and `result.json` are not available.
 The cause of the version difference is unknown.
 
 The change adds a diagnostic to `logs/seal.log`.
-The diagnostic records the rejected `GL_VERSION` value only if its format is correct for the diagnostic.
-The `seal` command continues to reject that value.
-For other values, the diagnostic gives `withheld`.
+The diagnostic gives the exact rejected `GL_VERSION` value only if the value is permitted in the diagnostic.
+For other rejected values, the diagnostic gives `withheld`.
+The `seal` command continues to reject these values.
+
 A test in standalone Python used sample values.
-The test validated the diagnostic in the two files.
-The result stayed `FAIL`.
+The test validated the diagnostic in the two files that the test made.
+In this test, the result from `complete` stayed `FAIL`.
 
 The project owner gave this instruction.
 
 > I authorise bounded renderer diagnosis and safe capture of the rejected OpenGL version. Make the smallest repair the evidence supports and get independent review. Keep existing limits. Runtime admission and ZY stay blocked.
 
-The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) apply.
-The previous `FAIL` results and the `2/2` repair record stay.
-The [stop condition](#runtime-compatibility-readiness-repair-panel) applies to a new test.
+The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) stay the same.
+The previous `FAIL` results stay.
+The result of `2/2` for the previous repairs stays the same.
+The [applicable condition](#runtime-compatibility-readiness-repair-panel) makes a project owner decision necessary before a new test.
 The full host matrix stays `Blocked`.
 
-The independent result and preservation records are in
+The files for the independent review and independent preservation are in
 `tmp/runtime-compatibility-qualification/post-d29-readiness-preparation-20261121/`.
-The result file is `hosted-readiness/independent-outcome-review.json`.
+The file for the independent review is `hosted-readiness/independent-outcome-review.json`.
 Its SHA-256 is `3a5a67dc598037f3897c6c28f0ebf9b44f0cf35376efcd3e10f92c964a26db8a`.
