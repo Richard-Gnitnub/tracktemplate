@@ -5491,25 +5491,27 @@ The `2/2` result for the previous repairs stays the same.
 
 ## B15 load check for `native-07` — 2026-11-27
 
-The [host matrix](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46079529039) at `a68b9aa` gave a `FAIL` result.
-The independent review confirmed seven `PASS` results, one `FAIL` result, and 72 `NOT_RUN` results.
-The log for `native-07` gives the outer B15 load error and contains two entry records.
-The cause of the two records and the original inner exception are unknown.
+The host matrix result for `a68b9aa` stays `FAIL`.
+The independent review shows seven `PASS` results, one `FAIL` result, and 72 `NOT_RUN` results. [Host matrix test 46079529039](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46079529039)
 
-In standalone Python 3.13.16, the B15 adapter rejected the original console argument.
-The default syntax tree text did not include an empty list.
-The new check includes that list to keep the accepted SHA-256 value.
-The B15 file and its acceptance checks stay the same.
-The same test in standalone Python gave a `PASS` result after the change.
+The file `guard/stdout` for `native-07` contains two lines that start with `TRACKTEMPLATE_MATRIX_ENTRY=`.
+The cause of the two lines is unknown.
+The file `guard/stderr` contains `The frozen B15 definitions could not load.`.
+The file does not show the Python error that caused this output.
 
-For a B15 load error in `native-07`, the wrapper adds permitted diagnostic codes to the existing error log.
-The wrapper raises the same exception.
-Tests in standalone Python checked the diagnostic codes, the exclusion of private text, and the original failure.
+The test in standalone Python 3.13.16 gave `Diagnostic B15 console argument differs`.
+Without `show_empty=True`, `ast.dump` in Python 3.13.16 does not include `keywords=[]` in the output for this argument.
+The new check includes `keywords=[]` in that output to keep the accepted SHA-256 value.
+The B15 file and the conditions that the file must meet stay the same.
+The same test gave a `PASS` result after the change.
+
+For the specified B15 load error in `native-07`, the launcher adds a diagnostic to `guard/stderr`.
+Tests in standalone Python showed that the diagnostic contains only permitted codes and that the launcher gives the same Python error.
 
 The project owner gave this instruction.
 
 > I authorise bounded Native 07 diagnosis and safe capture of the B15 load exception. Preserve the failure, make the smallest fix the evidence supports, and get independent review. No matrix retry. Runtime admission and ZY stay blocked.
 
-The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) and the `2/2` result for the previous repairs stay the same.
-The recorded matrix result stays `FAIL`.
-The original evidence and the independent preservation records are in `tmp/runtime-compatibility-qualification/matrix-qualification-a68b9aa/`.
+The `2/2` result for the previous repairs stays the same.
+The limits stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)
+The evidence from the host matrix and the independent preservation records are in `tmp/runtime-compatibility-qualification/matrix-qualification-a68b9aa/`.
