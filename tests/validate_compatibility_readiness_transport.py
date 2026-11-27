@@ -1540,7 +1540,7 @@ class TransportTests(unittest.TestCase):
         log = self.root / 'compatibility-readiness-logs/seal.log'
         for version in (
             '4.5 Mesa 25.2.8',
-            '4.5 (Compatibility Profile) Mesa 25.2.8 (git-0123456789)',
+            '4.5 Mesa 25.2.8 (git-0123456789)',
         ):
             observation['renderer']['version'] = version
             save(observation_path, observation)

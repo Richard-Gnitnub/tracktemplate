@@ -783,7 +783,8 @@ def _renderer(value):
         type(value["version"]) is str
         and re.fullmatch(
             r"[0-9]\.[0-9] \((?:Core|Compatibility) Profile\) Mesa "
-            r"[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}",
+            r"[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}"
+            r"(?: \(git-[0-9a-f]{10}\))?",
             value["version"],
         ),
         "renderer version differs",

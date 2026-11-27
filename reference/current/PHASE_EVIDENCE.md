@@ -5406,3 +5406,34 @@ The files for the independent review and independent preservation are in
 `tmp/runtime-compatibility-qualification/post-d29-readiness-preparation-20261121/`.
 The file for the independent review is `hosted-readiness/independent-outcome-review.json`.
 Its SHA-256 is `3a5a67dc598037f3897c6c28f0ebf9b44f0cf35376efcd3e10f92c964a26db8a`.
+
+## `gui-readiness` Mesa version check — 2026-11-27
+
+[Test 46063204234](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46063204234) used commit `93baaaf4561b807a21057e33da1bd9d2f98c6128`.
+The independent review gave a `PASS` result for the diagnostic.
+The `gui-readiness` result stays `FAIL`.
+The two files from GitHub contain all 47 necessary files from the test.
+The independent reviewer verified the copy on USB.
+
+The `seal` command rejected `4.6 (Compatibility Profile) Mesa 26.2.7 (git-b69adc2adf)`.
+The version check accepts the value without ` (git-b69adc2adf)`.
+The value from test `44932059978` is unknown.
+
+The version check now accepts ` (git-[0-9a-f]{10})` after the `Mesa` version.
+This part of the value is optional.
+The other checks stay the same.
+
+A test in standalone Python confirmed that the change accepts the exact value.
+The test confirmed that the change rejects incorrect values.
+
+The project owner gave this instruction.
+
+> I authorise the smallest fix to accept the Mesa git suffix. Get independent review, then run one hosted readiness after CI and preservation pass. Keep existing limits. No retry or matrix. Runtime admission and ZY stay blocked.
+
+The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) stay the same.
+The previous `FAIL` results and the `2/2` result for previous repairs stay the same.
+The full host matrix stays `Blocked`.
+
+The file for the independent review is
+`tmp/runtime-compatibility-qualification/renderer-hosted-diagnostic-93baaaf/hosted-readiness/independent-outcome-review.json`.
+Its SHA-256 is `016bf7ebdf5f1bc29522ff01eda2078c4ec9f2eeedde77baac4f6992165e6204`.

@@ -259,6 +259,28 @@ class EvidenceOutputTests(unittest.TestCase):
             result["images"][0]["sha256"], hashlib.sha256(png()).hexdigest()
         )
 
+    def test_mesa_git_suffix_seals_exact_version_and_rejects_other_text(self):
+        self.write_images("readiness")
+        value = self.observation()
+        version = "4.6 (Compatibility Profile) Mesa 26.2.7"
+        suffix = " (git-b69adc2adf)"
+        for invalid in (
+            " (git-b69adc2ad)", " (git-b69adc2adff)", " (git-B69adc2adf)",
+            " (git-b69adc2adz)", " (git-/home/user)", suffix + "\n",
+            suffix + " token=secret", suffix + suffix,
+        ):
+            with self.subTest(suffix=invalid), self.assertRaisesRegex(
+                output.EvidenceError, "^renderer version differs$"
+            ):
+                value["renderer"]["version"] = version + invalid
+                self.write_result("readiness", value)
+        value["renderer"]["version"] = version + suffix
+        result = self.write_result("readiness", value)
+        self.assertEqual(result["renderer"]["version"], version + suffix)
+        self.seal({"readiness": value})
+        sealed = self.destination / "gui/readiness/result.json"
+        self.assertEqual(json.loads(sealed.read_bytes()), result)
+
     def test_source_specific_sessions_sentinel_and_readiness(self):
         self.write_images("readiness")
         for change in (
