@@ -309,6 +309,7 @@ def _tt_diagnostic_b15_tree(tree, source):
     import ast as _tt_ast
     import copy as _tt_copy
     import hashlib as _tt_hashlib
+    import sys as _tt_sys
     if _tt_hashlib.sha256(source.encode("utf-8")).hexdigest() != (
         "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848"
     ):
@@ -327,10 +328,13 @@ def _tt_diagnostic_b15_tree(tree, source):
     if len(candidates) != 1:
         raise ValueError("Diagnostic B15 console site differs")
     call = candidates[0]
+    # Keep the empty fields included in the pinned Python 3.12 dump.
+    dump_options = {"show_empty": True} if _tt_sys.version_info >= (3, 13) else {}
     if (len(call.args) != 1 or call.keywords
             or _tt_ast.unparse(call.func) != "App.Console.PrintWarning"
             or _tt_hashlib.sha256(_tt_ast.dump(
-                call.args[0], include_attributes=False).encode()).hexdigest()
+                call.args[0], include_attributes=False,
+                **dump_options).encode()).hexdigest()
             != "c996ae42a2eaec470c4740ff7ff03b0873fe84f36fd3b7ba917b9718e419d096"):
         raise ValueError("Diagnostic B15 console argument differs")
     original_argument = call.args[0]

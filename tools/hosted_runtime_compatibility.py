@@ -722,8 +722,49 @@ def validate_control(control, receipts, environment, source_root):
     return fixed
 
 
+# The existing guard stderr may carry only fixed codes for this failure.
+NATIVE07_B15_FAILURE = '''except Exception as error:
+    load_error = error
+    wrappers = (
+        ("tools.phase3_transition_pilot", "TransitionPilotError"),
+        ("tracktemplate.compatibility.transition_workflow",
+         "TransitionWorkflowError"),
+    )
+    if any(type(error) is getattr(sys.modules.get(module), name, None)
+           for module, name in wrappers):
+        load_error = error.__cause__
+    host = sys.modules.get("tracktemplate.compatibility.b15_workflow_host")
+    if (type(load_error) is getattr(host, "B15WorkflowHostError", None)
+            and load_error.args == ("The frozen B15 definitions could not load.",)
+            and load_error.__cause__ is not None):
+        cause = load_error.__cause__
+        cause_types = (ValueError, ModuleNotFoundError, ImportError,
+                       SyntaxError, TypeError, NameError, AttributeError,
+                       KeyError, OSError, RuntimeError)
+        cause_type = next((kind.__name__ for kind in cause_types
+                           if type(cause) is kind), "Other")
+        reason = "other"
+        if (type(cause) is ValueError and len(cause.args) == 1
+                and type(cause.args[0]) is str):
+            reason = {
+                "Diagnostic B15 original fingerprint differs": "fingerprint",
+                "Diagnostic B15 loader AST differs": "loader-ast",
+                "Diagnostic B15 console site differs": "console-site",
+                "Diagnostic B15 console argument differs": "console-argument",
+            }.get(cause.args[0], reason)
+        try:
+            print("TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION=" + json.dumps({
+                "cause_type": cause_type, "reason": reason,
+            }), file=sys.stderr, flush=True)
+        except (OSError, ValueError):
+            pass
+    raise
+'''
+
+
 def _native_source(config):
     """Use the original script's real main invocation, including unittest."""
+    failure = NATIVE07_B15_FAILURE if config['id'] == 'native-07' else ''
     return (
         'import hashlib, json, os, runpy, sys\n'
         'assert __debug__ and not sys.flags.optimize\n'
@@ -742,6 +783,7 @@ def _native_source(config):
         'except SystemExit as error:\n'
         '    if error.code not in (None, 0):\n'
         '        raise\n'
+        f'{failure}'
         f'print({DONE_MARKER!r}, flush=True)\n'
     )
 

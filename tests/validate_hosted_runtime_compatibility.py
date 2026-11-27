@@ -2,9 +2,12 @@
 """Offline fixed-matrix, invocation, deadline and failure proofs."""
 
 import ast
-from contextlib import ExitStack, nullcontext
+from contextlib import (
+    ExitStack, nullcontext, redirect_stderr, redirect_stdout,
+)
 from dataclasses import FrozenInstanceError
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -13,12 +16,16 @@ import tempfile
 import time
 import types
 import unittest
+import warnings
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import hosted_runtime_compatibility as matrix  # noqa: E402
+from tools import phase3_transition_pilot  # noqa: E402
+from tools import runtime_compatibility_transport as transport  # noqa: E402
+from tracktemplate.compatibility import TransitionWorkflowError  # noqa: E402
 
 
 class MatrixTests(unittest.TestCase):
@@ -246,6 +253,69 @@ class MatrixTests(unittest.TestCase):
             'status': 'completed', 'process_exit': 0, 'cleanup_proved': True},
             result.stdout)
         self.assertIn('"run_name": "__main__"', result.stdout)
+
+    def test_native07_b15_failure_is_reported_safely_and_reraised(self):
+        source = self.work / 'proof.py'
+        source.write_text('raise AssertionError("Uninjected proof ran")\n')
+        marker = 'TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION='
+        load_failed = 'The frozen B15 definitions could not load.'
+        b15_error = phase3_transition_pilot.B15WorkflowHostError
+        pilot_error = phase3_transition_pilot.TransitionPilotError
+        private = '/home/operator/proof.FCStd?token=fixture-secret'
+        custom_error = type('PrivateDiagnostic', (Exception,), {})
+        cases = (
+            ('native-07', pilot_error, load_failed,
+             ValueError('Diagnostic B15 console argument differs'),
+             {'cause_type': 'ValueError', 'reason': 'console-argument'}),
+            ('native-07', TransitionWorkflowError, load_failed,
+             ModuleNotFoundError(private),
+             {'cause_type': 'ModuleNotFoundError', 'reason': 'other'}),
+            ('native-07', None, load_failed, custom_error(private),
+             {'cause_type': 'Other', 'reason': 'other'}),
+            ('native-07', pilot_error, 'Different loader failure',
+             ValueError(private), None),
+            ('native-07', RuntimeError, load_failed, ValueError(private), None),
+            ('native-06', pilot_error, load_failed, ValueError(private), None),
+        )
+        for identifier, outer, message, cause, expected in cases:
+            with self.subTest(identifier=identifier, outer=outer, cause=cause):
+                inner = b15_error(message)
+                inner.__cause__ = cause
+                original = inner if outer is None else outer(message)
+                if outer is not None:
+                    original.__cause__ = inner
+                config = {'id': identifier, 'entry_path': str(source),
+                          'entry_sha256': matrix.identity(source)['sha256'],
+                          'assessment': str(self.work), 'arguments': [],
+                          'fixture_environment': {}}
+                wrapper = matrix._native_source(config)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with (patch.object(sys, 'path', sys.path.copy()),
+                      patch.object(sys, 'argv', sys.argv.copy()),
+                      patch.object(matrix.runpy, 'run_path',
+                                   side_effect=original),
+                      redirect_stdout(stdout), redirect_stderr(stderr),
+                      warnings.catch_warnings(),
+                      self.assertRaises(type(original)) as raised):
+                    warnings.simplefilter("ignore", ResourceWarning)
+                    exec(compile(wrapper, '<native-wrapper>', 'exec'), {})
+                self.assertIs(raised.exception, original)
+                self.assertIs(inner.__cause__, cause)
+                self.assertNotIn(matrix.DONE_MARKER, stdout.getvalue())
+                if expected is None:
+                    self.assertEqual(stderr.getvalue(), '')
+                else:
+                    lines = stderr.getvalue().splitlines()
+                    self.assertEqual(len(lines), 1)
+                    self.assertTrue(lines[0].startswith(marker))
+                    self.assertEqual(json.loads(lines[0][len(marker):]),
+                                     expected)
+                    guard = self.work / 'guard'
+                    guard.mkdir(exist_ok=True)
+                    (guard / 'stderr').write_text(stderr.getvalue())
+                    self.assertEqual(transport.transport._inventory(
+                        guard, transport.GUARD_EVIDENCE,
+                    ), {'stderr': stderr.getvalue().encode()})
 
     def test_no_success_from_zero_exit_without_original_sentinel(self):
         good = {'status': 'completed', 'process_exit': 0,
