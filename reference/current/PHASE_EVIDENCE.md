@@ -5467,3 +5467,21 @@ The full host matrix stays `Blocked`.
 The repair does not change this instruction from the project owner.
 
 > Runtime admission and ZY remain blocked.
+
+## Matrix evidence checks — 2026-11-27
+
+Two offline checks of commit `49c35018db23ce924f9e8f8f55f73bf2e3bd1eaa` gave a FAIL result.
+The seal accepted a missing report for `native-24`.
+The seal rejected the Phase 5 selection failure from the bridge.
+
+The seal checks the necessary private reports for completed native sessions.
+The Phase 5 check verifies the original traceback from the bridge against the source for that test.
+The seal copies the permitted original bytes and keeps the FAIL result.
+
+The project owner gave this instruction.
+
+> I authorise the smallest fixes to the Native 24 and Phase 5 evidence paths. Get independent review, then run the one authorised matrix once existing checks pass. Keep existing limits. No retry. Runtime admission and ZY stay blocked.
+
+The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) and the `2/2` repair record stay the same.
+The `gui-readiness` result for `49c3501` stays PASS.
+The matrix source check rejects that readiness record after the change to `compatibility_evidence_output.py`.

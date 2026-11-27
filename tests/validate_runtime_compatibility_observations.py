@@ -1,5 +1,6 @@
 """Offline counterexamples for source-bound matrix observation extraction."""
 
+import ast
 import contextlib
 import copy
 import hashlib
@@ -20,6 +21,7 @@ from tools import compatibility_evidence_output as output  # noqa: E402
 from tools import hosted_runtime_compatibility as matrix  # noqa: E402
 from tools import runtime_compatibility_observations as observation  # noqa: E402
 from tools import runtime_compatibility_diagnostics as diagnostics  # noqa: E402
+from tools import runtime_compatibility_transport as transport  # noqa: E402
 
 SPEC = importlib.util.spec_from_file_location(
     "output_fixture", ROOT / "tests/validate_compatibility_evidence_output.py"
@@ -318,6 +320,120 @@ class ObservationTests(unittest.TestCase):
                                  directory, self.work / "evidence", staging)
         self.assertEqual(path.read_bytes(), b"")
 
+    def phase5_rpc_failure(self, site):
+        for name in output.PHASE5_FAILURE_SOURCES.values():
+            relative = name.removeprefix("assessment/")
+            path = self.tree / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            raw, receipt = diagnostics.transform_source(
+                relative, (ROOT / relative).read_bytes())
+            path.write_bytes(raw)
+            self.manifest["source_files"].append({
+                "path": relative, "assessment": receipt["successor"],
+            })
+        name = output.PHASE5_FAILURE_SOURCES[site]
+        source = ast.parse((self.work / name).read_bytes())
+        assertion, = [node for node in ast.walk(source)
+                      if isinstance(node, ast.Assert)
+                      and isinstance(node.msg, ast.Call)
+                      and isinstance(node.msg.func, ast.Name)
+                      and node.msg.func.id == "_tt_diagnostic_message"]
+        line = assertion.lineno
+        remote = (
+            "Traceback (most recent call last):\n"
+            '  File "/home/runner/work/_temp/l1-gui-1/bridge/'
+            'addon/FreecadCli/rpc_server.py", line 89, in _execute_and_capture\n'
+            '    exec(code, {"__builtins__": __builtins__})\n'
+            f'  File "<string>", line {source.body[-1].lineno}, in <module>\n'
+            f'  File "<string>", line {line}, in validate\n'
+            f"AssertionError: TT_DIAGNOSTIC site={site} "
+            f"value_sha256={'a' * 64}\n"
+        )
+        return remote, name, line
+
+    @patch.dict(os.environ, {"GITHUB_RUN_ID": "1"})
+    def test_phase5_rpc_failure_survives_projection_and_seal(self):
+        self.full_matrix_fixture()
+        self.destination = self.work / "public-matrix"
+        group = self.scope.groups[output.PHASE5_GROUP]
+        rows_path = self.work / "evidence/matrix-entries.json"
+        rows = json.loads(rows_path.read_bytes())
+        index = next(i for i, row in enumerate(rows)
+                     if row["id"] == group.group_id)
+        rows[index:] = [
+            {"id": row["id"], "status": "FAIL" if i == 0 else "NOT_RUN"}
+            for i, row in enumerate(rows[index:])
+        ]
+        write(rows_path, rows)
+        remote, name, line = self.phase5_rpc_failure("g05-selection")
+        stderr = self.work / "entries" / group.group_id / "client.stderr"
+        write(stderr, {"status": "error", "error": remote, "code": "rpc_fault"})
+        original = stderr.read_bytes()
+        result = self.extract_fixture()
+        self.assertEqual(result["status"], "FAIL")
+        self.assertEqual((self.destination / group.failure).read_bytes(),
+                         remote.encode())
+        typed = json.loads((self.destination / group.result).read_bytes())
+        self.assertEqual(typed["failure"], {
+            "stage": group.group_id, "exception_type": "AssertionError",
+            "source_relative_file": name, "line": line,
+            "reason_code": "ASSERTION_FAILED",
+            "original_safe_diagnostic_member": group.failure,
+        })
+        self.assertEqual(stderr.read_bytes(), original)
+        write(self.work / "matrix-payload-inventory.json", result)
+        with patch.object(matrix, "verify_source_members"), patch.object(
+            observation, "_base_object_count", return_value=9
+        ), patch.object(transport, "prepared_manifest",
+                        return_value=(self.manifest, {})):
+            contents, repeated = transport._payload(self.work)
+        self.assertEqual(repeated, result)
+        self.assertEqual(contents["payload/" + group.failure], remote.encode())
+        self.assertEqual(stderr.read_bytes(), original)
+
+    @patch.dict(os.environ, {"GITHUB_RUN_ID": "1"})
+    def test_phase5_rpc_rejects_unbound_and_unapproved_failure_bytes(self):
+        group = self.scope.groups[output.PHASE5_GROUP]
+        directory = self.root / "phase5"
+        directory.mkdir()
+        stderr = directory / "client.stderr"
+        staging = self.root / "projection"
+        remote, name, line = self.phase5_rpc_failure("g05-multi-selection")
+        scope = observation._bind_phase5_failure_sources(
+            self.scope, self.tree, self.manifest)
+        write(stderr, {"status": "error", "error": remote, "code": "rpc_fault"})
+        value = observation._failure(scope, group, directory,
+                                     self.root / "evidence", staging)
+        self.assertEqual((value["source_relative_file"], value["line"]),
+                         (name, line))
+        self.assertEqual((staging / group.failure).read_bytes(), remote.encode())
+        rejected = self.root / "rejected"
+        for raw in (
+            remote.replace("g05-multi-selection", "g05-other"),
+            remote.replace("g05-multi-selection", "g05-selection"),
+            remote.replace(f"line {line}, in validate",
+                           f"line {line + 1}, in validate"),
+            remote.replace("/home/runner/", "/home/operator/"),
+            remote.replace("l1-gui-1/", "l1-gui-2/"),
+            remote.replace("value_sha256=", "Private data: array=[1, 2]; "),
+            remote + "Extra diagnostic data\n",
+        ):
+            with self.subTest(raw=raw):
+                write(stderr, {"status": "error", "error": raw,
+                               "code": "rpc_fault"})
+                original = stderr.read_bytes()
+                with self.assertRaises(output.EvidenceError):
+                    observation._failure(scope, group, directory,
+                                         self.root / "evidence", rejected)
+                self.assertEqual(stderr.read_bytes(), original)
+                self.assertFalse(rejected.exists())
+        write(stderr, {"status": "error", "error": remote, "code": "rpc_fault",
+                       "extra": True})
+        with self.assertRaises(output.EvidenceError):
+            observation._failure(scope, group, directory,
+                                 self.root / "evidence", rejected)
+        self.assertFalse(rejected.exists())
+
     def test_original_receipt_cannot_claim_success_after_source_change(self):
         directory = self.tree / "benchmark-output/run"
         write(directory / "run.json", {
@@ -457,6 +573,18 @@ class ObservationTests(unittest.TestCase):
         write(receipt, value)
         return value, receipt
 
+    def private_report_witness(self, entry, directory, value):
+        namespace = {}
+        exec(diagnostics._helper_source(diagnostics.SOURCES[entry["path"]]),
+             namespace)
+        public = io.StringIO()
+        with patch.dict(os.environ, {
+            diagnostics.SESSION_ENV: str(directory),
+        }), contextlib.redirect_stdout(public):
+            namespace["_tt_diagnostic_report"](
+                diagnostics.REPORTS_BY_ENTRY[entry["id"]], value)
+        return public.getvalue()
+
     def full_matrix_fixture(self):
         write(self.work / "execution.json", self.capsule)
         base = self.tree / observation.assessment.BASE_PATH
@@ -503,24 +631,20 @@ class ObservationTests(unittest.TestCase):
                 if entry["id"] in originals:
                     value, receipt = originals[entry["id"]]
                     if entry["id"] == "phase5-view-edit-lifecycle":
-                        namespace = {}
-                        exec(diagnostics._helper_source(diagnostics.SOURCES[
-                            entry["path"]]), namespace)
-                        public = io.StringIO()
-                        with patch.dict(os.environ, {
-                            diagnostics.SESSION_ENV: str(directory),
-                        }), contextlib.redirect_stdout(public):
-                            namespace["_tt_diagnostic_report"](
-                                "g05-report",
-                                entry["sentinel"] + json.dumps(value))
+                        witness = self.private_report_witness(
+                            entry, directory,
+                            entry["sentinel"] + json.dumps(value))
                         text = text.replace(entry["sentinel"] + "\n",
-                                            public.getvalue())
+                                            witness)
                     elif receipt is not None:
                         marker = observation.RECEIPT_PREFIXES[entry["id"]]
                         if marker == entry["sentinel"]:
                             text = text.replace(marker + "\n", marker + str(receipt.parent) + "\n")
                         else:
                             text += marker + str(receipt.parent) + "\n"
+                elif entry["id"] in diagnostics.REPORTS_BY_ENTRY:
+                    text += self.private_report_witness(
+                        entry, directory, "synthetic private original")
                 if entry["path"].endswith("/freecad_validate_phase8_straight_crossover_b4.py"):
                     receipt = self.tree / "benchmark-output/native-b4.json"
                     write(receipt, {
@@ -597,6 +721,28 @@ class ObservationTests(unittest.TestCase):
         with self.assertRaises(output.EvidenceError):
             self.extract_fixture()
         self.assertFalse(self.destination.exists())
+
+    def test_full_matrix_rejects_missing_native_private_original(self):
+        self.full_matrix_fixture()
+        directory = self.work / "entries/native-24"
+        original = directory / "diagnostic-private/n24-report.txt"
+        raw = original.read_bytes()
+        public = (directory / "guard/stdout").read_text()
+        verified = diagnostics.verify_private_reports(
+            directory, "native-24", [public], completed=True)
+        self.assertEqual(verified["members"]["n24-report.txt"],
+                         output._identity(raw))
+        retained = directory / "retained-n24-report.txt"
+        original.rename(retained)
+
+        with self.assertRaisesRegex(
+            output.EvidenceError, "native private original verification failed"
+        ) as caught:
+            self.extract_fixture()
+        self.assertEqual(str(caught.exception.__cause__),
+                         "Diagnostic private original is missing")
+        self.assertFalse(self.destination.exists())
+        self.assertEqual(retained.read_bytes(), raw)
 
     def test_generation_semantic_must_be_same_run_actual_native_receipt(self):
         self.full_matrix_fixture()

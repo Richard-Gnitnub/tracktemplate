@@ -51,6 +51,21 @@ _FRAME = re.compile(
     r'  File "([a-zA-Z0-9_./-]+)", line ([1-9][0-9]*), '
     r"in ([a-zA-Z_][a-zA-Z0-9_]*|<module>)\Z"
 )
+PHASE5_GROUP = "phase5-view-edit-lifecycle"
+PHASE5_FAILURE_SOURCES = MappingProxyType({
+    "g05-selection":
+        "assessment/tests/freecad_gui_validate_phase5_transition_coin_viewprovider.py",
+    "g05-multi-selection":
+        "assessment/tests/freecad_gui_validate_phase5_transition_multi_object_edit.py",
+})
+_PHASE5_SERVER_FRAME = re.compile(
+    r'  File "/home/runner/work/_temp/l1-gui-([1-9][0-9]*)/bridge/'
+    r'addon/FreecadCli/rpc_server\.py", line 89, in _execute_and_capture'
+)
+_PHASE5_REASON = re.compile(
+    r"AssertionError: TT_DIAGNOSTIC site=(g05-(?:multi-)?selection) "
+    r"value_sha256=[0-9a-f]{64}"
+)
 _ROOT_FIELDS = {
     "schema_version",
     "group_id",
@@ -660,6 +675,62 @@ def _source_frame(source, line, function):
     return False
 
 
+def _phase5_failure_location(scope, raw):
+    """Bind the unmodified remote traceback to one reviewed derived assert."""
+    try:
+        lines = raw.decode("utf-8").split("\n")
+    except UnicodeError as error:
+        raise EvidenceError("failure encoding differs") from error
+    # The pinned bridge executes the supplied source directly as <string>.
+    # Hosted PYTHONNODEBUGRANGES leaves exactly these original frames.
+    _require(
+        len(lines) == 7 and lines[-1] == ""
+        and lines[0] == "Traceback (most recent call last):"
+        and lines[2] == '    exec(code, {"__builtins__": __builtins__})',
+        "Phase 5 bridge failure frames differ",
+    )
+    bridge_frame = _PHASE5_SERVER_FRAME.fullmatch(lines[1])
+    run_id = os.environ.get("GITHUB_RUN_ID")
+    _require(
+        bridge_frame is not None and (run_id is None or bridge_frame[1] == run_id),
+        "Phase 5 bridge failure does not match this hosted run",
+    )
+    reason = _PHASE5_REASON.fullmatch(lines[5])
+    _require(reason is not None, "Phase 5 failure reason differs")
+    site = reason[1]
+    name = PHASE5_FAILURE_SOURCES[site]
+    _require(name in scope.sources, "Phase 5 failure source not bound")
+    source = ast.parse(scope.sources[name])
+    _require(bool(source.body), "Phase 5 failure source is empty")
+    module_call = source.body[-1]
+    _require(
+        isinstance(module_call, ast.Expr)
+        and ast.unparse(module_call.value) == "validate()"
+        and lines[3] == (
+            f'  File "<string>", line {module_call.lineno}, in <module>'
+        ),
+        "Phase 5 module failure frame differs",
+    )
+    functions = [node for node in source.body
+                 if isinstance(node, ast.FunctionDef) and node.name == "validate"]
+    _require(len(functions) == 1, "Phase 5 validation source differs")
+    assertions = [
+        node for node in ast.walk(functions[0])
+        if isinstance(node, ast.Assert)
+        and isinstance(node.msg, ast.Call)
+        and isinstance(node.msg.func, ast.Name)
+        and node.msg.func.id == "_tt_diagnostic_message"
+        and len(node.msg.args) == 2
+        and not node.msg.keywords
+        and isinstance(node.msg.args[0], ast.Constant)
+        and node.msg.args[0].value == site
+    ]
+    _require(len(assertions) == 1 and lines[4] == (
+        f'  File "<string>", line {assertions[0].lineno}, in validate'
+    ), "Phase 5 assertion failure frame differs")
+    return name, assertions[0].lineno
+
+
 def _safe_failure(scope, group, value, root, original=None):
     if value is None:
         return None
@@ -682,6 +753,19 @@ def _safe_failure(scope, group, value, root, original=None):
     )
     if original is None:
         original = _read(root / group.failure, MAX_FAILURE_BYTES)
+    if (group.group_id == PHASE5_GROUP
+            and path in PHASE5_FAILURE_SOURCES.values()):
+        _require(
+            _phase5_failure_location(scope, original) == (path, line)
+            and value["exception_type"] == "AssertionError"
+            and value["reason_code"] == "ASSERTION_FAILED",
+            "Phase 5 failure binding differs",
+        )
+        return dict(
+            stage=group.group_id,
+            **value,
+            original_safe_diagnostic_member=group.failure,
+        )
     try:
         text = original.decode("utf-8")
     except UnicodeError as error:

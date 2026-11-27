@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools import compatibility_evidence_output as output  # noqa: E402
 from tools import compatibility_readiness_transport as transport  # noqa: E402
 from tools import hosted_compatibility_readiness as readiness  # noqa: E402
 from tools import hosted_l1_private_validation as native  # noqa: E402
@@ -628,6 +629,18 @@ def archive():
             directory = work / relative
             prefix = 'operational/' + relative.as_posix() + '/'
             _add_existing(contents, directory, SESSION_EVIDENCE, prefix)
+            if relative.name == output.PHASE5_GROUP:
+                stderr = contents.get(prefix + 'client.stderr', b'')
+                if any(line.lstrip().startswith(b'{') and b'"rpc_fault"' in line
+                       for line in stderr.splitlines()):
+                    # The sealed original is verified again below by _payload.
+                    failure = (work / 'public-matrix' / 'gui'
+                               / output.PHASE5_GROUP / 'failure.txt')
+                    require(
+                        failure.exists() and observations._phase5_rpc_traceback(
+                            stderr) == public_bytes(failure),
+                        'Phase 5 RPC original lacks a matching sealed failure',
+                    )
             for name, raw in transport._inventory(
                     directory / 'guard', GUARD_EVIDENCE,
                     excluded=('profile',)).items():

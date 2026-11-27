@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import re
+from types import MappingProxyType
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -245,7 +246,18 @@ def _session(directory, entry, tree, manifest, runtime, *, paired=False):
     for name in ("input-before.json", "input-after.json"):
         _require(_read_json(directory / name) == BASE_IDENTITY,
                  "same-run source preservation differs")
-    if entry["kind"] != "native":
+    if entry["kind"] == "native":
+        channels = [text]
+        channels.extend(_read_text(directory / name) for name in (
+            "guard/stderr", "client.stdout", "client.stderr")
+            if (directory / name).exists() or (directory / name).is_symlink())
+        try:
+            diagnostics.verify_private_reports(
+                directory, entry["id"], channels, completed=True)
+        except ValueError as error:
+            raise output.EvidenceError(
+                "native private original verification failed") from error
+    else:
         _require(output._runtime(_read_json(
             directory / "runtime-observation.json")) == runtime,
             "same-run runtime observation differs")
@@ -573,6 +585,38 @@ def _write(path, data):
         stream.write(data)
 
 
+def _phase5_rpc_traceback(stderr):
+    """Return the original remote traceback in the pinned client's line."""
+    envelope = output._json(stderr)
+    output._exact(envelope, ("status", "error", "code"),
+                  "Phase 5 bridge failure envelope differs")
+    _require(
+        envelope["status"] == "error" and envelope["code"] == "rpc_fault"
+        and type(envelope["error"]) is str
+        and stderr == (json.dumps({
+            "status": "error", "error": envelope["error"], "code": "rpc_fault",
+        }) + "\n").encode(),
+        "Phase 5 bridge failure envelope differs",
+    )
+    try:
+        return envelope["error"].encode("utf-8")
+    except UnicodeError as error:
+        raise output.EvidenceError("Phase 5 failure encoding differs") from error
+
+
+def _bind_phase5_failure_sources(scope, tree, manifest):
+    sources = dict(scope.sources)
+    for name in output.PHASE5_FAILURE_SOURCES.values():
+        relative = name.removeprefix("assessment/")
+        digest = _source_digest(tree, manifest, relative)
+        raw = output._read(tree / relative, 2 * 1024 * 1024)
+        _require(output._identity(raw)["sha256"] == digest,
+                 "Phase 5 failure source changed")
+        sources[name] = raw.decode("utf-8")
+    return output.Scope(scope.groups, MappingProxyType(sources),
+                        scope.assessments)
+
+
 def _failure(scope, group, directory, evidence, staging):
     candidates = [directory / "client.stderr", directory / "guard/stderr",
                   directory / "series.stderr", evidence / "matrix-failure.txt"]
@@ -581,6 +625,18 @@ def _failure(scope, group, directory, evidence, staging):
             if not path.is_symlink() and path.stat().st_size == 0:
                 continue
             raw = output._read(path, output.MAX_FAILURE_BYTES)
+            if (group.group_id == output.PHASE5_GROUP
+                    and path.name == "client.stderr" and raw.startswith(b"{")):
+                raw = _phase5_rpc_traceback(raw)
+                source, line = output._phase5_failure_location(scope, raw)
+                value = {
+                    "exception_type": "AssertionError",
+                    "source_relative_file": source,
+                    "line": line,
+                    "reason_code": "ASSERTION_FAILED",
+                }
+                _write(staging / group.failure, raw)
+                return value
             # No substring extraction, redaction or reconstructed traceback.
             lines = raw.decode("utf-8").splitlines()
             frames = [output._FRAME.fullmatch(line) for line in lines]
@@ -732,6 +788,8 @@ def extract_matrix_payload(
         else:
             if group_id == "straight-generation":
                 observation.update({name: None for name in output._STRAIGHT_FIELDS})
+            if group_id == output.PHASE5_GROUP:
+                scope = _bind_phase5_failure_sources(scope, tree, manifest)
             observation["failure"] = _failure(
                 scope, group, directory, evidence, staging)
         observations[group_id] = observation

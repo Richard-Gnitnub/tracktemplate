@@ -457,6 +457,39 @@ class TransportTests(unittest.TestCase):
                 'original-diagnostics/acquire.txt').read(), original)
             self.assertNotIn('private.FCStd', archive.getnames())
 
+    def test_phase5_rpc_requires_exact_sealed_original_before_archive(self):
+        self.prepare()
+        self.finalized(False)
+        relative = 'entries/phase5-view-edit-lifecycle/client.stderr'
+        stderr = self.work / relative
+        remote = 'Synthetic original RPC diagnostic\n'
+        save(stderr, {'status': 'error', 'error': remote, 'code': 'rpc_fault'})
+        original = stderr.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'matching sealed failure'):
+            transport.archive()
+        self.assertFalse((self.root / 'compatibility-matrix-primary.tar').exists())
+        self.assertEqual(stderr.read_bytes(), original)
+
+        member = 'gui/phase5-view-edit-lifecycle/failure.txt'
+        sealed = self.work / 'public-matrix' / member
+        sealed.parent.mkdir(parents=True)
+        sealed.write_bytes(b'Changed evidence\n')
+        with self.assertRaisesRegex(ValueError, 'matching sealed failure'):
+            transport.archive()
+        self.assertFalse((self.root / 'compatibility-matrix-primary.tar').exists())
+        self.assertEqual(stderr.read_bytes(), original)
+
+        sealed.write_bytes(remote.encode())
+        with patch.object(transport, '_payload', return_value=(
+            {'payload/' + member: sealed.read_bytes()}, {'status': 'FAIL'}
+        )):
+            self.assertEqual(transport.archive(), 'FAIL')
+        with tarfile.open(self.root / 'compatibility-matrix-primary.tar') as archive:
+            self.assertEqual(archive.extractfile('operational/' + relative).read(),
+                             original)
+            self.assertEqual(archive.extractfile('payload/' + member).read(),
+                             remote.encode())
+
     def test_unlisted_guard_diagnostic_refuses_public_archive(self):
         self.prepare()
         self.finalized(False)
