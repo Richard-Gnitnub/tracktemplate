@@ -5468,20 +5468,23 @@ The repair does not change this instruction from the project owner.
 
 > Runtime admission and ZY remain blocked.
 
-## Matrix evidence checks — 2026-11-27
+## Evidence checks for the host matrix — 2026-11-27
 
-Two offline checks of commit `49c35018db23ce924f9e8f8f55f73bf2e3bd1eaa` gave a FAIL result.
-The seal accepted a missing report for `native-24`.
-The seal rejected the Phase 5 selection failure from the bridge.
+The `seal` command checks the necessary files in `diagnostic-private` for each completed `native` test.
+The Phase 5 check compares the diagnostic from `rpc_server.py` with the applicable source file.
+The `seal` command preserves the permitted diagnostic bytes.
+For a Phase 5 test with this diagnostic, the result stays `FAIL`.
 
-The seal checks the necessary private reports for completed native sessions.
-The Phase 5 check verifies the original traceback from the bridge against the source for that test.
-The seal copies the permitted original bytes and keeps the FAIL result.
+Two tests in standalone Python gave FAIL results for commit `49c35018db23ce924f9e8f8f55f73bf2e3bd1eaa`.
+The `seal` command accepted the evidence when `n24-report.txt` for `native-24` was missing.
+For the Phase 5 selection test, the `seal` command rejected the diagnostic for the FAIL result.
+
+The `gui-readiness` result for commit `49c3501` stays `PASS`.
+The source check for the host matrix rejects the source hashes from that test because `compatibility_evidence_output.py` changed.
 
 The project owner gave this instruction.
 
 > I authorise the smallest fixes to the Native 24 and Phase 5 evidence paths. Get independent review, then run the one authorised matrix once existing checks pass. Keep existing limits. No retry. Runtime admission and ZY stay blocked.
 
-The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) and the `2/2` repair record stay the same.
-The `gui-readiness` result for `49c3501` stays PASS.
-The matrix source check rejects that readiness record after the change to `compatibility_evidence_output.py`.
+The [D-P9-023 limits](#runtime-compatibility-output-handling-panel) stay the same.
+The `2/2` result for the previous repairs stays the same.
