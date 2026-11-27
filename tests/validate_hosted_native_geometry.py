@@ -1497,9 +1497,19 @@ class PilotIdentityTests(unittest.TestCase):
             re.findall(r"^\s*cancel-in-progress:\s*(\S+)", workflow,
                        re.MULTILINE), ["false"],
         )
-        actions = re.findall(r"^\s*uses:\s*(\S+)", workflow, re.MULTILINE)
+        uses = r"^\s*uses:\s*(\S+)"
+        actions = re.findall(uses, workflow, re.MULTILINE)
+        local = "./.github/actions/readiness-primary-readback"
+        self.assertEqual(actions.count(local), 1)
+        actions.remove(local)
         self.assertTrue(actions)
-        for action in actions:
+        source = ROOT / local / "action.yml"
+        pin = hashlib.sha256(source.read_bytes()).hexdigest()
+        self.assertIn(f"'{pin}  {source.relative_to(ROOT)}' | sha256sum --check --status",
+                      workflow)
+        child_actions = re.findall(uses, source.read_text(), re.MULTILINE)
+        self.assertEqual(len(child_actions), 1)
+        for action in actions + child_actions:
             self.assertRegex(action, r"^[A-Za-z0-9_./-]+@[0-9a-f]{40}$")
 
 
