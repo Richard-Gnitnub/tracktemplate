@@ -5544,3 +5544,27 @@ The result must have independent review and independent preservation.
 The previous host matrix result stays `FAIL`.
 The `2/2` result for the previous repairs stays the same.
 The review, output and preservation conditions stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)
+
+## Initial controls check for `native-07` — 2026-11-28
+
+The initial controls check gave a `FAIL` result.
+The `native-07` test did not start. [Hosted test 46132725944](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46132725944)
+
+The workflow kept two evidence files.
+The files did not include the code or message from the initial controls error.
+The cause of the error is unknown.
+
+An offline test gave the same evidence loss when the initial controls check found a sample error.
+The change keeps a permitted error code in `logs/seed.log`.
+The workflow checks the complete contents of that file before it copies the file to either evidence file.
+The final step also shows the permitted code in the job log.
+When private storage is available, the workflow keeps the original error there.
+The offline test checks the two copies and the final `FAIL` result.
+
+The project owner gave this instruction.
+
+> I authorise bounded diagnosis and safe capture of the initial controls-check error. Preserve the failure, prove the smallest fix offline and get independent review. No retry or full matrix. Runtime admission and ZY stay blocked.You have unlimted repair resources to get over this issue.
+
+The previous host matrix result stays `FAIL`.
+The `2/2` result for the previous repairs stays the same.
+The review, output and preservation conditions stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)

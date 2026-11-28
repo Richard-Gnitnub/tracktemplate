@@ -2,9 +2,10 @@
 """Offline tests for matrix admission, cleanup and exact artifact transport."""
 
 import copy
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 import importlib.util
+from io import StringIO
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
+from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -387,6 +389,178 @@ class TransportTests(unittest.TestCase):
         self.assertFalse(self.install_work.exists())
         self.assertFalse(self.work.exists())
         self.clock_mock.assert_called_once()
+
+    def refused_seed(self):
+        logs = self.root / 'compatibility-matrix-logs'
+        logs.mkdir(mode=0o700)
+        log_path = logs / 'seed.log'
+        with (log_path.open('x') as log, redirect_stdout(log),
+              redirect_stderr(log)):
+            self.assertEqual(transport.main(['seed']), 1)
+        self.outcomes(('skipped',) * len(transport.OUTCOMES))
+        self.assertTrue(transport.finalize()['cleanup'])
+        self.assertFalse(self.install_work.exists())
+        self.assertFalse(self.work.exists())
+        return log_path
+
+    def test_seed_refusal_survives_both_artifact_readbacks(self):
+        self.clock_mock.side_effect = ValueError('Public server clock absent')
+        expected = self.refused_seed().read_bytes()
+        self.assertEqual(expected, (
+            b'COMPATIBILITY_MATRIX_SEED_REFUSAL=clock-server-date\n'
+            b'COMPATIBILITY_MATRIX_TRANSPORT_FAIL=seed\n'))
+        self.assertFalse((self.controls / 'seed.json').exists())
+        self.assertEqual(transport.main(['archive']), 0)
+        self.readback('primary')
+        self.assertEqual(transport.main(['publish']), 0)
+        self.readback('final')
+
+        for kind in ('primary', 'final'):
+            path = self.root / ('compatibility-matrix-' + kind + '.tar')
+            with tarfile.open(path) as archive:
+                self.assertEqual(archive.extractfile('logs/seed.log').read(),
+                                 expected)
+                self.assertNotIn('original-diagnostics/seed.txt',
+                                 archive.getnames())
+                self.assertNotIn('prerequisites/control.json',
+                                 archive.getnames())
+        manifest = json.loads(self.native07_archive()['transport/manifest.json'])
+        self.assertEqual(manifest['status'], 'FAIL')
+        self.assertFalse(manifest['original_diagnostic_preservation_complete'])
+        self.assertFalse(manifest['runtime_admission'])
+        self.assertFalse(manifest['zy_execution'])
+        captured = StringIO()
+        with redirect_stdout(captured):
+            self.assertEqual(transport.main(['complete']), 1)
+        self.assertEqual(captured.getvalue().splitlines(), [
+            'COMPATIBILITY_MATRIX_SEED_REFUSAL=clock-server-date',
+            'COMPATIBILITY_MATRIX_TRANSPORT_FAIL',
+        ])
+        completion = json.loads((self.root /
+            'compatibility-matrix-completion.json').read_bytes())
+        self.assertEqual(completion['status'], 'FAIL')
+        self.assertEqual(completion['primary_readback']['asset_id'], 42)
+        self.assertEqual(completion['final_readback']['asset_id'], 42)
+
+    def test_seed_unexpected_private_exception_is_withheld_from_public_output(self):
+        private = 'fake secret and /home/private-operator/document.FCStd'
+        self.clock_mock.side_effect = RuntimeError(private)
+        expected = self.refused_seed().read_bytes()
+        self.assertIn(b'SEED_REFUSAL=unexpected-error\n', expected)
+        self.assertNotIn(private.encode(), expected)
+        raw = (self.root / 'compatibility-matrix-private/seed.txt').read_bytes()
+        self.assertIn(private.encode(), raw)
+        self.assertEqual(transport.archive(), 'FAIL')
+        self.assertNotIn(private.encode(),
+                         b''.join(self.native07_archive().values()))
+
+        # Report the capture before requiring the final artifact readback.
+        captured = StringIO()
+        with redirect_stdout(captured):
+            self.assertEqual(transport.main(['complete']), 1)
+        self.assertEqual(captured.getvalue().splitlines(), [
+            'COMPATIBILITY_MATRIX_SEED_REFUSAL=unexpected-error',
+            'COMPATIBILITY_MATRIX_TRANSPORT_FAIL=complete',
+        ])
+        self.assertNotIn(private, captured.getvalue())
+
+    def test_seed_refusal_overrules_partial_receipt_with_retention_failure(self):
+        original = transport.write
+
+        def write(path, value):
+            if path.name != 'seed.json':
+                return original(path, value)
+            path.write_bytes(b'{')
+            raise OSError('injected interrupted seed receipt')
+
+        with (patch.object(transport, 'write', side_effect=write),
+              patch.object(transport, 'retain_failure',
+                           side_effect=OSError('private retention failure'))):
+            expected = self.refused_seed().read_bytes()
+        self.assertEqual(expected, (
+            b'COMPATIBILITY_MATRIX_SEED_REFUSAL=io-error\n'
+            b'COMPATIBILITY_MATRIX_SEED_PRIVATE_RETENTION_FAIL\n'
+            b'COMPATIBILITY_MATRIX_TRANSPORT_FAIL=seed\n'))
+        self.assertEqual((self.controls / 'seed.json').read_bytes(), b'{')
+
+        self.assertEqual(transport.archive(), 'FAIL')
+        self.assertEqual(self.native07_archive()['logs/seed.log'], expected)
+        self.readback('primary')
+        self.assertEqual(transport.publish()['status'], 'PASS')
+        with tarfile.open(self.root / 'compatibility-matrix-final.tar') as archive:
+            self.assertEqual(archive.extractfile('logs/seed.log').read(), expected)
+            self.assertNotIn('prerequisites/seed.json', archive.getnames())
+
+    def test_seed_log_rejects_mixed_unknown_oversized_and_linked_bytes(self):
+        logs = self.root / 'compatibility-matrix-logs'
+        logs.mkdir(mode=0o700)
+        log = logs / 'seed.log'
+        suffix = b'\nCOMPATIBILITY_MATRIX_TRANSPORT_FAIL=seed\n'
+        prefix = b'COMPATIBILITY_MATRIX_SEED_REFUSAL='
+        valid = prefix + b'clock-server-date' + suffix
+        for raw in (b'traceback\n' + valid, valid + b'private text\n',
+                    prefix + b'unlisted-reason' + suffix,
+                    b'x' * 400, valid + b'\xff'):
+            with self.subTest(raw=raw[:48]):
+                log.write_bytes(raw)
+                self.assertIsNone(transport._safe_seed_failure_log(self.root))
+        original = logs / 'seed-elsewhere.log'
+        original.write_bytes(valid)
+        log.unlink()
+        log.symlink_to(original)
+        self.assertIsNone(transport._safe_seed_failure_log(self.root))
+
+        self.outcomes(('skipped',) * len(transport.OUTCOMES))
+        self.assertTrue(transport.finalize()['cleanup'])
+        self.assertEqual(transport.archive(), 'FAIL')
+        self.assertNotIn('logs/seed.log', self.native07_archive())
+        self.readback('primary')
+        self.assertEqual(transport.publish()['status'], 'PASS')
+        with tarfile.open(self.root / 'compatibility-matrix-final.tar') as archive:
+            self.assertNotIn('logs/seed.log', archive.getnames())
+
+    def test_seed_code_remains_visible_when_complete_refuses_scratch(self):
+        logs = self.root / 'compatibility-matrix-logs'
+        logs.mkdir(mode=0o700)
+        with patch.dict(os.environ, {'GITHUB_RUN_ID': ''}):
+            with ((logs / 'seed.log').open('x') as log,
+                  redirect_stdout(log), redirect_stderr(log)):
+                self.assertEqual(transport.main(['seed']), 1)
+            captured = StringIO()
+            with redirect_stdout(captured), redirect_stderr(captured):
+                self.assertEqual(transport.main(['complete']), 1)
+        self.assertEqual(captured.getvalue().splitlines(), [
+            'COMPATIBILITY_MATRIX_SEED_REFUSAL=run-identity',
+            'COMPATIBILITY_MATRIX_TRANSPORT_PRIVATE_RETENTION_FAIL=complete',
+            'COMPATIBILITY_MATRIX_TRANSPORT_FAIL=complete',
+        ])
+        self.assertFalse(self.controls.exists())
+        self.assertFalse(self.install_work.exists())
+
+    def test_complete_denied_scratch_with_no_readable_seed_log(self):
+        for read_error in (None, PermissionError('private test path')):
+            with self.subTest(read_error=read_error):
+                captured = StringIO()
+                with (patch.dict(os.environ, {'GITHUB_RUN_ID': ''}),
+                      patch.object(transport, 'regular',
+                                   wraps=transport.regular,
+                                   side_effect=read_error),
+                      redirect_stdout(captured), redirect_stderr(captured)):
+                    self.assertEqual(transport.main(['complete']), 1)
+                self.assertEqual(captured.getvalue().splitlines(), [
+                    'COMPATIBILITY_MATRIX_TRANSPORT_PRIVATE_RETENTION_FAIL=complete',
+                    'COMPATIBILITY_MATRIX_TRANSPORT_FAIL=complete',
+                ])
+        self.assertFalse(self.controls.exists())
+        self.assertFalse(self.install_work.exists())
+
+    def test_seed_clock_http_reason_is_finite(self):
+        for status, reason in ((403, 'clock-http-403'), (429, 'clock-http-429'),
+                               (404, 'clock-http-other')):
+            with self.subTest(status=status):
+                error = HTTPError('https://example.invalid/', status,
+                                  'untrusted message', {}, None)
+                self.assertEqual(transport._seed_failure_reason(error), reason)
 
     def test_outer_clock_uses_actual_job_start_and_conservative_latency(self):
         job = {'id': 456, 'run_id': 123, 'head_sha': self.commit,

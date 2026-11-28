@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 import traceback
+import urllib.error
 import urllib.request
 from unittest.mock import patch
 
@@ -83,6 +84,126 @@ FINALIZER_EVIDENCE = frozenset({
 })
 NATIVE07_RELATIVE = Path('entries/native-07')
 NATIVE07_TRANSPORT_MARKER = 'COMPATIBILITY_NATIVE07_TRANSPORT_'
+MATRIX_TRANSPORT_MARKER = 'COMPATIBILITY_MATRIX_TRANSPORT_'
+SEED_LOG_MEMBER = 'logs/seed.log'
+SEED_REFUSAL_MARKER = 'COMPATIBILITY_MATRIX_SEED_REFUSAL='
+_SEED_RETENTION_MARKER = 'COMPATIBILITY_MATRIX_SEED_PRIVATE_RETENTION_FAIL'
+_SEED_FAILURE_MARKER = MATRIX_TRANSPORT_MARKER + 'FAIL=seed'
+_SEED_CHECK_REASONS = {
+    'Non-root assertions required': 'assertions-required',
+    'Hosted first-attempt readiness required': 'hosted-context',
+    'Run identity absent': 'run-identity',
+    'Runner scratch differs': 'runner-scratch',
+    'Private scratch differs': 'private-scratch',
+    'Source commit absent': 'source-commit',
+    'Regular unlinked absolute input required': 'input-file',
+    'Foreign evidence owner': 'input-owner',
+    'Symbolic links are not assessment inputs': 'input-file',
+    'Assessment input is not a regular file': 'input-file',
+    'Duplicate JSON field': 'duplicate-json-field',
+    'Nonfinite JSON value': 'nonfinite-json-value',
+    'Oversized dispatch event': 'event-size',
+    'Public repository required': 'repository',
+    'Exact dispatch inputs required': 'dispatch-fields',
+    'Qualification dispatch required': 'dispatch-workload',
+    'Exact review envelope string required': 'review-envelope',
+    'Exact review envelope fields required': 'review-envelope',
+    'Prerequisite string bound differs': 'prerequisite-size',
+    'Prerequisite object required': 'prerequisite-shape',
+    'Frozen public capsule changed': 'capsule-identity',
+    'Exact matrix control fields required': 'control-fields',
+    'Unknown compatibility execution scope': 'control-scope',
+    'Matrix authority or limits differ': 'control-authority',
+    'Hosted first-attempt matrix required': 'hosted-context',
+    'Debug logging refused': 'debug-logging',
+    'Dispatched matrix source differs': 'source-commit',
+    'Complete matrix source review required': 'source-review',
+    'Reviewed matrix source changed': 'source-review',
+    'Canonical contract changed': 'canonical-contract',
+    'Exact matrix prerequisite binding required': 'prerequisite-binding',
+    'Matrix prerequisite changed': 'prerequisite-binding',
+    'Matrix review incomplete': 'review-incomplete',
+    'Matrix preservation incomplete': 'preservation-incomplete',
+    'Actual reviewed runtime and bridge readiness missing': 'readiness-runtime',
+    'Readiness source differs from matrix prerequisites': 'readiness-source',
+    'Matrix prerequisite failed': 'prerequisite-failed',
+    'Matrix review or recovery is for other source': 'prerequisite-source',
+    'Public clock redirect refused': 'clock-redirect',
+    'Fresh public clock response required': 'clock-freshness',
+    'Public clock response too large': 'clock-response-size',
+    'Complete bounded job list required': 'clock-job-list',
+    'Unique current matrix job required': 'clock-job-list',
+    'Current public job identity differs': 'clock-job-identity',
+    'Job start timestamp differs': 'clock-job-start',
+    'Public server clock absent': 'clock-server-date',
+    'Finite clock observations required': 'clock-observations',
+    'Public and host clocks disagree': 'clock-disagreement',
+    'Outer job budget exhausted': 'clock-budget',
+}
+_SEED_EXCEPTION_REASONS = (
+    (UnicodeDecodeError, 'invalid-utf8'),
+    (json.JSONDecodeError, 'invalid-json'),
+    (TimeoutError, 'timeout'),
+    (urllib.error.URLError, 'clock-request'),
+    (FileExistsError, 'scratch-conflict'),
+    (OSError, 'io-error'),
+    (KeyError, 'missing-field'),
+    (TypeError, 'input-type'),
+    (AttributeError, 'input-type'),
+    (ValueError, 'validation-refused'),
+)
+_SEED_HTTP_REASONS = {403: 'clock-http-403', 429: 'clock-http-429'}
+_SEED_HTTP_OTHER = 'clock-http-other'
+_SEED_OTHER = 'unexpected-error'
+
+
+def _seed_failure_log(reason, retained):
+    lines = [SEED_REFUSAL_MARKER + reason]
+    if not retained:
+        lines.append(_SEED_RETENTION_MARKER)
+    lines.append(_SEED_FAILURE_MARKER)
+    return ('\n'.join(lines) + '\n').encode('ascii')
+
+
+_SEED_FAILURE_LOGS = frozenset(
+    _seed_failure_log(reason, retained)
+    for reason in (*_SEED_CHECK_REASONS.values(),
+                   *(reason for _, reason in _SEED_EXCEPTION_REASONS),
+                   *_SEED_HTTP_REASONS.values(), _SEED_HTTP_OTHER, _SEED_OTHER)
+    for retained in (True, False)
+)
+_MAX_SEED_FAILURE_LOG = max(map(len, _SEED_FAILURE_LOGS))
+
+
+def _seed_failure_reason(error):
+    if type(error) is urllib.error.HTTPError:
+        code = error.code
+        if type(code) is int:
+            return _SEED_HTTP_REASONS.get(code, _SEED_HTTP_OTHER)
+        return _SEED_HTTP_OTHER
+    if (type(error) is ValueError and len(error.args) == 1
+            and type(error.args[0]) is str):
+        return _SEED_CHECK_REASONS.get(error.args[0], 'validation-refused')
+    for kind, reason in _SEED_EXCEPTION_REASONS:
+        if isinstance(error, kind):
+            return reason
+    return _SEED_OTHER
+
+
+def _safe_seed_failure_log(root):
+    """Read only an exact finite refusal from the existing seed log."""
+    path = root / (PREFIX + '-logs') / 'seed.log'
+    try:
+        with regular(path).open('rb') as stream:
+            raw = stream.read(_MAX_SEED_FAILURE_LOG + 1)
+    except (OSError, ValueError):
+        return None
+    return raw if raw in _SEED_FAILURE_LOGS else None
+
+
+def _seed_failure_from_environment():
+    # Log readback does not grant admission if scratch validation refuses.
+    return _safe_seed_failure_log(Path(os.environ.get('RUNNER_TEMP', '')))
 
 
 def scratch():
@@ -112,6 +233,14 @@ def retain_failure(stage):
     private_directory(parent)
     with (parent / (stage + '.txt')).open('x', encoding='utf-8') as stream:
         stream.write(traceback.format_exc())
+
+
+def _try_retain_failure(stage):
+    try:
+        retain_failure(stage)
+    except Exception:
+        return False
+    return True
 
 
 def _capsule_hashes():
@@ -460,10 +589,12 @@ def _is_native07(controls):
 
 
 def _transport_marker():
+    if _seed_failure_from_environment() is not None:
+        return MATRIX_TRANSPORT_MARKER
     controls = paths()[1]
     if (controls / 'seed.json').exists() and _is_native07(controls):
         return NATIVE07_TRANSPORT_MARKER
-    return 'COMPATIBILITY_MATRIX_TRANSPORT_'
+    return MATRIX_TRANSPORT_MARKER
 
 
 def _native07_scope_isolated(work):
@@ -738,7 +869,10 @@ def archive():
     finalization = root / (PREFIX + '-finalization.json')
     summary = strict_json(regular(finalization).read_bytes())
     contents = {'transport/finalization.json': public_bytes(finalization)}
-    admitted = (controls / 'seed.json').exists()
+    seed_failure = _safe_seed_failure_log(root)
+    if seed_failure is not None:
+        contents[SEED_LOG_MEMBER] = seed_failure
+    admitted = seed_failure is None and (controls / 'seed.json').exists()
     native07 = admitted and _is_native07(seeded())
     isolated = not native07 or _native07_scope_isolated(work)
     if admitted:
@@ -902,7 +1036,10 @@ def publish():
     record = root / (PREFIX + '-archive.json')
     if record.exists():
         contents['transport/archive.json'] = public_bytes(record)
-    if (root / (PREFIX + '-control/seed.json')).exists():
+    seed_failure = _safe_seed_failure_log(root)
+    if seed_failure is not None:
+        contents[SEED_LOG_MEMBER] = seed_failure
+    elif (root / (PREFIX + '-control/seed.json')).exists():
         seeded()
         _add_existing(contents, root / (PREFIX + '-logs'),
                       ('archive.log',), 'logs/')
@@ -913,13 +1050,17 @@ def publish():
 
 
 def complete():
+    seed_failure = _seed_failure_from_environment()
+    if seed_failure is not None:
+        print(seed_failure.splitlines()[0].decode('ascii'), flush=True)
     root = scratch()
     final = _readback(root, 'final')
     publication = strict_json(regular(
         root / (PREFIX + '-publication.json')).read_bytes())
     archive_record = strict_json(regular(
         root / (PREFIX + '-archive.json')).read_bytes())
-    status = ('PASS' if publication['status'] == archive_record['status'] == 'PASS'
+    status = ('PASS' if seed_failure is None
+              and publication['status'] == archive_record['status'] == 'PASS'
               else 'FAIL')
     write(root / (PREFIX + '-completion.json'), {
         'status': status, 'final_readback': final,
@@ -930,15 +1071,37 @@ def complete():
     return status
 
 
+def _seed_command():
+    try:
+        seed()
+    except Exception as error:
+        reason = _seed_failure_reason(error)
+        raw = _seed_failure_log(reason, _try_retain_failure('seed'))
+        print(raw.decode('ascii'), end='', flush=True)
+        return 1
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=STAGES)
     arguments = parser.parse_args(argv)
+    if arguments.stage == 'seed':
+        return _seed_command()
     try:
         result = globals()[arguments.stage]()
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
-        retain_failure(arguments.stage)
-        print(_transport_marker() + 'FAIL=' + arguments.stage)
+        if arguments.stage == 'complete':
+            if not _try_retain_failure('complete'):
+                print(MATRIX_TRANSPORT_MARKER + 'PRIVATE_RETENTION_FAIL=complete')
+            try:
+                marker = _transport_marker()
+            except Exception:
+                marker = MATRIX_TRANSPORT_MARKER
+        else:
+            retain_failure(arguments.stage)
+            marker = _transport_marker()
+        print(marker + 'FAIL=' + arguments.stage)
         return 1
     if arguments.stage in ('run', 'seal', 'complete'):
         print(_transport_marker() + str(result))
