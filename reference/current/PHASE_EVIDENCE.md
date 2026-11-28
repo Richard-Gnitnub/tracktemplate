@@ -5515,3 +5515,24 @@ The project owner gave this instruction.
 The `2/2` result for the previous repairs stays the same.
 The limits stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)
 The evidence from the host matrix and the independent preservation records are in `tmp/runtime-compatibility-qualification/matrix-qualification-a68b9aa/`.
+
+## Hosted check for `native-07` — 2026-11-28
+
+The project owner gave this instruction.
+
+> I authorise one hosted check limited to Native 07 once existing checks pass. Keep existing limits. Independently review and preserve the result. No retry or full matrix. Runtime admission and ZY stay blocked.
+
+The `native07-check` stage selects only `native-07` from the approved host matrix.
+It uses the same original test, approved base, runtime, and process limits.
+The time limit for this test is 900 seconds.
+The launcher records and refuses a second start of the same test.
+The stage uses the existing GitHub workflow and its cleanup and evidence checks.
+
+A `PASS` result needs one original entry record, the original success message, and one completion record.
+The stage preserves the applicable original evidence with the existing limits on output.
+Both copies from GitHub require checks of their size and SHA-256 values.
+The results require independent review and preservation.
+
+The previous host matrix result stays `FAIL`.
+The `2/2` result for the previous repairs stays the same.
+The review and preservation conditions stay the same. [D-P9-023](#runtime-compatibility-output-handling-panel)

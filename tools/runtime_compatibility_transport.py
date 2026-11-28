@@ -81,6 +81,8 @@ FINALIZER_EVIDENCE = frozenset({
     'clearance.json', 'deadline-clearance.json', 'emergency-cleanup.json',
     'finalization.json',
 })
+NATIVE07_RELATIVE = Path('entries/native-07')
+NATIVE07_TRANSPORT_MARKER = 'COMPATIBILITY_NATIVE07_TRANSPORT_'
 
 
 def scratch():
@@ -452,10 +454,100 @@ def run():
                              heavy_start_deadline=latest_start)['status']
 
 
+def _is_native07(controls):
+    control = strict_json(regular(controls / 'control.json').read_bytes())
+    return control['stage'] == matrix.NATIVE07_STAGE
+
+
+def _transport_marker():
+    controls = paths()[1]
+    if (controls / 'seed.json').exists() and _is_native07(controls):
+        return NATIVE07_TRANSPORT_MARKER
+    return 'COMPATIBILITY_MATRIX_TRANSPORT_'
+
+
+def _native07_scope_isolated(work):
+    entries = work / NATIVE07_RELATIVE.parent
+    if not entries.exists() and not entries.is_symlink():
+        return True
+    private_directory(entries)
+    return all(path.name == NATIVE07_RELATIVE.name
+               and path.is_dir() and not path.is_symlink()
+               for path in entries.iterdir())
+
+
+def _verify_native07(work, manifest):
+    """Recheck the sole original native result without a typed payload."""
+    require(_native07_scope_isolated(work), 'Other execution state present')
+    capsule = matrix.load_execution_capsule(ROOT / matrix.CAPSULE, ROOT)
+    entry, = matrix.selected_entries(capsule, matrix.NATIVE07_STAGE)
+    directory = work / NATIVE07_RELATIVE
+    private_directory(directory)
+    matrix._verify_native07_invocation(directory)
+    source, = [row['assessment'] for row in manifest['source_files']
+               if row['path'] == entry['path']]
+    rows = strict_json(public_bytes(work / 'evidence/matrix-entries.json'))
+    journal = public_bytes(work / 'evidence/entry-results.jsonl').splitlines()
+    assessment = strict_json(public_bytes(
+        work / 'evidence/matrix-assessment.json'))
+    require(type(rows) is list and len(rows) == len(journal) == 1
+            and rows[0] == strict_json(journal[0])
+            and rows[0]['id'] == entry['id'] and rows[0]['status'] == 'PASS'
+            and type(rows[0]['sessions']) is int and rows[0]['sessions'] == 1
+            and rows[0]['assessment_entry'] == source
+            and rows[0]['originals_directory'] == str(directory)
+            and assessment['stage'] == matrix.NATIVE07_STAGE
+            and assessment['status'] == 'PASS'
+            and type(assessment['completed_entries']) is int
+            and assessment['completed_entries'] == 1
+            and assessment['display_cleanup'] is True
+            and assessment['public_payload_status'] == 'NOT_SEALED'
+            and assessment['runtime_admission'] is False
+            and assessment['zy_execution'] is False,
+            'Native 07 original result differs')
+    invocation = strict_json(public_bytes(directory / 'invocation.json'))
+    tree = work / 'assessment'
+    require(invocation['id'] == entry['id']
+            and invocation['kind'] == 'native'
+            and invocation['arguments'] == entry['arguments']
+            and invocation['entry_path'] == str(tree / entry['path'])
+            and invocation['entry_sha256'] == source['sha256']
+            and invocation['assessment'] == str(tree)
+            and invocation['session_directory'] == str(directory),
+            'Native 07 original invocation differs')
+    for name in ('input-before.json', 'input-after.json'):
+        require(strict_json(public_bytes(directory / name))
+                == observations.BASE_IDENTITY,
+                'Native 07 approved base identity differs')
+    guard = directory / 'guard'
+    result = strict_json(public_bytes(guard / 'result.json'))
+    require(type(result['process_exit']) is int,
+            'Native 07 process exit differs')
+    for name in ('stdout', 'wrapper.stdout'):
+        stdout = public_bytes(guard / name).decode('utf-8')
+        witnesses = [strict_json(line[len(matrix.ENTRY_MARKER):])
+                     for line in stdout.splitlines()
+                     if line.startswith(matrix.ENTRY_MARKER)]
+        require(witnesses == [{
+            'id': entry['id'], 'sha256': source['sha256'], 'run_name': '__main__',
+        }], 'Native 07 actual main invocation differs')
+        matrix.validate_entry(entry, result, stdout)
+    stderr = public_bytes(guard / 'stderr').decode('utf-8').splitlines()
+    require(matrix.NATIVE07_REENTRY_REFUSAL not in stderr
+            and not any(line.startswith(
+                'TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION=') for line in stderr),
+            'Native 07 contains an original failure')
+    require(strict_json(public_bytes(directory / 'clearance.json'))
+            == {'complete': True}, 'Native 07 session clearance differs')
+
+
 def seal():
-    prerequisites()
+    controls = prerequisites()
     _, _, _, work = paths()
     manifest, _ = prepared_manifest()
+    if _is_native07(controls):
+        _verify_native07(work, manifest)
+        return 'PASS'
     receipt = observations.extract_matrix_payload(
         ROOT, work, manifest, work / 'public-matrix',
         runtime_observation=work / 'entries/straight-generation/runtime-observation.json')
@@ -589,14 +681,67 @@ def _payload(work):
     return contents, expected
 
 
+def _native07_missing(contents, outcomes):
+    """Require the existing operational records for the reached stages."""
+    required = {'transport/finalization.json', 'logs/seed.log',
+                'logs/finalize.log'}
+    required.update('prerequisites/' + name + '.json' for name in (
+        'control', 'review', 'recovery', 'readiness', 'seed', 'outer-budget'))
+    required.update('finalizer/' + name + '.json' for name in (
+        'installer', 'runtime', 'display'))
+    for key, stage in zip(OUTCOMES, ('prepare', 'install', 'acquire', 'run')):
+        if outcomes[key] != 'skipped':
+            required.add('logs/' + stage + '.log')
+    if outcomes['L1_PREPARE'] == 'success':
+        required.add('installation/matrix-install-preparation.json')
+    if outcomes['L1_INSTALL'] == 'success' or (
+            'installation/installer-intent.json' in contents):
+        required.update('installation/' + name for name in (
+            'installer-intent.json', 'installer-ownership.json',
+            'installer-result.json', 'installer-output.log', 'derivation.json'))
+    if outcomes['L1_ACQUIRE'] == 'success':
+        required.add('prerequisites/acquisition.json')
+        required.update('operational/' + name for name in (
+            'preparation.json', 'assessment-manifest.json',
+            'original-assessment-manifest.json'))
+    if (outcomes['L1_PREPARE'] == 'success'
+            and outcomes['L1_RUN'] != 'skipped'):
+        required.update(('logs/seal.log',
+                         'prerequisites/run-reservation.json'))
+    session = 'operational/' + NATIVE07_RELATIVE.as_posix() + '/'
+    if (outcomes['L1_RUN'] == 'success'
+            or session + 'guard/ownership.json' in contents):
+        required.update(session + name for name in (
+            'invocation.json', 'input-before.json', 'input-after.json',
+            'guard/control.json', 'guard/result.json', 'guard/ownership.json',
+            'guard/measurements.jsonl', 'guard/stdout', 'guard/stderr',
+            'guard/wrapper.stdout'))
+        finalizer = 'finalizer/' + NATIVE07_RELATIVE.as_posix() + '/'
+        required.add(finalizer + 'finalization.json')
+    if outcomes['L1_RUN'] == 'success':
+        required.update(session + name for name in (
+            'clearance.json', 'resource-assessment.json',
+            'guard/clearance.json', 'guard/deadline-clearance.json'))
+        required.update(finalizer + name for name in (
+            'clearance.json', 'deadline-clearance.json'))
+        required.update('operational/' + name for name in (
+            'attempt.json', 'heavy-deadline.json', 'entry-results.jsonl',
+            'matrix-entries.json', 'matrix-assessment.json', 'clearance.json',
+            'display-start-intent.json', 'display-ownership.json',
+            'display-kernel.json', 'display-samples.jsonl', 'host-memory.jsonl',
+            'display-cleanup.json', 'xvfb.log'))
+    return sorted(required - contents.keys())
+
+
 def archive():
     root, controls, install_work, work = paths()
     finalization = root / (PREFIX + '-finalization.json')
     summary = strict_json(regular(finalization).read_bytes())
     contents = {'transport/finalization.json': public_bytes(finalization)}
     admitted = (controls / 'seed.json').exists()
+    native07 = admitted and _is_native07(seeded())
+    isolated = not native07 or _native07_scope_isolated(work)
     if admitted:
-        seeded()
         _add_existing(contents, controls, (
             'control.json', 'review.json', 'recovery.json', 'readiness.json',
             'seed.json', 'acquisition.json', 'outer-budget.json',
@@ -625,7 +770,8 @@ def archive():
         for name, raw in transport._inventory(
                 work / 'evidence', MATRIX_EVIDENCE).items():
             contents['operational/' + name] = raw
-        for relative in session_paths():
+        paths_to_preserve = (NATIVE07_RELATIVE,) if native07 else session_paths()
+        for relative in paths_to_preserve:
             directory = work / relative
             prefix = 'operational/' + relative.as_posix() + '/'
             _add_existing(contents, directory, SESSION_EVIDENCE, prefix)
@@ -649,10 +795,11 @@ def archive():
             for name, raw in transport._inventory(
                     finalizer, FINALIZER_EVIDENCE).items():
                 contents['finalizer/' + relative.as_posix() + '/' + name] = raw
-        for group in matrix.SERIES:
-            _add_existing(contents, work / 'entries' / group,
-                ('series.stdout', 'series.stderr', 'sessions.json'),
-                'operational/entries/' + group + '/')
+        if not native07:
+            for group in matrix.SERIES:
+                _add_existing(contents, work / 'entries' / group,
+                    ('series.stdout', 'series.stderr', 'sessions.json'),
+                    'operational/entries/' + group + '/')
         _add_existing(contents, root / (PREFIX + '-finalizer'),
                       ('installer.json', 'runtime.json', 'display.json'), 'finalizer/')
         logs = transport._inventory(root / (PREFIX + '-logs'),
@@ -662,7 +809,7 @@ def archive():
                 contents['logs/' + name + '.log'] = logs[name + '.log']
         for name, raw in _original_failures(root).items():
             contents['original-diagnostics/' + name] = raw
-    sealed = (work / 'public-matrix').exists()
+    sealed = not native07 and (work / 'public-matrix').exists()
     payload_status = 'FAIL'
     if sealed:
         require(admitted, 'Unadmitted matrix payload')
@@ -673,6 +820,29 @@ def archive():
               and summary['cleanup'] is True
               and all(summary['workflow_outcomes'][key] == 'success'
                       for key in OUTCOMES) else 'FAIL')
+    missing = []
+    if native07:
+        outcomes = summary['workflow_outcomes']
+        missing = _native07_missing(contents, outcomes)
+        if (not missing and isolated and summary['cleanup'] is True
+                and all(outcomes[key] == 'success' for key in OUTCOMES)
+                and summary['runtime'] is True
+                and strict_json(contents['finalizer/runtime.json']) == {
+                    'cleanup': True,
+                    'sessions': {NATIVE07_RELATIVE.as_posix(): True}}
+                and contents['logs/seal.log']
+                == (NATIVE07_TRANSPORT_MARKER + 'PASS\n').encode()
+                and not (work / 'public-matrix').exists()
+                and not (work / 'public-matrix').is_symlink()):
+            try:
+                manifest_bytes = contents['operational/assessment-manifest.json']
+                _verify_native07(work, strict_json(manifest_bytes))
+            except (OSError, ValueError, KeyError, TypeError):
+                retain_failure('archive')
+                contents['original-diagnostics/archive.txt'] = public_bytes(
+                    root / (PREFIX + '-private') / 'archive.txt')
+            else:
+                status = 'PASS'
     manifest = {
         'schema': 1, 'status': status, 'source_commit': os.environ['GITHUB_SHA'],
         'run_id': int(os.environ['GITHUB_RUN_ID']), 'retention_days': 30,
@@ -684,6 +854,12 @@ def archive():
                          'sha256': hashlib.sha256(raw).hexdigest()}
                   for name, raw in contents.items()},
     }
+    if native07:
+        manifest.update(
+            stage=matrix.NATIVE07_STAGE, scope_isolated=isolated,
+            matrix_execution=False, missing_mandatory_evidence=missing,
+            original_diagnostic_preservation_complete=not missing and isolated,
+        )
     contents['transport/manifest.json'] = json.dumps(
         manifest, indent=2, sort_keys=True).encode() + b'\n'
     identity = transport._tar(root / (PREFIX + '-primary.tar'), contents)
@@ -762,10 +938,10 @@ def main(argv=None):
         result = globals()[arguments.stage]()
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
         retain_failure(arguments.stage)
-        print('COMPATIBILITY_MATRIX_TRANSPORT_FAIL=' + arguments.stage)
+        print(_transport_marker() + 'FAIL=' + arguments.stage)
         return 1
     if arguments.stage in ('run', 'seal', 'complete'):
-        print('COMPATIBILITY_MATRIX_TRANSPORT_' + str(result))
+        print(_transport_marker() + str(result))
         return 0 if result == 'PASS' else 1
     if arguments.stage == 'install':
         return result

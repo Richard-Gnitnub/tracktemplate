@@ -130,6 +130,14 @@ SERIES = {
 ENTRY_MARKER = 'TRACKTEMPLATE_MATRIX_ENTRY='
 DONE_MARKER = 'TRACKTEMPLATE_MATRIX_ENTRY_COMPLETE'
 SENTINEL = 'TRACKTEMPLATE_RUNTIME_COMPATIBILITY_MATRIX_PASS'
+NATIVE07_STAGE = 'native07-check'
+NATIVE07_SENTINEL = 'TRACKTEMPLATE_RUNTIME_COMPATIBILITY_NATIVE07_PASS'
+NATIVE07_REENTRY_REFUSAL = 'TRACKTEMPLATE_NATIVE07_REENTRY_REFUSED'
+NATIVE07_OWNER_STATEMENT_SHA256 = (
+    'd80482f57decf1b79aba2eee87d84295c6a9a7f4e500714ac7f873833915c60a'
+)
+_NATIVE07_INVOCATION_CLAIM = 'native07-invocation-claim'
+_NATIVE07_REFUSAL_WITNESS = 'native07-reentry-refused'
 
 
 def require(condition, message):
@@ -178,6 +186,22 @@ def load_execution_capsule(path, source_root):
 def entries(capsule):
     return [capsule['generation'], *capsule['native_entries'],
             *capsule['gui_entries']]
+
+
+def selected_entries(capsule, stage):
+    """Select the exact execution scope of the reviewed control."""
+    if stage == 'qualification':
+        return tuple(entries(capsule))
+    require(stage == NATIVE07_STAGE, 'Unknown compatibility execution scope')
+    rows = tuple(row for row in entries(capsule) if row['id'] == 'native-07')
+    require(len(rows) == 1, 'Native 07 row missing or repeated')
+    entry = rows[0]
+    require(entry['kind'] == 'native'
+            and entry['path'] == 'tests/freecad_validate_phase3_transition_slice.py'
+            and entry['arguments'] == [] and entry['sessions'] == 1
+            and entry['timeout_seconds'] == 900,
+            'Native 07 execution scope differs')
+    return rows
 
 
 def adapt_series(manifest, tree):
@@ -622,11 +646,18 @@ def verify_readiness_sources(receipt, pins, source_root):
 
 def validate_control(control, receipts, environment, source_root):
     """Require exact reviewed sources, recovery and actual hosted readiness."""
+    require(type(control) is dict, 'Exact matrix control fields required')
+    stage = control.get('stage')
+    require(stage in ('qualification', NATIVE07_STAGE),
+            'Unknown compatibility execution scope')
+    owner_statement_sha256 = (
+        NATIVE07_OWNER_STATEMENT_SHA256 if stage == NATIVE07_STAGE else
+        'd193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a'
+    )
     fixed = {
-        'schema_version': 1, 'stage': 'qualification',
+        'schema_version': 1, 'stage': stage,
         'owner_decision': 'D-P9-024',
-        'owner_statement_sha256':
-        'd193c34674fa4eb09de4ccaad6a6ddfbf1a930fdd50f369652f33204e2daa19a',
+        'owner_statement_sha256': owner_statement_sha256,
         'output_scope_sha256': readiness.SCOPE_SHA256,
         'app_commit': readiness.APP_COMMIT,
         'runtime_commit': readiness.RUNTIME_COMMIT,
@@ -638,7 +669,7 @@ def validate_control(control, receipts, environment, source_root):
         'parallel': False, 'retry': False, 'runtime_admission': False,
         'zy_execution': False,
     }
-    require(type(control) is dict and set(control) == set(fixed) | {
+    require(set(control) == set(fixed) | {
         'source_commit', 'source_files', 'review', 'recovery', 'readiness'},
         'Exact matrix control fields required')
     require(all(type(control[k]) is type(v) and control[k] == v
@@ -682,7 +713,7 @@ def validate_control(control, receipts, environment, source_root):
                 'independent', 'stage', 'output_scope_sha256'},
                 'Exact matrix review required')
             require(receipt['independent'] is True
-                    and receipt['stage'] == 'qualification'
+                    and receipt['stage'] == stage
                     and receipt['output_scope_sha256'] == readiness.SCOPE_SHA256,
                     'Matrix review incomplete')
         elif key == 'recovery':
@@ -762,8 +793,29 @@ NATIVE07_B15_FAILURE = '''except Exception as error:
 '''
 
 
-def _native_source(config):
+_NATIVE07_INVOKE_ONCE = f'''def _claim_native07_invocation(name):
+    path = os.path.join(config["session_directory"], name)
+    os.close(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600))
+
+
+try:
+    _claim_native07_invocation({_NATIVE07_INVOCATION_CLAIM!r})
+except FileExistsError:
+    try:
+        _claim_native07_invocation({_NATIVE07_REFUSAL_WITNESS!r})
+    except FileExistsError:
+        pass
+    finally:
+        print({NATIVE07_REENTRY_REFUSAL!r}, file=sys.stderr, flush=True)
+    raise SystemExit(1)
+'''
+
+
+def _native_source(config, *, native07_once=False):
     """Use the original script's real main invocation, including unittest."""
+    require(not native07_once or config['id'] == 'native-07',
+            'Native 07 one-shot wrapper requires the fixed entry')
+    claim = _NATIVE07_INVOKE_ONCE if native07_once else ''
     failure = NATIVE07_B15_FAILURE if config['id'] == 'native-07' else ''
     return (
         'import hashlib, json, os, runpy, sys\n'
@@ -775,6 +827,7 @@ def _native_source(config):
         'sys.path.insert(0, config["assessment"])\n'
         'os.environ.update(config["fixture_environment"])\n'
         'sys.argv = [path, *config["arguments"]]\n'
+        f'{claim}'
         f'print({ENTRY_MARKER!r} + json.dumps({{"id":config["id"], '
         '"sha256":config["entry_sha256"], "run_name":"__main__"}), '
         'flush=True)\n'
@@ -786,6 +839,13 @@ def _native_source(config):
         f'{failure}'
         f'print({DONE_MARKER!r}, flush=True)\n'
     )
+
+
+def _verify_native07_invocation(directory):
+    require(not os.path.lexists(directory / _NATIVE07_REFUSAL_WITNESS),
+            'Native 07 wrapper re-entry refused')
+    marker = readiness.regular(directory / _NATIVE07_INVOCATION_CLAIM)
+    require(marker.stat().st_size == 0, 'Native 07 invocation claim differs')
 
 
 def gui_entry(config, launcher_name):
@@ -897,7 +957,7 @@ class MatrixRunner:
     """Fixed original entries, serial fresh sessions and original receipts."""
 
     def __init__(self, work, manifest, bridge_root, lease, context, deadline,
-                 watchdog=None):
+                 watchdog=None, *, native07_once=False):
         self.work = Path(work)
         self.tree = self.work / 'assessment'
         self.manifest = manifest
@@ -908,8 +968,11 @@ class MatrixRunner:
         self.session_count = 0
         self.group_deadline = deadline.expires
         self.watchdog = watchdog
+        self.native07_once = native07_once
 
     def _session(self, entry, arguments, directory):
+        require(not self.native07_once or entry['id'] == 'native-07',
+                'Unexpected entry in Native 07 check')
         self.deadline.remaining()
         verify_source_members(self.tree, self.manifest)
         directory.mkdir(mode=0o700, parents=True)
@@ -940,7 +1003,8 @@ class MatrixRunner:
         clean = readiness.child_environment(self.work)
         if entry['kind'] == 'native':
             macro = directory / 'entry.py'
-            macro.write_text(_native_source(config))
+            macro.write_text(_native_source(
+                config, native07_once=self.native07_once))
             argv = ['flatpak', 'run', '--command=FreeCADCmd']
             argv += [f'--env={name}={value}' for name, value in clean.items()
                      if name not in ('PATH', 'HOME', 'USER', 'LOGNAME', 'LANG',
@@ -974,6 +1038,8 @@ class MatrixRunner:
             directory / 'guard/measurements.jsonl').read_text().splitlines()]
         resources = assess_session_resources(result, samples, seconds, clearance)
         write(directory / 'resource-assessment.json', resources)
+        if self.native07_once:
+            _verify_native07_invocation(directory)
         guard_stdout = (directory / 'guard/stdout').read_text()
         stdout = ((directory / 'client.stdout').read_text()
                   if entry['kind'] == 'gui-client' else guard_stdout)
@@ -1126,13 +1192,13 @@ class MatrixRunner:
 
 
 def execute_entries(capsule, runner, deadline, evidence, *,
-                    clock=time.monotonic):
+                    stage='qualification', clock=time.monotonic):
     """Stop at first failure; preserve exact failures and every not-run row.
 
     The runner boundary is injectable for offline tests. Production always
     constructs MatrixRunner; no command or arbitrary runner comes from JSON.
     """
-    rows = entries(capsule)
+    rows = selected_entries(capsule, stage)
     results = [{'id': row['id'], 'status': 'NOT_RUN'} for row in rows]
     evidence = Path(evidence)
     with (evidence / 'entry-results.jsonl').open('x') as journal:
@@ -1161,7 +1227,7 @@ def execute_entries(capsule, runner, deadline, evidence, *,
 
 def run_matrix(work, expected, control_path, receipts, bridge_root, *,
                heavy_start_deadline):
-    """Execute one authorised, reviewed attempt; never resume its deadline."""
+    """Execute the reviewed scope under one non-renewable deadline."""
     entered = time.monotonic()
     require(type(heavy_start_deadline) in (int, float)
             and math.isfinite(heavy_start_deadline)
@@ -1175,6 +1241,8 @@ def run_matrix(work, expected, control_path, receipts, bridge_root, *,
             'Matrix scratch must be runner owned')
     control = json.loads(readiness.regular(control_path).read_text())
     validate_control(control, receipts, os.environ, ROOT)
+    stage = control['stage']
+    native07 = stage == NATIVE07_STAGE
     require(pilot._command('git', 'rev-parse', 'HEAD')
             == control['source_commit']
             and not pilot._command('git', 'status', '--porcelain',
@@ -1197,11 +1265,14 @@ def run_matrix(work, expected, control_path, receipts, bridge_root, *,
         'preparation': identity(work / 'preparation.json'),
         'heavy_start_deadline': heavy_start_deadline,
         'runtime_admission': False, 'zy_execution': False,
+        **({'stage': stage} if native07 else {}),
     })
     bridge.install_driver_token(bridge_root, work / 'assessment')
     capsule = load_execution_capsule(ROOT / CAPSULE, ROOT)
     outcome = {'status': 'FAIL', 'runtime_admission': False,
                'zy_execution': False, 'public_payload_status': 'NOT_SEALED'}
+    if native07:
+        outcome['stage'] = stage
     display_samples, host_samples = [], []
     ownership = ExitStack()
     deadline = None
@@ -1244,31 +1315,37 @@ def run_matrix(work, expected, control_path, receipts, bridge_root, *,
 
         observe()
         require(time.monotonic() < heavy_start_deadline,
-                'Heavy-start reservation exhausted before generation')
-        # Established once, before generation. Session starts and all
+                ('Heavy-start reservation exhausted before Native 07'
+                 if native07 else
+                 'Heavy-start reservation exhausted before generation'))
+        # Established once, before the first entry. Session starts and all
         # between-entry checks consume this same immutable interval.
         deadline = Deadline.start()
         write(evidence / 'heavy-deadline.json', vars(deadline))
         watchdog = ownership.enter_context(ControllerWatchdog(deadline))
         runner = MatrixRunner(work, manifest, bridge_root, lease,
                               guard.GuardContext(sleep=sleep), deadline,
-                              watchdog)
-        results = execute_entries(capsule, runner, deadline, evidence)
+                              watchdog, native07_once=native07)
+        results = execute_entries(capsule, runner, deadline, evidence,
+                                  stage=stage)
         deadline.remaining()
         observe()
-        require(len(results) == 80
+        expected_entries, expected_sessions = (1, 1) if native07 else (80, 84)
+        require(len(results) == expected_entries
                 and all(row['status'] == 'PASS' for row in results)
-                and runner.session_count == 84,
-                'Qualification matrix incomplete')
+                and runner.session_count == expected_sessions,
+                ('Native 07 check incomplete' if native07
+                 else 'Qualification matrix incomplete'))
         verify_source_members(work / 'assessment', manifest)
         require(identity(ROOT / assessment.CANONICAL_PATH)['sha256']
                 == assessment.CANONICAL_SHA256, 'Canonical contract changed')
         outcome['status'] = 'PASS'
-        outcome['straight_receipt'] = {
-            'path': str(runner.straight_receipt),
-            **identity(runner.straight_receipt)}
-        outcome['b4_receipt'] = {
-            'path': str(runner.b4_receipt), **identity(runner.b4_receipt)}
+        if not native07:
+            outcome['straight_receipt'] = {
+                'path': str(runner.straight_receipt),
+                **identity(runner.straight_receipt)}
+            outcome['b4_receipt'] = {
+                'path': str(runner.b4_receipt), **identity(runner.b4_receipt)}
     except BaseException:
         with (evidence / 'controller-failure.txt').open('x') as stream:
             traceback.print_exc(file=stream)
@@ -1301,7 +1378,7 @@ def run_matrix(work, expected, control_path, receipts, bridge_root, *,
             row['status'] == 'PASS' for row in results)
         write(evidence / 'matrix-assessment.json', outcome)
     if outcome['status'] == 'PASS':
-        print(SENTINEL)
+        print(NATIVE07_SENTINEL if native07 else SENTINEL)
     return outcome
 
 

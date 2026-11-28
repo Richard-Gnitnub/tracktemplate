@@ -125,7 +125,8 @@ class MatrixTests(unittest.TestCase):
 
     def test_display_delay_cannot_start_heavy_work_or_skip_cleanup(self):
         control = self.work / 'control.json'
-        control.write_text(json.dumps({'source_commit': 'a' * 40}))
+        control.write_text(json.dumps({'source_commit': 'a' * 40,
+                                       'stage': 'qualification'}))
         (self.work / 'preparation.json').write_text('{}')
         clock = [100]
 
@@ -174,6 +175,138 @@ class MatrixTests(unittest.TestCase):
         self.assertIn('Heavy-start reservation exhausted before generation',
                       (self.work / 'evidence/controller-failure.txt').read_text())
         self.assertFalse((self.work / 'evidence/heavy-deadline.json').exists())
+
+    def test_native07_selects_exact_capsule_row(self):
+        stage = matrix.NATIVE07_STAGE
+        rows = matrix.selected_entries(self.capsule, stage)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['id'], 'native-07')
+        self.assertEqual(rows[0]['timeout_seconds'], 900)
+        self.assertEqual(rows[0]['arguments'], [])
+        self.assertEqual(matrix.selected_entries(self.capsule, 'qualification'),
+                         tuple(matrix.entries(self.capsule)))
+        with self.assertRaisesRegex(ValueError, 'Unknown.*execution scope'):
+            matrix.selected_entries(self.capsule, 'native-08')
+        duplicate = dict(self.capsule,
+                         native_entries=[*self.capsule['native_entries'],
+                                         rows[0]])
+        with self.assertRaisesRegex(ValueError, 'row missing or repeated'):
+            matrix.selected_entries(duplicate, stage)
+
+    def test_native07_controller_runs_only_native07_on_pass_and_failure(self):
+        for passes in (True, False):
+            with self.subTest(passes=passes):
+                work = self.work / str(passes)
+                work.mkdir()
+                control = work / 'control.json'
+                control.write_text(json.dumps({
+                    'source_commit': 'a' * 40, 'stage': matrix.NATIVE07_STAGE,
+                }))
+                (work / 'preparation.json').write_text('{}')
+                calls = []
+
+                class Runner:
+                    def __init__(self, *_arguments, native07_once):
+                        if not native07_once:
+                            raise AssertionError('Native 07 gate not supplied')
+                        self.session_count = 0
+
+                    def run_entry(self, entry):
+                        calls.append(entry['id'])
+                        if not passes:
+                            raise ValueError('Offline native failure')
+                        self.session_count = 1
+                        return {'id': entry['id'], 'status': 'PASS',
+                                'sessions': self.session_count}
+
+                stdout = io.StringIO()
+                with ExitStack() as mocks:
+                    mocks.enter_context(redirect_stdout(stdout))
+                    mocks.enter_context(patch.dict(matrix.os.environ, {
+                        'RUNNER_TEMP': str(self.work),
+                        'XDG_RUNTIME_DIR': str(self.work),
+                    }))
+                    for owner, name, value in (
+                        (matrix, 'validate_control', {}),
+                        (matrix, 'verify_preparation', {}),
+                        (matrix, 'verify_source_members', None),
+                        (matrix.bridge, 'verify_bridge', None),
+                        (matrix.readiness, 'candidate_deployment', None),
+                        (matrix.bridge, 'install_driver_token', None),
+                        (matrix.pilot, '_memory',
+                         {'MemAvailable': 20000 * 1024**2}),
+                        (matrix.pilot, '_clearance', True),
+                        (matrix.gui, 'start_display', {}),
+                        (matrix.gui, '_display_group', work),
+                        (matrix.gui, 'assess_display', None),
+                        (matrix.gui, 'display_cleanup', {'cleanup': True}),
+                        (matrix.guard, '_sample', {}),
+                        (matrix.guard, 'acquire_validation_lease',
+                         nullcontext(None)),
+                    ):
+                        mocks.enter_context(patch.object(owner, name,
+                                                          return_value=value))
+                    mocks.enter_context(patch.object(matrix.pilot, '_command',
+                                                      side_effect=['a' * 40,
+                                                                   '']))
+                    mocks.enter_context(patch.object(matrix, 'MatrixRunner',
+                                                      Runner))
+                    expected = 'PASS' if passes else 'FAIL'
+                    outcome = matrix.run_matrix(
+                        work, {}, control, work, work,
+                        heavy_start_deadline=time.monotonic() + 60,
+                    )
+                self.assertEqual(calls, ['native-07'])
+                self.assertEqual(outcome['status'], expected)
+                self.assertEqual(outcome['stage'], matrix.NATIVE07_STAGE)
+                self.assertEqual(outcome['completed_entries'], int(passes))
+                self.assertNotIn('straight_receipt', outcome)
+                self.assertNotIn('b4_receipt', outcome)
+                attempt = work / 'evidence/attempt.json'
+                self.assertEqual(json.loads(attempt.read_bytes())['stage'],
+                                 matrix.NATIVE07_STAGE)
+                journal = work / 'evidence/entry-results.jsonl'
+                self.assertEqual(
+                    [(row['id'], row['status']) for row in (
+                        json.loads(line) for line in journal.read_text().splitlines()
+                    )],
+                    [('native-07', expected)],
+                )
+                self.assertEqual(stdout.getvalue().splitlines(),
+                                 [matrix.NATIVE07_SENTINEL] if passes else [])
+
+    def test_native07_one_shot_refuses_wrapper_reentry(self):
+        source = self.work / 'proof.py'
+        source.write_text('raise AssertionError("Uninjected proof ran")\n')
+        config = {'id': 'native-07', 'entry_path': str(source),
+                  'entry_sha256': matrix.identity(source)['sha256'],
+                  'assessment': str(self.work), 'arguments': [],
+                  'fixture_environment': {},
+                  'session_directory': str(self.work)}
+        wrapper = compile(matrix._native_source(config, native07_once=True),
+                          '<native-wrapper>', 'exec')
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with (patch.object(sys, 'path', sys.path.copy()),
+              patch.object(sys, 'argv', sys.argv.copy()),
+              patch.object(matrix.runpy, 'run_path') as run_original,
+              redirect_stdout(stdout), redirect_stderr(stderr),
+              warnings.catch_warnings()):
+            warnings.simplefilter('ignore', ResourceWarning)
+            exec(wrapper, {})
+            matrix._verify_native07_invocation(self.work)
+            with self.assertRaises(SystemExit) as refused:
+                exec(wrapper, {})
+        self.assertEqual(refused.exception.code, 1)
+        run_original.assert_called_once_with(str(source), run_name='__main__')
+        self.assertEqual(sum(line.startswith(matrix.ENTRY_MARKER)
+                             for line in stdout.getvalue().splitlines()), 1)
+        self.assertEqual(stderr.getvalue().splitlines(),
+                         [matrix.NATIVE07_REENTRY_REFUSAL])
+        with self.assertRaisesRegex(ValueError, 'wrapper re-entry refused'):
+            matrix._verify_native07_invocation(self.work)
+        ordinary = matrix._native_source(config)
+        self.assertNotIn(matrix.NATIVE07_REENTRY_REFUSAL, ordinary)
+        self.assertNotIn(matrix._NATIVE07_INVOCATION_CLAIM, ordinary)
 
     def test_complete_serial_schedule_keeps_exact_order(self):
         calls = []
@@ -807,6 +940,25 @@ class MatrixTests(unittest.TestCase):
             control[name] = {'path': path.name,
                              'sha256': matrix.identity(path)['sha256']}
         matrix.validate_control(control, receipts, env, source_root)
+        native07 = dict(control, stage=matrix.NATIVE07_STAGE)
+        with self.assertRaisesRegex(ValueError, 'authority or limits'):
+            matrix.validate_control(native07, receipts, env, source_root)
+        native07['owner_statement_sha256'] = (
+            matrix.NATIVE07_OWNER_STATEMENT_SHA256
+        )
+        with self.assertRaisesRegex(ValueError, 'Matrix review incomplete'):
+            matrix.validate_control(native07, receipts, env, source_root)
+        path = receipts / 'review.json'
+        original = path.read_bytes()
+        path.write_text(json.dumps(dict(prerequisite['review'],
+                                        stage=matrix.NATIVE07_STAGE)))
+        native07['review'] = dict(control['review'],
+                                  sha256=matrix.identity(path)['sha256'])
+        matrix.validate_control(native07, receipts, env, source_root)
+        with self.assertRaisesRegex(ValueError, 'Matrix review incomplete'):
+            matrix.validate_control(dict(control, review=native07['review']),
+                                     receipts, env, source_root)
+        path.write_bytes(original)
         for key, wrong in (('heavy_seconds', 7201), ('parallel', True),
                            ('retry', True), ('runtime_admission', True),
                            ('zy_execution', True), ('heavy_seconds', 7200.0)):

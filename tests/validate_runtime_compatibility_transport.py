@@ -2,6 +2,7 @@
 """Offline tests for matrix admission, cleanup and exact artifact transport."""
 
 import copy
+from contextlib import redirect_stdout
 from datetime import datetime, timezone
 import importlib.util
 import json
@@ -166,6 +167,195 @@ class TransportTests(unittest.TestCase):
         prefix = 'L1_PRIMARY' if kind == 'primary' else 'L1_FINAL'
         os.environ.update({prefix + '_UPLOAD': 'success',
                            prefix + '_DOWNLOAD': 'success', prefix + '_ID': '42'})
+
+    def native07_originals(self):
+        """Compose one synthetic native result through the actual transport."""
+        stage = transport.matrix.NATIVE07_STAGE
+        self.control.update(
+            stage=stage, owner_statement_sha256=(
+                transport.matrix.NATIVE07_OWNER_STATEMENT_SHA256))
+        self.receipts['review']['stage'] = stage
+        relative = 'tools/hosted_l1_gui_install.py'
+        installer = (ROOT / relative).read_bytes()
+        (self.source / relative).write_bytes(installer)
+        installer_sha = transport.hashlib.sha256(installer).hexdigest()
+        for name in ('review', 'readiness', 'recovery'):
+            self.receipts[name]['source_files'][relative] = installer_sha
+        self.raw = {name: json.dumps(value) + '\n'
+                    for name, value in self.receipts.items()}
+        self.bind_inputs()
+        self.prepare()
+        self.finalized()
+        self.work.mkdir(mode=0o700)
+        logs = self.root / 'compatibility-matrix-logs'
+        logs.mkdir()
+        for name in ('seed', 'prepare', 'install', 'acquire', 'run', 'finalize'):
+            (logs / (name + '.log')).write_text('')
+        for relative in ('acquisition.json', 'run-reservation.json'):
+            save(self.controls / relative, {})
+        for relative in ('installer-intent.json', 'installer-ownership.json',
+                         'installer-result.json'):
+            save(self.install_work / 'evidence' / relative, {})
+        (self.install_work / 'evidence/installer-output.log').write_text('')
+        (self.install_work / 'readiness_installer.py').write_text(
+            transport.readiness.installer_source(installer.decode()))
+        save(self.install_work / 'installer-adaptation.json', {})
+
+        capsule = transport.matrix.load_execution_capsule(
+            self.source / transport.matrix.CAPSULE, self.source)
+        entry, = transport.matrix.selected_entries(capsule, stage)
+        source = transport.matrix.identity(self.source / entry['path'])
+        manifest = {'source_files': [{'path': entry['path'],
+                                      'assessment': source}]}
+        save(self.work / 'assessment-manifest.json', manifest)
+        for relative in ('preparation.json', 'original-assessment-manifest.json'):
+            save(self.work / relative, {})
+        for relative in (
+                'attempt.json', 'heavy-deadline.json', 'clearance.json',
+                'display-start-intent.json', 'display-ownership.json',
+                'display-kernel.json', 'display-cleanup.json'):
+            save(self.work / 'evidence' / relative, {})
+        for relative in ('display-samples.jsonl', 'host-memory.jsonl', 'xvfb.log'):
+            (self.work / 'evidence' / relative).write_text('')
+        session = Path('entries/native-07')
+        directory = self.work / session
+        directory.mkdir(mode=0o700, parents=True)
+        directory.parent.chmod(0o700)
+        (directory / 'native07-invocation-claim').touch(mode=0o600)
+        tree = self.work / 'assessment'
+        save(directory / 'invocation.json', {
+            'id': entry['id'], 'kind': 'native', 'arguments': [],
+            'entry_sha256': source['sha256'], 'assessment': str(tree),
+            'entry_path': str(tree / entry['path']),
+            'session_directory': str(directory),
+        })
+        for name in ('input-before.json', 'input-after.json'):
+            save(directory / name, transport.observations.BASE_IDENTITY)
+        save(directory / 'clearance.json', {'complete': True})
+        save(directory / 'resource-assessment.json', {'status': 'PASS'})
+        for name in ('clearance.json', 'control.json', 'deadline-clearance.json',
+                     'ownership.json'):
+            save(directory / 'guard' / name, {})
+        save(directory / 'guard/result.json', {
+            'status': 'completed', 'process_exit': 0, 'cleanup_proved': True,
+        })
+        witness = transport.matrix.ENTRY_MARKER + json.dumps({
+            'id': entry['id'], 'sha256': source['sha256'],
+            'run_name': '__main__',
+        })
+        stdout = '\n'.join((witness, entry['sentinel'],
+                            transport.matrix.DONE_MARKER, ''))
+        (directory / 'guard/stdout').write_text(stdout)
+        (directory / 'guard/wrapper.stdout').write_text(stdout)
+        (directory / 'guard/stderr').write_text('')
+        (directory / 'guard/measurements.jsonl').write_text('')
+        outcome = {
+            'id': entry['id'], 'status': 'PASS', 'sessions': 1,
+            'assessment_entry': source, 'originals_directory': str(directory),
+        }
+        save(self.work / 'evidence/matrix-entries.json', [outcome])
+        save(self.work / 'evidence/entry-results.jsonl', outcome)
+        save(self.work / 'evidence/matrix-assessment.json', {
+            'stage': stage, 'status': 'PASS', 'completed_entries': 1,
+            'runtime_admission': False, 'zy_execution': False,
+            'display_cleanup': True, 'public_payload_status': 'NOT_SEALED',
+        })
+        finalizer = self.root / 'compatibility-matrix-finalizer'
+        finalization = self.root / 'compatibility-matrix-finalization.json'
+        summary = json.loads(finalization.read_text())
+        save(finalization, dict(summary, runtime=True))
+        save(finalizer / 'runtime.json', {'cleanup': True,
+            'sessions': {session.as_posix(): True}})
+        for name in ('display.json', 'installer.json'):
+            save(finalizer / name, {'cleanup': True})
+        for name in ('clearance.json', 'deadline-clearance.json',
+                     'finalization.json'):
+            save(finalizer / session / 'evidence' / name, {'cleanup': True})
+        return directory, manifest
+
+    def native07_seal(self, manifest):
+        with (patch.object(transport.matrix.pilot, '_command',
+                           side_effect=[self.commit, '']),
+              patch.object(transport, 'prepared_manifest',
+                           return_value=(manifest, {})),
+              patch.object(transport.traceback, 'format_exc',
+                           return_value='ValueError: exact injected failure\n'),
+              patch.object(transport.observations,
+                           'extract_matrix_payload') as typed,
+              (self.root / 'compatibility-matrix-logs/seal.log').open('x')
+              as log, redirect_stdout(log)):
+            code = transport.main(['seal'])
+            typed.assert_not_called()
+        return code
+
+    def native07_archive(self):
+        with tarfile.open(self.root / 'compatibility-matrix-primary.tar') as bundle:
+            return {member.name: bundle.extractfile(member).read()
+                    for member in bundle.getmembers()}
+
+    def test_native07_operational_result_and_both_exact_readbacks(self):
+        directory, original = self.native07_originals()
+        (directory / 'private.FCStd').write_bytes(b'PRIVATE DOCUMENT')
+        self.assertEqual(self.native07_seal(original), 0)
+        self.assertEqual(transport.archive(), 'PASS')
+        contents = self.native07_archive()
+        summary = json.loads(contents['transport/manifest.json'])
+        self.assertEqual(summary['stage'], transport.matrix.NATIVE07_STAGE)
+        self.assertTrue(summary['original_diagnostic_preservation_complete'])
+        self.assertFalse(summary['payload_sealed'])
+        self.assertFalse(summary['matrix_execution'])
+        self.assertFalse(summary['runtime_admission'])
+        self.assertFalse(summary['zy_execution'])
+        self.assertFalse(any('native07-invocation-claim' in name
+                             for name in contents))
+        self.assertNotIn(b'PRIVATE DOCUMENT', b''.join(contents.values()))
+        self.readback('primary')
+        self.assertEqual(transport.publish()['status'], 'PASS')
+        self.readback('final')
+        self.assertEqual(transport.complete(), 'PASS')
+
+    def test_native07_failure_original_survives_without_completion(self):
+        directory, original = self.native07_originals()
+        stdout = directory / 'guard/stdout'
+        stdout.write_text(stdout.read_text().splitlines()[0] + '\n')
+        diagnostic = (b'TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION='
+                      b'{"cause_type":"ValueError","reason":"console-argument"}\n')
+        (directory / 'guard/stderr').write_bytes(diagnostic)
+        self.assertEqual(self.native07_seal(original), 1)
+        self.assertEqual(transport.archive(), 'FAIL')
+        contents = self.native07_archive()
+        summary = json.loads(contents['transport/manifest.json'])
+        self.assertEqual(summary['status'], 'FAIL')
+        self.assertEqual(contents[
+            'operational/entries/native-07/guard/stderr'], diagnostic)
+        self.assertIn('original-diagnostics/seal.txt', contents)
+
+    def test_native07_missing_original_and_other_session_refuse_pass(self):
+        directory, original = self.native07_originals()
+        self.assertEqual(self.native07_seal(original), 0)
+        (directory / 'guard/stderr').unlink()
+        other = directory.parent / 'native-08/guard'
+        other.mkdir(parents=True)
+        (other / 'stderr').write_text('OUTSIDE APPROVED SESSION\n')
+        self.assertEqual(transport.archive(), 'FAIL')
+        contents = self.native07_archive()
+        summary = json.loads(contents['transport/manifest.json'])
+        self.assertEqual(summary['missing_mandatory_evidence'], [
+            'operational/entries/native-07/guard/stderr',
+        ])
+        self.assertFalse(summary['scope_isolated'])
+        self.assertNotIn(b'OUTSIDE APPROVED SESSION',
+                         b''.join(contents.values()))
+
+    def test_native07_private_original_has_no_public_archive(self):
+        directory, original = self.native07_originals()
+        self.assertEqual(self.native07_seal(original), 0)
+        private = b'ValueError: /home/private-operator/document.FCStd\n'
+        (directory / 'guard/stderr').write_bytes(private)
+        with self.assertRaisesRegex(ValueError, 'Private path'):
+            transport.archive()
+        self.assertEqual((directory / 'guard/stderr').read_bytes(), private)
+        self.assertFalse((self.root / 'compatibility-matrix-primary.tar').exists())
 
     def test_seed_preserves_all_four_exact_json_strings(self):
         transport.seed()
