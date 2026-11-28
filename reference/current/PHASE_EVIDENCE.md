@@ -5574,30 +5574,35 @@ The previous host matrix result stays `FAIL`.
 The `2/2` result for the previous repairs stays the same.
 The review, output and preservation conditions stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)
 
-## Direct launcher for `native-07` — 2026-11-28
+## Launcher for `native-07` — 2026-11-28
 
-The hosted check gave a `FAIL` result.
-The launcher recorded one start of the original test and a refusal of a second start.
-The error from the first start is unknown. [Hosted test 46139895022](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46139895022)
+The `native-07` check on GitHub gave a `FAIL` result.
+The launcher started the test one time.
+When the launcher started again, it wrote `TRACKTEMPLATE_NATIVE07_REENTRY_REFUSED` and stopped before the test started again.
+The error from the test is unknown. [Test 46139895022 on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46139895022)
 
-FreeCAD imports a file with the `.py` extension as a module.
-If the import gives a Python error, FreeCAD runs that file again as a script.
-For a file with the `.FCMacro` extension, FreeCAD runs it directly. [FreeCAD source](https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/App/Application.cpp#L2804-L2818)
+In `Application::processFiles`, FreeCAD uses `loadModule` for a `.py` file.
+If `loadModule` gives `Base::PyException`, FreeCAD uses `runFile` for the same file.
+For a `.FCMacro` file, FreeCAD uses `runFile` directly. [FreeCAD source](https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/App/Application.cpp#L2804-L2818)
 
-The scoped launcher uses `entry.FCMacro`.
-It adds the directory of the original test to the Python search path.
-It runs the original test as `__main__`.
-The one-start check stays the same.
+For this check, the launcher file is `entry.FCMacro`.
+The launcher adds the directory of the test to `sys.path`.
+The launcher starts the test as `__main__`.
+If the launcher starts again during this check, it stops before the test starts again.
 
-If the original test gives a failure, the launcher gives a permitted code and exit code `1`.
-The evidence check gives a `FAIL` result if this code is present.
-A test in standalone Python showed the missing import before the change.
-The same test showed correct import and failure output after the change.
+For an error in the test, the launcher writes a permitted diagnostic to `stderr`.
+The launcher uses `SystemExit(1)` for the same error.
+The `seal` command rejects evidence with this diagnostic.
+
+Before the change, a test in standalone Python gave `ModuleNotFoundError` for a file in the same directory.
+After the change, the same test found the file.
+For a specified error, the test showed the permitted diagnostic and `SystemExit(1)`.
 
 The project owner gave this instruction.
 
 > please carry out the repair
 
-The original hosted result stays `FAIL`.
-The `2/2` result for the previous repairs stays the same.
-Runtime admission and ZY stay blocked.
+The result for the previous repairs is `2/2`.
+The project owner also gave this instruction.
+
+> Runtime admission and ZY stay blocked.
