@@ -330,6 +330,25 @@ class TransportTests(unittest.TestCase):
             'operational/entries/native-07/guard/stderr'], diagnostic)
         self.assertIn('original-diagnostics/seal.txt', contents)
 
+    def test_native07_incomplete_early_session_keeps_available_originals(self):
+        directory, _ = self.native07_originals()
+        finalization = self.root / 'compatibility-matrix-finalization.json'
+        summary = json.loads(finalization.read_text())
+        summary['workflow_outcomes']['L1_RUN'] = 'failure'
+        save(finalization, summary)
+        (directory / 'guard/ownership.json').unlink()
+        stderr = b'ValueError: setup stopped before ownership\n'
+        (directory / 'guard/stderr').write_bytes(stderr)
+
+        self.assertEqual(transport.archive(), 'FAIL')
+        contents = self.native07_archive()
+        manifest = json.loads(contents['transport/manifest.json'])
+        prefix = 'operational/entries/native-07/guard/'
+        self.assertIn(prefix + 'ownership.json',
+                      manifest['missing_mandatory_evidence'])
+        self.assertFalse(manifest['original_diagnostic_preservation_complete'])
+        self.assertEqual(contents[prefix + 'stderr'], stderr)
+
     def test_native07_missing_original_and_other_session_refuse_pass(self):
         directory, original = self.native07_originals()
         self.assertEqual(self.native07_seal(original), 0)

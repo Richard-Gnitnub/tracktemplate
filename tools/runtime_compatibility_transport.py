@@ -710,7 +710,7 @@ def _native07_missing(contents, outcomes):
                          'prerequisites/run-reservation.json'))
     session = 'operational/' + NATIVE07_RELATIVE.as_posix() + '/'
     if (outcomes['L1_RUN'] == 'success'
-            or session + 'guard/ownership.json' in contents):
+            or any(name.startswith(session) for name in contents)):
         required.update(session + name for name in (
             'invocation.json', 'input-before.json', 'input-after.json',
             'guard/control.json', 'guard/result.json', 'guard/ownership.json',
