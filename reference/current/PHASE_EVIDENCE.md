@@ -5548,18 +5548,23 @@ The review, output and preservation conditions stay the same. [D-P9-023 limits](
 ## Initial controls check for `native-07` — 2026-11-28
 
 The initial controls check gave a `FAIL` result.
-The `native-07` test did not start. [Hosted test 46132725944](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46132725944)
+The `native-07` test did not start. [Test 46132725944 on GitHub](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/46132725944)
 
-The workflow kept two evidence files.
-The files did not include the code or message from the initial controls error.
+The two evidence files from GitHub gave no diagnostic for the error in the initial controls check.
 The cause of the error is unknown.
 
-An offline test gave the same evidence loss when the initial controls check found a sample error.
-The change keeps a permitted error code in `logs/seed.log`.
-The workflow checks the complete contents of that file before it copies the file to either evidence file.
-The final step also shows the permitted code in the job log.
-When private storage is available, the workflow keeps the original error there.
-The offline test checks the two copies and the final `FAIL` result.
+A local test used a specified error in the initial controls check.
+The workflow gave the same `FAIL` result.
+The two evidence files from the local test also had no diagnostic for the error.
+
+After the change, the workflow keeps a permitted error code in `logs/seed.log`.
+The workflow includes `logs/seed.log` in the evidence files only if its bytes are the same as the bytes of a permitted diagnostic.
+If the last step can read the permitted error code, that step shows the code in its output.
+The workflow keeps the full error only in `compatibility-matrix-private/seed.txt` when it can use that file.
+
+The same local test after the change showed the permitted error code in the two evidence files.
+The bytes in each copy were the same as the source bytes.
+The workflow result stayed `FAIL`.
 
 The project owner gave this instruction.
 
