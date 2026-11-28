@@ -664,9 +664,10 @@ def _verify_native07(work, manifest):
         }], 'Native 07 actual main invocation differs')
         matrix.validate_entry(entry, result, stdout)
     stderr = public_bytes(guard / 'stderr').decode('utf-8').splitlines()
+    failure_prefixes = (matrix.NATIVE07_FIRST_FAILURE,
+                        'TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION=')
     require(matrix.NATIVE07_REENTRY_REFUSAL not in stderr
-            and not any(line.startswith(
-                'TRACKTEMPLATE_NATIVE07_B15_LOAD_EXCEPTION=') for line in stderr),
+            and not any(line.startswith(failure_prefixes) for line in stderr),
             'Native 07 contains an original failure')
     require(strict_json(public_bytes(directory / 'clearance.json'))
             == {'complete': True}, 'Native 07 session clearance differs')

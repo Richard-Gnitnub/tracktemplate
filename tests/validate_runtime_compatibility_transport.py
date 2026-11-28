@@ -332,6 +332,18 @@ class TransportTests(unittest.TestCase):
             'operational/entries/native-07/guard/stderr'], diagnostic)
         self.assertIn('original-diagnostics/seal.txt', contents)
 
+    def test_native07_first_failure_marker_refuses_otherwise_pass_result(self):
+        directory, original = self.native07_originals()
+        diagnostic = (transport.matrix.NATIVE07_FIRST_FAILURE + json.dumps({
+            'exception_category': 'RuntimeError', 'original_line': 186,
+        }) + '\n').encode()
+        (directory / 'guard/stderr').write_bytes(diagnostic)
+
+        self.assertEqual(self.native07_seal(original), 1)
+        self.assertEqual(transport.archive(), 'FAIL')
+        self.assertEqual(self.native07_archive()[
+            'operational/entries/native-07/guard/stderr'], diagnostic)
+
     def test_native07_incomplete_early_session_keeps_available_originals(self):
         directory, _ = self.native07_originals()
         finalization = self.root / 'compatibility-matrix-finalization.json'

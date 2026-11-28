@@ -308,6 +308,42 @@ class MatrixTests(unittest.TestCase):
         self.assertNotIn(matrix.NATIVE07_REENTRY_REFUSAL, ordinary)
         self.assertNotIn(matrix._NATIVE07_INVOCATION_CLAIM, ordinary)
 
+    def test_native07_first_failure_records_safe_receipt(self):
+        private = '/home/operator/proof.FCStd?token=fixture-secret'
+        cases = (
+            ('ModuleNotFoundError', 'ModuleNotFoundError', ''),
+            ('SystemExit', 'SystemExit', ''),
+            ('PrivateDiagnostic', 'Other',
+             'class PrivateDiagnostic(Exception): pass\n'),
+        )
+        for exception, category, definition in cases:
+            with self.subTest(category=category):
+                session = self.work / category
+                session.mkdir()
+                source = session / 'original.py'
+                source.write_text(
+                    definition + f'raise {exception}({private!r})\n')
+                config = {'id': 'native-07', 'entry_path': str(source),
+                          'entry_sha256': matrix.identity(source)['sha256'],
+                          'assessment': str(self.work), 'arguments': [],
+                          'fixture_environment': {},
+                          'session_directory': str(session)}
+                wrapper = session / 'entry.FCMacro'
+                wrapper.write_text(matrix._native_source(config,
+                                                        native07_once=True))
+                result = subprocess.run(
+                    [sys.executable, '-I', '-B', str(wrapper)],
+                    capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertNotIn(matrix.DONE_MARKER, result.stdout)
+                self.assertTrue(result.stdout.startswith(matrix.ENTRY_MARKER))
+                receipt = {'exception_category': category,
+                           'original_line': 2 if definition else 1}
+                self.assertEqual(result.stderr, matrix.NATIVE07_FIRST_FAILURE
+                                 + json.dumps(receipt) + '\n')
+                matrix._verify_native07_invocation(session)
+
     def test_complete_serial_schedule_keeps_exact_order(self):
         calls = []
 
@@ -722,24 +758,49 @@ class MatrixTests(unittest.TestCase):
             "assert Path(os.environ['TRACKTEMPLATE_DIAGNOSTIC_SESSION'])"
             f".parent == Path({str(self.work)!r})\n"
             "print('PROOF_PASS')\n")
-        proof.chmod(0o644)
-        manifest = {'source_files': [{'path': 'proof.py',
-            'assessment': matrix.identity(proof), 'mode': 0o644}],
+        scoped_row, = matrix.selected_entries(
+            self.capsule, matrix.NATIVE07_STAGE)
+        scoped_proof = tree / scoped_row['path']
+        scoped_proof.parent.mkdir()
+        helper = scoped_proof.with_name('validate_phase7_straight_route.py')
+        helper.write_text("STATION_CALLER_NAMES = ('bound-helper',)\n")
+        scoped_proof.write_text(
+            "import sys\nfrom pathlib import Path\n"
+            "from validate_phase7_straight_route import STATION_CALLER_NAMES\n"
+            "assert STATION_CALLER_NAMES == ('bound-helper',)\n"
+            "assert __name__ == '__main__'\n"
+            "assert Path(sys.argv[0]) == Path(__file__)\n"
+            f"print({scoped_row['sentinel']!r})\n")
+        for source in (proof, scoped_proof, helper):
+            source.chmod(0o644)
+        manifest = {'source_files': [
+            {'path': path.relative_to(tree).as_posix(),
+             'assessment': matrix.identity(path), 'mode': 0o644}
+            for path in (proof, scoped_proof, helper)],
             'base_fixture': {'path': matrix.assessment.BASE_PATH,
                              **matrix.identity(base)}}
         deadline = matrix.Deadline.start()
         runner = matrix.MatrixRunner(self.work, manifest, self.work / 'bridge',
                                      object(), object(), deadline)
+        scoped_runner = matrix.MatrixRunner(
+            self.work, manifest, self.work / 'bridge', object(), object(),
+            deadline, native07_once=True,
+        )
         observed = []
 
         def guard(argv, **kwargs):
-            observed.append(kwargs['absolute_deadline'])
+            observed.append((Path(argv[-1]).name, kwargs['absolute_deadline']))
+            self.assertEqual(argv[:-1],
+                             ['flatpak', 'run', '--command=FreeCADCmd',
+                              matrix.guard.APP_ID])
             self.assertEqual(kwargs['limits'].memory_max_mib, 4096)
             self.assertTrue(kwargs['isolate_profile'])
             path = kwargs['evidence_dir']
             path.mkdir()
-            result = subprocess.run([sys.executable, '-B', argv[-1]],
-                                    capture_output=True, text=True, check=False)
+            result = subprocess.run(
+                [sys.executable, '-I', '-B', argv[-1]], capture_output=True,
+                text=True, check=False, cwd=kwargs['cwd'],
+            )
             (path / 'stdout').write_text(result.stdout)
             (path / 'stderr').write_text(result.stderr)
             receipt, sample = self.resource_fixture(
@@ -764,10 +825,16 @@ class MatrixTests(unittest.TestCase):
                     ValueError, 'required original diagnostic reports'):
                 runner._session(dict(row, id='native-24'), [],
                                 self.work / 'missing-report')
+            scoped_stdout, _ = scoped_runner._session(
+                scoped_row, [], self.work / 'native-07',
+            )
         self.assertIn('PROOF_PASS', stdout)
         self.assertEqual(runner.session_count, 1)
-        self.assertEqual(len(observed), 2)
-        self.assertTrue(all(value <= deadline.expires for value in observed))
+        self.assertIn(scoped_row['sentinel'], scoped_stdout)
+        self.assertEqual(scoped_runner.session_count, 1)
+        self.assertEqual([name for name, _ in observed],
+                         ['entry.py', 'entry.py', 'entry.FCMacro'])
+        self.assertTrue(all(end <= deadline.expires for _, end in observed))
         self.assertEqual(json.loads((self.work / 'session/input-before.json')
                                     .read_text()), matrix.identity(base))
         self.assertEqual((self.work / 'session/input-before.json').read_bytes(),

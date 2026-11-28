@@ -133,6 +133,7 @@ SENTINEL = 'TRACKTEMPLATE_RUNTIME_COMPATIBILITY_MATRIX_PASS'
 NATIVE07_STAGE = 'native07-check'
 NATIVE07_SENTINEL = 'TRACKTEMPLATE_RUNTIME_COMPATIBILITY_NATIVE07_PASS'
 NATIVE07_REENTRY_REFUSAL = 'TRACKTEMPLATE_NATIVE07_REENTRY_REFUSED'
+NATIVE07_FIRST_FAILURE = 'TRACKTEMPLATE_NATIVE07_FIRST_FAILURE='
 NATIVE07_OWNER_STATEMENT_SHA256 = (
     '9d2900266c50ee1a7f2ddd5113e235d2ed27540e669d0c43e8d86d413ec25a84'
 )
@@ -754,7 +755,7 @@ def validate_control(control, receipts, environment, source_root):
 
 
 # The existing guard stderr may carry only fixed codes for this failure.
-NATIVE07_B15_FAILURE = '''except Exception as error:
+_NATIVE07_B15_DIAGNOSTIC = '''except Exception as error:
     load_error = error
     wrappers = (
         ("tools.phase3_transition_pilot", "TransitionPilotError"),
@@ -789,8 +790,8 @@ NATIVE07_B15_FAILURE = '''except Exception as error:
             }), file=sys.stderr, flush=True)
         except (OSError, ValueError):
             pass
-    raise
 '''
+NATIVE07_B15_FAILURE = _NATIVE07_B15_DIAGNOSTIC + '    raise\n'
 
 
 _NATIVE07_INVOKE_ONCE = f'''def _claim_native07_invocation(name):
@@ -810,13 +811,44 @@ except FileExistsError:
     raise SystemExit(1)
 '''
 
+_NATIVE07_CAPTURE_FAILURE = f'''def _fail_native07(error):
+    categories = (
+        AssertionError, AttributeError, FileNotFoundError, ImportError, KeyError,
+        ModuleNotFoundError, NameError, OSError, RuntimeError, SyntaxError,
+        SystemExit, TypeError, ValueError,
+    )
+    category = next((kind.__name__ for kind in categories
+                     if type(error) is kind), "Other")
+    original_line = None
+    trace = BaseException.__traceback__.__get__(error)
+    while trace is not None:
+        if trace.tb_frame.f_code.co_filename == path and trace.tb_lineno > 0:
+            original_line = trace.tb_lineno
+        trace = trace.tb_next
+    try:
+        print({NATIVE07_FIRST_FAILURE!r} + json.dumps({{
+            "exception_category": category, "original_line": original_line,
+        }}), file=sys.stderr, flush=True)
+    except (OSError, ValueError):
+        pass
+    raise SystemExit(1) from None
+
+
+'''
+
 
 def _native_source(config, *, native07_once=False):
     """Use the original script's real main invocation, including unittest."""
     require(not native07_once or config['id'] == 'native-07',
             'Native 07 one-shot wrapper requires the fixed entry')
-    claim = _NATIVE07_INVOKE_ONCE if native07_once else ''
+    setup = ''
+    failed_exit = '        raise\n'
     failure = NATIVE07_B15_FAILURE if config['id'] == 'native-07' else ''
+    if native07_once:
+        setup = (_NATIVE07_INVOKE_ONCE + _NATIVE07_CAPTURE_FAILURE
+                 + 'sys.path.insert(0, os.path.dirname(path))\n')
+        failed_exit = '        _fail_native07(error)\n'
+        failure = _NATIVE07_B15_DIAGNOSTIC + '    _fail_native07(error)\n'
     return (
         'import hashlib, json, os, runpy, sys\n'
         'assert __debug__ and not sys.flags.optimize\n'
@@ -827,7 +859,7 @@ def _native_source(config, *, native07_once=False):
         'sys.path.insert(0, config["assessment"])\n'
         'os.environ.update(config["fixture_environment"])\n'
         'sys.argv = [path, *config["arguments"]]\n'
-        f'{claim}'
+        f'{setup}'
         f'print({ENTRY_MARKER!r} + json.dumps({{"id":config["id"], '
         '"sha256":config["entry_sha256"], "run_name":"__main__"}), '
         'flush=True)\n'
@@ -835,7 +867,7 @@ def _native_source(config, *, native07_once=False):
         '    runpy.run_path(path, run_name="__main__")\n'
         'except SystemExit as error:\n'
         '    if error.code not in (None, 0):\n'
-        '        raise\n'
+        f'{failed_exit}'
         f'{failure}'
         f'print({DONE_MARKER!r}, flush=True)\n'
     )
@@ -1002,7 +1034,9 @@ class MatrixRunner:
         write(directory / 'input-before.json', identity(self.base))
         clean = readiness.child_environment(self.work)
         if entry['kind'] == 'native':
-            macro = directory / 'entry.py'
+            # FreeCAD imports .py arguments and executes them again on error.
+            macro = directory / ('entry.FCMacro' if self.native07_once
+                                 else 'entry.py')
             macro.write_text(_native_source(
                 config, native07_once=self.native07_once))
             argv = ['flatpak', 'run', '--command=FreeCADCmd']
