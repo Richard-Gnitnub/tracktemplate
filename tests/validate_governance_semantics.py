@@ -9960,8 +9960,133 @@ def validate_to_zy_handling_mutations() -> None:
         )
 
 
+def validate_compatibility_output_decision_row() -> None:
+    """Reject changes to the exact additional owner-approved plan row."""
+    plan = read("reference/PROJECT_PLAN.md")
+    row = table_row_containing(plan, "| D-P9-023 |")
+    diagnostic = "authorised added dashboard row drifted: D-P9-023"
+    progress._validate_plan_shape(plan)
+    for label, changed in (
+        ("changed-output-count", replace_once(row, "160 ", "161 ")),
+        ("duplicate-decision", row + "\n" + row),
+    ):
+        candidate = replace_once(plan, row, changed)
+        expect_rejected(
+            "compatibility-output/" + label,
+            lambda candidate=candidate: progress._validate_plan_shape(candidate),
+            diagnostic,
+        )
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = next(item for item in document["decisions"]
+                  if item["id"] == "D-P9-023")
+    progress._validate_dp9_023_decision(record)
+    for field in ("decision", "authority", "exclusions", "panel_record"):
+        changed = copy.deepcopy(record)
+        changed[field] = "Unbounded acceptance"
+        expect_rejected(
+            "compatibility-output/changed-" + field,
+            lambda value=changed: progress._validate_dp9_023_decision(value),
+            "D-P9-023 exact output authority or reserved gates drifted",
+        )
+    removed = copy.deepcopy(document)
+    removed["decisions"] = [
+        item for item in removed["decisions"] if item["id"] != "D-P9-023"
+    ]
+    expect_rejected(
+        "compatibility-output/removed-decision",
+        lambda: progress._validate_phase9b_decisions(removed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+
+
+def validate_compatibility_standing_decision() -> None:
+    """Reject expanded standing authority and lost owner reservations."""
+    plan = read("reference/PROJECT_PLAN.md")
+    row = table_row_containing(plan, "| D-P9-024 |")
+    diagnostic = "authorised added dashboard row drifted: D-P9-024"
+    progress._validate_plan_shape(plan)
+    for label, changed in (
+        ("wider-merge", replace_once(row, "Level 1/2", "Level 3")),
+        ("duplicate-decision", row + "\n" + row),
+    ):
+        candidate = replace_once(plan, row, changed)
+        expect_rejected(
+            "compatibility-standing/" + label,
+            lambda candidate=candidate: progress._validate_plan_shape(candidate),
+            diagnostic,
+        )
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = next(item for item in document["decisions"]
+                  if item["id"] == "D-P9-024")
+    progress._validate_dp9_024_decision(record)
+    for field in ("decision", "authority", "exclusions", "panel_record"):
+        changed = copy.deepcopy(record)
+        changed[field] = "Unbounded acceptance"
+        expect_rejected(
+            "compatibility-standing/changed-" + field,
+            lambda value=changed: progress._validate_dp9_024_decision(value),
+            "D-P9-024 exact standing authority or reserved gates drifted",
+        )
+    removed = copy.deepcopy(document)
+    removed["decisions"] = [
+        item for item in removed["decisions"] if item["id"] != "D-P9-024"
+    ]
+    expect_rejected(
+        "compatibility-standing/removed-decision",
+        lambda: progress._validate_phase9b_decisions(removed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+
+
+def validate_acquisition_diagnostic_decision() -> None:
+    """Reject additional runs, missing authority and lost diagnostic stops."""
+    plan = read("reference/PROJECT_PLAN.md")
+    row = table_row_containing(plan, "| D-P9-026 |")
+    diagnostic = "authorised added dashboard row drifted: D-P9-026"
+    progress._validate_plan_shape(plan)
+    for label, changed in (
+        (
+            "additional-run",
+            replace_once(row, "one test on GitHub only", "two tests on GitHub"),
+        ),
+        ("duplicate-row", row + "\n" + row),
+        ("removed-row", ""),
+    ):
+        candidate = replace_once(plan, row, changed)
+        expect_rejected(
+            "acquisition-diagnostic/" + label,
+            lambda candidate=candidate: progress._validate_plan_shape(candidate),
+            diagnostic,
+        )
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = next(item for item in document["decisions"]
+                  if item["id"] == "D-P9-026")
+    progress._validate_dp9_026_decision(record)
+    progress._validate_phase9b_decisions(document)
+    for field in ("decision", "authority", "exclusions", "panel_record"):
+        changed = copy.deepcopy(record)
+        changed[field] = "Unbounded acceptance"
+        expect_rejected(
+            "acquisition-diagnostic/changed-" + field,
+            lambda value=changed: progress._validate_dp9_026_decision(value),
+            "D-P9-026 exact diagnostic authority or reserved gates drifted",
+        )
+    removed = copy.deepcopy(document)
+    removed["decisions"] = [
+        item for item in removed["decisions"] if item["id"] != "D-P9-026"
+    ]
+    expect_rejected(
+        "acquisition-diagnostic/removed-decision",
+        lambda: progress._validate_phase9b_decisions(removed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+
+
 def main() -> None:
     """Run every durable in-memory adversarial mutation."""
+    validate_compatibility_output_decision_row()
+    validate_compatibility_standing_decision()
+    validate_acquisition_diagnostic_decision()
     validate_product_vision_mutations()
     validate_architecture_mutations()
     validate_capability_matrix_mutations()

@@ -299,16 +299,18 @@ class BoundedValidationTests(unittest.TestCase):
         self.root = Path(temporary.name)
 
     def invoke(self, kernel, *, evidence_name="evidence", argv=None,
-               lease=None):
+               lease=None, absolute_deadline=None, timeout_seconds=3):
         if argv is None:
             argv = ["flatpak", "run", "--command=FreeCADCmd",
                     "org.freecad.FreeCAD", "proof.py"]
         result = guard.run_guarded_flatpak(
             argv,
-            limits=guard.ValidationLimits(memory_max_mib=256, timeout_seconds=3),
+            limits=guard.ValidationLimits(
+                memory_max_mib=256, timeout_seconds=timeout_seconds),
             evidence_dir=self.root / evidence_name,
             context=kernel.context(),
             lease=lease,
+            absolute_deadline=absolute_deadline,
         )
         self.assertIsInstance(result, dict)
         self.assertEqual(result["schema_version"], 1)
@@ -318,6 +320,111 @@ class BoundedValidationTests(unittest.TestCase):
                     "failure_reason"):
             self.assertEqual(receipt[key], result[key])
         return result
+
+    def test_shared_deadline_rejects_invalid_and_expired_values(self):
+        kernel = FakeKernel(self.root)
+        for value in (True, "90", 0, -1, float("inf"), float("nan")):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.invoke(kernel, absolute_deadline=value)
+        kernel.clock = 12
+        result = self.invoke(kernel, absolute_deadline=10)
+        self.assertEqual(result["failure_reason"], "deadline-exceeded")
+        self.assertNotIn("spawn", kernel.events)
+
+    def test_shared_deadline_counts_startup_before_release(self):
+        kernel = FakeKernel(self.root)
+        original = kernel.run
+
+        def delayed(argv, **kwargs):
+            if "set-property" in argv:
+                kernel.clock += 30
+            return original(argv, **kwargs)
+
+        kernel.run = delayed
+        result = self.invoke(kernel, absolute_deadline=20, timeout_seconds=90)
+        self.assertEqual(result["failure_reason"], "deadline-exceeded")
+        self.assertNotIn("payload-release", kernel.events)
+        self.assertTrue(result["cleanup_proved"])
+
+    def test_shared_deadline_shortens_independent_watchdog(self):
+        kernel = FakeKernel(self.root)
+        kernel.clock = 100
+        result = self.invoke(kernel, absolute_deadline=120, timeout_seconds=90)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["absolute_deadline"], 120)
+        self.assertEqual(kernel.timer_seconds, 15)
+        self.assertLessEqual(kernel.release_time + kernel.timer_seconds, 120)
+
+    def test_shared_deadline_preserves_completed_command_output(self):
+        kernel = FakeKernel(self.root)
+        kernel.clock = 15
+        original = kernel.run
+
+        def completed_at_deadline(argv, **kwargs):
+            result = original(argv, **kwargs)
+            if argv[0] == 'flatpak':
+                result.stdout = 'ORIGINAL_STDOUT\n'
+                result.stderr = 'ORIGINAL_STDERR\n'
+                kernel.clock = 20
+            return result
+
+        kernel.run = completed_at_deadline
+        result = self.invoke(kernel, absolute_deadline=20, timeout_seconds=90)
+        control = json.loads((self.root / 'evidence/control.json').read_text())
+        self.assertEqual(control[0]['stdout'], 'ORIGINAL_STDOUT\n')
+        self.assertEqual(control[0]['stderr'], 'ORIGINAL_STDERR\n')
+        self.assertEqual(control[0]['exit'], 0)
+        self.assertEqual(result['failure_reason'], 'deadline-exceeded')
+        self.assertNotIn('spawn', kernel.events)
+
+    def test_timer_created_before_deadline_failure_is_cancelled(self):
+        kernel = FakeKernel(self.root)
+        original = kernel.run
+        startup = []
+
+        def slow_startup(argv, **kwargs):
+            result = original(argv, **kwargs)
+            if len(startup) < 5:
+                startup.append(argv)
+                kernel.clock += min(4, kwargs['timeout'])
+            return result
+
+        kernel.run = slow_startup
+        result = self.invoke(kernel, absolute_deadline=20, timeout_seconds=90)
+        self.assertEqual(result['failure_reason'], 'deadline-exceeded')
+        self.assertTrue(result['cleanup_proved'])
+        self.assertTrue(kernel.timer_cancelled)
+        self.assertFalse(kernel.timer_armed)
+        self.assertNotIn('payload-release', kernel.events)
+
+    def test_distant_shared_deadline_preserves_short_entry(self):
+        kernel = FakeKernel(self.root)
+        result = self.invoke(kernel, absolute_deadline=100, timeout_seconds=3)
+        self.assertEqual(result['status'], 'completed')
+        self.assertEqual(kernel.timer_seconds, 3)
+
+    def test_shared_deadline_failure_still_proves_owned_cleanup(self):
+        kernel = FakeKernel(self.root, fault="deadline")
+        result = self.invoke(kernel, absolute_deadline=20, timeout_seconds=90)
+        self.assertNotEqual(result["status"], "completed")
+        self.assertTrue(result["cleanup_proved"])
+        self.assertLessEqual(kernel.clock, 20)
+
+    def test_shared_deadline_rejects_cleanup_after_expiry(self):
+        kernel = FakeKernel(self.root)
+        original = kernel.run
+
+        def delayed_cleanup(argv, **kwargs):
+            result = original(argv, **kwargs)
+            if "stop" in argv:
+                kernel.clock = 21
+            return result
+
+        kernel.run = delayed_cleanup
+        result = self.invoke(kernel, absolute_deadline=20, timeout_seconds=90)
+        self.assertNotEqual(result["status"], "completed")
+        self.assertEqual(result["failure_reason"], "deadline-exceeded")
+        self.assertTrue(result["cleanup_proved"])
 
     def test_explicit_valid_limits(self):
         limits = guard.ValidationLimits(memory_max_mib=256, timeout_seconds=3)

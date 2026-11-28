@@ -1404,7 +1404,7 @@ class PilotIdentityTests(unittest.TestCase):
                 "e9df630ef1a33a20b52b0bd961dd4255e9e23ad8344f8832718a095baee7cf51"
             ),
             "tools/freecad_validation_guard.py": (
-                "b193209f0f21f28c3c17f9c52e509e31dccb32690152c02414769c0f6e49c559"
+                "1c8c68350f82133d282e5a79914e44be8b6a5dbf564f7f261448e0e9c66b41f2"
             ),
         }
         self.assertEqual(pilot.TEST_SHA256, expected[pilot.TEST_PATH])
@@ -1469,7 +1469,16 @@ class PilotIdentityTests(unittest.TestCase):
             "- transition", "- rea-bc-readiness", "- rea-bc-native",
             "- rea-bc-exit-readiness", "- rea-bc-exit-native",
             "- rea-bc-straight-readiness", "- rea-bc-straight-native",
-            "- runtime-observation",
+            "- runtime-observation", "- compatibility-readiness",
+            "- compatibility-acquisition-diagnostic",
+            "- compatibility-qualification",
+            "readiness_control:",
+            "description: Exact reviewed compatibility readiness control JSON",
+            "required: false", "type: string", "readiness_review:",
+            "description: Independent readiness review receipt JSON",
+            "required: false", "type: string", "readiness_recovery:",
+            "description: Independent preservation receipt JSON",
+            "required: false", "type: string",
         ])
         self.assertIn("TRACKTEMPLATE_HOSTED_WORKLOAD: ${{ inputs.workload }}",
                       workflow)
@@ -1488,9 +1497,19 @@ class PilotIdentityTests(unittest.TestCase):
             re.findall(r"^\s*cancel-in-progress:\s*(\S+)", workflow,
                        re.MULTILINE), ["false"],
         )
-        actions = re.findall(r"^\s*uses:\s*(\S+)", workflow, re.MULTILINE)
+        uses = r"^\s*uses:\s*(\S+)"
+        actions = re.findall(uses, workflow, re.MULTILINE)
+        local = "./.github/actions/readiness-primary-readback"
+        self.assertEqual(actions.count(local), 1)
+        actions.remove(local)
         self.assertTrue(actions)
-        for action in actions:
+        source = ROOT / local / "action.yml"
+        pin = hashlib.sha256(source.read_bytes()).hexdigest()
+        self.assertIn(f"'{pin}  {source.relative_to(ROOT)}' | sha256sum --check --status",
+                      workflow)
+        child_actions = re.findall(uses, source.read_text(), re.MULTILINE)
+        self.assertEqual(len(child_actions), 1)
+        for action in actions + child_actions:
             self.assertRegex(action, r"^[A-Za-z0-9_./-]+@[0-9a-f]{40}$")
 
 

@@ -17,6 +17,21 @@ on:
           - rea-bc-straight-readiness
           - rea-bc-straight-native
           - runtime-observation
+          - compatibility-readiness
+          - compatibility-acquisition-diagnostic
+          - compatibility-qualification
+      readiness_control:
+        description: Exact reviewed compatibility readiness control JSON
+        required: false
+        type: string
+      readiness_review:
+        description: Independent readiness review receipt JSON
+        required: false
+        type: string
+      readiness_recovery:
+        description: Independent preservation receipt JSON
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -29,7 +44,10 @@ jobs:
   native-geometry:
     if: >-
       github.repository == 'Richard-Gnitnub/tracktemplate' &&
-      github.event.repository.private == false
+      github.event.repository.private == false &&
+      inputs.workload != 'compatibility-readiness' &&
+      inputs.workload != 'compatibility-acquisition-diagnostic' &&
+      inputs.workload != 'compatibility-qualification'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -138,3 +156,521 @@ jobs:
             benchmark-output/hosted-native-geometry/guard/watchdog.json
             benchmark-output/hosted-native-geometry/guard/stdout
             benchmark-output/hosted-native-geometry/guard/stderr
+
+  compatibility-readiness:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      inputs.workload == 'compatibility-readiness' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out the exact readiness source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate the public review and preservation controls
+        id: seed
+        timeout-minutes: 1
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/compatibility-readiness-logs"
+          printf '%s\n' '2c1824d6846a53154f9e61d276e5ab42aa9707bb7864b53a67984ac21ca9c767  .github/actions/readiness-primary-readback/action.yml' | sha256sum --check --status
+          python3 tools/compatibility_readiness_transport.py seed > "$RUNNER_TEMP/compatibility-readiness-logs/seed.log" 2>&1
+
+      - name: Prepare the source-bound readiness attempt
+        id: prepare
+        timeout-minutes: 1
+        run: |
+          python3 tools/hosted_compatibility_readiness.py prepare --control "$RUNNER_TEMP/compatibility-readiness-control/control.json" --decisions "$RUNNER_TEMP/compatibility-readiness-control" > "$RUNNER_TEMP/compatibility-readiness-logs/prepare.log" 2>&1
+
+      - name: Install the exact candidate within 540 seconds
+        id: install
+        timeout-minutes: 9
+        run: |
+          python3 tools/hosted_compatibility_readiness.py install > "$RUNNER_TEMP/compatibility-readiness-logs/install.log" 2>&1
+
+      - name: Acquire only the approved base and make the assessment copy
+        id: acquire
+        timeout-minutes: 1
+        run: |
+          {
+            python3 tools/compatibility_readiness_transport.py acquire
+            python3 tools/hosted_compatibility_readiness.py acquire --base "$RUNNER_TEMP/compatibility-readiness-control/base.FCStd"
+          } > "$RUNNER_TEMP/compatibility-readiness-logs/acquire.log" 2>&1
+
+      - name: Capture permitted acquisition failure originals separately
+        id: acquire_diagnostic
+        if: always() && steps.acquire.outcome == 'failure'
+        timeout-minutes: 1
+        env:
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+        run: |
+          umask 077
+          python3 tools/compatibility_readiness_transport.py acquire-diagnostic
+
+      - name: Preserve acquisition failure evidence for 30 days
+        id: acquire_diagnostic_upload
+        if: always() && steps.acquire.outcome == 'failure' && steps.acquire_diagnostic.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-readiness-acquisition-failure-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-readiness-acquisition-failure.tar
+
+      - name: Run the separate 90-second GUI readiness proof
+        id: run
+        timeout-minutes: 4
+        run: |
+          python3 tools/hosted_compatibility_readiness.py run > "$RUNNER_TEMP/compatibility-readiness-logs/run.log" 2>&1
+
+      - name: Seal only the approved readiness outputs
+        id: seal
+        if: always() && steps.prepare.outcome == 'success' && steps.run.outcome != 'skipped'
+        timeout-minutes: 1
+        run: |
+          python3 tools/hosted_compatibility_readiness.py seal > "$RUNNER_TEMP/compatibility-readiness-logs/seal.log" 2>&1
+
+      - name: Prove owned installer, FreeCAD and display cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: ${{ steps.run.outcome }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py finalize > "$RUNNER_TEMP/compatibility-readiness-logs/finalize.log" 2>&1
+
+      - name: Archive the exact reviewed operational evidence and sealed outputs
+        id: archive
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python3 tools/compatibility_readiness_transport.py archive > "$RUNNER_TEMP/compatibility-readiness-logs/archive.log" 2>&1
+
+      - name: Preserve the primary readiness artifact for 30 days
+        id: primary_upload
+        if: always() && steps.archive.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-readiness-primary-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-readiness-primary.tar
+
+      - name: Read back the same primary artifact
+        id: primary_download
+        if: always() && steps.primary_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: ./.github/actions/readiness-primary-readback
+        with:
+          artifact-id: ${{ steps.primary_upload.outputs.artifact-id }}
+
+      - name: Verify primary readback and seal the final transport record
+        id: publish
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_upload.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_download.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py publish > "$RUNNER_TEMP/compatibility-readiness-logs/publish.log" 2>&1
+
+      - name: Preserve the final readiness transport artifact for 30 days
+        id: final_upload
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-readiness-final-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-readiness-final.tar
+
+      - name: Read back the same final artifact
+        id: final_download
+        if: always() && steps.final_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-readiness-final-readback
+
+      - name: Require readiness, cleanup and both exact readbacks
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_FINAL_UPLOAD: ${{ steps.final_upload.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_download.outcome }}
+          L1_FINAL_ID: ${{ steps.final_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py complete 2>&1 | tee "$RUNNER_TEMP/compatibility-readiness-logs/complete.log"
+
+  compatibility-acquisition-diagnostic:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      inputs.workload == 'compatibility-acquisition-diagnostic' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out the exact acquisition diagnostic source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate the public review and preservation controls
+        id: seed
+        timeout-minutes: 1
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/compatibility-readiness-logs"
+          python3 tools/compatibility_readiness_transport.py seed > "$RUNNER_TEMP/compatibility-readiness-logs/seed.log" 2>&1
+
+      - name: Prepare the source-bound acquisition diagnostic
+        id: prepare
+        timeout-minutes: 1
+        run: |
+          python3 tools/hosted_compatibility_readiness.py prepare --control "$RUNNER_TEMP/compatibility-readiness-control/control.json" --decisions "$RUNNER_TEMP/compatibility-readiness-control" > "$RUNNER_TEMP/compatibility-readiness-logs/prepare.log" 2>&1
+
+      - name: Install the exact candidate within 540 seconds
+        id: install
+        timeout-minutes: 9
+        run: |
+          python3 tools/hosted_compatibility_readiness.py install > "$RUNNER_TEMP/compatibility-readiness-logs/install.log" 2>&1
+
+      - name: Acquire only the approved base and make the assessment copy
+        id: acquire
+        timeout-minutes: 1
+        run: |
+          {
+            python3 tools/compatibility_readiness_transport.py acquire
+            python3 tools/hosted_compatibility_readiness.py acquire --base "$RUNNER_TEMP/compatibility-readiness-control/base.FCStd"
+          } > "$RUNNER_TEMP/compatibility-readiness-logs/acquire.log" 2>&1
+
+      - name: Capture permitted acquisition failure originals separately
+        id: acquire_diagnostic
+        if: always() && steps.acquire.outcome == 'failure'
+        timeout-minutes: 1
+        env:
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+        run: |
+          umask 077
+          python3 tools/compatibility_readiness_transport.py acquire-diagnostic
+
+      - name: Preserve acquisition failure evidence for 30 days
+        id: acquire_diagnostic_upload
+        if: always() && steps.acquire.outcome == 'failure' && steps.acquire_diagnostic.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-readiness-acquisition-failure-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-readiness-acquisition-failure.tar
+
+      - name: Read back the same separate acquisition failure artifact
+        id: acquire_diagnostic_download
+        if: always() && steps.acquire_diagnostic_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.acquire_diagnostic_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-readiness-acquisition-failure-readback
+
+      - name: Prove owned installer, FreeCAD and display cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: skipped
+        run: |
+          python3 tools/compatibility_readiness_transport.py finalize > "$RUNNER_TEMP/compatibility-readiness-logs/finalize.log" 2>&1
+
+      - name: Archive only the reviewed diagnostic operational evidence
+        id: archive
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python3 tools/compatibility_readiness_transport.py diagnostic-archive > "$RUNNER_TEMP/compatibility-readiness-logs/archive.log" 2>&1
+
+      - name: Preserve the primary diagnostic artifact for 30 days
+        id: primary_upload
+        if: always() && steps.archive.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-acquisition-diagnostic-primary-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-primary.tar
+
+      - name: Read back the same primary artifact
+        id: primary_download
+        if: always() && steps.primary_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.primary_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-primary-readback
+
+      - name: Verify both readbacks and record final diagnostic transport
+        id: publish
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_upload.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_download.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_upload.outputs.artifact-id }}
+          L1_DIAGNOSTIC_UPLOAD: ${{ steps.acquire_diagnostic_upload.outcome }}
+          L1_DIAGNOSTIC_DOWNLOAD: ${{ steps.acquire_diagnostic_download.outcome }}
+          L1_DIAGNOSTIC_ID: ${{ steps.acquire_diagnostic_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py diagnostic-publish > "$RUNNER_TEMP/compatibility-readiness-logs/publish.log" 2>&1
+
+      - name: Pack safe diagnostic transport refusal records independently
+        id: transport_failure
+        if: always() && (steps.archive.outcome == 'failure' || steps.publish.outcome == 'failure')
+        timeout-minutes: 1
+        env:
+          L1_ARCHIVE: ${{ steps.archive.outcome }}
+          L1_PUBLISH: ${{ steps.publish.outcome }}
+        run: |
+          umask 077
+          python3 tools/compatibility_readiness_transport.py diagnostic-failure
+
+      - name: Preserve safe transport refusal records for 30 days
+        id: transport_failure_upload
+        if: always() && steps.transport_failure.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-acquisition-diagnostic-transport-failure-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-transport-failure.tar
+
+      - name: Read back the same transport refusal artifact
+        id: transport_failure_download
+        if: always() && steps.transport_failure_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.transport_failure_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-transport-failure-readback
+
+      - name: Verify the exact transport refusal artifact bytes
+        if: always() && steps.transport_failure_upload.outcome == 'success'
+        timeout-minutes: 1
+        env:
+          L1_TRANSPORT_FAILURE_UPLOAD: ${{ steps.transport_failure_upload.outcome }}
+          L1_TRANSPORT_FAILURE_DOWNLOAD: ${{ steps.transport_failure_download.outcome }}
+          L1_TRANSPORT_FAILURE_ID: ${{ steps.transport_failure_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py diagnostic-failure-readback
+
+      - name: Preserve the final diagnostic transport artifact for 30 days
+        id: final_upload
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-acquisition-diagnostic-final-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-final.tar
+
+      - name: Read back the same final artifact
+        id: final_download
+        if: always() && steps.final_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-acquisition-diagnostic-final-readback
+
+      - name: Report acquisition outcome only after cleanup and exact readbacks
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_FINAL_UPLOAD: ${{ steps.final_upload.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_download.outcome }}
+          L1_FINAL_ID: ${{ steps.final_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/compatibility_readiness_transport.py diagnostic-complete 2>&1 | tee "$RUNNER_TEMP/compatibility-readiness-logs/complete.log"
+
+  compatibility-matrix:
+    if: >-
+      github.repository == 'Richard-Gnitnub/tracktemplate' &&
+      github.event.repository.private == false &&
+      inputs.workload == 'compatibility-qualification' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 140
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out the exact qualification source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        timeout-minutes: 1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate the public review and preservation controls
+        id: seed
+        timeout-minutes: 1
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/compatibility-matrix-logs"
+          python3 tools/runtime_compatibility_transport.py seed > "$RUNNER_TEMP/compatibility-matrix-logs/seed.log" 2>&1
+
+      - name: Prepare the source-bound qualification attempt
+        id: prepare
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py prepare > "$RUNNER_TEMP/compatibility-matrix-logs/prepare.log" 2>&1
+
+      - name: Install the exact candidate within 540 seconds
+        id: install
+        timeout-minutes: 9
+        run: |
+          python3 tools/runtime_compatibility_transport.py install > "$RUNNER_TEMP/compatibility-matrix-logs/install.log" 2>&1
+
+      - name: Acquire only the approved base and make the assessment copy
+        id: acquire
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py acquire > "$RUNNER_TEMP/compatibility-matrix-logs/acquire.log" 2>&1
+
+      - name: Run the serial matrix within one shared 7200-second deadline
+        id: run
+        timeout-minutes: 122
+        run: |
+          python3 tools/runtime_compatibility_transport.py run > "$RUNNER_TEMP/compatibility-matrix-logs/run.log" 2>&1
+
+      - name: Seal only the approved matrix outputs
+        id: seal
+        if: always() && steps.prepare.outcome == 'success' && steps.run.outcome != 'skipped'
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py seal > "$RUNNER_TEMP/compatibility-matrix-logs/seal.log" 2>&1
+
+      - name: Prove owned installer, FreeCAD and display cleanup
+        id: finalize
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PREPARE: ${{ steps.prepare.outcome }}
+          L1_INSTALL: ${{ steps.install.outcome }}
+          L1_ACQUIRE: ${{ steps.acquire.outcome }}
+          L1_RUN: ${{ steps.run.outcome }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py finalize > "$RUNNER_TEMP/compatibility-matrix-logs/finalize.log" 2>&1
+
+      - name: Archive the exact reviewed operational evidence and sealed outputs
+        id: archive
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python3 tools/runtime_compatibility_transport.py archive > "$RUNNER_TEMP/compatibility-matrix-logs/archive.log" 2>&1
+
+      - name: Preserve the primary qualification artifact for 30 days
+        id: primary_upload
+        if: always() && steps.archive.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-matrix-primary-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-matrix-primary.tar
+
+      - name: Read back the same primary artifact
+        id: primary_download
+        if: always() && steps.primary_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.primary_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-matrix-primary-readback
+
+      - name: Verify primary readback and seal the final transport record
+        id: publish
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_PRIMARY_UPLOAD: ${{ steps.primary_upload.outcome }}
+          L1_PRIMARY_DOWNLOAD: ${{ steps.primary_download.outcome }}
+          L1_PRIMARY_ID: ${{ steps.primary_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py publish > "$RUNNER_TEMP/compatibility-matrix-logs/publish.log" 2>&1
+
+      - name: Preserve the final qualification transport artifact for 30 days
+        id: final_upload
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: compatibility-matrix-final-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ runner.temp }}/compatibility-matrix-final.tar
+
+      - name: Read back the same final artifact
+        id: final_download
+        if: always() && steps.final_upload.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.final_upload.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/compatibility-matrix-final-readback
+
+      - name: Require the matrix, cleanup and both exact readbacks
+        if: always()
+        timeout-minutes: 1
+        env:
+          L1_FINAL_UPLOAD: ${{ steps.final_upload.outcome }}
+          L1_FINAL_DOWNLOAD: ${{ steps.final_download.outcome }}
+          L1_FINAL_ID: ${{ steps.final_upload.outputs.artifact-id }}
+        run: |
+          python3 tools/runtime_compatibility_transport.py complete 2>&1 | tee "$RUNNER_TEMP/compatibility-matrix-logs/complete.log"
