@@ -5522,17 +5522,25 @@ The project owner gave this instruction.
 
 > I authorise one hosted check limited to Native 07 once existing checks pass. Keep existing limits. Independently review and preserve the result. No retry or full matrix. Runtime admission and ZY stay blocked.
 
-The `native07-check` stage selects only `native-07` from the approved host matrix.
-It uses the same original test, approved base, runtime, and process limits.
+With the `native07-check` control, the workflow selects only the `native-07` test from the approved host matrix.
+The check uses the same approved input file, host profile and process limits as the host matrix.
 The time limit for this test is 900 seconds.
-The launcher records and refuses a second start of the same test.
-The stage uses the existing GitHub workflow and its cleanup and evidence checks.
+Before the check starts, the independent review, validation and preservation must each give a `PASS` result for the exact source.
 
-A `PASS` result needs one original entry record, the original success message, and one completion record.
-The stage preserves the applicable original evidence with the existing limits on output.
-Both copies from GitHub require checks of their size and SHA-256 values.
-The results require independent review and preservation.
+The launcher starts the test one time.
+If the launcher starts again during this check, it writes a record and stops before a second test starts.
+The GitHub workflow does the cleanup and evidence checks for `native-07`.
+
+For a `PASS` result, the output must contain each of these lines one time.
+
+- One entry line with the prefix `TRACKTEMPLATE_MATRIX_ENTRY=`.
+- `Phase 3 transition routing FreeCAD smoke test passed`.
+- `TRACKTEMPLATE_MATRIX_ENTRY_COMPLETE`.
+
+The workflow keeps the permitted evidence files from the test.
+The workflow compares the byte count and SHA-256 hash of each of the two files from GitHub with its source.
+The result must have independent review and independent preservation.
 
 The previous host matrix result stays `FAIL`.
 The `2/2` result for the previous repairs stays the same.
-The review and preservation conditions stay the same. [D-P9-023](#runtime-compatibility-output-handling-panel)
+The review, output and preservation conditions stay the same. [D-P9-023 limits](#runtime-compatibility-output-handling-panel)
